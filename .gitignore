@@ -2,7 +2,7 @@
 
 # dependencies
 node_modules/
-
+logics/
 # Expo
 .expo/
 dist/

@@ -1,65 +1,132 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import ShortButton from '../buttons/ShortButton';
 import LongButton from '../buttons/LongButton';
 import { Color } from '../../ColorSet';
 import { TutorialEx } from '../../ExplainSet';
 import { RootStackParamList } from './pageTypes';
+import PagerView from 'react-native-pager-view';
 
 type TutorialProps = NativeStackScreenProps<RootStackParamList, "Tutorial">;
 
-export const Tutorial:React.FC<TutorialProps> = ({ navigation, route }) => {
-    const { Step } = route.params;
-    const descript = TutorialEx[Step];
+export const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
+    const [pageNum, setPageNum] = useState(0);
+    const Pages = ["0", "1", "2"]
     const photo = 'phptoUrl'//나중에 추가할것
-    const goToNextStep = () => {
-        navigation.navigate(`Tutorial`, { Step: Step + 1 });
+
+    const pagerRef = useRef<PagerView>(null);//러페런스 추가
+
+    // 페이지 이동 함수
+    const goToPage = () => {
+        if (pagerRef.current) {
+            pagerRef.current.setPage(pageNum+1);
+        }
     };
-    const SkipHandler =()=>{
+    const SkipHandler = () => {
         navigation.reset({
             index: 0,
-            routes: [{ name: 'Home' }],
-          })
+            routes: [{ name: 'Permission' }],
+        })
     }
     return (
-        //배경용
+        // 배경용
         <View style={styles.basicBackground}>
-            <View style={styles.TutorialPicture}>
-                <Text> {photo}</Text>
-                {/* <Image source={require('사진 경로')}/> */}
-                {/* 나중에 위 코드로 바꿔서 넣으면 됨 */}
-            </View>
-            <Text style={{ marginTop: 115, fontSize: 16, fontWeight: 600, width: 280, color: Color['blue500'], textAlign: 'center', height: 56 }}>
-                {descript}
-            </Text>
+            <PagerView style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center'
+            }} initialPage={0}
+                onPageScroll={(e) => { const { position, offset } = e.nativeEvent; setPageNum(position); }}
+                ref={pagerRef}>
+                <View style={{
+                    flex: 1,
+                    alignItems: 'center',
+                }}
+                    key={Pages[0]}>
+                    <View style={[styles.TutorialPicture, { backgroundColor: "#dddddd" }]}>
+                        {/* <Image source={require('사진 경로')}/> */}
+                        {/* 나중에 위 코드로 바꿔서 넣으면 됨 */}
+                        <Text>
+                            사진 1
+                        </Text>
+                    </View>
+                    <Text style={styles.TutorialDescript}>
+                        {TutorialEx[Pages[0]]}
+                    </Text>
+                </View>
+                <View style={{
+                    flex: 1,
+                    alignItems: 'center',
+                }}
+                    key={Pages[1]}>
+                    <View style={[styles.TutorialPicture, { backgroundColor: "#dddddd" }]}>
+                        {/* <Image source={require('사진 경로')}/> */}
+                        {/* 나중에 위 코드로 바꿔서 넣으면 됨 */}
+                        <Text>
+                            사진 2
+                        </Text>
+                    </View>
+                    <Text style={styles.TutorialDescript}>
+                        {TutorialEx[Pages[1]]}
+                    </Text>
+                </View>
+                <View style={{
+                    flex: 1,
+                    alignItems: 'center',
+                }}
+                    key={Pages[2]}>
+                    <View style={[styles.TutorialPicture, { backgroundColor: "#dddddd" }]}>
+                        {/* <Image source={require('사진 경로')}/> */}
+                        {/* 나중에 위 코드로 바꿔서 넣으면 됨 */}
+                        <Text>
+                            사진 3
+                        </Text>
+                    </View>
+                    <Text style={styles.TutorialDescript}>
+                        {TutorialEx[Pages[2]]}
+                    </Text>
+                </View>
+            </PagerView>
             <View style={{
-                position: 'absolute', flexDirection: 'row', bottom: 72, justifyContent: 'space-between', width: 320
-            }}>
-                {Step < 3 ? (
-                    <>
-                        <ShortButton
-                            innerText={'건너뛰기'}
-                            isFilled={true}
+                alignItems: 'center',
+                height: 230
+            }}><View style={styles.idicatorBackGround}>
+                    {/* indicator */}
+                    <View style={pageNum == 0 ? styles.indicatorSeleted : styles.indicator}>
+                    </View>
+                    <View style={pageNum == 1 ? styles.indicatorSeleted : styles.indicator}>
+                    </View>
+                    <View style={pageNum == 2 ? styles.indicatorSeleted : styles.indicator}>
+                    </View>
+                </View>
+                <View style={styles.CTA}>
+                    {pageNum < 2 ? (
+                        <>
+                            <ShortButton
+                                innerText={'건너뛰기'}
+                                isFilled={true}
+                                color={'blue'}
+                                onPress={SkipHandler}
+                            />
+                            <ShortButton
+                                innerText={'다음'}
+                                isFilled={false}
+                                color={'blue'}
+                                onPress={goToPage}
+                            />
+                        </>
+                    ) : (
+                        <LongButton
+                            innerText={'이해했어요'}
+                            isAble={true}
                             color={'blue'}
                             onPress={SkipHandler}
                         />
-                        <ShortButton
-                            innerText={'다음'}
-                            isFilled={false}
-                            color={'blue'}
-                            onPress={goToNextStep}
-                        />
-                    </>
-                ) : (
-                    <LongButton
-                        innerText={'이해했어요'}
-                        isAble={true}
-                        color={'blue'}
-                        onPress={SkipHandler}
-                    />
-                )}
+                    )}
+                </View>
             </View>
+
         </View>
     )
 }
@@ -68,20 +135,50 @@ export const Tutorial:React.FC<TutorialProps> = ({ navigation, route }) => {
 const styles = StyleSheet.create({
     basicBackground: {
         flexDirection: 'column',
-        alignItems: 'center',
+        justifyContent: 'center',
         flex: 1,
         backgroundColor: '#fff',
-        paddingLeft: 24,
-        paddingRight: 24
     },
     TutorialPicture: {
         marginTop: 120,
-        width: 250,
-        height: 250,
-        borderWidth: 1,
-        borderRadius: 100,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderColor: Color['blue500']
+        width: 300,
+        height: 300,
+        overflow: "hidden"
     },
+    TutorialDescript: {
+        fontFamily: "NanumSquareNeo-ExtraBold",
+        marginTop: 40,
+        fontSize: 16,
+        fontWeight: 600,
+        width: 300,
+        color: Color['blue500'],
+        textAlign: 'center',
+        height: 56
+    },
+    idicatorBackGround: {
+        width: 48,
+        bottom: 180,
+        position: 'absolute',
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center'
+    },
+    indicator: {
+        width: 8,
+        height: 8,
+        backgroundColor: Color["grey200"],
+        borderRadius: 25,
+    },
+    indicatorSeleted: {
+        width: 10,
+        height: 10,
+        backgroundColor: Color["blue500"],
+        borderRadius: 25,
+    },
+    CTA: {
+        position: 'absolute',
+        flexDirection: 'row',
+        bottom: 72,
+        justifyContent: 'space-between', width: 320
+    }
 })

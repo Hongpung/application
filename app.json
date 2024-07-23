@@ -12,16 +12,32 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs access to your camera to take photos.",
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select photos.",
+        "UIBackgroundModes": ["fetch", "remote-notification"]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions":[""]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "fonts": {
+      "NanumSquareNeo-Bold": "./assets/fonts/NanumSquareNeoOTF-Bd.otf",
+      "NanumSquareNeo-ExtraBold": "./assets/fonts/NanumSquareNeoOTF-Eb.otf",
+      "NanumSquareNeo-Regular": "./assets/fonts/NanumSquareNeoOTF-Rg.otf",
+      "NanumSquareNeo-Light": "./assets/fonts/NanumSquareNeoOTF-Lt.otf",
+      "NanumSquareNeo-Heavy": "./assets/fonts/NanumSquareNeoOTF-Hv.otf"
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

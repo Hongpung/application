@@ -1,4 +1,6 @@
 export type RootStackParamList = {
-    Tutorial: { Step: number };
+    Tutorial: any;
     Home: undefined;
+    Permission: undefined;
+    Login: any;
 };
