@@ -6,20 +6,27 @@ import { josa } from 'es-hangul';
 type InputProps = {
     label: string,
     isEncryption?: boolean,
-    validationCondition?: {validation:RegExp, errorText:string},
+    validationCondition?: { validation: RegExp, errorText: string },
+    checkValid?: (valid: boolean) => void,
+    value?: string
     color?: string
+    isEditible?: boolean
+    isRequired?: boolean
+    isRequiredMark?: boolean
 }
 
-const InputComponent: React.FC<InputProps> = ({ label, isEncryption, validationCondition, color }) => {
+const InputComponent: React.FC<InputProps> = ({ label, isEncryption, validationCondition, value, checkValid, color, isEditible = true, isRequired = true, isRequiredMark = false }) => {
 
-    const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState(value||'');
     const [isTyped, setIsTyped] = useState(false);
     const [isValid, setIsValid] = useState(true);
     const [errorText, setErrorText] = useState(``)
     const labelAnimation = useRef(new Animated.Value(0)).current; // 애니메이션 초기 값
+
     const [isVisible, setIsVisible] = useState(isEncryption || false);
 
-    const underlineColor = color ? color + "500" : Color[`blue500`];
+    const underlineColor = color ? Color[color + "500"] : Color[`blue500`];
+
     useEffect(() => {
         Animated.timing(labelAnimation, {
             toValue: isTyped ? 1 : 0,
@@ -37,15 +44,17 @@ const InputComponent: React.FC<InputProps> = ({ label, isEncryption, validationC
     }
 
     const handleBlur = () => {
-        if (inputValue.length == 0) {
+        if (inputValue.length == 0 && isRequired) {
             setIsTyped(false);
             setIsValid(false);
             setErrorText(josa(label, '을/를') + ' 입력해야해요')
-        }else if(validationCondition?.validation){
-            const regex : RegExp = validationCondition!.validation;
+        } else if (validationCondition?.validation) {
+            const regex: RegExp = validationCondition!.validation;
             const newCondition = regex.test(inputValue);
             setIsValid(newCondition);
-            if(!newCondition)setErrorText(validationCondition!.errorText)
+            if (!newCondition) setErrorText(validationCondition!.errorText)
+
+            if (checkValid) checkValid(newCondition);
         }
     }
 
@@ -64,7 +73,7 @@ const InputComponent: React.FC<InputProps> = ({ label, isEncryption, validationC
             <View style={[styles.underline, { borderBottomColor: isValid ? underlineColor : Color["red500"] }]} />
             {isEncryption ? <TextInput
                 style={styles.InputBox}
-                placeholder={josa(label, '을/를') + ' 입력하세요'}
+                placeholder={`${josa(label, '을/를')} 입력하세요`+`${!isRequired ? +'(공백시 본명 적용)' : ''}`}
                 value={inputValue}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
@@ -73,19 +82,21 @@ const InputComponent: React.FC<InputProps> = ({ label, isEncryption, validationC
                 :
                 <TextInput
                     style={styles.InputBox}
-                    placeholder={josa(label, '을/를') + ' 입력하세요'}
+                    placeholder={`${josa(label, '을/를')} 입력하세요`+`${!isRequired ? ' (공백시 본명 적용)' : ''}`}
                     value={inputValue}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
                     onChangeText={handleTextChange}
+                    editable={isEditible}
                 />
             }
-            <Animated.Text style={[styles.labelText, labelStyle]}>{label}</Animated.Text>
+            <Animated.Text style={[styles.labelText, labelStyle]}>{label}
+                {isRequiredMark && !isTyped && <Text style={{ color: 'red' }}>*</Text>}</Animated.Text>
             {isEncryption ?
                 <Pressable style={{ position: 'absolute', left: 273, top: 26, width: 18, height: 18, borderWidth: 1, borderColor: "#000", backgroundColor: isVisible ? "#000" : "#FFF" }}
                     onPress={() => { setIsVisible(!isVisible) }} />
                 : null}
-            {!isValid ?<Text style={styles.errorText}>{errorText}</Text>:null}
+            {!isValid ? <Text style={styles.errorText}>{errorText}</Text> : null}
         </View>
     );
 }
