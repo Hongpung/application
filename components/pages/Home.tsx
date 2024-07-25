@@ -1,14 +1,40 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable } from 'react-native';
 import { Color } from '../../ColorSet';
+import PagerView from 'react-native-pager-view';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { HomeStackParamList } from './pageTypes';
 
-const ExampleScreen = () => {
+type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
+
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+
+    const [bannerNum, setBannerNum] = useState(0);
+    const pagerRef = useRef<PagerView>(null);//러페런스 추가
+
+
+    const pages = [
+        { backgroundColor: Color.green200, text: '사진 1' },
+        { backgroundColor: Color.blue200, text: '사진 2' },
+        { backgroundColor: Color.red200, text: '사진 3' },
+    ];
+    const bannerMass = pages.length;
+
+
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <View style={styles.iconsRow}>
                 <View style={styles.iconContainer}>
-                    <Text style={styles.icons}>Bell</Text>
-                    <Text style={styles.icons}>Profile</Text>
+                    <Pressable
+                        style={styles.icons}
+                        onPress={() => { navigation.push('Notification'); }}>
+                        <Text>Bell</Text>
+                    </Pressable>
+                    <Pressable
+                        style={styles.icons}
+                        onPress={() => { navigation.push('MyPage'); }}>
+                        <Text>Profile</Text>
+                    </Pressable>
                 </View>
 
             </View>
@@ -23,39 +49,127 @@ const ExampleScreen = () => {
             </View>
             <View style={styles.Advertisebanner}>
                 {/* 배너 확인 */}
-            </View>
-            <View style={{ marginHorizontal: 24, marginTop: 32, }}>
-                <Text style={{
-                    fontSize: 18,
-                    fontFamily: 'NanumSquareNeo-Bold',
-                    marginLeft:8,
-                    marginBottom:16
+                <View style={{
+                    flex: 1,
                 }}>
-                    우리 동아리
-                </Text>
-                <View style={{height:120, backgroundColor:Color['grey300'],borderRadius:10}}>
+                    <PagerView style={{
+                        flex: 1,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }} initialPage={0}
+                        onPageScroll={(e) => { const { position, offset } = e.nativeEvent; setBannerNum(position) }}
+                        ref={pagerRef}>
+                        {pages.map((page, index) => (
+                            <View key={index} style={{ flex: 1 }}>
+                                <View style={[{ flex: 1, backgroundColor: page.backgroundColor }]}>
+                                </View>
+                            </View>
+                        ))}
+                    </PagerView>
+                </View>
+                <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', width: 88, height: 20, justifyContent: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 76, height: 16 }}>
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 9, textAlignVertical: 'center' }}>{bannerNum + 1}/{bannerMass}</Text>
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 10, height: 12 }}>모두보기 +</Text>
+                    </View>
                 </View>
             </View>
             <View style={{ marginHorizontal: 24, marginTop: 32, }}>
                 <Text style={{
                     fontSize: 18,
                     fontFamily: 'NanumSquareNeo-Bold',
-                    marginLeft:8,
-                    marginBottom:16
+                    marginBottom: 12,
+                    marginHorizontal: 4
                 }}>
                     우리 동아리
                 </Text>
-                <View style={{height:120, backgroundColor:Color['grey300'],borderRadius:10}}>
-                </View>
+                <TouchableOpacity activeOpacity={0.85}>
+                    <View style={{ height: 120, backgroundColor: Color['grey300'], borderRadius: 10 }} />
+                </TouchableOpacity>
             </View>
-        </View>
+            <View style={{ marginTop: 32 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
+                    <Text style={{
+                        fontSize: 18,
+                        fontFamily: 'NanumSquareNeo-Bold',
+                        height: 20
+                    }}>
+                        공연 홍보
+                    </Text>
+                    <Pressable>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: 'NanumSquareNeo-Light',
+                            height: 16
+                        }}>
+                            더 알아보기 {'>'}
+                        </Text>
+                    </Pressable>
+
+                </View>
+                <ScrollView style={{ height: 208, }} horizontal showsHorizontalScrollIndicator={false}>
+                    <View style={{ flex: 1, flexDirection: 'row', }}>
+                        <View style={{ marginLeft: 18 }} />
+                        <View style={{ height: 208, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
+                        </View>
+                        <View style={{ height: 208, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
+                        </View>
+                        <View style={{ height: 208, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
+                        </View>
+                        <View style={{ height: 208, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
+                        </View>
+
+                        <View style={{ marginRight: 18 }} />
+                    </View>
+                </ScrollView>
+            </View>
+            <View style={{ marginTop: 32 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
+                    <Text style={{
+                        fontSize: 18,
+                        fontFamily: 'NanumSquareNeo-Bold',
+                        height: 20
+                    }}>
+                        인원을 모으는 중인 활동
+                    </Text>
+
+                    <Pressable>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: 'NanumSquareNeo-Light',
+                            height: 16
+                        }}>
+                            더 알아보기 {'>'}
+                        </Text>
+                    </Pressable>
+                </View>
+                <ScrollView style={{ height: 126, }} horizontal showsHorizontalScrollIndicator={false}>
+                    <View style={{ flex: 1, flexDirection: 'row' }}>
+                        <View style={{ marginLeft: 18 }} />
+                        <View style={{ height: 126, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
+                        </View>
+                        <View style={{ height: 126, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
+                        </View>
+                        <View style={{ height: 126, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
+                        </View>
+                        <View style={{ height: 126, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
+                        </View>
+                        <View style={{ marginRight: 18 }} />
+                    </View>
+                </ScrollView>
+            </View>
+            <View style={{ marginLeft: 24, height: 120, marginTop: 48, marginBottom: 96 }}>
+                <Text>
+                    여기가 푸터
+                </Text>
+            </View>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        width: 390,
-        height: 7000,
+        flex: 1,
         position: 'relative',
         backgroundColor: 'white',
         overflow: 'scroll',
@@ -70,12 +184,12 @@ const styles = StyleSheet.create({
     iconContainer: {
         flexDirection: 'row',
         height: 30,
-        width: 72,
+        width: 78,
         justifyContent: 'space-between'
     },
     icons: {
-        width: 32,
-        height: 32,
+        width: 36,
+        height: 36,
         backgroundColor: Color['grey400']
     },
     textRow: {
@@ -89,19 +203,21 @@ const styles = StyleSheet.create({
     greetingText: {
         position: 'relative',
         textAlign: 'right',
-        color: '#0E0E0E',
+        color: Color['grey800'],
         fontSize: 20,
-        fontFamily: 'NanumSquareNeo-Bold'
+        fontFamily: 'NanumSquareNeo-Bold',
+        marginRight: 4
     },
     dateText: {
         position: 'relative',
-        color: '#0E0E0E',
+        color: Color['grey800'],
         fontSize: 14,
         fontFamily: 'NanumSquareNeo-Regular',
         lineHeight: 16,
+        marginLeft: 4
     },
     ScheduleOfDate: {
-        marginHorizontal: 24,
+        marginHorizontal: 26,
         height: 160,
         borderWidth: 2,
         borderRadius: 10,
@@ -112,8 +228,8 @@ const styles = StyleSheet.create({
         marginHorizontal: 24,
         height: 150,
         borderRadius: 10,
-        backgroundColor: Color['blue500']
+        overflow: 'hidden'
     }
 });
 
-export default ExampleScreen;
+export default HomeScreen;

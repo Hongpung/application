@@ -7,6 +7,7 @@ import tryLogin from '../../logics/login'
 import CheckboxComponent from '../checkboxs/CheckboxComponent'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from './pageTypes'
+import { StackActions } from '@react-navigation/native'
 
 
 
@@ -15,10 +16,7 @@ type LoginProps = NativeStackScreenProps<RootStackParamList, "Login">;
 const Login: React.FC<LoginProps> = ({ navigation }) => {
 
     const LoginBtnHandler = () => {
-        navigation.reset({
-            index: 0,
-            routes: [{ name: 'Home' }],
-        })
+        navigation.dispatch(StackActions.replace('HomeStack'))
     }
 
     const SignupBtnHandler = () => {

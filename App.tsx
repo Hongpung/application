@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { Tutorial } from './components/pages/tutorial'
+import { Tutorial } from './components/pages/Tutorial'
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect, useState } from 'react';
@@ -10,10 +10,10 @@ import Permission from './components/pages/Permission';
 import Login from './components/pages/Login';
 import SignUp from './components/pages/SignUp';
 import Header from './components/Header';
-import ExampleScreen from './components/pages/Home';
+import HomeStacks from './components/pages/HomeStacks';
 
 
-const RootStack = createNativeStackNavigator<RootStackParamList>();
+const RootStack = createNativeStackNavigator();
 
 const fetchFonts = async () => {
   await Font.loadAsync({
@@ -28,24 +28,21 @@ const fetchFonts = async () => {
 const ContentsContainer: React.FC = () => {
   return (
     <NavigationContainer>
-      <RootStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
-        <RootStack.Screen name="Tutorial" component={Tutorial} />
-        <RootStack.Screen name="Permission" component={Permission} />
-        <RootStack.Screen name="Login" component={Login} />
-        <RootStack.Screen name="SignUp" component={SignUp} options={{ headerShown: true, header: () => <Header leftButton='X'/> }} />
-        <RootStack.Screen name="Home" component={ExampleScreen}/>
-      </RootStack.Navigator>
+      <RootStacks />
     </NavigationContainer>
   )
 }
 
-const Home: React.FC = () => {
+
+const RootStacks: React.FC = () => {
   return (
-    <View style={{ flex: 1, backgroundColor: 'white', paddingLeft: 24, paddingRight: 24 }}>
-      <Text>
-        여기가 이제 홈이다
-      </Text>
-    </View>
+    <RootStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+      <RootStack.Screen name="Tutorial" component={Tutorial} />
+      <RootStack.Screen name="Permission" component={Permission} />
+      <RootStack.Screen name="Login" component={Login} />
+      <RootStack.Screen name="SignUp" component={SignUp} options={{ headerShown: true, header: () => <Header leftButton='X' /> }} />
+      <RootStack.Screen name="HomeStack" component={HomeStacks} options={{ animation: 'none'}}/>
+    </RootStack.Navigator>
   )
 }
 
