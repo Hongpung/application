@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { Tutorial } from './components/pages/Tutorial'
+import { StyleSheet, View } from 'react-native';
+import Tutorial  from './components/pages/Tutorial';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect, useState } from 'react';

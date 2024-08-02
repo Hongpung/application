@@ -10,7 +10,7 @@ import PagerView from 'react-native-pager-view';
 
 type TutorialProps = NativeStackScreenProps<RootStackParamList, "Tutorial">;
 
-export const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
+const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
     const [pageNum, setPageNum] = useState(0);
     const Pages = ["0", "1", "2"]
     const photo = 'phptoUrl'//나중에 추가할것
@@ -182,3 +182,5 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between', width: 320
     }
 })
+
+export default Tutorial;

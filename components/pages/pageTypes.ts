@@ -1,6 +1,7 @@
 export type RootStackParamList = {
     Tutorial: any;
-    Permission: undefined;
+    HomeStacks: any;
+    Permission: any;
     Login: any;
     SignUp:any;
 };
