@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator, Pressable, Modal,TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator, Pressable, Modal, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { HomeStackParamList } from './pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -106,42 +106,41 @@ const MyBadgeScreen: React.FC<MyBadgeProps> = ({ navigation }) => {
         name: "그냥 배지",
         imgUrl: 'https://storep-phinf.pstatic.net/ogq_61d824396f503/original_11.gif?type=pa50_50',
         descript: "그냥 랜덤 배지",
-        isHave:true
+        isHave: true
     },
     {
         name: "테스트 배지",
         imgUrl: 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG',
         descript: "그냥 테스트 배지",
-        isHave:true
+        isHave: true
     },
     ]
     const etcBadge = [{
         name: "너는 못 가질 배지",
         imgUrl: 'https://dimg.donga.com/wps/SPORTS/IMAGE/2021/10/30/109989730.1.jpg',
         descript: "아마도 그대로 활동해도 너는 못가질거야\n 이 배지는 특별하거든",
-        isHave:false
+        isHave: false
     },
     {
         name: "테스트 배지",
         imgUrl: 'https://postfiles.pstatic.net/MjAyNDA3MDdfMjQy/MDAxNzIwMzYwODg3Mzg3.siw5LvdkA7a4MPbS07jHAIFKw7GzlIdHbvJ4qvMeoJog.fiYaRMvdmmfUe56jgp-hQ8C5kWM20zJB1kLzAEQXakIg.JPEG/KakaoTalk_20240707_225628831_01.jpg?type=w386',
         descript: "윤하 공연 다녀오면 받을 수 있었답니다 호호",
-        isHave:false
+        isHave: false
     },
     {
         name: "윤하 배지",
         imgUrl: 'https://postfiles.pstatic.net/MjAyNDA2MjdfMzcg/MDAxNzE5NDE0MDM3NDUz.RuBIBrXGaRILULX7ZRzJmgKk1FS7GcWcWkHZ34OGlyUg.PmuZCGZpK_0vOvcOvPi17JCOW6YyxkV882nHJl0crsYg.JPEG/KakaoTalk_20240626_234559509_06.jpg?type=w386',
         descript: "윤하 기요워",
-        isHave:false
+        isHave: false
     }, {
         name: "데뷔 배지",
         imgUrl: 'https://img.khan.co.kr/news/2023/04/18/l_2023041901000727200065392.jpg',
         descript: "윤하는 1988년 4월 29일 생으로 영문 표기는 YounHa이다.\n일본에서 2005년도 유비키리(약속)으로 데뷔하여 지금 데뷔 20주년이다.",
-        isHave:false
+        isHave: false
     },
     ]
 
     const [modalVisible, setModalVisible] = useState(false);
-
 
     return (
         <BadgeProvider>
@@ -183,8 +182,8 @@ const BadgeModal: React.FC = () => {
                 onPress={() => setModalVisible(false)}
             >
                 <Pressable style={{ width: 340, height: 200, backgroundColor: '#FFF', borderRadius: 10, alignItems: 'center', justifyContent: 'center' }} onPress={(e) => e.stopPropagation()}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' ,}}>
-                        <View style={{ height: 122, width: 96, flexDirection: 'column',}}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+                        <View style={{ height: 122, width: 96, flexDirection: 'column', }}>
                             <View style={{ height: 96, width: 96, borderRadius: 100, overflow: 'hidden' }}>
                                 {loading && (
                                     <View style={{
@@ -203,9 +202,9 @@ const BadgeModal: React.FC = () => {
                             <BadgeShadow
                                 height={30} width={96} />
                         </View>
-                        <View style={{marginLeft:20, height:112}}>
-                            <Text style={{fontSize: 18, fontFamily: 'NanumSquareNeo-ExtraBold', color: Color['grey800'],marginBottom:12}}>{selectedBadge?.name}</Text>
-                            <Text numberOfLines={3} ellipsizeMode="tail" style={{fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'],width:180,height:84, flexWrap:'wrap'}}>{selectedBadge?.descript}</Text>
+                        <View style={{ marginLeft: 20, height: 112 }}>
+                            <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-ExtraBold', color: Color['grey800'], marginBottom: 12 }}>{selectedBadge?.name}</Text>
+                            <Text numberOfLines={3} ellipsizeMode="tail" style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], width: 180, height: 84, flexWrap: 'wrap' }}>{selectedBadge?.descript}</Text>
                         </View>
                     </View>
 
@@ -218,14 +217,14 @@ const BadgeModal: React.FC = () => {
                     >
                         <Text style={{ color: Color['grey700'], textAlign: 'center' }}>X</Text>
                     </Pressable>
-                    {selectedBadge?.isHave&&<TouchableOpacity
+                    {selectedBadge?.isHave && <TouchableOpacity
                         style={{
                             position: 'absolute',
-                            bottom: 20, right: 16, width: 72, height: 32, justifyContent: 'center', alignItems: 'center', borderRadius:5, backgroundColor:Color['grey100']
+                            bottom: 20, right: 16, width: 72, height: 32, justifyContent: 'center', alignItems: 'center', borderRadius: 5, backgroundColor: Color['grey100']
                         }}
                         onPress={() => setModalVisible(false)}
                     >
-                        <Text style={{fontSize: 14, fontFamily: 'NanumSquareNeo-Bold',  color: Color['blue400'], textAlign: 'center' }}>적용</Text>
+                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Bold', color: Color['blue400'], textAlign: 'center' }}>적용</Text>
                     </TouchableOpacity>}
                 </Pressable>
             </Pressable>

@@ -1,6 +1,5 @@
 export type RootStackParamList = {
     Tutorial: any;
-    HomeStacks: undefined;
     Permission: undefined;
     Login: any;
     SignUp:any;
@@ -8,6 +7,7 @@ export type RootStackParamList = {
 
 export type HomeStackParamList = {
     Home: any;
+    BottomNav: undefined;
     Notification: any;
     MyPage: any;
     MySchedules:any;

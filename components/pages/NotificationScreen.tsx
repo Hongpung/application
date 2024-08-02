@@ -1,8 +1,8 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useLayoutEffect, useRef, useState } from 'react'
 import { Color } from '../../ColorSet'
 
-import { Directions, GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamList } from './pageTypes';
 
@@ -25,8 +25,6 @@ type Notification = {
 type NotificationCard = {
     notification: Notification,
     onDelete: () => void;
-    onClose: () => void;
-    isOpen: boolean;
 }
 
 const getIcon = (type: NotificationType) => {
@@ -70,10 +68,9 @@ const calculateTimeDifference = (date1: Date) => {
     return `${differenceInWeeks}주`;
 };
 
-const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete, onClose, isOpen }) => {
+const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }) => {
 
     const swipeableRef = useRef<Swipeable>(null);
-    const [isSwipeableOpen, setSwipeableOpen] = useState(false);
 
     const renderRightActions = () => (
         <Pressable style={{
@@ -82,7 +79,10 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete, 
             alignItems: 'center',
             width: 140,
             marginVertical: 6,
-            marginLeft:-30
+            marginLeft: -30,
+            marginRight: 28,
+            borderTopRightRadius: 5,
+            borderBottomRightRadius: 5
         }}
             onPress={() => {
                 onDelete();
@@ -103,11 +103,8 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete, 
     return (
         <Swipeable
             renderRightActions={renderRightActions}
-            onSwipeableOpen={() => {
-                setSwipeableOpen(true);
-                onClose();
-            }}
-            onSwipeableClose={() => setSwipeableOpen(false)}>
+            dragOffsetFromRightEdge={16}
+        >
             <View style={[styles.NotificationCard]}>
                 <View style={{ margin: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -136,25 +133,42 @@ type NotificationList = {
 
 const NotificationList: React.FC<NotificationList> = ({ notifications, onDelete }) => {
 
-    const [openNotificationId, setOpenNotificationId] = useState<number | null>(null);
-
+    let showOldNotificationHeader = false;
     return (
-        <GestureHandlerRootView style={styles.container}>
-            {notifications.map((notification: Notification, id: any) => (
-                <NotificationCard
-                    key={id}
-                    notification={notification}
-                    onDelete={() => { onDelete(notification.id) }}
-                    onClose={() => setOpenNotificationId(notification.id)}
-                    isOpen={openNotificationId !== null && openNotificationId !== notification.id} />
-            ))}
-        </GestureHandlerRootView>
+        <View style={styles.container}>
+            {notifications.map((notification) => {
+
+                const isOldNotification = notification.time.getTime() < new Date('2024-07-05').getTime();
+                const shouldShowHeader = isOldNotification && !showOldNotificationHeader;
+
+                if (shouldShowHeader) {
+                    showOldNotificationHeader = true;
+                }
+                return (
+                    <View key={notification.id}>
+                        {shouldShowHeader && (
+                            <View style={{ backgroundColor: 'transparent', marginVertical:4,paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center' }}>
+                                <View style={{ height: 0, borderWidth: 0.6, flex: 1, marginRight: 8, borderColor: Color['grey200'] }} />
+                                <Text style={{ color: Color['grey300'] }}>이전 알림</Text>
+                                <View style={{ height: 0, borderWidth: 0.6, flex: 1, marginLeft: 8, borderColor: Color['grey200'] }} />
+                            </View>
+                        )}
+                        <GestureHandlerRootView>
+                            <NotificationCard
+                                notification={notification}
+                                onDelete={() => { onDelete(notification.id) }}
+                            />
+                        </GestureHandlerRootView>
+                    </View>
+                );
+            })}
+        </View>
     )
 }
 
-type NotificationProps = NativeStackScreenProps<HomeStackParamList,'Notification'>;
+type NotificationProps = NativeStackScreenProps<HomeStackParamList, 'Notification'>;
 
-const NotificationScreen: React.FC<NotificationProps> = ({navigation}) => {
+const NotificationScreen: React.FC<NotificationProps> = ({ navigation }) => {
     const [Notifications, setNotifications] = useState<Notification[]>([]);
     const handleDelete = (id: any) => {
         setNotifications(Notifications.filter(notification => notification.id !== id));
@@ -177,20 +191,22 @@ const NotificationScreen: React.FC<NotificationProps> = ({navigation}) => {
         {
             id: 3,
             type: NotificationType.Notification,
-            time: new Date('2024-02-05'),
+            time: new Date('2024-03-05'),
             message: '안전검사로 인한 연습실 사용 일시중단 안내',
         },
         {
             id: 4,
             type: NotificationType.Notification,
-            time: new Date('2024-02-05'),
+            time: new Date('2024-08-01'),
             message: '안전검사로 인한 연습실 사용 일시중단 안내',
         },
     ];
 
-    useEffect(() => {
-        setNotifications(notifications);
+    useLayoutEffect(() => {
+        const sorted = notifications.sort((a, b) => b.time.getTime() - a.time.getTime())
+        setNotifications(sorted);
     }, [])
+
     return (
         <ScrollView style={styles.container} >
             <View style={{ marginTop: 6 }} />

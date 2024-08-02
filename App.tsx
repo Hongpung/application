@@ -10,7 +10,9 @@ import Permission from './components/pages/Permission';
 import Login from './components/pages/Login';
 import SignUp from './components/pages/SignUp';
 import Header from './components/Header';
+import BottomNav from './components/pages/BottomNav';
 import HomeStacks from './components/pages/HomeStacks';
+
 
 
 const RootStack = createNativeStackNavigator();

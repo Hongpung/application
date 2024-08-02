@@ -27,12 +27,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 <View style={styles.iconContainer}>
                     <Pressable
                         style={styles.icons}
-                        onPress={() => { navigation.push('Notification'); }}>
+                        onPress={() => { navigation.navigate('Notification'); }}>
                         <Text>Bell</Text>
                     </Pressable>
                     <Pressable
                         style={styles.icons}
-                        onPress={() => { navigation.push('MyPage'); }}>
+                        onPress={() => { navigation.navigate('MyPage'); }}>
                         <Text>Profile</Text>
                     </Pressable>
                 </View>
@@ -110,15 +110,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 <ScrollView style={{ height: 208, }} horizontal showsHorizontalScrollIndicator={false}>
                     <View style={{ flex: 1, flexDirection: 'row', }}>
                         <View style={{ marginLeft: 18 }} />
-                        <View style={{ height: 208, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
-                        </View>
-                        <View style={{ height: 208, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
-                        </View>
-                        <View style={{ height: 208, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
-                        </View>
-                        <View style={{ height: 208, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
-                        </View>
+                        {
+                            Array(5).fill(null).map((_, index) => (
+                                <View
+                                    key={index}
+                                    style={{ height: 208, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}
+                                />
+                            ))
+                        }
 
+                        <View
+                            key={'last'}
+                            style={{ height: 208, width: 82, borderRadius: 10, marginHorizontal: 6, justifyContent: 'center', alignItems: 'center' }}
+                        >
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 16, marginBottom: 8 }}>더보기</Text>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 20 }}>{'->'}</Text>
+                        </View>
                         <View style={{ marginRight: 18 }} />
                     </View>
                 </ScrollView>
@@ -143,19 +150,27 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                         </Text>
                     </Pressable>
                 </View>
+
                 <ScrollView style={{ height: 126, }} horizontal showsHorizontalScrollIndicator={false}>
                     <View style={{ flex: 1, flexDirection: 'row' }}>
                         <View style={{ marginLeft: 18 }} />
-                        <View style={{ height: 126, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
+                        {
+                            Array(18).fill(null).map((_, index) => (
+                                <View
+                                    key={index}
+                                    style={{ height: 126, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}
+                                />
+                            ))
+                        }
+                        <View
+                            key={'last'}
+                            style={{ height: 126, width: 82, borderRadius: 10, marginHorizontal: 6, justifyContent: 'center', alignItems: 'center' }}
+                        >
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 16, marginBottom: 8 }}>더보기</Text>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 20 }}>{'->'}</Text>
                         </View>
-                        <View style={{ height: 126, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
-                        </View>
-                        <View style={{ height: 126, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
-                        </View>
-                        <View style={{ height: 126, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}>
-                        </View>
-                        <View style={{ marginRight: 18 }} />
                     </View>
+                    <View style={{ marginRight: 18 }} />
                 </ScrollView>
             </View>
             <View style={{ marginLeft: 24, height: 120, marginTop: 48, marginBottom: 96 }}>
