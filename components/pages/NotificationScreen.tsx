@@ -1,10 +1,11 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useLayoutEffect, useRef, useState } from 'react'
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Color } from '../../ColorSet'
 
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamList } from './pageTypes';
+import { transform } from 'typescript';
 
 
 enum NotificationType {
@@ -71,39 +72,69 @@ const calculateTimeDifference = (date1: Date) => {
 const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }) => {
 
     const swipeableRef = useRef<Swipeable>(null);
+    let DragX = 0;
 
-    const renderRightActions = () => (
-        <Pressable style={{
-            backgroundColor: Color[`red500`],
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: 140,
-            marginVertical: 6,
-            marginLeft: -30,
-            marginRight: 28,
-            borderTopRightRadius: 5,
-            borderBottomRightRadius: 5
-        }}
-            onPress={() => {
-                onDelete();
-                if (swipeableRef.current) {
-                    swipeableRef.current.close();
-                }
-            }}
-        >
-            <Text style={{
-                color: Color[`red100`],
-                fontSize: 16,
-                fontFamily: "NanumSquareNeo-Bold",
-            }}>삭제</Text>
-        </Pressable>
-    );
+    const renderRightActions = (progress: any, dragX: any) => {
+        dragX.addListener(({ value }: { value: number }) => {
+            DragX = value
+        });
+
+        const opacity = dragX.interpolate({
+            inputRange: [-80, 0],
+            outputRange: [1, 0],
+        });
+
+        const scaleX = dragX.interpolate({
+            inputRange: [-80, 0],
+            outputRange: [0.5, 0],
+        });
+        //나중에 수치 최적화
+
+        return (
+            <Pressable
+                style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+                onPress={() => {
+                    onDelete();
+                    if (swipeableRef.current) {
+                        swipeableRef.current.close();
+                    }
+                }}>
+                <Animated.View style={{
+                    flex: 1,
+                    backgroundColor: Color[`red500`],
+                    marginVertical: 6,
+                    marginLeft: -20,
+                    marginRight: 28,
+                    borderRadius: 5,
+                    width: 140,
+                    transform: [{ scaleX: scaleX }],
+                    opacity: opacity
+                }}
+                >
+
+                </Animated.View>
+                <Text style={{
+                    position: 'absolute',
+                    width: 140,
+                    left: 32,
+                    color: Color[`red100`],
+                    fontSize: 16,
+                    fontFamily: "NanumSquareNeo-Bold",
+                }}>삭제</Text>
+            </Pressable>
+
+        );
+    }
 
 
     return (
         <Swipeable
             renderRightActions={renderRightActions}
             dragOffsetFromRightEdge={16}
+            onSwipeableWillOpen={() => { if (DragX <= -210) onDelete() }}
         >
             <View style={[styles.NotificationCard]}>
                 <View style={{ margin: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
@@ -147,7 +178,7 @@ const NotificationList: React.FC<NotificationList> = ({ notifications, onDelete 
                 return (
                     <View key={notification.id}>
                         {shouldShowHeader && (
-                            <View style={{ backgroundColor: 'transparent', marginVertical:4,paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center' }}>
+                            <View style={{ backgroundColor: 'transparent', marginVertical: 4, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center' }}>
                                 <View style={{ height: 0, borderWidth: 0.6, flex: 1, marginRight: 8, borderColor: Color['grey200'] }} />
                                 <Text style={{ color: Color['grey300'] }}>이전 알림</Text>
                                 <View style={{ height: 0, borderWidth: 0.6, flex: 1, marginLeft: 8, borderColor: Color['grey200'] }} />

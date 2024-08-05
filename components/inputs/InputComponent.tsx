@@ -4,6 +4,7 @@ import { Color } from '../../ColorSet';
 import { josa } from 'es-hangul';
 
 type InputProps = {
+    length?:number,
     label: string,
     isEncryption?: boolean,
     validationCondition?: { validation: RegExp, errorText: string },
@@ -15,9 +16,9 @@ type InputProps = {
     isRequiredMark?: boolean
 }
 
-const InputComponent: React.FC<InputProps> = ({ label, isEncryption, validationCondition, value, checkValid, color, isEditible = true, isRequired = true, isRequiredMark = false }) => {
+const InputComponent: React.FC<InputProps> = ({ length=284,label, isEncryption, validationCondition, value, checkValid, color, isEditible = true, isRequired = true, isRequiredMark = false}) => {
 
-    const [inputValue, setInputValue] = useState(value||'');
+    const [inputValue, setInputValue] = useState(value || '');
     const [isTyped, setIsTyped] = useState(false);
     const [isValid, setIsValid] = useState(true);
     const [errorText, setErrorText] = useState(``)
@@ -69,11 +70,11 @@ const InputComponent: React.FC<InputProps> = ({ label, isEncryption, validationC
         }),
     };
     return (
-        <View style={styles.inputGroup}>
-            <View style={[styles.underline, { borderBottomColor: isValid ? underlineColor : Color["red500"] }]} />
+        <View style={[styles.inputGroup,{ width: length+16}]}>
+            <View style={[styles.underline, { borderBottomColor: isValid ? underlineColor : Color["red500"], width: length+16 }]} />
             {isEncryption ? <TextInput
-                style={styles.InputBox}
-                placeholder={`${josa(label, '을/를')} 입력하세요`+`${!isRequired ? +'(공백시 본명 적용)' : ''}`}
+                style={[styles.InputBox,{ width: length}]}
+                placeholder={`${josa(label, '을/를')} 입력하세요` + `${!isRequired ? +'(공백시 본명 적용)' : ''}`}
                 value={inputValue}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
@@ -81,8 +82,8 @@ const InputComponent: React.FC<InputProps> = ({ label, isEncryption, validationC
                 secureTextEntry={isVisible} />
                 :
                 <TextInput
-                    style={styles.InputBox}
-                    placeholder={`${josa(label, '을/를')} 입력하세요`+`${!isRequired ? ' (공백시 본명 적용)' : ''}`}
+                    style={[styles.InputBox,{ width: length}]}
+                    placeholder={`${josa(label, '을/를')} 입력하세요` + `${!isRequired ? ' (공백시 본명 적용)' : ''}`}
                     value={inputValue}
                     onFocus={handleFocus}
                     onBlur={handleBlur}

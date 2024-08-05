@@ -56,19 +56,20 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
                 </View>
             case 3:
                 return <View>
+                    <View style={{ flexDirection:'row', justifyContent:'space-between'}}>
                     <InputComponent
-                        label='비밀번호'
+                        label='동아리'
+                        length={126}
                         color={'green'}
-                        isEditible={false}
-                        isEncryption={true}
                         value={'qlalfqjsgh1@'}
                     />
-                    <View style={{ marginTop: 28 }} />
                     <InputComponent
-                        label='비밀번호'
+                        label='학번'
+                        length={126}
                         color={'green'}
-                        isEditible={false}
+                        isRequiredMark={true}
                     />
+                    </View>
                     <View style={{ marginTop: 28 }} />
                     <InputComponent
                         label='이름(본명)'
