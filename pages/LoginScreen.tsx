@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import InputComponent from '../inputs/InputComponent'
-import { Color } from '../../ColorSet'
-import LongButton from '../buttons/LongButton'
-import CheckboxComponent from '../checkboxs/CheckboxComponent'
+import InputComponent from '../components/inputs/InputComponent'
+import { Color } from '../ColorSet'
+import LongButton from '../components/buttons/LongButton'
+import CheckboxComponent from '../components/checkboxs/CheckboxComponent'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from './pageTypes'
 import { StackActions } from '@react-navigation/native'
@@ -12,7 +12,7 @@ import { StackActions } from '@react-navigation/native'
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, "Login">;
 
-const Login: React.FC<LoginProps> = ({ navigation }) => {
+const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
     const LoginBtnHandler = () => {
         navigation.dispatch(StackActions.replace('HomeStack'))
@@ -84,7 +84,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
     )
 }
 
-export default Login
+export default LoginScreen
 
 const styles = StyleSheet.create({
     title: {

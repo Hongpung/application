@@ -1,28 +1,44 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable } from 'react-native';
-import { Color } from '../../ColorSet';
+import { Color } from '../ColorSet'
 import PagerView from 'react-native-pager-view';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamList } from './pageTypes';
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
+interface Banner {
+    backgroundColor: string,
+    text: string
+}
+
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
-    const [bannerNum, setBannerNum] = useState(0);
+    const [bannerNum, setBannerNum] = useState<number>(0);
     const pagerRef = useRef<PagerView>(null);//러페런스 추가
 
+    const user = {
+        name: `홍길동`,
+        club: `산틀`
+    }
+    const today = new Date();
 
-    const pages = [
-        { backgroundColor: Color.green200, text: '사진 1' },
-        { backgroundColor: Color.blue200, text: '사진 2' },
-        { backgroundColor: Color.red200, text: '사진 3' },
+    const banners: Banner[] = [
+        { backgroundColor: Color[`green200`], text: '사진 1' },
+        { backgroundColor: Color[`blue200`], text: '사진 2' },
+        { backgroundColor: Color[`red200`], text: '사진 3' },
     ];
-    const bannerMass = pages.length;
 
+    const bannerMass = banners.length;// 배너 수
+
+    useEffect(() => {
+
+    }, [])
 
     return (
         <ScrollView style={styles.container}>
+
+            {/* 상단 아이콘 부분*/}
             <View style={styles.iconsRow}>
                 <View style={styles.iconContainer}>
                     <Pressable
@@ -36,18 +52,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                         <Text>Profile</Text>
                     </Pressable>
                 </View>
+            </View>
 
-            </View>
+            {/* 상단 문구*/}
             <View style={styles.textRow}>
-                <Text style={styles.dateText}>2024년 7월 7일</Text>
-                <Text style={styles.greetingText}>홍길동님 안녕하세요</Text>
+                <Text style={styles.dateText}>{today.getFullYear()}년 {today.getMonth()+1}월 {today.getDate()}일</Text>
+                <Text style={styles.greetingText}>{user.name}님 안녕하세요</Text>
             </View>
+
+            {/* 상단 일정*/}
             <View>
                 <Text style={styles.ScheduleOfDate}>
                     오늘의 일정이 없어요
                 </Text>
             </View>
-            <View style={styles.Advertisebanner}>
+
+            {/* 배너 부분*/}
+            <View style={styles.AdvertiseBanner}>
                 {/* 배너 확인 */}
                 <View style={{
                     flex: 1,
@@ -59,7 +80,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     }} initialPage={0}
                         onPageScroll={(e) => { const { position, offset } = e.nativeEvent; setBannerNum(position) }}
                         ref={pagerRef}>
-                        {pages.map((page, index) => (
+                        {banners.map((page, index) => (
                             <View key={index} style={{ flex: 1 }}>
                                 <View style={[{ flex: 1, backgroundColor: page.backgroundColor }]}>
                                 </View>
@@ -67,6 +88,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                         ))}
                     </PagerView>
                 </View>
+
+                {/* 배너 인디케이터 */}
                 <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', width: 88, height: 20, justifyContent: 'center' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 76, height: 16 }}>
                         <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 9, textAlignVertical: 'center' }}>{bannerNum + 1}/{bannerMass}</Text>
@@ -74,6 +97,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     </View>
                 </View>
             </View>
+
+
+            {/* 우리 동아리 */}
             <View style={{ marginHorizontal: 24, marginTop: 32, }}>
                 <Text style={{
                     fontSize: 18,
@@ -87,6 +113,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     <View style={{ height: 120, backgroundColor: Color['grey300'], borderRadius: 10 }} />
                 </TouchableOpacity>
             </View>
+
+            {/* 공연 홍보 */}
             <View style={{ marginTop: 32 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
                     <Text style={{
@@ -105,8 +133,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                             더 알아보기 {'>'}
                         </Text>
                     </Pressable>
-
                 </View>
+
                 <ScrollView style={{ height: 208, }} horizontal showsHorizontalScrollIndicator={false}>
                     <View style={{ flex: 1, flexDirection: 'row', }}>
                         <View style={{ marginLeft: 18 }} />
@@ -130,6 +158,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     </View>
                 </ScrollView>
             </View>
+
+            
+            {/* 일정 홍보 */}
             <View style={{ marginTop: 32 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
                     <Text style={{
@@ -173,7 +204,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     <View style={{ marginRight: 18 }} />
                 </ScrollView>
             </View>
-            <View style={{ marginLeft: 24, height: 120, marginTop: 48, marginBottom: 96 }}>
+
+            
+
+            {/* 푸터 */}
+            <View style={styles.footer}>
                 <Text>
                     여기가 푸터
                 </Text>
@@ -238,13 +273,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         marginTop: 12
     },
-    Advertisebanner: {
+    AdvertiseBanner: {
         marginTop: 28,
         marginHorizontal: 24,
         height: 150,
         borderRadius: 10,
         overflow: 'hidden'
-    }
+    },
+    footer:{ marginLeft: 24, height: 120, marginTop: 48, marginBottom: 96 }
 });
 
 export default HomeScreen;

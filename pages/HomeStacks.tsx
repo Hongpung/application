@@ -1,5 +1,5 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Header from '../Header';
+import Header from '../components/Header';
 import NotificationScreen from './NotificationScreen';
 import MyPageScreen from './ProfileScreen';
 import MySchedulesScreen from './MySchedulesScreen';

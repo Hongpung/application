@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 
-// Badge 타입 정의
+// 배지 타입 정의
 export type Badge = {
     name: string;
     imgUrl: string;
@@ -15,8 +15,10 @@ interface BadgeContextProps {
     setModalVisible: (visible: boolean) => void;
 }
 
+//배지 컨텍스트
 const BadgeContext = createContext<BadgeContextProps | undefined>(undefined);
 
+//배지 프로바이더
 const BadgeProvider: React.FC<{children:any}> = ({ children }) => {
     const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
     const [modalVisible, setModalVisible] = useState(false);
@@ -28,6 +30,7 @@ const BadgeProvider: React.FC<{children:any}> = ({ children }) => {
     );
 };
 
+//유스 배지 hoc
 const useBadge = () => {
     const context = useContext(BadgeContext);
     if (context === undefined) {

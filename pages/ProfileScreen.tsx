@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { Color } from '../../ColorSet'
+import { Color } from '../ColorSet'
 import { HomeStackParamList } from './pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -12,8 +12,8 @@ const MyPageScreen: React.FC<MyPageProps> = ({navigation}) => {
         name:string,
         link:string
     }
-    const myActivities = [{name:'내 일정', link:'MySchedules'},{name:'내 활동', link:''},{name:'내 배지', link:'MyBadges'},]
-    const Settings = [{name:'알림 설정', link:''},{name:'로그인 설정', link:''},{name:'암호 잠금', link:''}, {name:'앱 설정', link:''},]
+    const myActivities:subMenu[] = [{name:'내 일정', link:'MySchedules'},{name:'내 활동', link:''},{name:'내 배지', link:'MyBadges'},]
+    const Settings:subMenu[] = [{name:'알림 설정', link:''},{name:'로그인 설정', link:''},{name:'암호 잠금', link:''}, {name:'앱 설정', link:''},]
 
     return (
         <ScrollView style={styles.container}>
@@ -51,11 +51,11 @@ const MyPageScreen: React.FC<MyPageProps> = ({navigation}) => {
     )
 }
 
-interface ProfileBoxPropsP {
+interface ProfileBoxProps {
     isCard: boolean
 }
 
-const ProfileBox: React.FC<ProfileBoxPropsP> = ({ isCard }) => {
+const ProfileBox: React.FC<ProfileBoxProps> = ({ isCard }) => {
     return (
         <View style={[styles.ProfileContainer, isCard ? { borderWidth: 1, borderColor: Color['grey200'] } : null]}>
             <View style={{ width: 304, flex: 1, marginHorizontal: 24, marginTop: 24 }}>

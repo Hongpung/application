@@ -2,8 +2,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { HomeStackParamList } from './pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Color } from '../../ColorSet';
-
+import { Color } from '../ColorSet';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 
@@ -32,7 +31,7 @@ const MySchedulesScreen: React.FC = () => {
     //     return{}
     // }
 
-    const RenderBalnkDay: React.FC = () => {
+    const RenderBlankDay: React.FC = () => {
         return (<View style={{}}>
             <View style={{ height: 70, marginTop: -120, justifyContent: 'space-between', alignItems: 'center' }}>
                 <Text style={{ fontSize: 24, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey800'] }}>오늘 예정된 일정이 없어요!</Text>

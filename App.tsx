@@ -1,17 +1,16 @@
 import { StyleSheet, View } from 'react-native';
-import Tutorial  from './components/pages/Tutorial';
+import Tutorial from './pages/Tutorial';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { RootStackParamList } from './components/pages/pageTypes';
-import Permission from './components/pages/Permission';
-import Login from './components/pages/Login';
-import SignUp from './components/pages/SignUp';
+import { RootStackParamList } from './pages/pageTypes';
+import Permission from './pages/Permission';
+import LoginScreen from './pages/LoginScreen';
+import SignUp from './pages/SignUp';
 import Header from './components/Header';
-import BottomNav from './components/pages/BottomNav';
-import HomeStacks from './components/pages/HomeStacks';
+import HomeStacks from './pages/HomeStacks';
 
 
 
@@ -41,9 +40,9 @@ const RootStacks: React.FC = () => {
     <RootStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
       <RootStack.Screen name="Tutorial" component={Tutorial} />
       <RootStack.Screen name="Permission" component={Permission} />
-      <RootStack.Screen name="Login" component={Login} />
+      <RootStack.Screen name="Login" component={LoginScreen} />
       <RootStack.Screen name="SignUp" component={SignUp} options={{ headerShown: true, header: () => <Header leftButton='X' /> }} />
-      <RootStack.Screen name="HomeStack" component={HomeStacks} options={{ animation: 'none'}}/>
+      <RootStack.Screen name="HomeStack" component={HomeStacks} options={{ animation: 'none' }} />
     </RootStack.Navigator>
   )
 }

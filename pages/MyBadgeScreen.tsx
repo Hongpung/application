@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator, Pressable
 import React, { useState } from 'react'
 import { HomeStackParamList } from './pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Color } from '../../ColorSet';
+import { Color } from '../ColorSet';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { BadgeProvider, useBadge, Badge } from './BadgeContext';
 

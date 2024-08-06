@@ -3,10 +3,10 @@ import React from 'react';
 import { Color } from '../../ColorSet';
 
 export type LongButtonProps={
-    innerText:String,
-    onPress:Function,
+    innerText:string,
+    onPress:()=>void,
     isAble:boolean,
-    color:String
+    color:string
 }
 
 const LongButton: React.FC<LongButtonProps> = ({innerText, onPress, isAble, color}) => {

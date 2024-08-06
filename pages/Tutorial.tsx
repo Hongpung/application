@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useRef, useState } from 'react'
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import ShortButton from '../buttons/ShortButton';
-import LongButton from '../buttons/LongButton';
-import { Color } from '../../ColorSet';
-import { TutorialEx } from '../../ExplainSet';
+import ShortButton from '../components/buttons/ShortButton';
+import LongButton from '../components/buttons/LongButton';
+import { Color } from '../ColorSet';
+import { TutorialEx } from '../ExplainSet';
 import { RootStackParamList } from './pageTypes';
 import PagerView from 'react-native-pager-view';
 
