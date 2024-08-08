@@ -1,21 +1,24 @@
-import React from "react"
-import { View, StyleSheet, Text, Pressable } from "react-native"
+import React, { useState } from "react"
+import { View, StyleSheet, Text, Pressable, Image } from "react-native"
 
 import { Color } from "../../ColorSet"
+import { User } from "../../userInterface"
+import { useUser } from "../../pages/UserContext"
 
-export type MiniCardType = {
-    name:string
+export interface MiniCardType {
+    user: User
     view: "inClubView" | "inReserveView"
     isPicked: boolean
-    isCapt?: boolean
-    addtionalRole?: "상쇠" | "상장구" | "수북" | "수법고"
-    NickName?: string
 }
 
-const ProfileMiniCard: React.FC<MiniCardType> = ({ name, view, isCapt, addtionalRole, NickName, isPicked }) => {
+const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked }) => {
+
+    const { setSelectedUser, setModalVisible } = useUser();
+    const [loading, setLoading] = useState(false);
+
 
     const RoleTag = () => {
-        switch (addtionalRole) {
+        switch (user.addRole) {
             case '상쇠':
                 return (
                     <View>
@@ -31,7 +34,7 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ name, view, isCapt, addtional
                     <View>
                         <View style={{ height: 16, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4, backgroundColor: Color['blue100'], borderRadius: 5, marginRight: 4 }}>
                             <Text style={{ fontSize: 12, fontFamily: "NanumSquareNeo-Bold", color: Color['blue600'], }}>
-                                {String(addtionalRole)}
+                                {String(user.addRole)}
                             </Text>
                         </View>
                     </View>
@@ -39,38 +42,44 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ name, view, isCapt, addtional
         }
     }
 
-
     return (
         <View style={[styles.ProfileContainer, isPicked ? styles.PickedProfile : null,]}>
             <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
                 <View style={styles.ProfilePhoto} />
                 <View style={{ height: 42, justifyContent: 'space-evenly' }}>
-                    <View style={[{ flexDirection: 'row', flex: 1, alignItems: 'center', }, NickName ? { marginTop: 3 } : null]}>
+                    <View style={[{ flexDirection: 'row', flex: 1, alignItems: 'center', }, user.nickname ? { marginTop: 3 } : null]}>
                         <View style={styles.instrumnetMark} />
-                        <Text style={styles.UserName}>{name}</Text>
+                        <Text style={styles.UserName}>{user.name}</Text>
                     </View>
-                    {NickName && <Text style={styles.UserNickName}>{NickName}</Text>}
+                    {user.nickname && <Text style={styles.UserNickName}>{user.nickname}</Text>}
                 </View>
             </View>
             <View style={{ position: 'absolute', flexDirection: 'row', left: 104, bottom: 16, alignItems: 'center', justifyContent: 'flex-start' }}>
-                {isCapt && <View>
+                {user.isCapt && <View>
                     <View style={{ height: 16, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4, backgroundColor: Color['blue100'], borderRadius: 5, marginRight: 4 }}>
                         <Text style={{ fontSize: 12, fontFamily: "NanumSquareNeo-Bold", color: Color['blue600'], }}>
                             {'패짱'}
                         </Text>
                     </View>
                 </View>}
-                {addtionalRole && RoleTag()}
+                {user.addRole && RoleTag()}
             </View>
-            <View style={{ position: 'absolute', width: 56, height: 56, borderRadius: 200, borderWidth: 1, borderColor: Color['grey500'], justifyContent: 'center', alignItems: 'center', right: 16, top: 24 }}><Text>배지</Text></View>
+            <View style={{ position: 'absolute', width: 56, height: 56, borderRadius: 200, borderWidth: 1, borderColor: Color['grey500'], justifyContent: 'center', alignItems: 'center', right: 16, top: 24 }}>
+                {user.badge&&
+                    <Image
+                    source={{ uri: user.badge }}
+                    style={{ height: 56, width: 56, }}
+                    onLoadEnd={() => {setLoading(false)}}
+                />}
+            </View>
             {view == 'inClubView' ?
-                <Pressable style={{ position: 'absolute', borderRadius: 200, right: 16, bottom: 8 }}>
+                <Pressable style={{ position: 'absolute', borderRadius: 200, right: 16, bottom: 8 }}
+                onPress={()=>{setSelectedUser(user); setModalVisible(true)}}>
                     <Text style={styles.moreBtn}>{`더 알아보기 >`}</Text>
                 </Pressable> :
                 <View style={{ position: 'absolute', borderRadius: 200, right: 16, bottom: 8, flexDirection: 'row', alignItems: 'flex-end' }}>
-                    <Text style={[{ marginRight: 1 }, styles.clubInfo]}>{`@`}</Text>
-                    <Text style={[{ marginRight: 1 }, styles.clubInfo]}>{`18`}</Text>
-                    <Text style={styles.clubInfo}>{`신명화랑`}</Text>
+                    <Text style={[{ marginRight: 1 }, styles.clubInfo]}>{`@ `+user.grade}</Text>
+                    <Text style={styles.clubInfo}>{user.club}</Text>
                 </View>}
         </View>
     )
@@ -90,7 +99,7 @@ const styles = StyleSheet.create({
     PickedProfile: {
         backgroundColor: Color['blue100'],
         borderColor: Color['blue600'],
-        borderWidth:2,
+        borderWidth: 2,
     },
     ProfilePhoto: {
         marginLeft: 20,

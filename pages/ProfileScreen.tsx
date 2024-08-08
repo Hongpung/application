@@ -71,9 +71,15 @@ interface ProfileBoxProps {
 
 export const ProfileBox: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
     const [loading, setLoading] = useState(true);
+    const RoleTextRender = ()=>{
+        if(user.isCapt) return "패짱"
+        if(user.addRole){ return user.addRole}
+        return "동아리원"
+    }
 
+    if(!user) return;
     return (
-        <View style={[styles.ProfileContainer, isCard ? { borderWidth: 1, borderColor: Color['grey200'] } : null]}>
+        <View style={[styles.ProfileContainer, isCard ? { paddingTop:12, paddingBottom:20,borderWidth: 1, borderColor: Color['grey200'] } : null]}>
             <View style={{ width: 304, flex: 1, marginHorizontal: 24, marginTop: 24 }}>
                 <View style={{ flexDirection: 'row', flex: 1 }}>
                     <View style={styles.ProfilePhoto} />
@@ -88,7 +94,7 @@ export const ProfileBox: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
                                 <View style={styles.icons}>
                                 </View>
                             </View>
-                            {user.badge && <View style={styles.Badge}>
+                            {user?.badge && <View style={styles.Badge}>
                                 <Image
                                     source={{ uri: user.badge }}
                                     style={styles.Badge}
@@ -116,7 +122,7 @@ export const ProfileBox: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
                         <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{user.club + `(${user.grade})`}</Text>
                     </View>
                     <View style={styles.info}>
-                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>직급</Text><Text style={{ fontSize: 16, color: Color['blue500'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right', }}>{user.isCapt ?? user.addRole ?? `동아리원`}</Text>
+                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>직급</Text><Text style={{ fontSize: 16,fontFamily: "NanumSquareNeo-Bold", textAlign: 'right',  color: user.addRole == '상쇠'?Color['red500']:Color['blue500'], }}>{RoleTextRender()}</Text>
                     </View>
 
                 </View>

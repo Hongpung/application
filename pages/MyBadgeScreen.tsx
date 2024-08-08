@@ -135,7 +135,6 @@ const MyBadgeScreen: React.FC<MyBadgeProps> = ({ navigation }) => {
     },
     ]
 
-    const [modalVisible, setModalVisible] = useState(false);
 
     return (
         <BadgeProvider>

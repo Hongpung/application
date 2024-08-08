@@ -4,79 +4,98 @@ import { Color } from '../ColorSet'
 import { HomeStackParamList } from './pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ProfileMiniCard from '../components/cards/ProfileMiniCard'
+import { UserProvider, useUser } from './UserContext';
+import { UserModal } from './ClubMemeberScreen';
 
 
 type MyClubProps = NativeStackScreenProps<HomeStackParamList, 'MyClub'>;
 
 const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
-    type subMenu = {
+
+
+    interface subMenu {
         name: string,
         link: string
     }
-    const manageClubMenu: subMenu[] = [{ name: '부원 관리', link: 'MySchedules' }, { name: '악기 관리', link: '' }, { name: '연습 기록 보기', link: 'MyBadges' },]
+
+    const manageClubMenu: subMenu[] = [{ name: '부원 관리', link: 'ClubMembers' }, { name: '악기 관리', link: '' }, { name: '연습 기록 보기', link: 'MyBadges' },]
+
 
     return (
-        <ScrollView style={styles.container}>
-            <View style={{ flex: 1, alignItems: 'center' }}>
-                <View style={{ width: 96, height: 96, marginTop: 24, borderRadius: 25, backgroundColor: `grey` }} />
-                <View style={{ flex: 1 }}>
-                    <View style={{ paddingVertical: 10 }} />
-                    <View style={styles.info}>
-                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>상쇠</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>홍길동(길동색시)</Text>
-                    </View>
-                    <View style={styles.info}>
-                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>패짱</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>임꺽정</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', height: 20, justifyContent: 'flex-start', marginLeft: -8, marginTop: 20, marginBottom: 16 }}>
-                        <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>동아리 관리</Text>
-                    </View>
-                    {manageClubMenu.map((subMenu: subMenu, index: number) => {
-                        return (<Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => { navigation.push(subMenu.link) }}>
-                            <Text style={styles.subMenuTitle}>{subMenu.name}</Text><Text style={styles.subMenuArrow}>{'>'}</Text>
-                        </Pressable>)
-                    })}
-                    <View style={{ justifyContent: 'space-between', height: 36, marginLeft: -8, marginTop: 20, marginBottom: 4 }}>
-                        <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>활동 우수자</Text>
-                        <Text style={{ fontSize: 12, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>최근 30일의 기록으로 선정해요.</Text>
-                    </View>
-                    <View style={{ marginVertical: 12 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                            <Text style={{ fontSize: 18, color: Color['grey500'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>출석 1위</Text>
-                            <Text style={{ fontSize: 14, color: Color['grey400'], fontFamily: "NanumSquareNeo-Light", textAlign: 'left', marginLeft: 8 }}>{`자세히 보기 >`}</Text>
+        <UserProvider>
+            <ScrollView style={styles.container}>
+                <View style={{ flex: 1, alignItems: 'center' }}>
+                    <View style={{ width: 96, height: 96, marginTop: 24, borderRadius: 25, backgroundColor: `grey` }} />
+                    <View style={{ flex: 1 }}>
+                        <View style={{ paddingVertical: 10 }} />
+                        <View style={styles.info}>
+                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>상쇠</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>홍길동(길동색시)</Text>
                         </View>
-                        <View style={{height:12}}/>
-                        <ProfileMiniCard
-                            name='홍길동'
-                            NickName='길동색시'
-                            isPicked={false}
-                            view='inClubView'
-                            addtionalRole='상장구'
-                        />
-                    </View>
-                    <View style={{ marginVertical: 12 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                            <Text style={{ fontSize: 18, color: Color['grey500'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>예약 1위</Text>
-                            <Text style={{ fontSize: 14, color: Color['grey400'], fontFamily: "NanumSquareNeo-Light", textAlign: 'left', marginLeft: 8 }}>{`자세히 보기 >`}</Text>
+                        <View style={styles.info}>
+                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>패짱</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>임꺽정</Text>
                         </View>
-                        <View style={{height:12}}/>
-                        <ProfileMiniCard
-                            name='임꺽정'
-                            isCapt={true}
-                            NickName='길동색시'
-                            isPicked={false}
-                            view='inClubView'
-                            addtionalRole='상쇠'
-                        />
+                        <View style={{ flexDirection: 'row', height: 20, justifyContent: 'flex-start', marginLeft: -8, marginTop: 20, marginBottom: 16 }}>
+                            <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>동아리 관리</Text>
+                        </View>
+                        {manageClubMenu.map((subMenu: subMenu, index: number) => {
+                            return (<Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => { navigation.push(subMenu.link) }}>
+                                <Text style={styles.subMenuTitle}>{subMenu.name}</Text><Text style={styles.subMenuArrow}>{'>'}</Text>
+                            </Pressable>)
+                        })}
+                        <View style={{ justifyContent: 'space-between', height: 36, marginLeft: -8, marginTop: 20, marginBottom: 4 }}>
+                            <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>활동 우수자</Text>
+                            <Text style={{ fontSize: 12, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>최근 30일의 기록으로 선정해요.</Text>
+                        </View>
+                        <View style={{ marginVertical: 12 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                                <Text style={{ fontSize: 18, color: Color['grey500'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>출석 1위</Text>
+                                <Text style={{ fontSize: 14, color: Color['grey400'], fontFamily: "NanumSquareNeo-Light", textAlign: 'left', marginLeft: 8 }}>{`자세히 보기 >`}</Text>
+                            </View>
+                            <View style={{ height: 12 }} />
+                            <ProfileMiniCard
+                                user={{
+                                    name: '홍길동',
+                                    nickname: '길동색시',
+                                    addRole: '상장구',
+                                    club: '기타',
+                                    grade: 20,
+                                    instrument: '장구'
+                                }}
+                                isPicked={false}
+                                view='inClubView'
+                            />
+                        </View>
+                        <View style={{ marginVertical: 12 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                                <Text style={{ fontSize: 18, color: Color['grey500'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>예약 1위</Text>
+                                <Text style={{ fontSize: 14, color: Color['grey400'], fontFamily: "NanumSquareNeo-Light", textAlign: 'left', marginLeft: 8 }}>{`자세히 보기 >`}</Text>
+                            </View>
+                            <View style={{ height: 12 }} />
+                            <ProfileMiniCard
+                                user={{
+                                    name: '임꺽정',
+                                    isCapt: true,
+                                    nickname: '길동색시',
+                                    addRole: '상쇠',
+                                    club: '기타',
+                                    grade: 14,
+                                    instrument: '새납'
+                                }}
+                                isPicked={false}
+                                view='inClubView'
+                            />
+                        </View>
                     </View>
-                </View>
 
-            </View>
-            <View style={styles.footer}>
-                <Pressable style={{ paddingBottom: 1, borderBottomWidth: 1, borderBottomColor: Color['grey300'], alignItems: 'center' }}>
-                    <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'], textAlign: 'center' }}>동아리 정보 변경을 원하시나요?</Text>
-                </Pressable>
-            </View>
-        </ScrollView>
+                </View>
+                <View style={styles.footer}>
+                    <Pressable style={{ paddingBottom: 1, borderBottomWidth: 1, borderBottomColor: Color['grey300'], alignItems: 'center' }}>
+                        <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'], textAlign: 'center' }}>동아리 정보 변경을 원하시나요?</Text>
+                    </Pressable>
+                </View>
+                <UserModal />
+            </ScrollView>
+        </UserProvider>
     )
 }
 

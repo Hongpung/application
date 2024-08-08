@@ -3,93 +3,109 @@ import { View, ScrollView, Modal, Pressable, Image, Text } from "react-native";
 import ProfileMiniCard, { MiniCardType } from "../components/cards/ProfileMiniCard";
 import { Color } from "../ColorSet";
 import { ProfileBox } from "./ProfileScreen";
+import { User } from "../userInterface";
+import { HomeStackParamList } from "./pageTypes";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { UserProvider, useUser } from "./UserContext";
 
-interface user {
-    user: MiniCardType
-}
+type ClubMembersProps = NativeStackScreenProps<HomeStackParamList, 'ClubMembers'>
 
-const MemeberList: React.FC<{ userList: user[] }> = ({ userList }) => {
-    const renderBadges = () => {
-        const rows = [];
-        for (let i = 0; i < userList.length; i += 3) {
-            const group = userList.slice(i, i + 3);
-            rows.push(
-                <View key={i} style={{ height: 84, width: 288, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 8, }}>
-                    {group.map((user, index) => (
-                        <ProfileMiniCard key={index} badge={user} />
-                    ))}
-                    {group.length % 3 == 2 && <View style={{ height: 84, width: 72 }} />}
-                </View>
-            );
-        }
-        return rows;
-    };
+
+const MemeberList: React.FC<{ memberList: User[] }> = ({ memberList }) => {
+
     return (
         <View>
-            {renderBadges()}
+            {memberList.map((member, index) => (
+                <View style={{marginVertical:6}}>
+                    <ProfileMiniCard key={index} user={member} isPicked={false} view={'inClubView'} />
+                </View>
+            ))}
         </View>
     )
 }
 
-const ClubMemeberScreen: React.FC<MyBadgeProps> = ({ navigation }) => {
+const ClubMemeberScreen: React.FC<ClubMembersProps> = ({ navigation }) => {
 
-    const users = [{
+
+    const users: User[] = [{
         name: "홍길동",
-        nickName: '길동색시',
-        descript: "그냥 랜덤 배지",
+        nickname: '길동색시',
         badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG",
         club: "산틀",
-        grade: 18
-    },
-    {
-        name: "테스트 배지",
-        imgUrl: 'https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG',
-        descript: "그냥 테스트 배지",
-        isHave: true
+        grade: 18,
+        instrument: '장구',
+        isCapt: true
+    },{
+        name: "임꺽정",
+        badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG",
+        club: "산틀",
+        grade: 18,
+        instrument: '장구',
+        isCapt: false
+    },,{
+        name: "임꺽정",
+        badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG",
+        club: "산틀",
+        grade: 18,
+        instrument: '장구',
+        isCapt: false
+    },,{
+        name: "임꺽정",
+        club: "산틀",
+        grade: 18,
+        instrument: '장구',
+        addRole:'상쇠'
     },
     ]
 
-    const [modalVisible, setModalVisible] = useState(false);
-
     return (
-        <View style={{
-            flexGrow: 1,
-            backgroundColor: '#fff',
-        }}>
-            <ScrollView contentContainerStyle={{
+        <UserProvider>
+            <View style={{
                 flexGrow: 1,
-                alignItems: 'center',
                 backgroundColor: '#fff',
             }}>
-                {users && <MemeberList userList={users} />}
-            </ScrollView>
-            {modalVisible&&<UserModal onClose={() => setModalVisible(false)} />}
-        </View>
+                <ScrollView contentContainerStyle={{
+                    flexGrow: 1,
+                    alignItems: 'center',
+                    backgroundColor: '#fff',
+                }}>
+                    {users && <MemeberList memberList={users} />}
+                </ScrollView>
+                <UserModal />
+            </View>
+        </UserProvider>
     )
 }
 
-const UserModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+export const UserModal: React.FC = () => {
+    const { setModalVisible, modalVisible, selectedUser, setSelectedUser } = useUser();
+
+    const CloseHandler = () => {
+        setSelectedUser(null);
+        setModalVisible(false)
+    }
     return (
-        <Modal transparent={true} visible={true}>
+        <Modal transparent={true} visible={modalVisible}>
             <Pressable style={{
                 flex: 1,
                 justifyContent: 'center',
                 alignItems: 'center',
                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
             }}
-                onPress={onClose}
+                onPress={CloseHandler}
             >
-                <Pressable style={{ width: 340, height: 200, backgroundColor: '#FFF', borderRadius: 10, alignItems: 'center', justifyContent: 'center' }} onPress={(event) => event.stopPropagation()}>
+                <Pressable style={{ width: 352, height: 326, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, alignItems: 'center', justifyContent: 'center' }} onPress={(event) => event.stopPropagation()}>
                     <ProfileBox
+                        user={selectedUser!}
                         isCard={true}
                     />
 
                     <Pressable
                         style={{
                             position: 'absolute',
-                            top: 6, right: 2, width: 36, height: 36, justifyContent: 'center', alignItems: 'center'
+                            top: 8, right: 4, width: 36, height: 36, justifyContent: 'center', alignItems: 'center'
                         }}
-                        onPress={onClose}
+                        onPress={CloseHandler}
                     >
                         <Text style={{ color: Color['grey700'], textAlign: 'center' }}>X</Text>
                     </Pressable>
