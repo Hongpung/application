@@ -1,39 +1,52 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { Pressable, ScrollView, StyleSheet, Text, View, Image } from 'react-native'
+import React, { useState } from 'react'
 import { Color } from '../ColorSet'
 import { HomeStackParamList } from './pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { User } from '../userInterface';
+import { useBadge } from './BadgeContext';
 
 
-type MyPageProps = NativeStackScreenProps<HomeStackParamList,'MyPage'>;
+type MyPageProps = NativeStackScreenProps<HomeStackParamList, 'MyPage'>;
 
-const MyPageScreen: React.FC<MyPageProps> = ({navigation}) => {
+const MyPageScreen: React.FC<MyPageProps> = ({ navigation }) => {
     type subMenu = {
-        name:string,
-        link:string
+        name: string,
+        link: string
     }
-    const myActivities:subMenu[] = [{name:'내 일정', link:'MySchedules'},{name:'내 활동', link:''},{name:'내 배지', link:'MyBadges'},]
-    const Settings:subMenu[] = [{name:'알림 설정', link:''},{name:'로그인 설정', link:''},{name:'암호 잠금', link:''}, {name:'앱 설정', link:''},]
+    const myActivities: subMenu[] = [{ name: '내 일정', link: 'MySchedules' }, { name: '내 활동', link: '' }, { name: '내 배지', link: 'MyBadges' },]
+    const Settings: subMenu[] = [{ name: '알림 설정', link: '' }, { name: '로그인 설정', link: '' }, { name: '암호 잠금', link: '' }, { name: '앱 설정', link: '' },]
 
     return (
         <ScrollView style={styles.container}>
             <View style={{ flex: 1, alignItems: 'center' }}>
-                <ProfileBox isCard={false} />
+                <ProfileBox
+                    isCard={false}
+                    user={{
+                        club:'산틀',
+                        name:'홍길동',
+                        grade:18,
+                        nickname:'길동색시',
+                        addRole:'상장구',
+                        instrument:'장구',
+                        badge:"https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG"
+                    }}
+                   />
                 <View style={{ flex: 1 }}>
                     <View style={{ flexDirection: 'row', height: 20, justifyContent: 'flex-start', marginLeft: -8, marginTop: 20, marginBottom: 16 }}>
                         <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>활동 내역</Text>
                     </View>
                     {myActivities.map((subMenu: subMenu, index: number) => {
-                        return (<Pressable key={subMenu.name + index} style={{ width: 312, flexDirection: 'row', justifyContent: 'space-between',marginVertical: 6 , padding:6  }} onPress={()=>{navigation.push(subMenu.link)}}>
-                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>{subMenu.name}</Text><Text style={{ fontSize: 16, color: Color['grey500'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{'>'}</Text>
+                        return (<Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => { navigation.push(subMenu.link) }}>
+                            <Text style={styles.subMenuTitle}>{subMenu.name}</Text><Text style={styles.subMenuArrow}>{'>'}</Text>
                         </Pressable>)
                     })}
                     <View style={{ flexDirection: 'row', height: 20, justifyContent: 'flex-start', marginLeft: -8, marginTop: 20, marginBottom: 16 }}>
                         <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>내 설정</Text>
                     </View>
                     {Settings.map((submenu: subMenu, index: number) => {
-                        return (<Pressable key={submenu.name + index} style={{ width: 312, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 6 , padding:6 }} onPress={()=>{navigation.push(submenu.link)}}>
-                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>{submenu.name}</Text><Text style={{ fontSize: 16, color: Color['grey500'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{'>'}</Text>
+                        return (<Pressable key={submenu.name + index} style={styles.subMenu} onPress={() => { navigation.push(submenu.link) }}>
+                            <Text style={styles.subMenuTitle}>{submenu.name}</Text><Text style={styles.subMenuArrow}>{'>'}</Text>
                         </Pressable>)
                     })}
                 </View>
@@ -52,10 +65,13 @@ const MyPageScreen: React.FC<MyPageProps> = ({navigation}) => {
 }
 
 interface ProfileBoxProps {
-    isCard: boolean
+    isCard: boolean,
+    user: User
 }
 
-const ProfileBox: React.FC<ProfileBoxProps> = ({ isCard }) => {
+export const ProfileBox: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
+    const [loading, setLoading] = useState(true);
+
     return (
         <View style={[styles.ProfileContainer, isCard ? { borderWidth: 1, borderColor: Color['grey200'] } : null]}>
             <View style={{ width: 304, flex: 1, marginHorizontal: 24, marginTop: 24 }}>
@@ -72,7 +88,12 @@ const ProfileBox: React.FC<ProfileBoxProps> = ({ isCard }) => {
                                 <View style={styles.icons}>
                                 </View>
                             </View>
-                            <View style={styles.Badge} />
+                            {user.badge && <View style={styles.Badge}>
+                                <Image
+                                    source={{ uri: user.badge }}
+                                    style={styles.Badge}
+                                    onLoadEnd={() => setLoading(false)} />
+                            </View>}
                         </View>
                         <View style={{ height: 40 }}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', width: 200, marginBottom: 6 }}>
@@ -88,14 +109,14 @@ const ProfileBox: React.FC<ProfileBoxProps> = ({ isCard }) => {
                 </View>
                 <View style={{ flex: 1, alignItems: 'center', marginTop: 8 }}>
 
-                    <View style={{ width: 300, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 12 }}>
-                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>이름(패명)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>홍길동(길동색시)</Text>
+                    <View style={styles.info}>
+                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>이름(패명)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{user.name}{user.nickname ? `(${user.nickname})` : ''}</Text>
                     </View>
-                    <View style={{ width: 300, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 12 }}>
-                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>산틀(18)</Text>
+                    <View style={styles.info}>
+                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{user.club + `(${user.grade})`}</Text>
                     </View>
-                    <View style={{ width: 300, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 12 }}>
-                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>직급</Text><Text style={{ fontSize: 16, color: Color['blue500'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right', }}>동아리원</Text>
+                    <View style={styles.info}>
+                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>직급</Text><Text style={{ fontSize: 16, color: Color['blue500'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right', }}>{user.isCapt ?? user.addRole ?? `동아리원`}</Text>
                     </View>
 
                 </View>
@@ -132,7 +153,6 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 100,
-        borderWidth: 1
     }, footer: {
         flex: 1,
         backgroundColor: Color['grey100'],
@@ -140,5 +160,8 @@ const styles = StyleSheet.create({
         height: 200,
         paddingTop: 32,
         marginTop: 32
-    }
+    }, info: { width: 300, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 12 },
+    subMenu: { width: 312, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 4, paddingVertical: 8, },
+    subMenuTitle: { fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' },
+    subMenuArrow: { fontSize: 16, color: Color['grey500'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }
 })

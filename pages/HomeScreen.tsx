@@ -56,7 +56,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
             {/* 상단 문구*/}
             <View style={styles.textRow}>
-                <Text style={styles.dateText}>{today.getFullYear()}년 {today.getMonth()+1}월 {today.getDate()}일</Text>
+                <Text style={styles.dateText}>{today.getFullYear()}년 {today.getMonth() + 1}월 {today.getDate()}일</Text>
                 <Text style={styles.greetingText}>{user.name}님 안녕하세요</Text>
             </View>
 
@@ -109,7 +109,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 }}>
                     우리 동아리
                 </Text>
-                <TouchableOpacity activeOpacity={0.85}>
+                <TouchableOpacity activeOpacity={0.85}
+                    onPress={() => navigation.navigate('MyClub')}>
                     <View style={{ height: 120, backgroundColor: Color['grey300'], borderRadius: 10 }} />
                 </TouchableOpacity>
             </View>
@@ -159,7 +160,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 </ScrollView>
             </View>
 
-            
+
             {/* 일정 홍보 */}
             <View style={{ marginTop: 32 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
@@ -205,7 +206,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 </ScrollView>
             </View>
 
-            
+
 
             {/* 푸터 */}
             <View style={styles.footer}>
@@ -280,7 +281,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow: 'hidden'
     },
-    footer:{ marginLeft: 24, height: 120, marginTop: 48, marginBottom: 96 }
+    footer: { marginLeft: 24, height: 120, marginTop: 48, marginBottom: 96 }
 });
 
 export default HomeScreen;

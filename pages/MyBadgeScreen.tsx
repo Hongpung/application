@@ -37,13 +37,7 @@ const BadgeShadow: React.FC<{ width: number, height: number }> = ({ width, heigh
 interface BadgeListProps {
     badgeList: Badge[];
 }
-const BadgeCard: React.FC<{ badge: Badge }> = ({ badge }) => {
-    return (
-        <View style={{ position: 'absolute', backgroundColor: Color['grey700'], width: 200, height: 400 }}>
 
-        </View>
-    )
-}
 
 const BadgeComponent: React.FC<{ badge: Badge }> = ({ badge }) => {
     const [loading, setLoading] = useState(true);
@@ -54,6 +48,7 @@ const BadgeComponent: React.FC<{ badge: Badge }> = ({ badge }) => {
         setSelectedBadge(badge);
         setModalVisible(true);
     };
+    
     return (
         <Pressable onPress={handleBadgeOnPress} style={{ height: 84, width: 72, flexDirection: 'column' }}>
             <View style={{ height: 72, width: 72, borderRadius: 100, overflow: 'hidden' }}>
@@ -167,6 +162,7 @@ const MyBadgeScreen: React.FC<MyBadgeProps> = ({ navigation }) => {
         </BadgeProvider>
     )
 }
+
 const BadgeModal: React.FC = () => {
     const { selectedBadge, modalVisible, setModalVisible } = useBadge();
     const [loading, setLoading] = useState(true);

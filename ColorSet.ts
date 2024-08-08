@@ -8,7 +8,7 @@ export const Color:ColorType={
     red300: "#EFAA00",
     red400: "#ED7E6E",
     red500: "#F26B57",
-    red600: "#E4F438",
+    red600: "#EE4F38",
     red700: "#EE371C",
     red800: "#D31800",
     green100: "#FCFFFD",

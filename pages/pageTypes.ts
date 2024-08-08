@@ -13,4 +13,5 @@ export type HomeStackParamList = {
     MyPage: any;
     MySchedules:any;
     MyBadges:any
+    MyClub:any
 };

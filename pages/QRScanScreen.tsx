@@ -1,4 +1,4 @@
-import React, { useState,  useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, Text, View, Button, Pressable, Linking, Dimensions } from 'react-native';
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { Color } from '../ColorSet';
@@ -7,13 +7,14 @@ import { Color } from '../ColorSet';
 const QRScanScreen: React.FC = () => {
     const [facing, setFacing] = useState<CameraType>('back');
     const [permission, requestPermission] = useCameraPermissions();
-    const [isScanned, setScanned] = useState<boolean>(false);
+    let isScanned: boolean = false
 
-    useLayoutEffect(()=>{
-        setScanned(false);
-    },[])
+
+    useEffect(() => {
+        isScanned = false;
+    }, [])
+
     const debounce = (func: (...args: any[]) => void, wait: number) => {
-        console.log('디바운스')
         let timeout: NodeJS.Timeout;
         return (...args: any[]) => {
             clearTimeout(timeout);
@@ -41,9 +42,10 @@ const QRScanScreen: React.FC = () => {
     }
 
     const openUrl = (url: string) => {
-        console.log(`호출됨`)
-        Linking.openURL(url).catch((err) => console.error('Failed to open URL:', err));
-        setScanned(false)
+        if (!isScanned) return
+        Linking.openURL(url)
+            .catch((err) => { console.error('Failed to open URL:', err); })
+            .finally(debounce(() => isScanned = false, 500))
     };
 
     const isInCenter = (x: number, y: number) => {
@@ -56,20 +58,19 @@ const QRScanScreen: React.FC = () => {
         return x > centerX - centerWidth / 2 && x < centerX + centerWidth / 2 && y > centerY - centerHeight / 2 && y < centerY + centerHeight / 2;
     };
 
-    const handleScanned =
-        ({ type, data, bounds }: { type: string; data: string, bounds: { origin: { x: number, y: number }, size: { width: number, height: number } } }) => {
-            
-            if (isScanned) return;
+    const handleScanned = ({ type, data, bounds }: { type: string; data: string, bounds: { origin: { x: number, y: number }, size: { width: number, height: number } } }) => {
 
-            const { origin, size } = bounds;
-            const centerX = origin.x + size.width / 2;
-            const centerY = origin.y + size.height / 2;
+        if (isScanned) return;
 
-            setScanned(true);
-            if (isInCenter(centerX, centerY)) {
-                openUrl(data);
-            }
+        const { origin, size } = bounds;
+        const centerX = origin.x + size.width / 2;
+        const centerY = origin.y + size.height / 2;
+
+        if (isInCenter(centerX, centerY)) {
+            isScanned = true;
+            openUrl(data)
         }
+    }
 
     return (
         <View style={styles.container}>
@@ -79,7 +80,7 @@ const QRScanScreen: React.FC = () => {
                 barcodeScannerSettings={{
                     barcodeTypes: ["qr"],
                 }}
-                onBarcodeScanned={debounce(handleScanned,5)}
+                onBarcodeScanned={handleScanned}
             >
                 <View style={styles.overlay}>
                     <View style={styles.topOverlay} />
