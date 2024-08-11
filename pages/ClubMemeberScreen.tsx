@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { View, ScrollView, Modal, Pressable, Image, Text } from "react-native";
-import ProfileMiniCard, { MiniCardType } from "../components/cards/ProfileMiniCard";
+import ProfileMiniCard from "../components/cards/ProfileMiniCard";
 import { Color } from "../ColorSet";
-import { ProfileBox } from "./ProfileScreen";
-import { User } from "../userInterface";
+import ProfileBoxCard from "../components/cards/PrifileBoxCard";
+import { instrumentOrder, User } from "../UserType";
 import { HomeStackParamList } from "./pageTypes";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { UserProvider, useUser } from "./UserContext";
@@ -11,13 +11,14 @@ import { UserProvider, useUser } from "./UserContext";
 type ClubMembersProps = NativeStackScreenProps<HomeStackParamList, 'ClubMembers'>
 
 
+
 const MemeberList: React.FC<{ memberList: User[] }> = ({ memberList }) => {
 
     return (
         <View>
-            {memberList.map((member, index) => (
-                <View style={{marginVertical:6}}>
-                    <ProfileMiniCard key={index} user={member} isPicked={false} view={'inClubView'} />
+            {memberList.map((member) => (
+                <View style={{ marginVertical: 8 }}>
+                    <ProfileMiniCard key={member.name} user={member} isPicked={false} view={'inClubView'} />
                 </View>
             ))}
         </View>
@@ -33,30 +34,34 @@ const ClubMemeberScreen: React.FC<ClubMembersProps> = ({ navigation }) => {
         badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG",
         club: "산틀",
         grade: 18,
-        instrument: '장구',
+        instrument: '소고',
         isCapt: true
-    },{
+    }, {
         name: "임꺽정",
         badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG",
         club: "산틀",
         grade: 18,
-        instrument: '장구',
-        isCapt: false
-    },,{
-        name: "임꺽정",
+        instrument: "장구",
+        isCapt: false,
+        addRole: '상장구'
+    }, {
+        name: "북꺽정",
         badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG",
         club: "산틀",
         grade: 18,
-        instrument: '장구',
-        isCapt: false
-    },,{
+        instrument: '북',
+        isCapt: false,
+        addRole: '수북'
+    }, {
         name: "임꺽정",
         club: "산틀",
         grade: 18,
-        instrument: '장구',
-        addRole:'상쇠'
-    },
+        instrument: '쇠',
+        addRole: '상쇠'
+    }
     ]
+
+    users.sort((a, b) => instrumentOrder(a.instrument) - instrumentOrder(b.instrument))
 
     return (
         <UserProvider>
@@ -95,7 +100,7 @@ export const UserModal: React.FC = () => {
                 onPress={CloseHandler}
             >
                 <Pressable style={{ width: 352, height: 326, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, alignItems: 'center', justifyContent: 'center' }} onPress={(event) => event.stopPropagation()}>
-                    <ProfileBox
+                    <ProfileBoxCard
                         user={selectedUser!}
                         isCard={true}
                     />
@@ -107,7 +112,7 @@ export const UserModal: React.FC = () => {
                         }}
                         onPress={CloseHandler}
                     >
-                        <Text style={{ color: Color['grey700'], textAlign: 'center' }}>X</Text>
+                        <Text style={{ color: Color['grey700'], textAlign: 'center', fontFamily: 'NanumSquareNeo-Bold', fontSize: 18 }}>X</Text>
                     </Pressable>
 
                 </Pressable>

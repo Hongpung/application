@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { View, StyleSheet, Text, Pressable, Image } from "react-native"
 
 import { Color } from "../../ColorSet"
-import { User } from "../../userInterface"
+import { User } from "../../UserType"
 import { useUser } from "../../pages/UserContext"
 
 export interface MiniCardType {
@@ -64,21 +64,21 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked }) => {
                 </View>}
                 {user.addRole && RoleTag()}
             </View>
-            <View style={{ position: 'absolute', width: 56, height: 56, borderRadius: 200, borderWidth: 1, borderColor: Color['grey500'], justifyContent: 'center', alignItems: 'center', right: 16, top: 24 }}>
-                {user.badge&&
+            <View style={{ position: 'absolute', width: 56, height: 56, borderRadius: 200, overflow: 'hidden', borderWidth: loading?1:0, borderColor: Color['grey500'], justifyContent: 'center', alignItems: 'center', right: 16, top: 24 }}>
+                {user.badge &&
                     <Image
-                    source={{ uri: user.badge }}
-                    style={{ height: 56, width: 56, }}
-                    onLoadEnd={() => {setLoading(false)}}
-                />}
+                        source={{ uri: user.badge }}
+                        style={{ height: 56, width: 56, borderRadius: 200, }}
+                        onLoadEnd={() => { setLoading(false) }}
+                    />}
             </View>
             {view == 'inClubView' ?
                 <Pressable style={{ position: 'absolute', borderRadius: 200, right: 16, bottom: 8 }}
-                onPress={()=>{setSelectedUser(user); setModalVisible(true)}}>
+                    onPress={() => { setSelectedUser(user); setModalVisible(true) }}>
                     <Text style={styles.moreBtn}>{`더 알아보기 >`}</Text>
                 </Pressable> :
                 <View style={{ position: 'absolute', borderRadius: 200, right: 16, bottom: 8, flexDirection: 'row', alignItems: 'flex-end' }}>
-                    <Text style={[{ marginRight: 1 }, styles.clubInfo]}>{`@ `+user.grade}</Text>
+                    <Text style={[{ marginRight: 1 }, styles.clubInfo]}>{`@ ` + user.grade}</Text>
                     <Text style={styles.clubInfo}>{user.club}</Text>
                 </View>}
         </View>
@@ -86,11 +86,14 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked }) => {
 }
 
 export default ProfileMiniCard;
+
+
+
 const styles = StyleSheet.create({
     ProfileContainer: {
         position: 'relative',
         height: 112,
-        width: 322,
+        width: 320,
         borderRadius: 15,
         backgroundColor: '#FFF',
         borderWidth: 1,

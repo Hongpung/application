@@ -61,11 +61,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             </View>
 
             {/* 상단 일정*/}
-            <View>
+            <Pressable onPress={() => navigation.push(`MySchedules`)}>
                 <Text style={styles.ScheduleOfDate}>
                     오늘의 일정이 없어요
                 </Text>
-            </View>
+            </Pressable>
 
             {/* 배너 부분*/}
             <View style={styles.AdvertiseBanner}>

@@ -15,4 +15,5 @@ export type HomeStackParamList = {
     MyBadges:any
     MyClub:any
     ClubMembers:any
+    ClubInstruments:any
 };

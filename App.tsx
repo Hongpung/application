@@ -10,7 +10,7 @@ import Permission from './pages/Permission';
 import LoginScreen from './pages/LoginScreen';
 import SignUp from './pages/SignUp';
 import Header from './components/Header';
-import HomeStacks from './pages/HomeStacks';
+import HomeStacks from './nav/HomeStacks';
 
 
 
@@ -37,7 +37,7 @@ const ContentsContainer: React.FC = () => {
 
 const RootStacks: React.FC = () => {
   return (
-    <RootStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+    <RootStack.Navigator initialRouteName="HomeStack" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
       <RootStack.Screen name="Tutorial" component={Tutorial} />
       <RootStack.Screen name="Permission" component={Permission} />
       <RootStack.Screen name="Login" component={LoginScreen} />

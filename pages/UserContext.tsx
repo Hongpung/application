@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { User } from '../userInterface';
+import { User } from '../UserType';
 
 interface UserContextProps {
     selectedUser: User | null;

@@ -1,8 +1,8 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react';
+import React, { useState,  useEffect } from 'react';
 import { StyleSheet, Text, View, Button, Pressable, Linking, Dimensions } from 'react-native';
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { Color } from '../ColorSet';
-
+import { debounce } from 'lodash';
 
 const QRScanScreen: React.FC = () => {
     const [facing, setFacing] = useState<CameraType>('back');
@@ -13,14 +13,6 @@ const QRScanScreen: React.FC = () => {
     useEffect(() => {
         isScanned = false;
     }, [])
-
-    const debounce = (func: (...args: any[]) => void, wait: number) => {
-        let timeout: NodeJS.Timeout;
-        return (...args: any[]) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func(...args), wait);
-        };
-    };
 
     if (!permission) {
         // Camera permissions are still loading.

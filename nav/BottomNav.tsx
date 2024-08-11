@@ -1,10 +1,10 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import ChatScreen from './ChatScreen';
+import ChatScreen from '../pages/ChatScreen';
 import React from 'react';
 import Header from '../components/Header';
-import HomeScreen from './HomeScreen';
+import HomeScreen from '../pages/HomeScreen';
 import { Color } from '../ColorSet';
-import QRScanScreen from './QRScanScreen';
+import QRScanScreen from '../pages/QRScanScreen';
 
 const Tab = createBottomTabNavigator();
 
