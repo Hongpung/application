@@ -9,7 +9,8 @@ type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
 interface Banner {
     backgroundColor: string,
-    text: string
+    Title: string,
+    Descript: string
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
@@ -24,9 +25,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     const today = new Date();
 
     const banners: Banner[] = [
-        { backgroundColor: Color[`green200`], text: '사진 1' },
-        { backgroundColor: Color[`blue200`], text: '사진 2' },
-        { backgroundColor: Color[`red200`], text: '사진 3' },
+        { backgroundColor: Color[`blue400`], Title: '배너로 활동을 홍보하세요!', Descript: '활동 인원을 모집하고\n공연 관객을 모집해보세요!' },
+        { backgroundColor: Color[`green400`], Title: '홍풍 앱 출시 이벤트', Descript: '후기가 담긴 인스타 게시물을 업로드 해주세요\n추첨을 통해 스타벅스 기프티콘을 드립니다' },
+        { backgroundColor: Color[`red400`], Title: '홍풍 마당놀이 모집중!', Descript: '2022년 금상, 2023년 대상에 이어 나갈\n홍풍 회원님들을 모집합니다!' },
     ];
 
     const bannerMass = banners.length;// 배너 수
@@ -62,9 +63,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
             {/* 상단 일정*/}
             <Pressable onPress={() => navigation.push(`MySchedules`)}>
-                <Text style={styles.ScheduleOfDate}>
-                    오늘의 일정이 없어요
-                </Text>
+                <View style={styles.ScheduleOfDate}>
+                    <View style={{ position: 'absolute', bottom: 12, left: 20 }}>
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>오늘의 일정이 없어요</Text>
+                        <View style={{ height: 4 }} />
+                        <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 18 }}>새로운 일정 예약하러 가기</Text>
+                    </View>
+                </View>
             </Pressable>
 
             {/* 배너 부분*/}
@@ -78,11 +83,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                         alignItems: 'center',
                         justifyContent: 'center'
                     }} initialPage={0}
-                        onPageScroll={(e) => { const { position, offset } = e.nativeEvent; setBannerNum(position) }}
+                        onPageScroll={(e) => { const { position } = e.nativeEvent; setBannerNum(position) }}
                         ref={pagerRef}>
                         {banners.map((page, index) => (
                             <View key={index} style={{ flex: 1 }}>
                                 <View style={[{ flex: 1, backgroundColor: page.backgroundColor }]}>
+                                    <View style={{ position: 'absolute', top: 36, left: 22 }}>
+                                        <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{page.Title}</Text>
+                                    </View>
+
+                                    <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
+                                        <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{page.Descript}</Text>
+                                    </View>
                                 </View>
                             </View>
                         ))}
@@ -90,10 +102,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 </View>
 
                 {/* 배너 인디케이터 */}
-                <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', width: 88, height: 20, justifyContent: 'center' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 76, height: 16 }}>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 9, textAlignVertical: 'center' }}>{bannerNum + 1}/{bannerMass}</Text>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 10, height: 12 }}>모두보기 +</Text>
+                <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', width: 92, height: 20, justifyContent: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 88, height: 16 }}>
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', width: 36, paddingLeft: 4, fontSize: 10, textAlignVertical: 'center', textAlign: 'right' }}>{bannerNum < 9 ? '0' + (bannerNum + 1) : bannerNum + 1}/{bannerMass < 10 ? '0' + bannerMass : bannerMass}</Text>
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 10, width: 56, textAlignVertical: 'center', textAlign: 'center' }}>모두보기 +</Text>
                     </View>
                 </View>
             </View>
@@ -113,51 +125,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     onPress={() => navigation.navigate('MyClub')}>
                     <View style={{ height: 120, backgroundColor: Color['grey300'], borderRadius: 10 }} />
                 </TouchableOpacity>
-            </View>
-
-            {/* 공연 홍보 */}
-            <View style={{ marginTop: 32 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
-                    <Text style={{
-                        fontSize: 18,
-                        fontFamily: 'NanumSquareNeo-Bold',
-                        height: 20
-                    }}>
-                        공연 홍보
-                    </Text>
-                    <Pressable>
-                        <Text style={{
-                            fontSize: 14,
-                            fontFamily: 'NanumSquareNeo-Light',
-                            height: 16
-                        }}>
-                            더 알아보기 {'>'}
-                        </Text>
-                    </Pressable>
-                </View>
-
-                <ScrollView style={{ height: 208, }} horizontal showsHorizontalScrollIndicator={false}>
-                    <View style={{ flex: 1, flexDirection: 'row', }}>
-                        <View style={{ marginLeft: 18 }} />
-                        {
-                            Array(5).fill(null).map((_, index) => (
-                                <View
-                                    key={index}
-                                    style={{ height: 208, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}
-                                />
-                            ))
-                        }
-
-                        <View
-                            key={'last'}
-                            style={{ height: 208, width: 82, borderRadius: 10, marginHorizontal: 6, justifyContent: 'center', alignItems: 'center' }}
-                        >
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 16, marginBottom: 8 }}>더보기</Text>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 20 }}>{'->'}</Text>
-                        </View>
-                        <View style={{ marginRight: 18 }} />
-                    </View>
-                </ScrollView>
             </View>
 
 
@@ -205,6 +172,55 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     <View style={{ marginRight: 18 }} />
                 </ScrollView>
             </View>
+
+
+
+            {/* 공연 홍보 */}
+            <View style={{ marginTop: 32 }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
+                    <Text style={{
+                        fontSize: 18,
+                        fontFamily: 'NanumSquareNeo-Bold',
+                        height: 20
+                    }}>
+                        공연 홍보
+                    </Text>
+                    <Pressable>
+                        <Text style={{
+                            fontSize: 14,
+                            fontFamily: 'NanumSquareNeo-Light',
+                            height: 16
+                        }}>
+                            더 알아보기 {'>'}
+                        </Text>
+                    </Pressable>
+                </View>
+
+                <ScrollView style={{ height: 208, }} horizontal showsHorizontalScrollIndicator={false}>
+                    <View style={{ flex: 1, flexDirection: 'row', }}>
+                        <View style={{ marginLeft: 18 }} />
+                        {
+                            Array(5).fill(null).map((_, index) => (
+                                <View
+                                    key={index}
+                                    style={{ height: 208, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}
+                                />
+                            ))
+                        }
+
+                        <View
+                            key={'last'}
+                            style={{ height: 208, width: 82, borderRadius: 10, marginHorizontal: 6, justifyContent: 'center', alignItems: 'center' }}
+                        >
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 16, marginBottom: 8 }}>더보기</Text>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 20 }}>{'->'}</Text>
+                        </View>
+                        <View style={{ marginRight: 18 }} />
+                    </View>
+                </ScrollView>
+            </View>
+
+
 
 
 
@@ -270,9 +286,9 @@ const styles = StyleSheet.create({
     ScheduleOfDate: {
         marginHorizontal: 26,
         height: 160,
-        borderWidth: 2,
         borderRadius: 10,
-        marginTop: 12
+        marginTop: 12,
+        backgroundColor: Color['green500']
     },
     AdvertiseBanner: {
         marginTop: 28,
