@@ -5,7 +5,6 @@ import { Color } from '../ColorSet';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamList } from './pageTypes';
-import { transform } from 'typescript';
 
 
 enum NotificationType {
@@ -78,17 +77,12 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
         dragX.addListener(({ value }: { value: number }) => {
             DragX = value
         });
-
         const opacity = dragX.interpolate({
-            inputRange: [-80, 0],
-            outputRange: [1, 0],
+            inputRange: [-80, -20, 0],
+            outputRange: [1, 0.5, 0],
+            extrapolate: 'clamp',
         });
 
-        const scaleX = dragX.interpolate({
-            inputRange: [-80, 0],
-            outputRange: [0.5, 0],
-        });
-        //나중에 수치 최적화
 
         return (
             <Pressable
@@ -106,11 +100,10 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
                     flex: 1,
                     backgroundColor: Color[`red500`],
                     marginVertical: 6,
-                    marginLeft: -20,
                     marginRight: 28,
+                    marginLeft:-20,
                     borderRadius: 5,
                     width: 140,
-                    transform: [{ scaleX: scaleX }],
                     opacity: opacity
                 }}
                 >

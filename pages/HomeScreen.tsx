@@ -4,6 +4,7 @@ import { Color } from '../ColorSet'
 import PagerView from 'react-native-pager-view';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamList } from './pageTypes';
+import { debounce } from 'lodash';
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -28,9 +29,28 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         { backgroundColor: Color[`blue400`], Title: '배너로 활동을 홍보하세요!', Descript: '활동 인원을 모집하고\n공연 관객을 모집해보세요!' },
         { backgroundColor: Color[`green400`], Title: '홍풍 앱 출시 이벤트', Descript: '후기가 담긴 인스타 게시물을 업로드 해주세요\n추첨을 통해 스타벅스 기프티콘을 드립니다' },
         { backgroundColor: Color[`red400`], Title: '홍풍 마당놀이 모집중!', Descript: '2022년 금상, 2023년 대상에 이어 나갈\n홍풍 회원님들을 모집합니다!' },
+        { backgroundColor: Color[`blue400`], Title: '배너로 활동을 홍보하세요!', Descript: '활동 인원을 모집하고\n공연 관객을 모집해보세요!' },
+        { backgroundColor: Color[`green400`], Title: '홍풍 앱 출시 이벤트', Descript: '후기가 담긴 인스타 게시물을 업로드 해주세요\n추첨을 통해 스타벅스 기프티콘을 드립니다' },
+        { backgroundColor: Color[`red400`], Title: '홍풍 마당놀이 모집중!', Descript: '2022년 금상, 2023년 대상에 이어 나갈\n홍풍 회원님들을 모집합니다!' }
     ];
 
     const bannerMass = banners.length;// 배너 수
+
+    const BannerHandler = (e: any) => {
+        const { position } = e.nativeEvent;
+        
+        if (position === 0) {
+            pagerRef.current?.setPageWithoutAnimation(banners.length + 1);
+            setBannerNum(banners.length - 1)
+
+        } else if (position === banners.length + 1) {
+            pagerRef.current?.setPageWithoutAnimation(1);
+            setBannerNum(0)
+        } else {
+            setBannerNum(position - 1)
+        }
+    }
+
 
     useEffect(() => {
 
@@ -82,11 +102,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                         flex: 1,
                         alignItems: 'center',
                         justifyContent: 'center'
-                    }} initialPage={0}
-                        onPageScroll={(e) => { const { position } = e.nativeEvent; setBannerNum(position) }}
+                    }} initialPage={1}
+                        onPageSelected={(e) => {
+                            BannerHandler(e)
+                        }}
                         ref={pagerRef}>
+                        <View style={[{ flex: 1, backgroundColor: banners[banners.length - 1].backgroundColor }]}>
+                            <View style={{ position: 'absolute', top: 36, left: 22 }}>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{banners[banners.length - 1].Title}</Text>
+                            </View>
+
+                            <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{banners[banners.length - 1].Descript}</Text>
+                            </View>
+                        </View>
                         {banners.map((page, index) => (
-                            <View key={index} style={{ flex: 1 }}>
+                            <View key={index + 1} style={{ flex: 1 }}>
                                 <View style={[{ flex: 1, backgroundColor: page.backgroundColor }]}>
                                     <View style={{ position: 'absolute', top: 36, left: 22 }}>
                                         <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{page.Title}</Text>
@@ -98,6 +129,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                                 </View>
                             </View>
                         ))}
+                        <View style={[{ flex: 1, backgroundColor: banners[0].backgroundColor }]}>
+                            <View style={{ position: 'absolute', top: 36, left: 22 }}>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{banners[0].Title}</Text>
+                            </View>
+
+                            <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{banners[0].Descript}</Text>
+                            </View>
+                        </View>
                     </PagerView>
                 </View>
 
