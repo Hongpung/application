@@ -6,7 +6,7 @@ import ProfileBoxCard from "../components/cards/PrifileBoxCard";
 import { instrumentOrder, User } from "../UserType";
 import { HomeStackParamList } from "./pageTypes";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { UserProvider, useUser } from "./UserContext";
+import { UserProvider, useUser } from "../context/UserContext";
 
 type ClubMembersProps = NativeStackScreenProps<HomeStackParamList, 'ClubMembers'>
 

@@ -4,7 +4,7 @@ import { HomeStackParamList } from './pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Color } from '../ColorSet';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
-import { BadgeProvider, useBadge, Badge } from './BadgeContext';
+import { BadgeProvider, useBadge, Badge } from '../context/BadgeContext';
 
 type MyBadgeProps = NativeStackScreenProps<HomeStackParamList, 'MyBadges'>;
 

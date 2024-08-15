@@ -3,17 +3,18 @@ import { View, StyleSheet, Text, Pressable, Image } from "react-native"
 
 import { Color } from "../../ColorSet"
 import { Instrument } from "../../UserType"
+import { useInstrument } from "../../context/InstrumentContext";
 
 
 const InstrumentCard: React.FC<{ instrument: Instrument, view: "inManage" | "inBorrow", navigation?: any }> = ({ instrument, view, navigation }) => {
 
     const [isPicked, setPicked] = useState(false && view == "inBorrow");
-
+    const {setSelectedInstrument} = useInstrument();
     const ClickHandler = () => {
         if (view == "inBorrow")
             setPicked(isPicked => !isPicked)
         
-        else { navigation?.push('InstrumentSpecific',instrument) }
+        else { navigation.push('InstrumentSpecific'); setSelectedInstrument(instrument) }
     }
     const renderTag = () => {
         return (

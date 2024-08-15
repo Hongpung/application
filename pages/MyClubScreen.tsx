@@ -4,7 +4,7 @@ import { Color } from '../ColorSet'
 import { HomeStackParamList } from './pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ProfileMiniCard from '../components/cards/ProfileMiniCard'
-import { UserProvider } from './UserContext';
+import { UserProvider } from '../context/UserContext';
 import { UserModal } from './ClubMemeberScreen';
 
 

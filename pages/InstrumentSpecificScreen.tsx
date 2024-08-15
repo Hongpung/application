@@ -3,6 +3,7 @@ import React from 'react'
 import { useRoute } from '@react-navigation/native';
 import { Color } from '../ColorSet';
 import { Instrument } from '../UserType';
+import { useInstrument } from '../context/InstrumentContext';
 
 interface Reserve {
     date: Date
@@ -12,20 +13,9 @@ interface Reserve {
 }
 
 const InstrumentSpecificScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-    const route = useRoute();
+    const {selectedInstrument} = useInstrument();
+    const instrument = selectedInstrument!;
     
-    function isInstrument(instruments: any): instruments is Instrument {
-        return instruments && typeof instruments.name === 'string'; 
-    }
-    
-    const instruments = route.params;
-    
-    if (!isInstrument(instruments)) {
-
-        console.error("Invalid route params. Expected Instrument type.");
-
-        return;
-    }
     const preReserves: Reserve[] = [
         {
             date: new Date('2023-11-30'),
@@ -97,7 +87,7 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any }> = ({ navigation })
         return Cards;
     }
 
-    if (instruments == undefined)
+    if (instrument == undefined)
         return (<View><Text>Error:Can't find the instrument</Text></View>)
     return (
         <View style={{ flex: 1, backgroundColor:`#FFF`}}>
@@ -105,7 +95,7 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any }> = ({ navigation })
                 <View style={{height:12}}/>
                 <View style={styles.imageContainer}>
                     <Image
-                        source={{ uri: instruments?.imgURL }}
+                        source={{ uri: instrument?.imgURL }}
                         style={styles.image}
                     />
                 </View>
@@ -113,27 +103,27 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any }> = ({ navigation })
                 <View style={styles.Row}>
 
                     <Text style={styles.RowLeft}>{`악기`}</Text>
-                    <Text style={styles.RowRight}>{instruments.name}</Text>
+                    <Text style={styles.RowRight}>{instrument.name}</Text>
 
                 </View>
 
                 <View style={styles.Row}>
 
                     <Text style={styles.RowLeft}>{`악기 타입`}</Text>
-                    <Text style={styles.RowRight}>{instruments.type}</Text>
+                    <Text style={styles.RowRight}>{instrument.type}</Text>
 
                 </View>
 
                 <View style={styles.Row}>
 
                     <Text style={styles.RowLeft}>{`할당 치배`}</Text>
-                    <Text style={styles.RowRight}>{instruments.owner ?? '-'}</Text>
+                    <Text style={styles.RowRight}>{instrument.owner ?? '-'}</Text>
 
                 </View>
-                {instruments.nickname && <View style={styles.Row}>
+                {instrument.nickname && <View style={styles.Row}>
 
                     <Text style={styles.RowLeft}>{`별명`}</Text>
-                    <Text style={styles.RowRight}>{instruments.nickname}</Text>
+                    <Text style={styles.RowRight}>{instrument.nickname}</Text>
 
                 </View>}
 

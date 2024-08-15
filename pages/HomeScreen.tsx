@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable } from 'react-native';
-import { Color } from '../ColorSet'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Modal, FlatList } from 'react-native';
+import { Color } from '../ColorSet.ts'
 import PagerView from 'react-native-pager-view';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamList } from './pageTypes';
@@ -17,6 +17,7 @@ interface Banner {
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
     const [bannerNum, setBannerNum] = useState<number>(0);
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
     const pagerRef = useRef<PagerView>(null);//러페런스 추가
 
     const user = {
@@ -38,14 +39,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
     const BannerHandler = (e: any) => {
         const { position } = e.nativeEvent;
-        
-        if (position === 0) {
-            pagerRef.current?.setPageWithoutAnimation(banners.length + 1);
-            setBannerNum(banners.length - 1)
 
+        if (position === 0) {
+            setBannerNum(banners.length - 1);
+            setTimeout(() => {
+                pagerRef.current?.setPageWithoutAnimation(banners.length);
+            }, 200)
         } else if (position === banners.length + 1) {
-            pagerRef.current?.setPageWithoutAnimation(1);
-            setBannerNum(0)
+            setBannerNum(0);
+            setTimeout(() => {
+                pagerRef.current?.setPageWithoutAnimation(1);
+            }, 200)
         } else {
             setBannerNum(position - 1)
         }
@@ -141,15 +145,47 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     </PagerView>
                 </View>
 
+
                 {/* 배너 인디케이터 */}
                 <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', width: 92, height: 20, justifyContent: 'center' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 88, height: 16 }}>
                         <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', width: 36, paddingLeft: 4, fontSize: 10, textAlignVertical: 'center', textAlign: 'right' }}>{bannerNum < 9 ? '0' + (bannerNum + 1) : bannerNum + 1}/{bannerMass < 10 ? '0' + bannerMass : bannerMass}</Text>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 10, width: 56, textAlignVertical: 'center', textAlign: 'center' }}>모두보기 +</Text>
+                        <Pressable onPress={() => setModalVisible(true)}>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', height: 12, fontSize: 10, width: 56, textAlignVertical: 'center', textAlign: 'center' }}>모두보기 +</Text>
+                        </Pressable>
                     </View>
                 </View>
             </View>
 
+            <Modal transparent={true} visible={modalVisible}>
+                <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)',}}>
+
+                    <Pressable style={{ flex: 1 }} onPress={() => setModalVisible(false)}>
+                        <View style={{ flexDirection: 'row', height: 64, justifyContent: 'flex-end', alignItems: 'center' }}>
+                            <Text style={{ top: 12, right: 24, color: '#FFF', fontSize: 36, textAlignVertical: 'center' }}>X</Text>
+                        </View>
+                        <View style={{ flex: 1, alignItems: 'center' }} >
+                            <FlatList
+                                style={{ paddingHorizontal: 24, paddingVertical: 4 }}
+                                data={banners}
+                                renderItem={({ item, index }) => (
+                                    <Pressable key={index + 1} style={{ width: 320, height: 160, marginVertical: 8, borderRadius: 5, overflow: 'hidden' }} onPress={(e) => { e.stopPropagation(); setModalVisible(false); navigation.navigate('MyPage') }}>
+                                        <View style={[{ flex: 1, backgroundColor: item.backgroundColor }]}>
+                                            <View style={{ position: 'absolute', top: 36, left: 22 }}>
+                                                <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{item.Title}</Text>
+                                            </View>
+
+                                            <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
+                                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{item.Descript}</Text>
+                                            </View>
+                                        </View>
+                                    </Pressable>
+                                )} />
+                        </View>
+                        <View style={{ height: 36 }} />
+                    </Pressable>
+                </View>
+            </Modal>
 
             {/* 우리 동아리 */}
             <View style={{ marginHorizontal: 24, marginTop: 32, }}>
@@ -270,7 +306,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     여기가 푸터
                 </Text>
             </View>
-        </ScrollView>
+        </ScrollView >
     );
 };
 

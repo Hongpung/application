@@ -3,7 +3,7 @@ import { View, StyleSheet, Text, Pressable, Image } from "react-native"
 
 import { Color } from "../../ColorSet"
 import { User } from "../../UserType"
-import { useUser } from "../../pages/UserContext"
+import { useUser } from "../../context/UserContext"
 
 export interface MiniCardType {
     user: User
