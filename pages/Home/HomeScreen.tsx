@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Modal, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Modal, FlatList, Animated } from 'react-native';
 import { Color } from '../../ColorSet'
 import PagerView from 'react-native-pager-view';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -15,6 +15,8 @@ interface Banner {
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
+    const [isUsed, setUsed] = useState(true);
+    const [isSlideUp, setSlide] = useState(false);
     const [bannerNum, setBannerNum] = useState<number>(0);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const pagerRef = useRef<PagerView>(null);//러페런스 추가
@@ -24,6 +26,26 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         club: `산틀`
     }
     const today = new Date();
+    const animatedValue = useRef(new Animated.Value(-82)).current; // 초기 bottom 값
+
+    const toggleBottomSheet = () => {
+        if (isSlideUp) {
+            // 바텀 시트 닫기
+            Animated.timing(animatedValue, {
+                toValue: -82, // 닫을 때 bottom 위치 (화면 아래로 숨기기)
+                duration: 200,
+                useNativeDriver: false,
+            }).start(() => setSlide(false));
+        } else {
+            setSlide(true);
+            // 바텀 시트 열기
+            Animated.timing(animatedValue, {
+                toValue: 0, // 열릴 때 bottom 위치
+                duration: 200,
+                useNativeDriver: false,
+            }).start();
+        }
+    };
 
     const banners: Banner[] = [
         { backgroundColor: Color[`blue400`], Title: '배너로 활동을 홍보하세요!', Descript: '활동 인원을 모집하고\n공연 관객을 모집해보세요!' },
@@ -56,263 +78,307 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
 
     useEffect(() => {
-
+        setUsed(true)
     }, [])
 
     return (
-        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-
-            {/* 상단 아이콘 부분*/}
-            <View style={styles.iconsRow}>
-                <View style={styles.iconContainer}>
-                    <Pressable
-                        style={styles.icons}
-                        onPress={() => { navigation.navigate('Notification'); }}>
-                        <Text>Bell</Text>
-                    </Pressable>
-                    <Pressable
-                        style={styles.icons}
-                        onPress={() => { navigation.navigate('MyPage'); }}>
-                        <Text>Profile</Text>
-                    </Pressable>
-                </View>
-            </View>
-
-            {/* 상단 문구*/}
-            <View style={styles.textRow}>
-                <Text style={styles.dateText}>{today.getFullYear()}년 {today.getMonth() + 1}월 {today.getDate()}일</Text>
-                <Text style={styles.greetingText}>{user.name}님 안녕하세요</Text>
-            </View>
-
-            {/* 상단 일정*/}
-            <Pressable onPress={() => navigation.push(`MySchedules`)}>
-                <View style={styles.ScheduleOfDate}>
-                    <View style={{ position: 'absolute', bottom: 12, left: 20 }}>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>오늘의 일정이 없어요</Text>
-                        <View style={{ height: 4 }} />
-                        <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 18 }}>새로운 일정 예약하러 가기</Text>
-                    </View>
-                </View>
-            </Pressable>
-
-            {/* 배너 부분*/}
-            <View style={styles.AdvertiseBanner}>
-                {/* 배너 확인 */}
-                <View style={{
-                    flex: 1,
-                }}>
-                    <PagerView style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }} initialPage={1}
-                        onPageSelected={(e) => {
-                            BannerHandler(e)
-                        }}
-                        ref={pagerRef}>
-                        <View style={[{ flex: 1, backgroundColor: banners[banners.length - 1].backgroundColor }]}>
-                            <View style={{ position: 'absolute', top: 36, left: 22 }}>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{banners[banners.length - 1].Title}</Text>
-                            </View>
-
-                            <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{banners[banners.length - 1].Descript}</Text>
-                            </View>
-                        </View>
-                        {banners.map((page, index) => (
-                            <View key={index + 1} style={{ flex: 1 }}>
-                                <View style={[{ flex: 1, backgroundColor: page.backgroundColor }]}>
-                                    <View style={{ position: 'absolute', top: 36, left: 22 }}>
-                                        <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{page.Title}</Text>
-                                    </View>
-
-                                    <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
-                                        <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{page.Descript}</Text>
-                                    </View>
-                                </View>
-                            </View>
-                        ))}
-                        <View style={[{ flex: 1, backgroundColor: banners[0].backgroundColor }]}>
-                            <View style={{ position: 'absolute', top: 36, left: 22 }}>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{banners[0].Title}</Text>
-                            </View>
-
-                            <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{banners[0].Descript}</Text>
-                            </View>
-                        </View>
-                    </PagerView>
-                </View>
-
-
-                {/* 배너 인디케이터 */}
-                <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 2, height: 20, justifyContent: 'center' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 16, width: 100 }}>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', width: 42, fontSize: 10, textAlignVertical: 'center', textAlign: 'right' }}>{bannerNum < 9 ? '0' + (bannerNum + 1) : bannerNum + 1}/{bannerMass < 10 ? '0' + bannerMass : bannerMass}</Text>
-                        <Pressable onPress={() => setModalVisible(true)}>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', height: 12, fontSize: 10, width: 56, textAlignVertical: 'center', textAlign: 'center' }}>모두보기 +</Text>
+        <View style={{ flex: 1 }}>
+            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+                {/* 상단 아이콘 부분*/}
+                <View style={styles.iconsRow}>
+                    <View style={styles.iconContainer}>
+                        <Pressable
+                            style={styles.icons}
+                            onPress={() => { navigation.navigate('Notification'); }}>
+                            <Text>Bell</Text>
+                        </Pressable>
+                        <Pressable
+                            style={styles.icons}
+                            onPress={() => { navigation.navigate('MyPage'); }}>
+                            <Text>Profile</Text>
                         </Pressable>
                     </View>
                 </View>
-            </View>
 
-            <Modal transparent={true} visible={modalVisible}>
-                <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', }}>
-
-                    <Pressable style={{ flex: 1 }} onPress={() => setModalVisible(false)}>
-                        <View style={{ flexDirection: 'row', height: 64, justifyContent: 'flex-end', alignItems: 'center' }}>
-                            <Text style={{ top: 12, right: 24, color: '#FFF', fontSize: 36, textAlignVertical: 'center' }}>X</Text>
-                        </View>
-                        <View style={{ flex: 1, alignItems: 'center' }} >
-                            <FlatList
-                                style={{ paddingHorizontal: 24, paddingVertical: 4 }}
-                                data={banners}
-                                renderItem={({ item, index }) => (
-                                    <Pressable key={index + 1} style={{ width: 332, height: 160, marginVertical: 8, borderRadius: 5, overflow: 'hidden' }} onPress={(e) => { e.stopPropagation(); navigation.navigate('MyPage'); setModalVisible(false); }}>
-                                        <View style={[{ flex: 1, backgroundColor: item.backgroundColor }]}>
-                                            <View style={{ position: 'absolute', top: 36, left: 22 }}>
-                                                <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{item.Title}</Text>
-                                            </View>
-
-                                            <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
-                                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{item.Descript}</Text>
-                                            </View>
-                                        </View>
-                                    </Pressable>
-                                )} />
-                        </View>
-                        <View style={{ height: 36 }} />
-                    </Pressable>
-                </View>
-            </Modal>
-
-            {/* 우리 동아리 */}
-            <View style={{ marginHorizontal: 24, marginTop: 32, }}>
-                <Text style={{
-                    fontSize: 18,
-                    fontFamily: 'NanumSquareNeo-Bold',
-                    marginBottom: 12,
-                    marginHorizontal: 4
-                }}>
-                    우리 동아리
-                </Text>
-                <TouchableOpacity activeOpacity={0.85}
-                    onPress={() => navigation.navigate('MyClub')}>
-                    <View style={{ height: 120, backgroundColor: Color['grey300'], borderRadius: 10 }} />
-                </TouchableOpacity>
-            </View>
-
-
-            {/* 일정 홍보 */}
-            <View style={{ marginTop: 32 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
-                    <Text style={{
-                        fontSize: 18,
-                        fontFamily: 'NanumSquareNeo-Bold',
-                        height: 20
-                    }}>
-                        인원을 모으는 중인 활동
-                    </Text>
-
-                    <Pressable>
-                        <Text style={{
-                            fontSize: 14,
-                            fontFamily: 'NanumSquareNeo-Light',
-                            height: 16
-                        }}>
-                            더 알아보기 {'>'}
-                        </Text>
-                    </Pressable>
+                {/* 상단 문구*/}
+                <View style={styles.textRow}>
+                    <Text style={styles.dateText}>{today.getFullYear()}년 {today.getMonth() + 1}월 {today.getDate()}일</Text>
+                    <Text style={styles.greetingText}>{user.name}님 안녕하세요</Text>
                 </View>
 
-                <ScrollView style={{ height: 126, }} horizontal showsHorizontalScrollIndicator={false}>
-                    <View style={{ flex: 1, flexDirection: 'row' }}>
-                        <View style={{ marginLeft: 18 }} />
-                        {
-                            Array(18).fill(null).map((_, index) => (
-                                <View
-                                    key={index}
-                                    style={{ height: 126, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}
-                                />
-                            ))
-                        }
-                        <View
-                            key={'last'}
-                            style={{ height: 126, width: 82, borderRadius: 10, marginHorizontal: 6, justifyContent: 'center', alignItems: 'center' }}
-                        >
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 16, marginBottom: 8 }}>더보기</Text>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 20 }}>{'->'}</Text>
+                {/* 상단 일정*/}
+                <Pressable onPress={() => navigation.push(`MySchedules`)}>
+                    <View style={styles.ScheduleOfDate}>
+                        <View style={{ position: 'absolute', bottom: 12, left: 20 }}>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>오늘의 일정이 없어요</Text>
+                            <View style={{ height: 4 }} />
+                            <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 18 }}>새로운 일정 예약하러 가기</Text>
                         </View>
                     </View>
-                    <View style={{ marginRight: 18 }} />
-                </ScrollView>
-            </View>
+                </Pressable>
+
+                {/* 배너 부분*/}
+                <View style={styles.AdvertiseBanner}>
+                    {/* 배너 확인 */}
+                    <View style={{
+                        flex: 1,
+                    }}>
+                        <PagerView style={{
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }} initialPage={1}
+                            onPageSelected={(e) => {
+                                BannerHandler(e)
+                            }}
+                            ref={pagerRef}>
+                            <View style={[{ flex: 1, backgroundColor: banners[banners.length - 1].backgroundColor }]}>
+                                <View style={{ position: 'absolute', top: 36, left: 22 }}>
+                                    <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{banners[banners.length - 1].Title}</Text>
+                                </View>
+
+                                <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
+                                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{banners[banners.length - 1].Descript}</Text>
+                                </View>
+                            </View>
+                            {banners.map((page, index) => (
+                                <View key={index + 1} style={{ flex: 1 }}>
+                                    <View style={[{ flex: 1, backgroundColor: page.backgroundColor }]}>
+                                        <View style={{ position: 'absolute', top: 36, left: 22 }}>
+                                            <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{page.Title}</Text>
+                                        </View>
+
+                                        <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
+                                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{page.Descript}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            ))}
+                            <View style={[{ flex: 1, backgroundColor: banners[0].backgroundColor }]}>
+                                <View style={{ position: 'absolute', top: 36, left: 22 }}>
+                                    <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{banners[0].Title}</Text>
+                                </View>
+
+                                <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
+                                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{banners[0].Descript}</Text>
+                                </View>
+                            </View>
+                        </PagerView>
+                    </View>
 
 
+                    {/* 배너 인디케이터 */}
+                    <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 2, height: 20, justifyContent: 'center' }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 16, width: 100 }}>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', width: 42, fontSize: 10, textAlignVertical: 'center', textAlign: 'right' }}>{bannerNum < 9 ? '0' + (bannerNum + 1) : bannerNum + 1}/{bannerMass < 10 ? '0' + bannerMass : bannerMass}</Text>
+                            <Pressable onPress={() => setModalVisible(true)}>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', height: 12, fontSize: 10, width: 56, textAlignVertical: 'center', textAlign: 'center' }}>모두보기 +</Text>
+                            </Pressable>
+                        </View>
+                    </View>
+                </View>
 
-            {/* 공연 홍보 */}
-            <View style={{ marginTop: 32 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
+                <Modal transparent={true} visible={modalVisible}>
+                    <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', }}>
+
+                        <Pressable style={{ flex: 1 }} onPress={() => setModalVisible(false)}>
+                            <View style={{ flexDirection: 'row', height: 64, justifyContent: 'flex-end', alignItems: 'center' }}>
+                                <Text style={{ top: 12, right: 24, color: '#FFF', fontSize: 36, textAlignVertical: 'center' }}>X</Text>
+                            </View>
+                            <View style={{ flex: 1, alignItems: 'center' }} >
+                                <FlatList
+                                    style={{ paddingHorizontal: 24, paddingVertical: 4 }}
+                                    data={banners}
+                                    renderItem={({ item, index }) => (
+                                        <Pressable key={index + 1} style={{ width: 332, height: 160, marginVertical: 8, borderRadius: 5, overflow: 'hidden' }} onPress={(e) => { e.stopPropagation(); navigation.navigate('MyPage'); setModalVisible(false); }}>
+                                            <View style={[{ flex: 1, backgroundColor: item.backgroundColor }]}>
+                                                <View style={{ position: 'absolute', top: 36, left: 22 }}>
+                                                    <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{item.Title}</Text>
+                                                </View>
+
+                                                <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
+                                                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{item.Descript}</Text>
+                                                </View>
+                                            </View>
+                                        </Pressable>
+                                    )} />
+                            </View>
+                            <View style={{ height: 36 }} />
+                        </Pressable>
+                    </View>
+                </Modal>
+
+                {/* 우리 동아리 */}
+                <View style={{ marginHorizontal: 24, marginTop: 32, }}>
                     <Text style={{
                         fontSize: 18,
                         fontFamily: 'NanumSquareNeo-Bold',
-                        height: 20
+                        marginBottom: 12,
+                        marginHorizontal: 4
                     }}>
-                        공연 홍보
+                        우리 동아리
                     </Text>
-                    <Pressable>
-                        <Text style={{
-                            fontSize: 14,
-                            fontFamily: 'NanumSquareNeo-Light',
-                            height: 16
-                        }}>
-                            더 알아보기 {'>'}
-                        </Text>
-                    </Pressable>
+                    <TouchableOpacity activeOpacity={0.85}
+                        onPress={() => navigation.navigate('MyClub')}>
+                        <View style={{ height: 120, backgroundColor: Color['grey300'], borderRadius: 10 }} />
+                    </TouchableOpacity>
                 </View>
 
-                <ScrollView style={{ height: 208, }} horizontal showsHorizontalScrollIndicator={false}>
-                    <View style={{ flex: 1, flexDirection: 'row', }}>
-                        <View style={{ marginLeft: 18 }} />
-                        {
-                            Array(5).fill(null).map((_, index) => (
-                                <View
-                                    key={index}
-                                    style={{ height: 208, width: 136, backgroundColor: Color['grey300'], borderRadius: 10, marginHorizontal: 6 }}
-                                />
-                            ))
-                        }
 
-                        <View
-                            key={'last'}
-                            style={{ height: 208, width: 82, borderRadius: 10, marginHorizontal: 6, justifyContent: 'center', alignItems: 'center' }}
-                        >
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 16, marginBottom: 8 }}>더보기</Text>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 20 }}>{'->'}</Text>
+                {/* 일정 홍보 */}
+                <View style={{ marginTop: 32 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
+                        <Text style={{
+                            fontSize: 18,
+                            fontFamily: 'NanumSquareNeo-Bold',
+                            height: 20
+                        }}>
+                            인원을 모으는 중인 활동
+                        </Text>
+
+                        <Pressable>
+                            <Text style={{
+                                fontSize: 14,
+                                fontFamily: 'NanumSquareNeo-Light',
+                                height: 16
+                            }}>
+                                더 알아보기 {'>'}
+                            </Text>
+                        </Pressable>
+                    </View>
+
+                    <ScrollView style={{ height: 126, }} horizontal showsHorizontalScrollIndicator={false}>
+                        <View style={{ flex: 1, flexDirection: 'row' }}>
+                            <View style={{ marginLeft: 18 }} />
+                            {
+                                Array(18).fill(null).map((_, index) => (
+                                    <View
+                                        key={index}
+                                        style={{ height: 126, width: 136, borderColor: Color['grey100'], borderRadius: 10, marginHorizontal: 6, borderWidth: 1 }}
+                                    >
+                                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'], fontSize: 14, marginHorizontal: 8, marginTop: 12 }} numberOfLines={2} ellipsizeMode='tail'>인인 활동입니다</Text>
+                                        <View style={{ marginHorizontal: 10, flexDirection: 'row', alignItems: 'center', bottom: 32, position: 'absolute' }}>
+                                            <View style={{ width: 24, height: 24, backgroundColor: Color['grey200'], }} />
+                                            <View style={{ width: 4 }} />
+                                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], fontSize: 14 }}>{`24`}</Text>
+                                        </View>
+                                        <View style={{ marginHorizontal: 6, flexDirection: 'row', bottom: 12, position: 'absolute' }}>
+                                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], fontSize: 12 }}>{`#술모임`}</Text>
+                                            <View style={{ width: 4 }} />
+                                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], fontSize: 12 }}>{`#술모임`}</Text>
+                                        </View>
+                                    </View>
+                                ))
+                            }
+                            <View
+                                key={'last'}
+                                style={{ height: 126, width: 82, borderRadius: 10, marginHorizontal: 6, justifyContent: 'center', alignItems: 'center' }}
+                            >
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 16, marginBottom: 8 }}>더보기</Text>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 20 }}>{'->'}</Text>
+                            </View>
                         </View>
                         <View style={{ marginRight: 18 }} />
+                    </ScrollView>
+                </View>
+
+
+
+                {/* 공연 홍보 */}
+                <View style={{ marginTop: 32 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
+                        <Text style={{
+                            fontSize: 18,
+                            fontFamily: 'NanumSquareNeo-Bold',
+                            height: 20
+                        }}>
+                            공연 홍보
+                        </Text>
+                        <Pressable>
+                            <Text style={{
+                                fontSize: 14,
+                                fontFamily: 'NanumSquareNeo-Light',
+                                height: 16
+                            }}>
+                                더 알아보기 {'>'}
+                            </Text>
+                        </Pressable>
                     </View>
-                </ScrollView>
-            </View>
+
+                    <ScrollView style={{ height: 208, }} horizontal showsHorizontalScrollIndicator={false}>
+                        <View style={{ flex: 1, flexDirection: 'row', }}>
+                            <View style={{ marginLeft: 18 }} />
+                            {
+                                Array(6).fill(null).map((_, index) => (
+                                    <View
+                                        key={index}
+                                        style={{ height: 208, width: 136, borderColor: Color['grey100'], borderRadius: 10, marginHorizontal: 6, overflow: 'hidden', borderWidth: 1 }}
+                                    >
+                                        <View style={{ height: 148, backgroundColor: Color['blue100'] }} />
+                                        <Text style={{ marginHorizontal: 8, marginTop: 8, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 14 }}>산틀-산데렐라</Text>
+                                        <View style={{ marginHorizontal: 10, flexDirection: 'row', alignItems: 'center', bottom: 4, position: 'absolute' }}>
+                                            <View style={{ width: 20, height: 20, backgroundColor: Color['red200'], }} />
+                                            <View style={{ width: 4 }} />
+                                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['red400'], fontSize: 12 }}>{`24`}</Text>
+                                        </View>
+                                    </View>
+                                ))
+                            }
+
+                            <View
+                                key={'last'}
+                                style={{ height: 208, width: 82, borderRadius: 10, marginHorizontal: 6, justifyContent: 'center', alignItems: 'center' }}
+                            >
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 16, marginBottom: 8 }}>더보기</Text>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 20 }}>{'->'}</Text>
+                            </View>
+                            <View style={{ marginRight: 18 }} />
+                        </View>
+                    </ScrollView>
+                </View>
 
 
 
 
 
-            {/* 푸터 */}
-            <View style={styles.footer}>
-                <Text>
-                    여기가 푸터
-                </Text>
-            </View>
-        </ScrollView >
+                {/* 푸터 */}
+                <View style={styles.footer}>
+                    <Text>
+                        여기가 푸터
+                    </Text>
+                </View>
+                {isUsed && <View style={{ height: 24 }} />}
+            </ScrollView>
+            {isUsed && <Animated.View style={{ position: 'absolute', left: 0, right: 0, bottom: animatedValue, height: 196, flex: 1, }}>
+                <View style={{ backgroundColor: `rgba(0,0,0,0.8)`, flex: 1, borderRadius: 15, overflow: 'hidden' }}>
+                    <Pressable
+                        onPress={toggleBottomSheet}>
+                        <View style={{ height: 26, width: 40, marginVertical: 4, backgroundColor: '#FFF', alignSelf: 'center' }} />
+                    </Pressable>
+                    <View style={{ flexDirection: 'row', marginHorizontal: 24, justifyContent: 'space-between' }}>
+                        <View style={{ justifyContent: 'center', height: 64 }}>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>남은 예약 시간</Text>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'], fontSize: 12 }}>(17:00~19:00)</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: 110 }}>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>1 시간</Text>
+                            <View style={{ width: 8 }} />
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>20 분</Text>
+                        </View>
+                        <Pressable style={{ justifyContent: 'center' }}
+                            onPress={()=>navigation.push('UsingManage')}>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14, backgroundColor: `rgba(0,0,0,0.8)`, padding: 16, borderRadius: 8, overflow: 'hidden' }}>{`연장/종료`}</Text>
+                        </Pressable>
+                    </View>
+                </View>
+            </Animated.View>}
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        position: 'relative',
         backgroundColor: 'white',
         overflow: 'scroll',
     },
@@ -372,7 +438,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow: 'hidden'
     },
-    footer: { marginLeft: 24, height: 120, marginTop: 48, marginBottom: 96 }
+    footer: { marginLeft: 24, height: 20, marginTop: 48, marginBottom: 96 }
 });
 
 export default HomeScreen;

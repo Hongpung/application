@@ -5,7 +5,7 @@ type ColorType = {
 export const Color:ColorType={
     red100: "#FFEBE7",
     red200: "#EFBCB5",
-    red300: "#EFAA00",
+    red300: "#EFAAA0",
     red400: "#ED7E6E",
     red500: "#F26B57",
     red600: "#EE4F38",

@@ -14,6 +14,8 @@ import InstrumentEditScreen from '../pages/Home/MyClub/Instruments/InstrumentEdi
 import { InstrumentProvider, useInstrument } from '../pages/Home/MyClub/Instruments/context/InstrumentContext';
 import ClubCalendar from '../pages/Home/MyClub/ClubCalendar/ClubCalendar';
 import PracticeInfoScreen from '../pages/share/PracticeInfoScreen';
+import UsingManageScreen from '../pages/Home/UsingManageScreen';
+import NotificationSettingScreen from '../pages/Setting/NotificationSetting';
 
 // HomeStack Navigator
 const HomeStack = createNativeStackNavigator();
@@ -43,6 +45,23 @@ const HomeStacks = () => {
                 component={MyClubStacks}
                 options={{
                     animation: 'none',
+                }}
+            />
+            <HomeStack.Screen
+                name='UsingManage'
+                component={UsingManageScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => <Header leftButton='X' HeaderName='현재 정보' />
+                }}
+            />
+            <HomeStack.Screen
+                name='NotificationSetting'
+                component={NotificationSettingScreen}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='<-' HeaderName='알림 설정' />
                 }}
             />
         </HomeStack.Navigator>
@@ -80,6 +99,14 @@ const MyPageStacks = () => {
                     headerShown: true,
                     animation: 'none',
                     header: () => <Header leftButton='<-' HeaderName='내 배지' />
+                }}
+            />
+            <MyPageStack.Screen
+                name='MyCalendar'
+                component={ClubCalendar}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='<-' HeaderName='내 활동' />
                 }}
             />
         </MyPageStack.Navigator>

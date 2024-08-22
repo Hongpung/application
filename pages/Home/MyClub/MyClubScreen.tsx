@@ -1,17 +1,26 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Color } from '../../../ColorSet'
 import { HomeStackParamList } from '../../../pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ProfileMiniCard from '../../../components/cards/ProfileMiniCard'
 import { UserProvider } from '../../../context/UserContext';
 import { UserModal } from './ClubMember/ClubMemeberScreen';
+import { throttle } from 'lodash';
 
 
 type MyClubProps = NativeStackScreenProps<HomeStackParamList, 'MyClubHome'>;
 
 const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
 
+    const throttledNavigation = useMemo(
+        () =>
+            throttle((ScreenName:any) => {
+            navigation.push(ScreenName);  // 원하는 화면으로 navigation
+          }, 2000,
+          { leading: true, trailing: false }),
+        [navigation]
+      );
     interface subMenu {
         name: string,
         link: string
@@ -39,7 +48,7 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                             <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>동아리 관리</Text>
                         </View>
                         {manageClubMenu.map((subMenu: subMenu, index: number) => {
-                            return (<Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => { navigation.push(subMenu.link) }}>
+                            return (<Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => {throttledNavigation(subMenu.link)}}>
                                 <Text style={styles.subMenuTitle}>{subMenu.name}</Text><Text style={styles.subMenuArrow}>{'>'}</Text>
                             </Pressable>)
                         })}

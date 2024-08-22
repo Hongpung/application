@@ -7,7 +7,7 @@ import LongButton from '../../components/buttons/LongButton'
 
 const PracticeInfoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     return (
-        <View style={{ flex: 1, backgroundColor: '#FFF', alignItems: 'center' }}>
+        <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <ScrollView contentContainerStyle={{ backgroundColor: '#FFF' }}>
                 <View style={{ height: 12 }} />
                 <View style={{ marginHorizontal: 24, height: 80, borderWidth: 1, borderRadius: 10, borderColor: Color['grey200'] }}>
@@ -267,7 +267,7 @@ const PracticeInfoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <View style={{ height: 8 }} />
 
             </ScrollView>
-            <View style={{paddingVertical:8}}>
+            <View style={{paddingVertical:8, marginHorizontal:24}}>
                 <LongButton color='green' innerText='이미지로 저장' isAble={true} onPress={() => { }} />
             </View>
         </View>
