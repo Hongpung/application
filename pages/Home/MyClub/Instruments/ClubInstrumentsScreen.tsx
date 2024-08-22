@@ -1,12 +1,12 @@
 import { ScrollView, View, Text } from "react-native"
-import { Instrument, instrumentOrder } from "../UserType"
-import { HomeStackParamList } from "./pageTypes"
+import { Instrument, instrumentOrder } from "../../../../UserType"
+import { HomeStackParamList } from "../../../../pageTypes"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import InstrumentCard from "../components/cards/InstrumentCard"
-import { Color } from "../ColorSet"
+import InstrumentCard from "../../../../components/cards/InstrumentCard"
+import { Color } from "../../../../ColorSet"
 
 
-type ClubInstrumentsScreenProps = NativeStackScreenProps<HomeStackParamList, 'ClubInstruments'>
+type ClubInstrumentsScreenProps = NativeStackScreenProps<HomeStackParamList, 'InstrumentsHome'>
 
 const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any }> = ({ instrumentsList, navigation }) => {
 
@@ -46,7 +46,7 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
         return rows;
     };
     return (
-        <View>
+        <View style={{flex:1}}>
             {renderInstruments()}
         </View>
     )

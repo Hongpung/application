@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { Color } from '../ColorSet'
-import LongButton from '../components/buttons/LongButton';
-import { RootStackParamList } from './pageTypes';
+import { Color } from '../../ColorSet'
+import LongButton from '../../components/buttons/LongButton';
+import { RootStackParamList } from '../../pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as Notifications from 'expo-notifications';
 import { Camera } from 'expo-camera';

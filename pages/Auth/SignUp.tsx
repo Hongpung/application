@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { RootStackParamList } from './pageTypes';
-import { Color } from '../ColorSet'
-import InputComponent from '../components/inputs/InputComponent';
-import LongButton from '../components/buttons/LongButton';
-import SignUpEmailInput from '../components/inputs/SignupEmailInput';
+import { RootStackParamList } from '../../pageTypes';
+import { Color } from '../../ColorSet'
+import InputComponent from '../../components/inputs/InputComponent';
+import LongButton from '../../components/buttons/LongButton';
+import SignUpEmailInput from '../../components/inputs/SignupEmailInput';
 
 type SignUpProps = NativeStackScreenProps<RootStackParamList, "SignUp">;
 

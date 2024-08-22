@@ -24,11 +24,11 @@ export default LongButton
 
 const styles = StyleSheet.create({
     basic:{
+        marginHorizontal:24,
         height:56,
         justifyContent:'center',
         alignItems:'center',
         borderRadius:15,
-        width:320
     },basicText:{
         fontSize:16,
         fontWeight:500,

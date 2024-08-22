@@ -1,7 +1,7 @@
 import React, { useState,  useEffect } from 'react';
 import { StyleSheet, Text, View, Button, Pressable, Linking, Dimensions } from 'react-native';
 import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
-import { Color } from '../ColorSet';
+import { Color } from '../../ColorSet';
 import { debounce } from 'lodash';
 
 const QRScanScreen: React.FC = () => {

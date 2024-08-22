@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Modal, FlatList } from 'react-native';
-import { Color } from '../ColorSet.ts'
+import { Color } from '../../ColorSet'
 import PagerView from 'react-native-pager-view';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { HomeStackParamList } from './pageTypes';
-import { debounce } from 'lodash';
+import { HomeStackParamList } from '../../pageTypes.js';
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
 
@@ -61,7 +60,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     }, [])
 
     return (
-        <ScrollView style={styles.container}>
+        <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
 
             {/* 상단 아이콘 부분*/}
             <View style={styles.iconsRow}>
@@ -147,9 +146,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
 
                 {/* 배너 인디케이터 */}
-                <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', width: 92, height: 20, justifyContent: 'center' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 88, height: 16 }}>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', width: 36, paddingLeft: 4, fontSize: 10, textAlignVertical: 'center', textAlign: 'right' }}>{bannerNum < 9 ? '0' + (bannerNum + 1) : bannerNum + 1}/{bannerMass < 10 ? '0' + bannerMass : bannerMass}</Text>
+                <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 2, height: 20, justifyContent: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 16, width: 100 }}>
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', width: 42, fontSize: 10, textAlignVertical: 'center', textAlign: 'right' }}>{bannerNum < 9 ? '0' + (bannerNum + 1) : bannerNum + 1}/{bannerMass < 10 ? '0' + bannerMass : bannerMass}</Text>
                         <Pressable onPress={() => setModalVisible(true)}>
                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', height: 12, fontSize: 10, width: 56, textAlignVertical: 'center', textAlign: 'center' }}>모두보기 +</Text>
                         </Pressable>
@@ -158,7 +157,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             </View>
 
             <Modal transparent={true} visible={modalVisible}>
-                <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)',}}>
+                <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', }}>
 
                     <Pressable style={{ flex: 1 }} onPress={() => setModalVisible(false)}>
                         <View style={{ flexDirection: 'row', height: 64, justifyContent: 'flex-end', alignItems: 'center' }}>
@@ -169,7 +168,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                                 style={{ paddingHorizontal: 24, paddingVertical: 4 }}
                                 data={banners}
                                 renderItem={({ item, index }) => (
-                                    <Pressable key={index + 1} style={{ width: 320, height: 160, marginVertical: 8, borderRadius: 5, overflow: 'hidden' }} onPress={(e) => { e.stopPropagation(); setModalVisible(false); navigation.navigate('MyPage') }}>
+                                    <Pressable key={index + 1} style={{ width: 332, height: 160, marginVertical: 8, borderRadius: 5, overflow: 'hidden' }} onPress={(e) => { e.stopPropagation(); navigation.navigate('MyPage'); setModalVisible(false); }}>
                                         <View style={[{ flex: 1, backgroundColor: item.backgroundColor }]}>
                                             <View style={{ position: 'absolute', top: 36, left: 22 }}>
                                                 <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{item.Title}</Text>
@@ -360,7 +359,7 @@ const styles = StyleSheet.create({
         marginLeft: 4
     },
     ScheduleOfDate: {
-        marginHorizontal: 26,
+        marginHorizontal: 24,
         height: 160,
         borderRadius: 10,
         marginTop: 12,

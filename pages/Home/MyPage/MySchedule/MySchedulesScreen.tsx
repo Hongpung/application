@@ -1,8 +1,8 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
-import { HomeStackParamList } from './pageTypes';
+import { HomeStackParamList } from '../../../../pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Color } from '../ColorSet';
+import { Color } from '../../../../ColorSet';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 
@@ -43,10 +43,6 @@ const MySchedulesScreen: React.FC = () => {
             </View>
         </View>)
     }
-    const cardWidth = 320;
-    const cardHeight = 160;
-    const focusX = 100;
-    const focusY = 180;
 
     return (
         <View style={{
@@ -57,16 +53,19 @@ const MySchedulesScreen: React.FC = () => {
         }}>
             <View style={{ top: 0, height: 64, width: '100%', alignItems: 'center', }}>
                 <View style={{ paddingTop: 8, flexDirection: 'row', alignItems: 'center', height: 40 }}>
+                    {/* 이전 버튼 */}
                     <Pressable style={{ width: 32, height: 32, justifyContent: 'center', alignItems: 'center' }} onPress={subtractDate}>
-                        <Text style={{ fontSize: 26, color: Color['blue500'] }}>{'◀'}</Text>
+                        <Text style={{ fontSize: 20, color: Color['blue500'] }}>{'◀'}</Text>
                     </Pressable>
-                    <View style={{ width: 124, justifyContent: 'center', alignItems: 'center', marginHorizontal: 4 }}>
-                        <Text style={{ fontSize: 20, fontFamily: 'NanumSquareNeo-Bold' }}>
+
+                    <View style={{ width: 124, justifyContent: 'center', alignItems: 'center', marginHorizontal: 4, height: 32, }}>
+                        <Text style={{ fontSize: 20, fontFamily: 'NanumSquareNeo-Bold', textAlignVertical: 'center', }}>
                             {DateFormat(selectedDate)}
                         </Text>
                     </View>
+                    {/* 이후 버튼 */}
                     <Pressable style={{ width: 32, height: 32, justifyContent: 'center', alignItems: 'center' }} onPress={addDate}>
-                        <Text style={{ fontSize: 26, color: Color['blue500'] }}>{'▶'}</Text>
+                        <Text style={{ fontSize: 20, color: Color['blue500'] }}>{'▶'}</Text>
                     </Pressable>
                 </View>
             </View>
@@ -102,7 +101,7 @@ const MySchedulesScreen: React.FC = () => {
                             <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['blue500'] }}>내가 만든 일정 </Text><Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['grey800'] }}>|</Text><Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>7월 7일</Text>
                         </View>
                         <View style={{ position: 'absolute', width: 208, top: 62, left: 56 }}>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, textAlign: 'center' }}>내가 만든 일정</Text>
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, textAlign: 'center', }} numberOfLines={1} ellipsizeMode='tail' >내가 만든 일정 최대 12자</Text>
                         </View>
                         <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 50 }}>
                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>17:00~18:00</Text>
@@ -137,7 +136,7 @@ const MySchedulesScreen: React.FC = () => {
                             <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['green500'] }}>참가하는 일정 </Text><Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['grey800'] }}>|</Text><Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>7월 7일</Text>
                         </View>
                         <View style={{ position: 'absolute', width: 208, top: 62, left: 56 }}>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, textAlign: 'center' }}>내가 만든 일정 최대 12자</Text>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, textAlign: 'center', }} numberOfLines={1} ellipsizeMode='tail' >참가하는 일정 최대 12자</Text>
                         </View>
                         <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 50 }}>
                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>17:00~18:00</Text>

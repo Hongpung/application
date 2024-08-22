@@ -1,17 +1,16 @@
-import { StyleSheet, View } from 'react-native';
-import Tutorial from './pages/Tutorial';
+import { Platform, StyleSheet, View, SafeAreaView as SafeView, ViewStyle, StyleProp } from 'react-native';
+import Tutorial from './pages/Auth/Tutorial';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { RootStackParamList } from './pages/pageTypes';
-import Permission from './pages/Permission';
-import LoginScreen from './pages/LoginScreen';
-import SignUp from './pages/SignUp';
+import Permission from './pages/Auth/Permission';
+import LoginScreen from './pages/Auth/LoginScreen';
+import SignUp from './pages/Auth/SignUp';
 import Header from './components/Header';
-import HomeStacks from './nav/HomeStacks';
-
+import MainStacks from './nav/HomeStacks';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 const RootStack = createNativeStackNavigator();
@@ -42,7 +41,7 @@ const RootStacks: React.FC = () => {
       <RootStack.Screen name="Permission" component={Permission} />
       <RootStack.Screen name="Login" component={LoginScreen} />
       <RootStack.Screen name="SignUp" component={SignUp} options={{ headerShown: true, header: () => <Header leftButton='X' /> }} />
-      <RootStack.Screen name="HomeStack" component={HomeStacks} options={{ animation: 'none' }} />
+      <RootStack.Screen name="HomeStack" component={MainStacks} options={{ animation: 'none' }} />
     </RootStack.Navigator>
   )
 }
@@ -66,10 +65,26 @@ const App: React.FC = () => {
   if (!fontLoaded) {
     return null;
   }
+
+  const SafeZone: React.FC<{ children: any, style: StyleProp<ViewStyle> }> = ({ children, style }) => {
+    if (Platform.OS == 'android')
+      return (
+        <SafeAreaView style={[style]} >
+          {children}
+        </SafeAreaView>
+      )
+
+    return (
+      <SafeView style={style}>
+        {children}
+      </SafeView>
+    )
+  }
+
   return (
-    <View style={{ flex: 1, marginTop: 54, backgroundColor: "#FFFFFF" }}>
+    <SafeZone style={{ flex: 1, backgroundColor: "#FFFFFF",}}>
       <ContentsContainer />
-    </View>
+    </SafeZone>
   );
 }
 

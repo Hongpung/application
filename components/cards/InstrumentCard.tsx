@@ -3,17 +3,17 @@ import { View, StyleSheet, Text, Pressable, Image } from "react-native"
 
 import { Color } from "../../ColorSet"
 import { Instrument } from "../../UserType"
-import { useInstrument } from "../../context/InstrumentContext";
+import { useInstrument } from "../../pages/Home/MyClub/Instruments/context/InstrumentContext";
 
 
 const InstrumentCard: React.FC<{ instrument: Instrument, view: "inManage" | "inBorrow", navigation?: any }> = ({ instrument, view, navigation }) => {
 
     const [isPicked, setPicked] = useState(false && view == "inBorrow");
-    const {setSelectedInstrument} = useInstrument();
+    const { setSelectedInstrument } = useInstrument();
     const ClickHandler = () => {
         if (view == "inBorrow")
             setPicked(isPicked => !isPicked)
-        
+
         else { navigation.push('InstrumentSpecific'); setSelectedInstrument(instrument) }
     }
     const renderTag = () => {
@@ -35,10 +35,12 @@ const InstrumentCard: React.FC<{ instrument: Instrument, view: "inManage" | "inB
             style={[styles.card, { height: instrument?.nickname ? 172 : 156 }, isPicked && { borderColor: Color['blue500'], backgroundColor: Color['blue100'], borderWidth: 1, }]}>
             <View>
                 <View style={styles.imageContainer}>
-                    <Image
+                    {instrument.imgURL?<Image
                         source={{ uri: instrument.imgURL }}
                         style={styles.image}
-                    />
+                    />:
+                    <View style={{backgroundColor:Color['grey100'], flex:1,height:200,width:300}}>
+                    </View>}
                 </View>
 
                 <View style={styles.tagContainer}>
@@ -102,13 +104,15 @@ const styles = StyleSheet.create({
     tagText: {
         fontSize: 12,
         fontFamily: "NanumSquareNeo-Bold",
-        lineHeight:12
+        lineHeight: 12,
+        textAlignVertical:'center'
     },
     clubText: {
         alignSelf: 'center',
         color: Color['grey300'],
         fontSize: 12,
         fontFamily: "NanumSquareNeo-Bold",
+        textAlignVertical:'center'
     },
     nameContainer: {
         flexDirection: 'row',
@@ -120,13 +124,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: "NanumSquareNeo-Bold",
         color: Color['gre700'],
-        
+        textAlignVertical:'center'
     },
     nickNameContainer: {
         flexDirection: 'row',
         marginHorizontal: 16,
         marginTop: 4,
-        height: 12,
     },
     nickNameText: {
         color: Color['grey400'],

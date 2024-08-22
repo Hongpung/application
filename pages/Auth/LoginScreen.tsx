@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import InputComponent from '../components/inputs/InputComponent'
-import { Color } from '../ColorSet'
-import LongButton from '../components/buttons/LongButton'
-import CheckboxComponent from '../components/checkboxs/CheckboxComponent'
+import InputComponent from '../../components/inputs/InputComponent'
+import { Color } from '../../ColorSet'
+import LongButton from '../../components/buttons/LongButton'
+import CheckboxComponent from '../../components/checkboxs/CheckboxComponent'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { RootStackParamList } from './pageTypes'
+import { RootStackParamList } from '../../pageTypes'
 import { StackActions } from '@react-navigation/native'
 
 

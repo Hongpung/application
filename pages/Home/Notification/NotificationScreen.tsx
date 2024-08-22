@@ -1,10 +1,10 @@
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Color } from '../ColorSet';
+import { Color } from '../../../ColorSet';
 
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { HomeStackParamList } from './pageTypes';
+import { HomeStackParamList } from '../../../pageTypes';
 
 
 enum NotificationType {

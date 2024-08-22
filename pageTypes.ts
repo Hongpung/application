@@ -11,9 +11,13 @@ export type HomeStackParamList = {
     BottomNav: undefined;
     Notification: any;
     MyPage: any;
+    MyPageHome:any;
     MySchedules:any;
     MyBadges:any
     MyClub:any
     ClubMembers:any
     ClubInstruments:any
+    MyClubHome:any
+    ClubMembersHome:any
+    InstrumentsHome:any
 };

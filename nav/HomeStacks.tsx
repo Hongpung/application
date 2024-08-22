@@ -1,61 +1,207 @@
+import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Header from '../components/Header';
-import NotificationScreen from '../pages/NotificationScreen';
-import MyPageScreen from '../pages/MyPageScreen';
-import MySchedulesScreen from '../pages/MySchedulesScreen';
-import MyBadgeScreen from '../pages/MyBadgeScreen';
+import NotificationScreen from '../pages/Home/Notification/NotificationScreen';
+import MyPageScreen from '../pages/Home/MyPage/MyPageScreen';
+import MySchedulesScreen from '../pages/Home/MyPage/MySchedule/MySchedulesScreen';
+import MyBadgeScreen from '../pages/Home/MyPage/MyBadge/MyBadgeScreen';
 import BottomNav from './BottomNav';
-import MyClubScreen from '../pages/MyClubScreen';
-import ClubMemeberScreen from '../pages/ClubMemeberScreen';
-import ClubInstrumentsScreen from '../pages/ClubInstrumentsScreen';
-import InstrumentSpecificScreen from '../pages/InstrumentSpecificScreen';
-import InstrumentEditScreen from '../pages/InstrumentEditScreen';
-import { InstrumentProvider, useInstrument } from '../context/InstrumentContext';
+import MyClubScreen from '../pages/Home/MyClub/MyClubScreen';
+import ClubMemeberScreen from '../pages/Home/MyClub/ClubMember/ClubMemeberScreen';
+import ClubInstrumentsScreen from '../pages/Home/MyClub/Instruments/ClubInstrumentsScreen';
+import InstrumentSpecificScreen from '../pages/Home/MyClub/Instruments/InstrumentSpecificScreen';
+import InstrumentEditScreen from '../pages/Home/MyClub/Instruments/InstrumentEditScreen';
+import { InstrumentProvider, useInstrument } from '../pages/Home/MyClub/Instruments/context/InstrumentContext';
+import ClubCalendar from '../pages/Home/MyClub/ClubCalendar/ClubCalendar';
+import PracticeInfoScreen from '../pages/share/PracticeInfoScreen';
 
-
+// HomeStack Navigator
 const HomeStack = createNativeStackNavigator();
 
-
 const HomeStacks = () => {
+    return (
+        <HomeStack.Navigator initialRouteName="BottomNav" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+            <HomeStack.Screen name="BottomNav" component={BottomNav} options={{}} />
+            <HomeStack.Screen
+                name="Notification"
+                component={NotificationScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => <Header leftButton='X' HeaderName='알림' />
+                }}
+            />
+            <HomeStack.Screen
+                name="MyPage"
+                component={MyPageStacks}
+                options={{
+                    animation: 'none',
+                }}
+            />
+            <HomeStack.Screen
+                name="MyClub"
+                component={MyClubStacks}
+                options={{
+                    animation: 'none',
+                }}
+            />
+        </HomeStack.Navigator>
+    );
+};
 
+// MyPageStack Navigator
+const MyPageStack = createNativeStackNavigator();
+
+const MyPageStacks = () => {
+    return (
+        <MyPageStack.Navigator initialRouteName="MyPageHome" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+            <MyPageStack.Screen
+                name="MyPageHome"
+                component={MyPageScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => <Header leftButton='X' HeaderName='마이페이지' />
+                }}
+            />
+            <MyPageStack.Screen
+                name="MySchedules"
+                component={MySchedulesScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => <Header leftButton='<-' HeaderName='내 일정' />
+                }}
+            />
+            <MyPageStack.Screen
+                name="MyBadges"
+                component={MyBadgeScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => <Header leftButton='<-' HeaderName='내 배지' />
+                }}
+            />
+        </MyPageStack.Navigator>
+    );
+};
+
+// MyClubStack Navigator
+const MyClubStack = createNativeStackNavigator();
+
+const MyClubStacks = () => {
+    return (
+        <MyClubStack.Navigator initialRouteName="MyClubHome" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+            <MyClubStack.Screen
+                name="MyClubHome"
+                component={MyClubScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => <Header leftButton='<-' HeaderName='우리 동아리' />
+                }}
+            />
+            <MyClubStack.Screen
+                name="ClubMembers"
+                component={MyClubMembersStacks}
+            />
+            <MyClubStack.Screen
+                name="Instruments"
+                component={InstrumentStacks}
+            />
+            <MyClubStack.Screen
+                name='ClubCalendar'
+                component={ClubCalendar}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='<-' HeaderName='연습 기록 보기' />
+                }}
+            />
+            <MyClubStack.Screen
+                name='PracticeInfo'
+                component={PracticeInfoScreen}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='<-' HeaderName='연습 상세 기록' />
+                }}
+            />
+
+        </MyClubStack.Navigator>
+    );
+};
+
+// MyClubMembersStack Navigator
+const MyClubMembersStack = createNativeStackNavigator();
+
+const MyClubMembersStacks = () => {
+    return (
+        <MyClubMembersStack.Navigator initialRouteName="ClubMembersHome" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+            <MyClubMembersStack.Screen
+                name="ClubMembersHome"
+                component={ClubMemeberScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => <Header leftButton='<-' HeaderName='우리 동아리' />
+                }}
+            />
+        </MyClubMembersStack.Navigator>
+    );
+};
+
+// InstrumentStack Navigator with Context
+const InstrumentStack = createNativeStackNavigator();
+
+const InstrumentStacks = () => {
     return (
         <InstrumentProvider>
-            <HomeStack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right', }}>
-                <HomeStack.Screen name="BottomNav" component={BottomNav} options={{}} />
-                <HomeStack.Screen name="Notification" component={NotificationScreen} options={{ headerShown: true, animation: 'none', header: () => <Header leftButton='X' HeaderName='알림' />, }} />
-                <HomeStack.Screen name="MyPage" component={MyPageScreen} options={{ headerShown: true, animation: 'none', header: () => <Header leftButton='X' HeaderName='마이페이지' /> }} />
-                <HomeStack.Screen name="MySchedules" component={MySchedulesScreen} options={{ headerShown: true, animation: 'none', header: () => <Header leftButton='<-' HeaderName='내 일정' /> }} />
-                <HomeStack.Screen name="MyBadges" component={MyBadgeScreen} options={{ headerShown: true, animation: 'none', header: () => <Header leftButton='<-' HeaderName='내 배지' /> }} />
-                <HomeStack.Screen name="MyClub" component={MyClubScreen} options={{ headerShown: true, animation: 'none', header: () => <Header leftButton='<-' HeaderName='우리 동아리' /> }} />
-                <HomeStack.Screen name="ClubMembers" component={ClubMemeberScreen} options={{ headerShown: true, animation: 'none', header: () => <Header leftButton='<-' HeaderName='동아리원' /> }} />
-                <HomeStack.Screen name="ClubInstruments" component={ClubInstrumentsScreen} options={{ headerShown: true, animation: 'none', header: () => <Header leftButton='<-' HeaderName='악기 관리' /> }} />
-                <HomeStack.Screen name="InstrumentSpecific" component={InstrumentSpecificScreen} options={({ navigation }) => ({
-                    headerShown: true,
-                    animation: 'none',
-                    header: () => <Header
-                        leftButton='X'
-                        HeaderName='악기 상세'
-                        RightButton='수정'
-                        RightAction={() => navigation.push('InstrumentEdit')}
-                        addLeftAction={() => {
-                            const { setSelectedInstrument } = useInstrument()
-                            setSelectedInstrument(null);
-                        }}
-                    />
-                })} />
-                <HomeStack.Screen name="InstrumentEdit" component={InstrumentEditScreen} options={({ navigation }) => ({
-                    headerShown: true,
-                    animation: 'none',
-                    header: () => <Header
-                        leftButton='<-'
-                        HeaderName='악기 수정'
-                        RightButton='저장'
-                        RightAction={() => navigation.goBack()} // 네비게이션 동작 추가
-                    />
-                })} />
-            </HomeStack.Navigator>
+            <InstrumentStack.Navigator initialRouteName="InstrumentsHome" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+                <InstrumentStack.Screen
+                    name="InstrumentsHome"
+                    component={ClubInstrumentsScreen}
+                    options={{
+                        headerShown: true,
+                        animation: 'none',
+                        header: () => <Header leftButton='<-' HeaderName='악기 관리' />
+                    }}
+                />
+                <InstrumentStack.Screen
+                    name="InstrumentSpecific"
+                    component={InstrumentSpecificScreen}
+                    options={({ navigation }) => ({
+                        headerShown: true,
+                        animation: 'none',
+                        header: () => (
+                            <Header
+                                leftButton='X'
+                                HeaderName='악기 상세'
+                                RightButton='수정'
+                                RightAction={() => navigation.push('InstrumentEdit')}
+                                addLeftAction={() => {
+                                    const { setSelectedInstrument } = useInstrument();
+                                    setSelectedInstrument(null);
+                                }}
+                            />
+                        )
+                    })}
+                />
+                <InstrumentStack.Screen
+                    name="InstrumentEdit"
+                    component={InstrumentEditScreen}
+                    options={{
+                        headerShown: true,
+                        animation: 'none',
+                        header: () => (
+                            <Header
+                                leftButton='<-'
+                                HeaderName='악기 수정'
+                            />
+                        )
+                    }}
+                />
+            </InstrumentStack.Navigator>
         </InstrumentProvider>
     );
-}
+};
 
 export default HomeStacks;

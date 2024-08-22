@@ -1,12 +1,10 @@
 import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator, Pressable, Modal, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
-import { HomeStackParamList } from './pageTypes';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Color } from '../ColorSet';
+import { Color } from '../../../../ColorSet';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
-import { BadgeProvider, useBadge, Badge } from '../context/BadgeContext';
+import { BadgeProvider, useBadge, Badge } from '../../../../context/BadgeContext';
 
-type MyBadgeProps = NativeStackScreenProps<HomeStackParamList, 'MyBadges'>;
+// 현재 유저의 대표 뱃지 변경 기능
 
 const BadgeShadow: React.FC<{ width: number, height: number }> = ({ width, height }) => {
     return (
@@ -48,7 +46,7 @@ const BadgeComponent: React.FC<{ badge: Badge }> = ({ badge }) => {
         setSelectedBadge(badge);
         setModalVisible(true);
     };
-    
+
     return (
         <Pressable onPress={handleBadgeOnPress} style={{ height: 84, width: 72, flexDirection: 'column' }}>
             <View style={{ height: 72, width: 72, borderRadius: 100, overflow: 'hidden' }}>
@@ -95,7 +93,7 @@ const BadgeList: React.FC<BadgeListProps> = ({ badgeList }) => {
     )
 }
 
-const MyBadgeScreen: React.FC<MyBadgeProps> = ({ navigation }) => {
+const MyBadgeScreen: React.FC = () => {
 
     const haveBadge = [{
         name: "그냥 배지",
@@ -227,12 +225,4 @@ const BadgeModal: React.FC = () => {
     );
 };
 
-export default MyBadgeScreen
-
-const styles = StyleSheet.create({
-
-    blurbox: {
-        ...StyleSheet.absoluteFillObject,
-        width: 64, height: 20, borderRadius: 10,
-    }
-})
+export default MyBadgeScreen;

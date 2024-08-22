@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View, ScrollView, Image } from 'react-native'
 import React from 'react'
 import { useRoute } from '@react-navigation/native';
-import { Color } from '../ColorSet';
-import { Instrument } from '../UserType';
-import { useInstrument } from '../context/InstrumentContext';
+import { Color } from '../../../../ColorSet';
+import { Instrument } from '../../../../UserType';
+import { useInstrument } from './context/InstrumentContext';
 
 interface Reserve {
     date: Date
@@ -14,7 +14,7 @@ interface Reserve {
 
 const InstrumentSpecificScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const {selectedInstrument} = useInstrument();
-    const instrument = selectedInstrument!;
+    const instrument:Instrument = selectedInstrument!;
     
     const preReserves: Reserve[] = [
         {

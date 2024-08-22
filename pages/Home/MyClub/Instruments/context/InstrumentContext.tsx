@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { Instrument } from '../UserType';
-
+import { Instrument } from '../../../../../UserType';
 
 interface IndstrumentContextProps {
     selectedInstrument: Instrument | null;

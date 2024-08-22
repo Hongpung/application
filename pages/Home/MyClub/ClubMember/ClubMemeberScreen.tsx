@@ -1,23 +1,23 @@
 import React, { useState } from "react";
 import { View, ScrollView, Modal, Pressable, Image, Text } from "react-native";
-import ProfileMiniCard from "../components/cards/ProfileMiniCard";
-import { Color } from "../ColorSet";
-import ProfileBoxCard from "../components/cards/PrifileBoxCard";
-import { instrumentOrder, User } from "../UserType";
-import { HomeStackParamList } from "./pageTypes";
+import ProfileMiniCard from "../../../../components/cards/ProfileMiniCard";
+import { Color } from "../../../../ColorSet";
+import ProfileBoxCard from "../../../../components/cards/PrifileBoxCard";
+import { instrumentOrder, User } from "../../../../UserType";
+import { HomeStackParamList } from "../../../../pageTypes";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { UserProvider, useUser } from "../context/UserContext";
+import { UserProvider, useUser } from "../../../../context/UserContext";
 
-type ClubMembersProps = NativeStackScreenProps<HomeStackParamList, 'ClubMembers'>
+type ClubMembersProps = NativeStackScreenProps<HomeStackParamList, 'ClubMembersHome'>
 
 
 
 const MemeberList: React.FC<{ memberList: User[] }> = ({ memberList }) => {
 
     return (
-        <View>
+        <View style={{flex:1}}>
             {memberList.map((member) => (
-                <View style={{ marginVertical: 8 }}>
+                <View style={{ marginVertical: 8, marginHorizontal:24 }}>
                     <ProfileMiniCard key={member.name} user={member} isPicked={false} view={'inClubView'} />
                 </View>
             ))}
@@ -61,7 +61,7 @@ const ClubMemeberScreen: React.FC<ClubMembersProps> = ({ navigation }) => {
     }
     ]
 
-    users.sort((a, b) => instrumentOrder(a.instrument) - instrumentOrder(b.instrument))
+    users.sort((a, b) => instrumentOrder(a.instrument) - instrumentOrder(b.instrument)) // 악기 순으로 정렬
 
     return (
         <UserProvider>
@@ -70,8 +70,6 @@ const ClubMemeberScreen: React.FC<ClubMembersProps> = ({ navigation }) => {
                 backgroundColor: '#fff',
             }}>
                 <ScrollView contentContainerStyle={{
-                    flexGrow: 1,
-                    alignItems: 'center',
                     backgroundColor: '#fff',
                 }}>
                     {users && <MemeberList memberList={users} />}
@@ -89,32 +87,30 @@ export const UserModal: React.FC = () => {
         setSelectedUser(null);
         setModalVisible(false)
     }
+
     return (
         <Modal transparent={true} visible={modalVisible}>
             <Pressable style={{
                 flex: 1,
                 justifyContent: 'center',
-                alignItems: 'center',
                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
             }}
                 onPress={CloseHandler}
             >
-                <Pressable style={{ width: 352, height: 326, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, alignItems: 'center', justifyContent: 'center' }} onPress={(event) => event.stopPropagation()}>
+                <Pressable style={{ height: 326, marginHorizontal: 4, paddingVertical: 6, paddingHorizontal: 12, borderRadius: 10 }} onPress={(event) => event.stopPropagation()}>
                     <ProfileBoxCard
                         user={selectedUser!}
                         isCard={true}
                     />
-
                     <Pressable
                         style={{
                             position: 'absolute',
-                            top: 8, right: 4, width: 36, height: 36, justifyContent: 'center', alignItems: 'center'
+                            top: 12, right: 12, width: 36, height: 36, justifyContent: 'center', alignItems: 'center'
                         }}
                         onPress={CloseHandler}
                     >
-                        <Text style={{ color: Color['grey700'], textAlign: 'center', fontFamily: 'NanumSquareNeo-Bold', fontSize: 18 }}>X</Text>
+                        <Text style={{ color: Color['grey700'], textAlign: 'center', fontFamily: 'NanumSquareNeo-Bold', fontSize: 20 }}>X</Text>
                     </Pressable>
-
                 </Pressable>
             </Pressable>
         </Modal>

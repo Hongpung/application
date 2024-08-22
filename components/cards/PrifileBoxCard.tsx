@@ -21,8 +21,8 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
 
     if (!user) return;
     return (
-        <View style={[styles.ProfileContainer, isCard ? { paddingTop: 12, paddingBottom: 20, borderWidth: 1, borderColor: Color['grey200'] } : null]}>
-            <View style={{ width: 304, flex: 1, marginHorizontal: 24, marginTop: 24 }}>
+        <View style={[styles.ProfileContainer, isCard ?{ marginHorizontal: 0, paddingHorizontal:8,paddingVertical:8 } : null]}>
+            <View style={{ flex: 1, marginHorizontal: 12, marginTop: 24 }}>
                 <View style={{ flexDirection: 'row', flex: 1 }}>
                     <View style={styles.ProfilePhoto} />
                     <View style={{
@@ -47,30 +47,27 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
                             </View>}
                         </View>
                         <View style={{ height: 40 }}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', width: 200, marginBottom: 6 }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginBottom: 6 }}>
                                 <Text style={{ fontSize: 18, fontFamily: "NanumSquareNeo-Regular", color: Color['grey700'] }}>Lv.1</Text>
                                 <Text style={{ fontSize: 10, textAlign: 'right', fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'] }}>12/20</Text>
                             </View>
-                            <View style={{ height: 8 }}>
-                                <View style={{ position: 'absolute', width: 200, height: 8, borderColor: Color['blue500'], borderWidth: 1, borderRadius: 2 }}></View>
-                                <View style={{ position: 'absolute', width: 120, height: 8, backgroundColor: Color['blue500'], borderTopLeftRadius: 2, borderBottomLeftRadius: 2 }}></View>
+                            <View style={{ height: 8, marginHorizontal: 0, borderColor: Color['blue500'], borderWidth: 0.5, borderRadius: 2, overflow: 'hidden' }}>
+                                <View style={{ position: "absolute", height: 8, paddingRight: 36, left: 0, backgroundColor: Color['blue500'] }}></View>
                             </View>
                         </View>
                     </View>
                 </View>
-                <View style={{ flex: 1, alignItems: 'center', marginTop: 8 }}>
-
-                    <View style={styles.info}>
-                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>이름(패명)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{user.name}{user.nickname ? `(${user.nickname})` : ''}</Text>
-                    </View>
-                    <View style={styles.info}>
-                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{user.club + `(${user.grade})`}</Text>
-                    </View>
-                    <View style={styles.info}>
-                        <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>역할</Text><Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'right', color: user.addRole == '상쇠' ? Color['red500'] : Color['blue500'], }}>{RoleTextRender()}</Text>
-                    </View>
-
+                <View style={{ height: 8 }} />
+                <View style={styles.info}>
+                    <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>이름(패명)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{user.name}{user.nickname ? `(${user.nickname})` : ''}</Text>
                 </View>
+                <View style={styles.info}>
+                    <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{user.club + `(${user.grade})`}</Text>
+                </View>
+                <View style={styles.info}>
+                    <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>역할</Text><Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'right', color: user.addRole == '상쇠' ? Color['red500'] : Color['blue500'], }}>{RoleTextRender()}</Text>
+                </View>
+
             </View>
         </View>
     )
@@ -84,7 +81,7 @@ const styles = StyleSheet.create({
         height: 292,
         borderRadius: 15,
         backgroundColor: 'white',
-        width: 352,
+        marginHorizontal: 24
     }, ProfilePhoto: {
         width: 90,
         height: 120,
@@ -107,7 +104,6 @@ const styles = StyleSheet.create({
         paddingTop: 32,
         marginTop: 32
     }, info: {
-        width: 300,
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginVertical: 12

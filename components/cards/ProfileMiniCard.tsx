@@ -46,7 +46,7 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked }) => {
         <View style={[styles.ProfileContainer, isPicked ? styles.PickedProfile : null,]}>
             <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
                 <View style={styles.ProfilePhoto} />
-                <View style={{ height: 42, justifyContent: 'space-evenly' }}>
+                <View style={{ height: 44, justifyContent: 'space-evenly' }}>
                     <View style={[{ flexDirection: 'row', flex: 1, alignItems: 'center', }, user.nickname ? { marginTop: 3 } : null]}>
                         <View style={styles.instrumnetMark} />
                         <Text style={styles.UserName}>{user.name}</Text>
@@ -93,7 +93,6 @@ const styles = StyleSheet.create({
     ProfileContainer: {
         position: 'relative',
         height: 112,
-        width: 320,
         borderRadius: 15,
         backgroundColor: '#FFF',
         borderWidth: 1,
@@ -124,7 +123,7 @@ const styles = StyleSheet.create({
         fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left'
     },
     UserNickName: {
-        fontSize: 14, color: Color['grey500'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left', marginTop: 4
+        fontSize: 14, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left', marginTop: 4
     },
     moreBtn: {
         fontSize: 12, color: Color['grey500'], fontFamily: "NanumSquareNeo-Light", textAlign: 'right', marginTop: 4
