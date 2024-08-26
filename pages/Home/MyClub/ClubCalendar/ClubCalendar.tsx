@@ -7,14 +7,14 @@ const ClubCalendar: React.FC<{ navigation: any }> = ({ navigation }) => {
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <ScrollView contentContainerStyle={{ backgroundColor: '#FFF' }}>
-                <Calendar />
+                <MiniCalendar />
                 <PrevPracticeList prevPractice={[1, 4, 5, 1, 4, 5]} onPress={() => navigation.push('PracticeInfo')} />
             </ScrollView>
         </View>
     )
 }
 
-const Calendar: React.FC = () => {
+const MiniCalendar: React.FC = () => {
     const [calendarMonth, setMonth] = useState(new Date)
     const [selectedDate, setDate] = useState<number | null>(null)
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);

@@ -14,7 +14,7 @@ const MyPageScreen: React.FC<MyPageProps> = ({ navigation }) => {
         link: string
     }
     const myActivities: subMenu[] = [{ name: '내 일정', link: 'MySchedules' }, { name: '내 활동', link: 'MyCalendar' }, { name: '내 배지', link: 'MyBadges' },]
-    const Settings: subMenu[] = [{ name: '알림 설정', link: 'NotificationSetting' }, { name: '로그인 설정', link: '' }, { name: '암호 잠금', link: '' }, { name: '앱 설정', link: '' },]
+    const Settings: subMenu[] = [{ name: '알림 설정', link: 'NotificationSetting' }, { name: '로그인 설정', link: 'LoginSetting' }, { name: '암호 잠금', link: '' }, { name: '앱 설정', link: '' },]
 
     return (
         <ScrollView style={styles.container}>

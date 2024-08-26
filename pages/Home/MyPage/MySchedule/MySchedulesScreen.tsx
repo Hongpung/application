@@ -32,16 +32,17 @@ const MySchedulesScreen: React.FC = () => {
     // }
 
     const RenderBlankDay: React.FC = () => {
-        return (<View style={{}}>
-            <View style={{ height: 70, marginTop: -120, justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text style={{ fontSize: 24, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey800'] }}>오늘 예정된 일정이 없어요!</Text>
-                <Pressable>
-                    <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>
-                        {`오늘의 참여 가능한 일정 둘러보기  >`}
-                    </Text>
-                </Pressable>
-            </View>
-        </View>)
+        return (
+            <View style={{}}>
+                <View style={{ height: 70, marginTop: -120, justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 24, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey800'] }}>오늘 예정된 일정이 없어요!</Text>
+                    <Pressable>
+                        <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>
+                            {`오늘의 참여 가능한 일정 둘러보기  >`}
+                        </Text>
+                    </Pressable>
+                </View>
+            </View>)
     }
 
     return (
@@ -101,7 +102,7 @@ const MySchedulesScreen: React.FC = () => {
                             <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['blue500'] }}>내가 만든 일정 </Text><Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['grey800'] }}>|</Text><Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>7월 7일</Text>
                         </View>
                         <View style={{ position: 'absolute', width: 208, top: 62, left: 56 }}>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, textAlign: 'center', }} numberOfLines={1} ellipsizeMode='tail' >내가 만든 일정 최대 12자</Text>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, textAlign: 'center', }} numberOfLines={1} ellipsizeMode='tail' >내가 만든 일정 최대 12자</Text>
                         </View>
                         <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 50 }}>
                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>17:00~18:00</Text>

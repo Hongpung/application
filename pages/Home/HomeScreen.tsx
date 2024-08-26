@@ -367,7 +367,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                         </View>
                         <Pressable style={{ justifyContent: 'center' }}
                             onPress={()=>navigation.push('UsingManage')}>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14, backgroundColor: `rgba(0,0,0,0.8)`, padding: 16, borderRadius: 8, overflow: 'hidden' }}>{`연장/종료`}</Text>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14, backgroundColor: `rgba(0,0,0,0.4)`, padding: 16, borderRadius: 8, overflow: 'hidden' }}>{`연장/종료`}</Text>
                         </Pressable>
                     </View>
                 </View>

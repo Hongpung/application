@@ -15,12 +15,10 @@ const QRScanScreen: React.FC = () => {
     }, [])
 
     if (!permission) {
-        // Camera permissions are still loading.
         return <View />;
     }
 
     if (!permission.granted) {
-        // Camera permissions are not granted yet.
         return (
             <View style={styles.container}>
                 <Text style={styles.message}>카메라 권한이 필요합니다</Text>

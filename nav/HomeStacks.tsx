@@ -16,15 +16,18 @@ import ClubCalendar from '../pages/Home/MyClub/ClubCalendar/ClubCalendar';
 import PracticeInfoScreen from '../pages/share/PracticeInfoScreen';
 import UsingManageScreen from '../pages/Home/UsingManageScreen';
 import NotificationSettingScreen from '../pages/Setting/NotificationSetting';
+import LoginSettingScreen from '../pages/Setting/LoginSetting';
+import ReserveCalendarScreen from '../pages/Reserve/ReserveCalendarScreen';
+import DailyReserveListScreen from '../pages/Reserve/DailyReserveListScreen';
 
 // HomeStack Navigator
-const HomeStack = createNativeStackNavigator();
+const MainStack = createNativeStackNavigator();
 
-const HomeStacks = () => {
+const MainStacks = () => {
     return (
-        <HomeStack.Navigator initialRouteName="BottomNav" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
-            <HomeStack.Screen name="BottomNav" component={BottomNav} options={{}} />
-            <HomeStack.Screen
+        <MainStack.Navigator initialRouteName="BottomNav" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+            <MainStack.Screen name="BottomNav" component={BottomNav} options={{}} />
+            <MainStack.Screen
                 name="Notification"
                 component={NotificationScreen}
                 options={{
@@ -33,21 +36,21 @@ const HomeStacks = () => {
                     header: () => <Header leftButton='X' HeaderName='알림' />
                 }}
             />
-            <HomeStack.Screen
+            <MainStack.Screen
                 name="MyPage"
                 component={MyPageStacks}
                 options={{
                     animation: 'none',
                 }}
             />
-            <HomeStack.Screen
+            <MainStack.Screen
                 name="MyClub"
                 component={MyClubStacks}
                 options={{
                     animation: 'none',
                 }}
             />
-            <HomeStack.Screen
+            <MainStack.Screen
                 name='UsingManage'
                 component={UsingManageScreen}
                 options={{
@@ -56,7 +59,7 @@ const HomeStacks = () => {
                     header: () => <Header leftButton='X' HeaderName='현재 정보' />
                 }}
             />
-            <HomeStack.Screen
+            <MainStack.Screen
                 name='NotificationSetting'
                 component={NotificationSettingScreen}
                 options={{
@@ -64,7 +67,31 @@ const HomeStacks = () => {
                     header: () => <Header leftButton='<-' HeaderName='알림 설정' />
                 }}
             />
-        </HomeStack.Navigator>
+            <MainStack.Screen
+                name='LoginSetting'
+                component={LoginSettingScreen}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='<-' HeaderName='로그인 설정' />
+                }}
+            />
+            <MainStack.Screen
+                name='ReserveCalendar'
+                component={ReserveCalendarScreen}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='<-' HeaderName='연습실 예약 조회' />
+                }}
+            />
+            <MainStack.Screen
+                name='DailyReserveList'
+                component={DailyReserveListScreen}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='<-' HeaderName='연습실 예약 조회' />
+                }}
+            />
+        </MainStack.Navigator>
     );
 };
 
@@ -231,4 +258,4 @@ const InstrumentStacks = () => {
     );
 };
 
-export default HomeStacks;
+export default MainStacks;

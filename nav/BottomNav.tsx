@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import HomeScreen from '../pages/Home/HomeScreen';
 import { Color } from '../ColorSet';
 import QRScanScreen from '../pages/QRScan/QRScanScreen';
+import ReserveMainScreen from '../pages/Reserve/ReserveMainScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -12,6 +13,7 @@ const BottomNav = () => {
     return (
         <Tab.Navigator initialRouteName="Home" screenOptions={{ tabBarStyle: { height: 80, borderTopLeftRadius: 20, borderTopRightRadius: 20, borderColor: 'transparent', backgroundColor: '#FFF', position: 'absolute' }, headerShown: false, tabBarIconStyle: { width: 36, height: 36, marginTop: 16, marginBottom: 2, backgroundColor: 'grey' }, tabBarLabelStyle: { fontFamily: 'NanumSquareNeo-Bold', fontSize: 12 } }}>
             <Tab.Screen name="Home" component={HomeScreen} />
+            <Tab.Screen name="Reserve" component={ReserveMainScreen} />
             <Tab.Screen name="QRScan" component={QRScanScreen} options={{ headerShown: true, header: () => <Header leftButton='X' HeaderName='QR스캔' />, tabBarLabel: 'QR스캔', tabBarStyle: { display: 'none' } }} />
             <Tab.Screen name="Chat" component={ChatScreen} options={{ headerShown: true, header: () => <Header leftButton='X' HeaderName='채팅' />, tabBarLabel: '채팅', tabBarStyle: { display: 'none' } }} />
         </Tab.Navigator>
