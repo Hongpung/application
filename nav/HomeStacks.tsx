@@ -19,13 +19,14 @@ import NotificationSettingScreen from '../pages/Setting/NotificationSetting';
 import LoginSettingScreen from '../pages/Setting/LoginSetting';
 import ReserveCalendarScreen from '../pages/Reserve/ReserveCalendarScreen';
 import DailyReserveListScreen from '../pages/Reserve/DailyReserveListScreen';
+import ReservationScreen from '../pages/Reserve/ReservationScreen';
 
 // HomeStack Navigator
 const MainStack = createNativeStackNavigator();
 
 const MainStacks = () => {
     return (
-        <MainStack.Navigator initialRouteName="BottomNav" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+        <MainStack.Navigator initialRouteName="BottomNav" screenOptions={{ headerShown: false, animationDuration: 50, animation: 'slide_from_right' }}>
             <MainStack.Screen name="BottomNav" component={BottomNav} options={{}} />
             <MainStack.Screen
                 name="Notification"
@@ -87,10 +88,19 @@ const MainStacks = () => {
                 name='DailyReserveList'
                 component={DailyReserveListScreen}
                 options={{
-                    headerShown: true,
-                    header: () => <Header leftButton='<-' HeaderName='연습실 예약 조회' />
+                    animation:'none',
                 }}
             />
+            <MainStack.Screen
+                name='Reservation'
+                component={ReservationScreen}
+                options={{
+                    animation:'none',
+                    headerShown: true,
+                    header: () => <Header leftButton='X' HeaderName='연습실 예약' />
+                }}
+            />
+            
         </MainStack.Navigator>
     );
 };

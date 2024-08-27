@@ -3,7 +3,7 @@ import React, { useRef } from 'react'
 import { Color } from '../../ColorSet'
 
 
-const { width } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 
 const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
@@ -18,8 +18,8 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
 
     return (
-        <View style={{ backgroundColor: '#FFF', flex: 1, justifyContent: 'center' }}>
-            <View>
+        <View style={{ backgroundColor: '#FFF', flex: 1}}>
+            <View style={{marginTop:264}}>
                 <View style={{ flexDirection: 'row', marginHorizontal: 32, justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 20 }}>연습실 이용상태</Text>
                     <View style={{ flexDirection: 'row' }}>

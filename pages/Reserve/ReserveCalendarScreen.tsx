@@ -2,7 +2,7 @@ import { useLayoutEffect, useState } from "react";
 import { Pressable, View, Text, StyleSheet, Dimensions } from "react-native";
 import { Color } from "../../ColorSet";
 
-const { width } = Dimensions.get(`window`);
+const { height, width } = Dimensions.get(`window`);
 
 const Calendar: React.FC<{ onClickDate: (date: Date) => void }> = ({ onClickDate }) => {
     const [calendarMonth, setMonth] = useState(new Date)
@@ -76,7 +76,7 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void }> = ({ onClickDate
                             {day % (calendarMonth.getMonth() - 6) == 0 && <View style={{ height: 4, backgroundColor: Color['green500'], width: 28, borderRadius: 5, marginTop: 2 }} />}
                             {day % 4 == 0 && <View style={{ height: 4, backgroundColor: Color['blue500'], width: 28, borderRadius: 5, marginTop: 2 }} />}
                         </View>
-                        {day % 8 == 0 && <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey500'], marginTop: 2 }}>+3</Text>}
+                        {day % 8 == 0 && <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'], marginTop: 2 }}>+3</Text>}
                     </Pressable>
                 );
             }
