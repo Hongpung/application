@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import CheckboxComponent from '../../components/checkboxs/CheckboxComponent'
 import { Color } from '../../ColorSet'
 import LongButton from '../../components/buttons/LongButton'
@@ -8,6 +8,10 @@ const ReservationScreen: React.FC<{ navigation: any, route: any }> = ({ navigati
     const { date } = route.params
     const selectedDate = new Date(date);
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
+    const [isParticipatible, setParticipatible] = useState(true);
+    const [isRegular, setRegular] = useState(true);
+    const [isAgree, setAgree] = useState(false)
+
     const DateString = useCallback(() => {
         return `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1)}.${selectedDate.getDate()}(${daysOfWeek[selectedDate.getDay()]})`
     }, [])
@@ -18,7 +22,8 @@ const ReservationScreen: React.FC<{ navigation: any, route: any }> = ({ navigati
                 <View style={{ height: 24 }} />
                 <Text style={{ marginHorizontal: 24, fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey500'] }}>예약 일시</Text>
                 <View style={{ height: 16 }} />
-                <View style={{ height: 100, marginHorizontal: 40, backgroundColor: Color['grey100'], borderRadius: 10 }}>
+                <Pressable style={{ height: 100, marginHorizontal: 40, backgroundColor: Color['grey100'], borderRadius: 10 }}
+                    onPress={() => { navigation.push('ResrvationDateSelect') }}>
                     <View style={{ flexDirection: 'row', marginTop: 8, marginLeft: 8, alignItems: 'center' }}>
                         <View style={{ height: 24, width: 24, backgroundColor: Color['grey300'], marginRight: 6 }} />
                         <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey700'] }}>{DateString()}</Text>
@@ -30,7 +35,7 @@ const ReservationScreen: React.FC<{ navigation: any, route: any }> = ({ navigati
                         </View>
                         <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'] }}>19:00</Text>
                     </View>
-                </View>
+                </Pressable>
 
                 <View style={{ height: 28 }} />
 
@@ -53,14 +58,40 @@ const ReservationScreen: React.FC<{ navigation: any, route: any }> = ({ navigati
 
                 <View style={{ marginHorizontal: 44, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>정기 연습</Text>
-                    <View style={{ width: 218, height: 36, borderRadius: 5, borderWidth: 1 }}></View>
+                    <View style={{ width: 218, height: 36, borderRadius: 5, flexDirection: 'row', alignItems: 'center' }}>
+                        <Pressable style={[{ width: 108, alignItems: 'center', borderBottomLeftRadius: 5, borderTopLeftRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderRightWidth: 0.5, borderColor: isRegular ? Color['blue500'] : Color['red500'] }, isRegular && { backgroundColor: Color['blue100'] }]}
+                            onPress={() => { setRegular(true) }}>
+                            <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, isRegular ? { color: Color['blue600'] } : { color: Color['red300'] }]}>
+                                예
+                            </Text>
+                        </Pressable>
+                        <Pressable style={[{ width: 108, alignItems: 'center', borderBottomRightRadius: 5, borderTopRightRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderLeftWidth: 0.5, borderColor: isRegular ? Color['blue500'] : Color['red500'] }, !isRegular && { backgroundColor: Color['red100'] }]}
+                            onPress={() => { setRegular(false) }}>
+                            <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, isRegular ? { color: Color['blue300'] } : { color: Color['red600'] }]}>
+                                아니오
+                            </Text>
+                        </Pressable>
+                    </View>
                 </View>
 
                 <View style={{ height: 20 }} />
 
                 <View style={{ marginHorizontal: 44, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>참여 가능</Text>
-                    <View style={{ width: 218, height: 36, borderRadius: 5, borderWidth: 1 }}></View>
+                    <View style={{ width: 218, height: 36, borderRadius: 5, flexDirection: 'row', alignItems: 'center' }}>
+                        <Pressable style={[{ width: 108, alignItems: 'center', borderBottomLeftRadius: 5, borderTopLeftRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderRightWidth: 0.5, borderColor: isParticipatible ? Color['blue500'] : Color['red500'] }, isParticipatible && { backgroundColor: Color['blue100'] }]}
+                            onPress={() => { setParticipatible(true) }}>
+                            <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, isParticipatible ? { color: Color['blue600'] } : { color: Color['red300'] }]}>
+                                예
+                            </Text>
+                        </Pressable>
+                        <Pressable style={[{ width: 108, alignItems: 'center', borderBottomRightRadius: 5, borderTopRightRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderLeftWidth: 0.5, borderColor: isParticipatible ? Color['blue500'] : Color['red500'] }, !isParticipatible && { backgroundColor: Color['red100'] }]}
+                            onPress={() => { setParticipatible(false) }}>
+                            <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, isParticipatible ? { color: Color['blue300'] } : { color: Color['red600'] }]}>
+                                아니오
+                            </Text>
+                        </Pressable>
+                    </View>
                 </View>
 
                 <View style={{ height: 24 }} />
@@ -110,13 +141,16 @@ const ReservationScreen: React.FC<{ navigation: any, route: any }> = ({ navigati
                 <View style={{ height: 16 }} />
             </ScrollView>
             <View style={{ marginHorizontal: 24, marginVertical: 8, height: 100 }}>
-                <CheckboxComponent
-                    innerText='예약 전날 오후10시까지 수정*취소할 수 있어요'
-                ></CheckboxComponent>
+                <View style={{ marginHorizontal: 18, height: 40 }}>
+                    <CheckboxComponent
+                        innerText='예약 전날 오후10시까지 수정*취소할 수 있어요'
+                        onCheck={()=>setAgree(!isAgree)}
+                    ></CheckboxComponent>
+                </View>
                 <LongButton
                     color='blue'
                     innerText='예약하기'
-                    isAble={false}
+                    isAble={isAgree}
                     onPress={() => { }}
                 />
             </View>

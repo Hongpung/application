@@ -4,8 +4,14 @@ import { Color } from '../../ColorSet'
 import InstrumentCard from '../../components/cards/InstrumentCard'
 import { InstrumentProvider } from '../Home/MyClub/Instruments/context/InstrumentContext'
 import LongButton from '../../components/buttons/LongButton'
+import { Reserve } from '../Home/MyClub/ClubCalendar/ClubCalendar'
 
-const PracticeInfoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+
+    const { reserve }: { reserve: Reserve } = route.params;
+
+    const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
+
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <ScrollView contentContainerStyle={{ backgroundColor: '#FFF' }}>
@@ -17,13 +23,13 @@ const PracticeInfoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 18,
                             color: Color['grey700']
-                        }}>나는 바보</Text>
+                        }}>{reserve.title}</Text>
                         <Text style={{
                             position: 'absolute', left: 18, bottom: 12,
                             fontFamily: 'NanumSquareNeo-Light',
                             fontSize: 14,
                             color: Color['grey400']
-                        }}>{`2024-07-18(월)`}</Text>
+                        }}>{reserve.date.getFullYear()}-{reserve.date.getMonth() + 1}-{reserve.date.getDate()}-{daysOfWeek[reserve.date.getDay()]}</Text>
 
                         <Text style={{
                             position: 'absolute', right: 16, bottom: 12,
@@ -31,31 +37,28 @@ const PracticeInfoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                             fontFamily: 'NanumSquareNeo-Light',
                             fontSize: 14,
                             color: Color['grey400']
-                        }}>{`17:00~18:00`}</Text>
+                        }}>{reserve.startTime}:00~{reserve.endTime}:00</Text>
 
-                        {/* 동아리 개별 연습 유형 */
-                            // <View style={{
-                            //     position: 'absolute', right: 20, top: 12,
-                            // }}>
-                            //     <Text style={{
-                            //         textAlign: 'right',
-                            //         fontFamily: 'NanumSquareNeo-Regular',
-                            //         fontSize: 14,
-                            //         color: Color['grey600']
-                            //     }}>홍길동</Text>
-                            //     <View style={{ height: 4 }} />
-                            //     <Text style={{
-                            //         textAlign: 'right',
-                            //         fontFamily: 'NanumSquareNeo-Regular',
-                            //         fontSize: 12,
-                            //         color: Color['grey400']
-                            //     }}>홍길동</Text>
-                            // </View>
-                        }
-                        {/* 동아리 정기 연습 유형 */
-                            < View style={{
-                                position: 'absolute', right: 24, top: -1, width: 26, height: 36, backgroundColor: Color['blue500']
-                            }} />
+                        {reserve.type == 'regular' ? < View style={{
+                            position: 'absolute', right: 24, top: -1, width: 26, height: 36, backgroundColor: Color['blue500']
+                        }} /> :
+                            <View style={{
+                                position: 'absolute', right: 20, top: 12,
+                            }}>
+                                <Text style={{
+                                    textAlign: 'right',
+                                    fontFamily: 'NanumSquareNeo-Regular',
+                                    fontSize: 14,
+                                    color: Color['grey600']
+                                }}>{reserve.name}</Text>
+                                <View style={{ height: 4 }} />
+                                {reserve.nickname && <Text style={{
+                                    textAlign: 'right',
+                                    fontFamily: 'NanumSquareNeo-Regular',
+                                    fontSize: 12,
+                                    color: Color['grey400']
+                                }}>{reserve.nickname}</Text>}
+                            </View>
                         }
                     </View>
                 </View>
@@ -83,7 +86,7 @@ const PracticeInfoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey700']
-                    }}>17:00</Text>
+                    }}>{reserve.startTime}:00</Text>
                 </View>
 
                 <View style={{ height: 12 }} />
@@ -100,7 +103,7 @@ const PracticeInfoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey700']
-                    }}>17:00</Text>
+                    }}>{reserve.endTime}:00</Text>
                 </View>
 
                 <View style={{ height: 12 }} />
@@ -111,13 +114,13 @@ const PracticeInfoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey400']
-                    }}>시작 시간</Text>
+                    }}>연장 횟수</Text>
                     <Text style={{
                         textAlign: 'right',
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey700']
-                    }}>17:00</Text>
+                    }}>0회</Text>
                 </View>
 
                 <View style={{ height: 32 }} />
@@ -212,7 +215,7 @@ const PracticeInfoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                                             type: '쇠',
                                             name: 'www',
                                             state: '대여가능',
-                                            nickname:'ss'
+                                            nickname: 'ss'
                                         }} view={'inBorrow'} />
                                     </View>
                                 )
@@ -267,7 +270,7 @@ const PracticeInfoScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <View style={{ height: 8 }} />
 
             </ScrollView>
-            <View style={{paddingVertical:8, marginHorizontal:24}}>
+            <View style={{ paddingVertical: 8, marginHorizontal: 24 }}>
                 <LongButton color='green' innerText='이미지로 저장' isAble={true} onPress={() => { }} />
             </View>
         </View>

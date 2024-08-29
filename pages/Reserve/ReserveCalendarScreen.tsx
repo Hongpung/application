@@ -6,7 +6,6 @@ const { height, width } = Dimensions.get(`window`);
 
 const Calendar: React.FC<{ onClickDate: (date: Date) => void }> = ({ onClickDate }) => {
     const [calendarMonth, setMonth] = useState(new Date)
-    const [selectedDate, setDate] = useState<number | null>(null)
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
 
     const today = new Date();
@@ -16,11 +15,6 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void }> = ({ onClickDate
         return day - 1;
     }
 
-    const filterLogforDate = (date: number) => {
-        const newDate = new Date(calendarMonth);
-        newDate.setDate(date);
-        setDate(date)
-    }
     useLayoutEffect(() => {
         const year = calendarMonth.getFullYear();
         const month = calendarMonth.getMonth();
@@ -48,14 +42,12 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void }> = ({ onClickDate
         const newDate = new Date(calendarMonth);
         newDate.setMonth(calendarMonth.getMonth() + 1);
         setMonth(newDate);
-        setDate(null);
     };
 
     const decrementMonth = () => {
         const newDate = new Date(calendarMonth);
         newDate.setMonth(calendarMonth.getMonth() - 1);
         setMonth(newDate);
-        setDate(null);
     };
 
     const renderWeeks = () => {
@@ -68,7 +60,7 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void }> = ({ onClickDate
                 days.push(
                     <Pressable key={`date-${day}`}
                         style={{ height: 60, width: 32, alignItems: 'center', justifyContent: 'flex-start', backgroundColor: (day == today.getDate()) && (calendarMonth.getMonth() == today.getMonth()) ? Color['blue100'] : 'transparent', borderRadius: 5 }}
-                        onPress={() => onClickDate(new Date(`${calendarMonth.getFullYear()}-${calendarMonth.getMonth()+1}-${day}`))}
+                        onPress={() => onClickDate(new Date(`${calendarMonth.getFullYear()}-${calendarMonth.getMonth() + 1}-${day}`))}
                     >
                         <Text style={[styles.CalendarText, (day == today.getDate()) && (calendarMonth.getMonth() == today.getMonth()) ? { color: Color['blue600'] } : null]}>{day}</Text>
                         <View style={{ marginHorizontal: 2, height: 16, flexDirection: 'column-reverse', marginTop: 4 }}>
@@ -164,6 +156,9 @@ const ReserveCalendarScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 }
 
 export default ReserveCalendarScreen;
+
+export { Calendar }
+
 
 const styles = StyleSheet.create({
     MonthRow: {

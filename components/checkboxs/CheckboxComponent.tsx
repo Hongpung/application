@@ -15,7 +15,7 @@ const CheckboxComponent: React.FC<CheckBoxProps> = ({ innerText, onCheck }) => {
     return (
         <Pressable
             style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
-            onPress={() => setIsChecked(!isChecked)}>
+            onPress={() => { setIsChecked(!isChecked); onCheck && onCheck() }}>
             <View style={styles.checkboxBorder}>
                 {isChecked ? <View style={styles.checkboxFill} /> : null}
             </View>

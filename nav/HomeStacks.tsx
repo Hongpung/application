@@ -20,6 +20,7 @@ import LoginSettingScreen from '../pages/Setting/LoginSetting';
 import ReserveCalendarScreen from '../pages/Reserve/ReserveCalendarScreen';
 import DailyReserveListScreen from '../pages/Reserve/DailyReserveListScreen';
 import ReservationScreen from '../pages/Reserve/ReservationScreen';
+import DateSelcectScreen from '../pages/Reserve/DateSelcectScreen';
 
 // HomeStack Navigator
 const MainStack = createNativeStackNavigator();
@@ -88,19 +89,29 @@ const MainStacks = () => {
                 name='DailyReserveList'
                 component={DailyReserveListScreen}
                 options={{
-                    animation:'none',
+                    animation: 'none',
                 }}
             />
             <MainStack.Screen
                 name='Reservation'
                 component={ReservationScreen}
                 options={{
-                    animation:'none',
+                    animation: 'none',
                     headerShown: true,
                     header: () => <Header leftButton='X' HeaderName='연습실 예약' />
                 }}
             />
-            
+
+            <MainStack.Screen
+                name='ResrvationDateSelect'
+                component={DateSelcectScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => <Header leftButton='<-' HeaderName='예약 일시 선택' />
+                }}
+            />
+
         </MainStack.Navigator>
     );
 };
