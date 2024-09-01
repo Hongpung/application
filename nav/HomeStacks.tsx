@@ -23,6 +23,7 @@ import ReservationScreen from '../pages/Reserve/ReservationScreen';
 import DateSelcectScreen from '../pages/Reserve/DateSelcectScreen';
 import TimeSelectScreen from '../pages/Reserve/TimeSelectScreen';
 import BorrowInstrumentSelectScreen from '../pages/Reserve/BorrowInstrumentSelectScreen';
+import ChatMediaViewerScreen from '../pages/Chat/ChatMediaViewerScreen';
 
 // HomeStack Navigator
 const MainStack = createNativeStackNavigator();
@@ -119,17 +120,26 @@ const MainStacks = () => {
                 name='TimeSelect'
                 component={TimeSelectScreen}
             />
-            
+
 
             <MainStack.Screen
                 name='BorrowInstrumentSelect'
                 component={BorrowInstrumentSelectScreen}
                 options={{
                     headerShown: true,
-                    animationDuration:100,
-                    header: () => <Header leftButton='X' HeaderName='대여 악기 선택'/>
+                    animationDuration: 100,
+                    header: () => <Header leftButton='X' HeaderName='대여 악기 선택' />
                 }}
             />
+
+            <MainStack.Screen
+                name='ChatViewer'
+                component={ChatMediaViewerScreen}
+                options={{
+                    animationDuration: 100,
+                }}
+            />
+
         </MainStack.Navigator>
     );
 };

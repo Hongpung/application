@@ -4,6 +4,7 @@ import { Instrument, instrumentOrder } from '../../UserType'
 import InstrumentCard from '../../components/cards/InstrumentCard'
 import { Color } from '../../ColorSet'
 import { InstrumentProvider, useInstrument } from '../Home/MyClub/Instruments/context/InstrumentContext'
+import LongButton from '../../components/buttons/LongButton'
 
 const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const instruments: Instrument[] = [{
@@ -45,7 +46,7 @@ const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigatio
 
 const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any }> = ({ instrumentsList, navigation }) => {
 
-    const { selectedInstrument, setSelectedInstrument } = useInstrument();
+    const [selectedInstruments, setSelectedInstruments] = useState<Instrument[]>([]);
     const [isGGwangOpen, setGGwangOpen] = useState(false);
     const [isJangguOpen, setJangguOpen] = useState(false);
     const [isBukOpen, setBukOpen] = useState(false);
@@ -57,6 +58,12 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
     const toggleBuk = () => setBukOpen(!isBukOpen);
     const toggleSogo = () => setSogoOpen(!isSogoOpen);
     const toggleETC = () => setETCOpen(!isETCOpen);
+
+    const [GGwangSelected, setGGwangSelected] = useState(0);
+    const [JangguSelected, setJangguSelected] = useState(0);
+    const [BukSelected, setBukSelected] = useState(0);
+    const [SogoSelected, setSogoSelected] = useState(0);
+    const [ETCSelected, setETCSelected] = useState(0);
 
     const toggleFunction = (type: string) => {
         switch (type) {
@@ -79,10 +86,57 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
             default: return false;
         }
     }
-
-    const addInstruments = () => {
-
+    const getCount = (type: string) => {
+        switch (type) {
+            case '쇠': return GGwangSelected;
+            case '장구': return JangguSelected;
+            case '북': return BukSelected;
+            case '소고': return SogoSelected;
+            case '기타': return ETCSelected;
+            default: return 0;
+        }
     }
+    const addInstruments = (instrument: Instrument) => {
+        setSelectedInstruments([instrument, ...selectedInstruments])
+        switch (instrument.type) {
+            case '쇠':
+                setGGwangSelected(prevCount => prevCount + 1);
+                break;
+            case '장구':
+                setJangguSelected(prevCount => prevCount + 1);
+                break;
+            case '북':
+                setBukSelected(prevCount => prevCount + 1);
+                break;
+            case '소고':
+                setSogoSelected(prevCount => prevCount + 1);
+                break;
+            default:
+                break;
+        }
+    }
+
+    const removeInstruments = (instrument: Instrument) => {
+        setSelectedInstruments(selectedInstruments.filter((item) => item != instrument))
+        switch (instrument.type) {
+            case '쇠':
+                setGGwangSelected(prevCount => prevCount > 0 ? prevCount - 1 : 0);
+                break;
+            case '장구':
+                setJangguSelected(prevCount => prevCount > 0 ? prevCount - 1 : 0);
+                break;
+            case '북':
+                setBukSelected(prevCount => prevCount > 0 ? prevCount - 1 : 0);
+                break;
+            case '소고':
+                setSogoSelected(prevCount => prevCount > 0 ? prevCount - 1 : 0);
+                break;
+            default:
+                break;
+        }
+    }
+
+
 
     const renderInstruments = () => {
         const rows = [];
@@ -92,13 +146,14 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
             if (instrumentsList[i].type != instrumentsList[i + 1]?.type) sliceCnt = 1;
             const group = instrumentsList.slice(i, i + sliceCnt);
             if (cnt < instrumentOrder(group[0].type)) {
+                const selectedCount = getCount(group[0].type);
                 rows.push(
                     <Pressable key={group[0].type + 'header'} style={{ paddingVertical: 16, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
                         onPress={toggleFunction(group[0].type)}>
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <View style={{ width: 24, height: 24, backgroundColor: Color['grey400'] }} />
-                            <Text style={{ fontSize: 18, color: Color['grey400'], marginLeft: 8 }}>
-                                {group[0].type}
+                            <Text style={[{ fontSize: 18, color: Color['grey400'], marginLeft: 8 }, selectedCount > 0 && { color: Color['blue500'] }]}>
+                                {group[0].type} {selectedCount > 0 && `(` + selectedCount + `)`}
                             </Text>
                         </View>
                         <View style={{ width: 24, height: 24, backgroundColor: Color['grey200'] }} />
@@ -115,6 +170,13 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
                                 instrument={instrument}
                                 view="inBorrow"
                                 navigation={navigation}
+                                isPicked={selectedInstruments.includes(instrument)}
+                                onSelectInstrument={(item: Instrument) => {
+                                    if (selectedInstruments.includes(item))
+                                        removeInstruments(item)
+                                    else
+                                        addInstruments(item)
+                                }}
                             />
                         ))}
                         {group.length % 2 == 1 && <View style={{ height: 168, width: 154 }} />}
@@ -128,7 +190,15 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
     };
     return (
         <View style={{ flex: 1, }}>
-            {renderInstruments()}
+            <ScrollView>{renderInstruments()}</ScrollView>
+            {selectedInstruments.length>0&&<View style={{paddingTop:12, width:'100%'}}>
+                <LongButton
+                    color='blue'
+                    isAble={true}
+                    innerText={`선택완료 (${selectedInstruments.length})`}
+                    onPress={()=>navigation.pop()}
+                />
+            </View>}
         </View>
     )
 }

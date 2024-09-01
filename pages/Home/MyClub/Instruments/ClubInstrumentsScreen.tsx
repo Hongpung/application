@@ -4,12 +4,13 @@ import { HomeStackParamList } from "../../../../pageTypes"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import InstrumentCard from "../../../../components/cards/InstrumentCard"
 import { Color } from "../../../../ColorSet"
+import { useInstrument } from "./context/InstrumentContext"
 
 
 type ClubInstrumentsScreenProps = NativeStackScreenProps<HomeStackParamList, 'InstrumentsHome'>
 
 const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any }> = ({ instrumentsList, navigation }) => {
-
+    const { setSelectedInstrument } = useInstrument();
     const renderInstruments = () => {
         const rows = [];
         let cnt = instrumentOrder(instrumentsList[0].type) - 1;
@@ -19,7 +20,7 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
             const group = instrumentsList.slice(i, i + sliceCnt);
             if (cnt < instrumentOrder(group[0].type)) {
                 rows.push(
-                    <View key={group[0].type+'header'}style={{ marginTop: 16, marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
+                    <View key={group[0].type + 'header'} style={{ marginTop: 16, marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
                         <View style={{ width: 24, height: 24, backgroundColor: Color['grey400'] }} />
                         <Text style={{ fontSize: 18, color: Color['grey400'], marginLeft: 8 }}>
                             {group[0].type}
@@ -28,6 +29,7 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
                 )
                 cnt++;
             }
+
             rows.push(
                 <View key={i} style={{ height: 168, width: 324, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 4, }}>
                     {group.map((instrument, index) => (
@@ -36,6 +38,7 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
                             instrument={instrument}
                             view="inManage"
                             navigation={navigation}
+                            onSelectInstrument={(instrument) => { setSelectedInstrument(instrument); navigation.push('InstrumentSpecific'); }}
                         />
                     ))}
                     {group.length % 2 == 1 && <View style={{ height: 168, width: 154 }} />}
@@ -46,7 +49,7 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
         return rows;
     };
     return (
-        <View style={{flex:1}}>
+        <View style={{ flex: 1 }}>
             {renderInstruments()}
         </View>
     )

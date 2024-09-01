@@ -1,5 +1,5 @@
 import { FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View, Image, Modal, Button, Alert, PermissionsAndroid, Dimensions, ActivityIndicator } from 'react-native'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Color } from '../../ColorSet'
 import * as MediaLibrary from 'expo-media-library';
 import LongButton from '../../components/buttons/LongButton';
@@ -36,7 +36,7 @@ const ChatMessage = React.memo(({ message, timestamp, isUser }: { message: strin
 
 
 
-const ChatScreen: React.FC = () => {
+const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [isTyped, setType] = useState(false);
     const [typedMessage, setMessage] = useState<string>("");
     const [inputHeight, setInputHeight] = useState<number>(48);
@@ -68,6 +68,7 @@ const ChatScreen: React.FC = () => {
         }
     };
 
+    //대화 내용 불러오기
     const loadChatLogFromFile = async () => {
         try {
             const fileExists = await FileSystem.getInfoAsync(fileUri);
@@ -81,6 +82,7 @@ const ChatScreen: React.FC = () => {
         }
     };
 
+    //대화 내용 초기화
     const clearChatLogFile = async () => {
         try {
             const fileExists = await FileSystem.getInfoAsync(fileUri);
@@ -96,6 +98,7 @@ const ChatScreen: React.FC = () => {
         }
     };
 
+    //대화 내용에 대한 useEffect(초기수행)
     useEffect(() => {
         const fetchChatLog = async () => {
             const savedChatLog = await loadChatLogFromFile();
@@ -103,6 +106,7 @@ const ChatScreen: React.FC = () => {
         };
 
         fetchChatLog();
+        getAlbums();
 
         return () => {
             saveChatLogToFile(chatLog);
@@ -110,7 +114,7 @@ const ChatScreen: React.FC = () => {
 
     }, []);
 
-    ;
+    //권한에 대한 useEffect(초기 수행)
     useEffect(() => {
         const getPermission = async () => {
             if (Platform.OS === 'android') {
@@ -142,14 +146,7 @@ const ChatScreen: React.FC = () => {
 
     }, []);
 
-    useEffect(() => {
-
-        setPhotos([]);
-        setHasMore(true);
-        fetchPhotos();
-
-    }, [selectedAlbum])
-
+    //앨범 목록 받아오기
     const getAlbums = async () => {
         try {
             const albumList = await MediaLibrary.getAlbumsAsync();
@@ -159,19 +156,20 @@ const ChatScreen: React.FC = () => {
         }
     };
 
-
+    //이미지를 selectedImages에 추가
     const addImage = (item: { originUri: string, originHeight: number, originWidth: number }) => {
         if (selectedImages.length < 10)
             setSelectedImages([...selectedImages, item])
     }
-
+    //이미지를 selectedImages에서 제거
     const removeImage = (item: { originUri: string, originHeight: number, originWidth: number }) => {
         setSelectedImages(selectedImages.filter(element => element.originUri !== item.originUri));
     };
 
+    //앨범에서 내용 불러오기
     const fetchPhotos = async () => {
-        if (!hasPermission || isLoading) return;
-        
+        if (!hasPermission || isLoading || !ModalVisible) return;
+
         setLoading(true);
 
         try {
@@ -188,12 +186,9 @@ const ChatScreen: React.FC = () => {
                     const manipResult = await ImageManipulator.manipulateAsync(
                         asset.uri,
                         [],
-                        { compress: 0.4 }
+                        { compress: 0.7 }
                     );
-                    const Origin = await ImageManipulator.manipulateAsync(
-                        asset.uri
-                    );
-                    return { ...asset, uri: manipResult.uri, originUri: Origin.uri, originHeight: asset.height, originWidth: asset.width };
+                    return { ...asset, uri: manipResult.uri, originUri: manipResult.uri, originHeight: asset.height, originWidth: asset.width };
                 })
             );
 
@@ -214,19 +209,36 @@ const ChatScreen: React.FC = () => {
         }
     };
 
-    const getAllImages = (): { id: string, uri: string, originHeight: number, originWidth: number }[] => {
+    const getAllImages = (): { user: string, id: string, uri: string, originHeight: number, originWidth: number }[] => {
         return chatLog
             .filter(item => item.image || item.images)  // 이미지가 있는 항목만 필터링
-            .flatMap(item => item.images ? item.images : [item.image!]);  // 단일 이미지와 다중 이미지 모두를 포함
+            .flatMap(item =>
+                item.images
+                    ? item.images.map(image => ({ user: item.user, ...image }))
+                    : [{ user: item.user, ...item.image! }]
+            );
     };
 
+    const inViewer = (id: string) => {
+        const images = getAllImages();
+        navigation.push('ChatViewer', { images: images, selectedImgId: id });
+    }
+
     useEffect(() => {
-        if (ModalVisible) {
-            getAlbums();
-            setPhotos([]);
-            fetchPhotos();
-        }
+        if (ModalVisible)
+            setAlbum(null);
+        else if (selectedAlbum != null)
+            setPhotos([])
+
+
     }, [ModalVisible]);
+
+    useEffect(() => {
+
+        setPhotos([]);
+        fetchPhotos();
+
+    }, [selectedAlbum])
 
     const TimeFormat = (time: Date): string => {
         const localDate = new Date(time.getUTCHours());
@@ -250,9 +262,10 @@ const ChatScreen: React.FC = () => {
 
             return (
                 <View style={styles.formalZone}>
-                    <View key={item.image.id} style={[isUser ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }, { alignItems: 'flex-end' }]}>
+                    <View style={[isUser ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }, { alignItems: 'flex-end' }]}>
                         <Pressable
-                            onPress={() => console.log(item.image.uri)}>
+                            key={item.image.id}
+                            onPress={() => inViewer(item.image.id)}>
                             <Image
                                 source={{ uri: item.image.uri }}
                                 style={{ width: 200, height: item.image.originHeight / item.image.originWidth * 200, borderRadius: 10 }}
@@ -273,7 +286,8 @@ const ChatScreen: React.FC = () => {
             item.images.forEach((image: { id: string, uri: string }, index: number) => {
 
                 rows.push(
-                    <Pressable key={image.id}>
+                    <Pressable key={image.id}
+                        onPress={() => inViewer(image.id)}>
                         <Image
                             source={{ uri: image.uri }}
                             style={[{ width: division == 2 ? 100 : imgLenth % 3 == 2 ? (imgLenth - index <= 2 ? 122 : 80) : (imgLenth % 3 == 1 ? (imgLenth - index == 1 ? 248 : 80) : 80), height: division == 2 ? 100 : 80, borderRadius: 10, }, index % division != 0 && { marginLeft: 4 }]}
@@ -286,7 +300,7 @@ const ChatScreen: React.FC = () => {
                 }
             })
             if (rows.length > 0) {
-                columns.push(<View key={`row-${item.images.length}`} style={{ flexDirection: 'row' }}>{rows}</View>);
+                columns.push(<View style={{ flexDirection: 'row' }}>{rows}</View>);
             }
 
             return (
@@ -353,7 +367,7 @@ const ChatScreen: React.FC = () => {
             // 소켓을 통해 서버로 이미지 전송
             // socket.emit('sendImages', { user: user, images: base64Images });
 
-            const images = selectedImages.map((item, index) => { return { id: index + 'image', uri: item.originUri, originHeight: item.originHeight, originWidth: item.originWidth } })
+            const images = selectedImages.map((item, index) => { return { id: index + item.originUri.slice(-10, -5), uri: item.originUri, originHeight: item.originHeight, originWidth: item.originWidth } })
 
             // 전송 후 선택된 이미지 초기화
 
@@ -363,8 +377,8 @@ const ChatScreen: React.FC = () => {
             else
                 setChatLog([...chatLog, { user: 'user', images: images, time: now.toISOString() }]);
 
-            setSelectedImages([]);
             setModalVisible(false);
+            setSelectedImages([]);
         } catch (error) {
             console.error('Error sending images via socket:', error);
         }
@@ -378,7 +392,7 @@ const ChatScreen: React.FC = () => {
             setMessage('');
         }
     };
-    const selectAlbum = (item: MediaLibrary.Album) => {
+    const selectAlbum = (item: MediaLibrary.Album | null) => {
         setAlbum(item);
         setSelctingState(false);
     }
@@ -401,7 +415,7 @@ const ChatScreen: React.FC = () => {
                 <View style={{ marginHorizontal: 12, paddingHorizontal: 2, paddingVertical: 2, borderWidth: 1, borderRadius: 20, borderColor: Color['grey200'], flexDirection: 'row', height: inputHeight, maxHeight: 78, minHeight: 48, backgroundColor: '#FFF' }}>
                     {typedMessage == "" && !isTyped && <Pressable
                         style={{ backgroundColor: Color['blue500'], marginVertical: 2, marginHorizontal: 2, width: 50, height: 40, borderRadius: 16, alignSelf: 'center', alignItems: 'center', justifyContent: 'center' }}
-                        onPress={() => { setMenuOpen(!isMenuOpen); setAlbum(null); }}>
+                        onPress={() => { setMenuOpen(!isMenuOpen); }}>
                         <Text style={{ color: '#FFF', fontSize: 24, textAlignVertical: 'center' }}>{isMenuOpen ? `x` : `+`}</Text>
                     </Pressable>
                     }
@@ -413,7 +427,7 @@ const ChatScreen: React.FC = () => {
                         </Pressable>
                         <Pressable
                             style={{ height: 40, width: 50, borderRadius: 16, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderColor: Color['grey200'], borderWidth: 1, backgroundColor: `#FFF` }}
-                            onPress={clearChatLogFile}>
+                            onPress={async () => await clearChatLogFile()}>
                             <View style={{ backgroundColor: Color['red500'], width: 20, height: 20 }} />
                         </Pressable>
                     </View>}
@@ -442,8 +456,7 @@ const ChatScreen: React.FC = () => {
                 transparent
                 animationType="slide"
             >
-                <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}
-                    onPress={() => { }}>
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
                     <View style={{ height: 420, padding: 12, backgroundColor: "#FFF", paddingBottom: 0, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
                         <Pressable style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 120, alignSelf: 'center', marginVertical: 12, paddingBottom: 8 }}
                             onPress={() => setSelctingState(true)}>
@@ -460,17 +473,18 @@ const ChatScreen: React.FC = () => {
                         }}>
                             <FlatList
                                 contentContainerStyle={{ flex: 1 }}
-                                data={albums}
+                                data={[null, ...albums]}
                                 renderItem={({ item }) => {
                                     return (
                                         <Pressable style={{ flexDirection: 'row-reverse', width: 120, paddingVertical: 8, marginVertical: 4, alignItems: 'center', justifyContent: 'space-between' }}
-                                            onPress={() => { selectAlbum(item) }}>
-                                            <Text style={{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, textAlign: 'right', color: selectedAlbum == item ? Color['blue500'] : Color['grey400'] }}>{item.title}</Text>
+                                            onPress={() => { item ? selectAlbum(item) : selectAlbum(null); }}>
+                                            <Text style={{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, textAlign: 'right', color: selectedAlbum == item ? Color['blue500'] : Color['grey400'] }}>{item?.title ?? '전체'}</Text>
                                         </Pressable>
                                     )
                                 }}
                             />
                         </View>}
+                        {isSelectingAlbum && <Pressable style={{ position: 'absolute', flex: 1, width: width, height: '120%', zIndex: 1 }} onPress={() => setSelctingState(false)} />}
                         {photos?.length > 0 ? <FlatList
                             data={photos}
                             renderItem={renderModalItem}
@@ -500,14 +514,20 @@ const ChatScreen: React.FC = () => {
                     </View>
                     <View style={{ backgroundColor: "#FFF" }}>
                         <View style={{ height: 8 }} />
-                        <LongButton color='red' isAble={true} innerText="닫기" onPress={() => { setModalVisible(false), setSelectedImages([]), setAlbum(null) }} />
+                        <LongButton color='red'
+                            isAble={true}
+                            innerText="닫기"
+                            onPress={() => {
+                                setModalVisible(false);
+                                setSelectedImages([]);
+                            }} />
 
                         <View style={{ height: 8 }} />
                         <LongButton color='blue' isAble={selectedImages.length > 0} innerText={selectedImages.length > 0 ? `사진 전송 (${selectedImages.length})` : '사진 선택'} onPress={handleSendImagesViaSocket} />
 
                         <View style={{ height: 24 }} />
                     </View>
-                </Pressable>
+                </View>
             </Modal>
         </KeyboardAvoidingView>
     )
