@@ -1,15 +1,15 @@
-import { FlatList, StyleSheet, Text, View, Dimensions, Pressable } from 'react-native'
+import { FlatList, StyleSheet, Text, View, Dimensions, Pressable, NativeScrollEvent, NativeSyntheticEvent } from 'react-native'
 import React, { useRef } from 'react'
 import { Color } from '../../ColorSet'
 
 
-const { height, width } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     const flatListRef = useRef<FlatList>(null);
 
-    const handleMomentumScrollEnd = (event: any) => {
+    const handleMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
         const offsetX = event.nativeEvent.contentOffset.x;
         const index = Math.round(offsetX / (width - 100));
 
@@ -18,8 +18,8 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
 
     return (
-        <View style={{ backgroundColor: '#FFF', flex: 1}}>
-            <View style={{marginTop:264}}>
+        <View style={{ backgroundColor: '#FFF', flex: 1 }}>
+            <View style={{ marginTop: 264 }}>
                 <View style={{ flexDirection: 'row', marginHorizontal: 32, justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 20 }}>연습실 이용상태</Text>
                     <View style={{ flexDirection: 'row' }}>

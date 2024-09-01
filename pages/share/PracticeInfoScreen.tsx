@@ -8,7 +8,12 @@ import { Reserve } from '../Home/MyClub/ClubCalendar/ClubCalendar'
 
 const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
 
-    const { reserve }: { reserve: Reserve } = route.params;
+    const { reserveInfo }: { reserveInfo: Reserve } = route.params;
+
+    const reserveData = {
+        ...reserveInfo,
+        date: new Date(reserveInfo.date), 
+    };
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -23,13 +28,13 @@ const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 18,
                             color: Color['grey700']
-                        }}>{reserve.title}</Text>
+                        }}>{reserveData.title}</Text>
                         <Text style={{
                             position: 'absolute', left: 18, bottom: 12,
                             fontFamily: 'NanumSquareNeo-Light',
                             fontSize: 14,
                             color: Color['grey400']
-                        }}>{reserve.date.getFullYear()}-{reserve.date.getMonth() + 1}-{reserve.date.getDate()}-{daysOfWeek[reserve.date.getDay()]}</Text>
+                        }}>{reserveData.date.getFullYear()}-{reserveData.date.getMonth() + 1}-{reserveData.date.getDate()}-{daysOfWeek[reserveData.date.getDay()]}</Text>
 
                         <Text style={{
                             position: 'absolute', right: 16, bottom: 12,
@@ -37,9 +42,9 @@ const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                             fontFamily: 'NanumSquareNeo-Light',
                             fontSize: 14,
                             color: Color['grey400']
-                        }}>{reserve.startTime}:00~{reserve.endTime}:00</Text>
+                        }}>{reserveData.startTime}:00~{reserveData.endTime}:00</Text>
 
-                        {reserve.type == 'regular' ? < View style={{
+                        {reserveData.type == 'regular' ? < View style={{
                             position: 'absolute', right: 24, top: -1, width: 26, height: 36, backgroundColor: Color['blue500']
                         }} /> :
                             <View style={{
@@ -50,14 +55,14 @@ const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                                     fontFamily: 'NanumSquareNeo-Regular',
                                     fontSize: 14,
                                     color: Color['grey600']
-                                }}>{reserve.name}</Text>
+                                }}>{reserveData.name}</Text>
                                 <View style={{ height: 4 }} />
-                                {reserve.nickname && <Text style={{
+                                {reserveData.nickname && <Text style={{
                                     textAlign: 'right',
                                     fontFamily: 'NanumSquareNeo-Regular',
                                     fontSize: 12,
                                     color: Color['grey400']
-                                }}>{reserve.nickname}</Text>}
+                                }}>{reserveData.nickname}</Text>}
                             </View>
                         }
                     </View>
@@ -86,7 +91,7 @@ const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey700']
-                    }}>{reserve.startTime}:00</Text>
+                    }}>{reserveData.startTime}:00</Text>
                 </View>
 
                 <View style={{ height: 12 }} />
@@ -103,7 +108,7 @@ const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey700']
-                    }}>{reserve.endTime}:00</Text>
+                    }}>{reserveData.endTime}:00</Text>
                 </View>
 
                 <View style={{ height: 12 }} />

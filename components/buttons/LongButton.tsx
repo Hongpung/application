@@ -14,7 +14,7 @@ const LongButton: React.FC<LongButtonProps> = ({ innerText, onPress, isAble, col
         <Pressable
             style={[styles.basic, { backgroundColor: isAble ? Color[color + "500"] : Color[color + "300"] }]}
             onPress={() => {
-                isAble && onPress
+                isAble && onPress();
             }}
         >
             <Text style={[styles.basicText, { color: !isAble ? Color[color + "100"] : 'white' }]}>{innerText}</Text>

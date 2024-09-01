@@ -1,11 +1,13 @@
-import { useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Pressable, View, Text, StyleSheet, Dimensions } from "react-native";
 import { Color } from "../../ColorSet";
+import { useFocusEffect } from "@react-navigation/native";
 
-const { height, width } = Dimensions.get(`window`);
+const { width } = Dimensions.get(`window`);
 
-const Calendar: React.FC<{ onClickDate: (date: Date) => void }> = ({ onClickDate }) => {
-    const [calendarMonth, setMonth] = useState(new Date)
+const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Date }> = ({ onClickDate, calendarDate }) => {
+
+    const [calendarMonth, setMonth] = useState(calendarDate ?? new Date())
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
 
     const today = new Date();
@@ -14,6 +16,9 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void }> = ({ onClickDate
         if (day == 0) return 6;
         return day - 1;
     }
+    useEffect(()=>{
+        calendarDate&&setMonth(calendarDate)
+    },[calendarDate])
 
     useLayoutEffect(() => {
         const year = calendarMonth.getFullYear();
@@ -35,16 +40,20 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void }> = ({ onClickDate
             daysArray.push(0);
         }
 
+
         setDaysInMonth(daysArray);
     }, [calendarMonth]);
 
+
     const incrementMonth = () => {
         const newDate = new Date(calendarMonth);
+        console.log('증가')
         newDate.setMonth(calendarMonth.getMonth() + 1);
         setMonth(newDate);
     };
 
     const decrementMonth = () => {
+        console.log('감소')
         const newDate = new Date(calendarMonth);
         newDate.setMonth(calendarMonth.getMonth() - 1);
         setMonth(newDate);
@@ -75,7 +84,7 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void }> = ({ onClickDate
 
             if ((index + 1) % 7 === 0) {
                 weeks.push(
-                    <View key={index} style={{ flexDirection: 'row', marginHorizontal: 32, justifyContent: 'space-around' }}>
+                    <View key={'day-' + index} style={{ flexDirection: 'row', marginHorizontal: 32, justifyContent: 'space-around' }}>
                         {days}
                     </View>
                 );
@@ -120,7 +129,22 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void }> = ({ onClickDate
     );
 }
 
-const ReserveCalendarScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const ReserveCalendarScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+
+    const [calendarDate, setCalendarDate] = useState(new Date())
+
+    useFocusEffect(
+        useCallback(() => {
+            if (route.params?.date) {
+                const newDate = new Date(route.params.date);
+                console.log(newDate)
+                if (calendarDate.getTime() !== newDate.getTime()) {
+                    setCalendarDate(newDate);
+                }
+            }
+        }, [route.params?.date])
+    );
+
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <View style={{ position: 'absolute', right: 32, top: 30 }}>
@@ -139,10 +163,12 @@ const ReserveCalendarScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>참여 가능</Text>
                 </View>
             </View>
-            <View style={{ marginTop: 96, flex: 1 }}>
-                <Calendar onClickDate={(date: Date) => {
-                    navigation.push(`DailyReserveList`, { date: date.getTime() })
-                }} />
+            <View style={{ marginTop: 88, flex: 1 }}>
+                <Calendar
+                    calendarDate={calendarDate}
+                    onClickDate={(date: Date) => {
+                        navigation.push(`DailyReserveList`, { date: date.getTime() })
+                    }} />
             </View>
             <View style={{ position: 'absolute', width: width, bottom: 12 }}>
                 <View style={{ marginHorizontal: 24, height: 88, backgroundColor: Color['grey200'], borderRadius: 10 }}>

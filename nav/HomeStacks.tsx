@@ -21,6 +21,8 @@ import ReserveCalendarScreen from '../pages/Reserve/ReserveCalendarScreen';
 import DailyReserveListScreen from '../pages/Reserve/DailyReserveListScreen';
 import ReservationScreen from '../pages/Reserve/ReservationScreen';
 import DateSelcectScreen from '../pages/Reserve/DateSelcectScreen';
+import TimeSelectScreen from '../pages/Reserve/TimeSelectScreen';
+import BorrowInstrumentSelectScreen from '../pages/Reserve/BorrowInstrumentSelectScreen';
 
 // HomeStack Navigator
 const MainStack = createNativeStackNavigator();
@@ -82,7 +84,8 @@ const MainStacks = () => {
                 component={ReserveCalendarScreen}
                 options={{
                     headerShown: true,
-                    header: () => <Header leftButton='<-' HeaderName='연습실 예약 조회' />
+                    header: ({ navigation }) => <Header leftButton='<-' HeaderName='연습실 예약 조회' RightButton='예약'
+                        RightAction={() => navigation.push('Reservation')} />
                 }}
             />
             <MainStack.Screen
@@ -108,10 +111,25 @@ const MainStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: () => <Header leftButton='<-' HeaderName='예약 일시 선택' />
+                    header: ({ navigation }) => <Header leftButton='<-' HeaderName='예약 일시 선택' LeftAction={() => navigation.navigate('Reservation')} />
                 }}
             />
 
+            <MainStack.Screen
+                name='TimeSelect'
+                component={TimeSelectScreen}
+            />
+            
+
+            <MainStack.Screen
+                name='BorrowInstrumentSelect'
+                component={BorrowInstrumentSelectScreen}
+                options={{
+                    headerShown: true,
+                    animationDuration:100,
+                    header: () => <Header leftButton='X' HeaderName='대여 악기 선택'/>
+                }}
+            />
         </MainStack.Navigator>
     );
 };

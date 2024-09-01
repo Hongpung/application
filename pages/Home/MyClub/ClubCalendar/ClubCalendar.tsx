@@ -137,8 +137,21 @@ const ClubCalendar: React.FC<{ navigation: any }> = ({ navigation }) => {
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <ScrollView contentContainerStyle={{ backgroundColor: '#FFF' }}>
-                <MiniCalendar onSelect={(date) => setDate(date)} selectedDate={selectedDate} setMonth={setMonth} calendarMonth={calendarMonth} reservedDates={reservedDate} />
-                <PrevPracticeList prevPractice={reserveList} onPress={(reserve: Reserve) => navigation.push('PracticeInfo', { reserve: reserve })} />
+                <MiniCalendar
+                    onSelect={(date) => setDate(date)}
+                    selectedDate={selectedDate}
+                    setMonth={setMonth}
+                    calendarMonth={calendarMonth}
+                    reservedDates={reservedDate} />
+                <PrevPracticeList
+                    prevPractice={reserveList}
+                    onPress={(reserve: Reserve) => {
+                        const serializedReserve = {
+                            ...reserve,
+                            date: reserve.date.toISOString(),
+                        };
+                        navigation.push('PracticeInfo', { reserveInfo: serializedReserve });
+                    }} />
             </ScrollView>
         </View>
     )
@@ -208,12 +221,12 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
                     <Pressable key={`date-${day}`}
                         style={{ height: 32, width: 32, alignItems: 'center', justifyContent: 'flex-start', backgroundColor: day == selectedDate?.getDate() ? Color['blue100'] : 'transparent', borderRadius: 5 }}
                         onPress={() => {
-                            if (selectedDate?.getDate() == day ) onSelect(null);
-                            else isReserved&&filterLogforDate(day);
+                            if (selectedDate?.getDate() == day) onSelect(null);
+                            else isReserved && filterLogforDate(day);
                         }}
                     >
-                        <Text style={[styles.CalendarText, isReserved&& { color: Color['grey600'] }, day == selectedDate?.getDate() && { color: Color['blue600'] }]}>{day}</Text>
-                        {isReserved && <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop:2 }}>
+                        <Text style={[styles.CalendarText, isReserved && { color: Color['grey600'] }, day == selectedDate?.getDate() && { color: Color['blue600'] }]}>{day}</Text>
+                        {isReserved && <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 2 }}>
                             <View style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: Color['blue500'] }} />
                         </View>}
                     </Pressable>
@@ -222,7 +235,7 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
 
             if ((index + 1) % 7 === 0) {
                 weeks.push(
-                    <View key={index} style={{ flexDirection: 'row', marginHorizontal: 48, width: 320, justifyContent: 'space-around' }}>
+                    <View key={'day' + index} style={{ flexDirection: 'row', marginHorizontal: 48, width: 320, justifyContent: 'space-around' }}>
                         {days}
                     </View>
                 );

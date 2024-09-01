@@ -1,5 +1,5 @@
 import { Dimensions, FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Color } from '../../ColorSet';
 
 const { width } = Dimensions.get(`window`)
@@ -13,7 +13,7 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
 
     const times = ['AM10', 'AM11', 'PM12', 'PM01', 'PM02', 'PM03', 'PM04', 'PM05', 'PM06', 'PM07', 'PM08', 'PM09', 'PM10'];
 
-    const selectedWeek = () => {
+    const renderWeekOfDate = useCallback((selectedDate: Date) => {
         const day = selectedDate.getDay() == 0 ? 7 : selectedDate.getDay();
         const week = [];
         const startDate = new Date(selectedDate);
@@ -29,7 +29,7 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
             )
         }
         return week;
-    }
+    }, [])
 
     const incrementMonth = () => {
         const nextMonth = new Date(selectedDate);
@@ -55,7 +55,9 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
         setDate(nextDay);
     }
 
-    useEffect(() => { console.log(selectedDate + '로드') }, [selectedDate])
+    useEffect(() => {
+        // fetch 함수 구현
+    }, [selectedDate])
 
     return (
         <View style={{ backgroundColor: '#FFF', flex: 1 }}>
@@ -67,7 +69,7 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
                 backgroundColor: '#FFF',
                 paddingHorizontal: 24
             }}>
-                <Pressable onPress={() => { navigation.goBack(); }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28, backgroundColor: Color['grey300'] }}>
+                <Pressable onPress={() => { navigation.navigate('ReserveCalendar', { date: selectedDate.toString() }); }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28, backgroundColor: Color['grey300'] }}>
                     <Text style={{
                         fontFamily: "NanumSquareNeo-Bold",
                         height: 24,
@@ -111,7 +113,7 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Pressable style={{ height: 32, width: 32, backgroundColor: Color['grey200'] }} onPress={prevWeek} />
                     <View style={{ height: 32, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 264, marginHorizontal: 8 }}>
-                        {selectedWeek()}
+                        {renderWeekOfDate(selectedDate)}
                     </View>
                     <Pressable style={{ height: 32, width: 32, backgroundColor: Color['grey200'] }} onPress={nextWeek} />
                 </View>

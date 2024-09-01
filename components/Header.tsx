@@ -5,15 +5,24 @@ import { useNavigation } from "@react-navigation/native";
 import { Color } from '../ColorSet';
 
 interface HeaderProps {
-    leftButton: string, HeaderName?: string, RightButton?: string, RightAction?: () => void, addLeftAction?: () => void
+    leftButton: string, HeaderName?: string, RightButton?: string, RightAction?: () => void, addLeftAction?: () => void, LeftAction?: () => void
 }
 
-const Header: React.FC<HeaderProps> = ({ leftButton, HeaderName, RightButton, RightAction, addLeftAction }) => {
+const Header: React.FC<HeaderProps> = ({ leftButton, HeaderName, RightButton, RightAction, addLeftAction, LeftAction }) => {
     const navigation = useNavigation();
 
     return (
         <View style={styles.HeadrContainer}>
-            <Pressable onPress={() => { navigation.goBack(); addLeftAction }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28, backgroundColor: Color['grey300'] }}>
+            <Pressable onPress={() => {
+                if (!LeftAction) {
+                    navigation.goBack();
+                } else {
+                    LeftAction();
+                }
+                addLeftAction
+            }}
+                style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28, backgroundColor: Color['grey300'] }}
+            >
                 <Text style={styles.Text}>{leftButton}</Text>
             </Pressable>
             <Text style={styles.Title}>{HeaderName}</Text>
