@@ -1,32 +1,33 @@
-import React, { useState } from "react"
+import React from "react"
 import { View, StyleSheet, Text, Pressable, Image } from "react-native"
 
 import { Color } from "../../ColorSet"
 import { Instrument } from "../../UserType"
-import { useInstrument } from "../../pages/Home/MyClub/Instruments/context/InstrumentContext";
 
 
-const InstrumentCard: React.FC<{ instrument: Instrument, view: "inManage" | "inBorrow", navigation?: any, onSelectInstrument: (instrument: Instrument) => void, isPicked?: boolean }> = ({ instrument, view, navigation, onSelectInstrument, isPicked }) => {
+const InstrumentTag: React.FC<{ state: string }> = ({ state }) => {
+    return (
+        <View style={[styles.tag, {
+            backgroundColor: state == '분실' ? Color['red100'] : Color['blue100']
+        }]}>
+            <Text style={[styles.tagText, { color: state == '분실' ? Color['red500'] : Color['blue500'] }]}>
+                {'분실'}
+            </Text>
+        </View>
+    )
+}
 
-    const ClickHandler = () => {
-        onSelectInstrument(instrument)
-    }
-    const renderTag = () => {
-        return (
-            <View style={[styles.tag, {
-                backgroundColor: instrument.state == '분실' ? Color['red100'] : Color['blue100']
-            }]}>
-                <Text style={[styles.tagText, { color: instrument.state == '분실' ? Color['red500'] : Color['blue500'] }]}>
-                    {'분실'}
-                </Text>
-            </View>
-        )
-    }
+interface instrumentCardProps {
+    instrument: Instrument,
+    view: "inManage" | "inBorrow",
+    onSelectInstrument: (instrument: Instrument) => void,
+    isPicked?: boolean
+}
 
-
+const InstrumentCard: React.FC<instrumentCardProps> = ({ instrument, view, onSelectInstrument, isPicked }) => {
     return (
         <Pressable
-            onPress={ClickHandler}
+            onPress={() => onSelectInstrument(instrument)}
             style={[styles.card, { height: instrument?.nickname ? 172 : 156 }, isPicked && { borderColor: Color['blue500'], backgroundColor: Color['blue100'], borderWidth: 1, }]}>
             <View>
                 <View style={styles.imageContainer}>
@@ -40,7 +41,7 @@ const InstrumentCard: React.FC<{ instrument: Instrument, view: "inManage" | "inB
 
                 <View style={styles.tagContainer}>
                     {view == `inManage` ?
-                        instrument?.state && renderTag()
+                        instrument?.state && <InstrumentTag state={instrument.state} />
                         :
                         <Text style={styles.clubText}>
                             {'@ ' + instrument.club}

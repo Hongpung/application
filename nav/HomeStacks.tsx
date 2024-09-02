@@ -24,6 +24,7 @@ import DateSelcectScreen from '../pages/Reserve/DateSelcectScreen';
 import TimeSelectScreen from '../pages/Reserve/TimeSelectScreen';
 import BorrowInstrumentSelectScreen from '../pages/Reserve/BorrowInstrumentSelectScreen';
 import ChatMediaViewerScreen from '../pages/Chat/ChatMediaViewerScreen';
+import { ReservationProvider } from '../context/ReservationContext';
 
 // HomeStack Navigator
 const MainStack = createNativeStackNavigator();
@@ -48,6 +49,14 @@ const MainStacks = () => {
                     animation: 'none',
                 }}
             />
+
+            <MainStack.Screen
+                name="Reservation"
+                component={ReservationStacks}
+                options={{
+                    animation: 'none',
+                }} />
+
             <MainStack.Screen
                 name="MyClub"
                 component={MyClubStacks}
@@ -96,41 +105,7 @@ const MainStacks = () => {
                     animation: 'none',
                 }}
             />
-            <MainStack.Screen
-                name='Reservation'
-                component={ReservationScreen}
-                options={{
-                    animation: 'none',
-                    headerShown: true,
-                    header: () => <Header leftButton='X' HeaderName='연습실 예약' />
-                }}
-            />
 
-            <MainStack.Screen
-                name='ResrvationDateSelect'
-                component={DateSelcectScreen}
-                options={{
-                    headerShown: true,
-                    animation: 'none',
-                    header: ({ navigation }) => <Header leftButton='<-' HeaderName='예약 일시 선택' LeftAction={() => navigation.navigate('Reservation')} />
-                }}
-            />
-
-            <MainStack.Screen
-                name='TimeSelect'
-                component={TimeSelectScreen}
-            />
-
-
-            <MainStack.Screen
-                name='BorrowInstrumentSelect'
-                component={BorrowInstrumentSelectScreen}
-                options={{
-                    headerShown: true,
-                    animationDuration: 100,
-                    header: () => <Header leftButton='X' HeaderName='대여 악기 선택' />
-                }}
-            />
 
             <MainStack.Screen
                 name='ChatViewer'
@@ -141,6 +116,52 @@ const MainStacks = () => {
             />
 
         </MainStack.Navigator>
+    );
+};
+
+const ReservationStack = createNativeStackNavigator();
+
+const ReservationStacks = () => {
+    return (
+        <ReservationProvider>
+            <ReservationStack.Navigator initialRouteName="Reservation" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+                <ReservationStack.Screen
+                    name='Reservation'
+                    component={ReservationScreen}
+                    options={{
+                        animation: 'none',
+                        headerShown: true,
+                        header: () => <Header leftButton='X' HeaderName='연습실 예약' />
+                    }}
+                />
+                <ReservationStack.Screen
+                    name='ResrvationDateSelect'
+                    component={DateSelcectScreen}
+                    options={{
+                        headerShown: true,
+                        animation: 'none',
+                        header: ({ navigation }) => <Header leftButton='<-' HeaderName='예약 일시 선택' LeftAction={() => navigation.navigate('Reservation')} />
+                    }}
+                />
+                <ReservationStack.Screen
+                    name='TimeSelect'
+                    component={TimeSelectScreen}
+                    options={{
+                        animation: 'none',
+                    }}
+                />
+                <ReservationStack.Screen
+                    name='BorrowInstrumentSelect'
+                    component={BorrowInstrumentSelectScreen}
+                    options={{
+                        headerShown: true,
+                        animationDuration: 100,
+                        header: () => <Header leftButton='X' HeaderName='대여 악기 선택' />
+                    }}
+                />
+            </ReservationStack.Navigator>
+        </ReservationProvider>
+
     );
 };
 

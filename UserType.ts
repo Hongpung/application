@@ -11,7 +11,7 @@ export const instrumentOrder = (instrument: InstrumentType) => {
 export type Instrument = {
     imgURL: string|null// url
     club: '들녘' | '산틀' | '신명화랑' | '악반'
-    type: '쇠' | '장구' | '북' | '소고' | '새납'
+    type: InstrumentType
     name: string
     nickname?: string
     owner?: string//User

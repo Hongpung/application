@@ -1,29 +1,30 @@
 import { Pressable, ScrollView, StyleSheet, Text, View, Image } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Instrument, instrumentOrder } from '../../UserType'
 import InstrumentCard from '../../components/cards/InstrumentCard'
 import { Color } from '../../ColorSet'
 import { InstrumentProvider, useInstrument } from '../Home/MyClub/Instruments/context/InstrumentContext'
 import LongButton from '../../components/buttons/LongButton'
+import { useReservation } from '../../context/ReservationContext'
 
 const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const instruments: Instrument[] = [{
         imgURL: 'https://postfiles.pstatic.net/MjAyNDA3MDdfMjQy/MDAxNzIwMzYwODg3Mzg3.siw5LvdkA7a4MPbS07jHAIFKw7GzlIdHbvJ4qvMeoJog.fiYaRMvdmmfUe56jgp-hQ8C5kWM20zJB1kLzAEQXakIg.JPEG/KakaoTalk_20240707_225628831_01.jpg?type=w386',
-        name: "길동무",
+        name: "길동무1",
         type: '쇠',
         club: '들녘',
         nickname: '바보',
         owner: '홍길동'
     }, {
         imgURL: 'https://postfiles.pstatic.net/MjAyNDA3MDdfMjQy/MDAxNzIwMzYwODg3Mzg3.siw5LvdkA7a4MPbS07jHAIFKw7GzlIdHbvJ4qvMeoJog.fiYaRMvdmmfUe56jgp-hQ8C5kWM20zJB1kLzAEQXakIg.JPEG/KakaoTalk_20240707_225628831_01.jpg?type=w386',
-        name: "길동무",
+        name: "길동무2",
         type: '쇠',
         club: '들녘',
         nickname: '바보',
         owner: '홍길동'
     }, {
         imgURL: 'https://postfiles.pstatic.net/MjAyNDA3MDdfMjQy/MDAxNzIwMzYwODg3Mzg3.siw5LvdkA7a4MPbS07jHAIFKw7GzlIdHbvJ4qvMeoJog.fiYaRMvdmmfUe56jgp-hQ8C5kWM20zJB1kLzAEQXakIg.JPEG/KakaoTalk_20240707_225628831_01.jpg?type=w386',
-        name: "길동무",
+        name: "길동무3",
         type: '장구',
         club: '들녘',
         nickname: '바보',
@@ -31,22 +32,31 @@ const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigatio
     }
     ]
 
+    const { reservation } = useReservation();
+
     return (
-        <InstrumentProvider>
-            <View style={{ flex: 1, backgroundColor: '#FFF' }}>
-                <ScrollView contentContainerStyle={{ flex: 1, backgroundColor: '#FFF' }}>
-                    <View style={{ flex: 1, marginHorizontal: 24 }}>
-                        <InstrumentsList instrumentsList={instruments} navigation={navigation} />
-                    </View>
-                </ScrollView>
-            </View>
-        </InstrumentProvider>
+        <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+            <ScrollView contentContainerStyle={{ flex: 1, backgroundColor: '#FFF' }}>
+                <View style={{ flex: 1, marginHorizontal: 24 }}>
+                    <InstrumentsList instrumentsList={instruments} />
+                </View>
+            </ScrollView>
+            {reservation.borrowInstruments.length > 0 && <View style={{ paddingTop: 12, width: '100%' }}>
+                <LongButton
+                    color='blue'
+                    isAble={true}
+                    innerText={`선택완료 (${reservation.borrowInstruments.length})`}
+                    onPress={() => navigation.pop()}
+                />
+            </View>}
+        </View>
     )
 }
 
-const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any }> = ({ instrumentsList, navigation }) => {
+const InstrumentsList: React.FC<{ instrumentsList: Instrument[] }> = ({ instrumentsList }) => {
 
-    const [selectedInstruments, setSelectedInstruments] = useState<Instrument[]>([]);
+    const { setBorrowInstruments, reservation } = useReservation();
+
     const [isGGwangOpen, setGGwangOpen] = useState(false);
     const [isJangguOpen, setJangguOpen] = useState(false);
     const [isBukOpen, setBukOpen] = useState(false);
@@ -96,8 +106,21 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
             default: return 0;
         }
     }
+
+    const haveSameInstrument = (existInstruments: Instrument[], instrument: Instrument) => existInstruments.some(existInstrument => JSON.stringify(existInstrument) === JSON.stringify(instrument));
+
+
+    useEffect(() => {
+        setGGwangSelected(reservation.borrowInstruments.filter((instrument) => instrument.type == '쇠').length)
+        setJangguSelected(reservation.borrowInstruments.filter((instrument) => instrument.type == '장구').length)
+        setBukSelected(reservation.borrowInstruments.filter((instrument) => instrument.type == '북').length)
+        setSogoSelected(reservation.borrowInstruments.filter((instrument) => instrument.type == '소고').length)
+        setETCSelected(reservation.borrowInstruments.filter((instrument) => instrument.type == '새납').length)
+    }, [])
+
     const addInstruments = (instrument: Instrument) => {
-        setSelectedInstruments([instrument, ...selectedInstruments])
+
+        setBorrowInstruments([...reservation.borrowInstruments, instrument])
         switch (instrument.type) {
             case '쇠':
                 setGGwangSelected(prevCount => prevCount + 1);
@@ -117,7 +140,8 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
     }
 
     const removeInstruments = (instrument: Instrument) => {
-        setSelectedInstruments(selectedInstruments.filter((item) => item != instrument))
+        setBorrowInstruments(reservation.borrowInstruments.filter((existInstrument) => JSON.stringify(existInstrument) != JSON.stringify(instrument)))
+
         switch (instrument.type) {
             case '쇠':
                 setGGwangSelected(prevCount => prevCount > 0 ? prevCount - 1 : 0);
@@ -135,8 +159,6 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
                 break;
         }
     }
-
-
 
     const renderInstruments = () => {
         const rows = [];
@@ -166,13 +188,12 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
                     {isOpen(instrumentsList[i].type) && <View key={i} style={{ height: 168, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 4, marginHorizontal: 12 }}>
                         {group.map((instrument, index) => (
                             <InstrumentCard
-                                key={instrument.name + index}
+                                key={instrument.name + instrument.imgURL?.slice(-10, -5) + index}
                                 instrument={instrument}
                                 view="inBorrow"
-                                navigation={navigation}
-                                isPicked={selectedInstruments.includes(instrument)}
+                                isPicked={haveSameInstrument(reservation.borrowInstruments, instrument)}
                                 onSelectInstrument={(item: Instrument) => {
-                                    if (selectedInstruments.includes(item))
+                                    if (haveSameInstrument(reservation.borrowInstruments, item))
                                         removeInstruments(item)
                                     else
                                         addInstruments(item)
@@ -191,14 +212,6 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
     return (
         <View style={{ flex: 1, }}>
             <ScrollView>{renderInstruments()}</ScrollView>
-            {selectedInstruments.length>0&&<View style={{paddingTop:12, width:'100%'}}>
-                <LongButton
-                    color='blue'
-                    isAble={true}
-                    innerText={`선택완료 (${selectedInstruments.length})`}
-                    onPress={()=>navigation.pop()}
-                />
-            </View>}
         </View>
     )
 }

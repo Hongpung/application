@@ -225,20 +225,29 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     }
 
     useEffect(() => {
+        if (photos.length == 0)
+            fetchPhotos();
         if (ModalVisible)
             setAlbum(null);
         else if (selectedAlbum != null)
             setPhotos([])
-
 
     }, [ModalVisible]);
 
     useEffect(() => {
 
         setPhotos([]);
-        fetchPhotos();
 
     }, [selectedAlbum])
+
+    useEffect(() => {
+
+        
+        console.log(selectedAlbum, photos)
+        if (photos.length < 1)
+            fetchPhotos();
+
+    }, [photos])
 
     const TimeFormat = (time: Date): string => {
         const localDate = new Date(time.getUTCHours());
@@ -322,7 +331,7 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         return <View></View>;
     }
 
-    const renderModalItem = useCallback(({ item }: { item: (MediaLibrary.Asset & { originUri: string, originHeight: number, originWidth: number }) }) => {
+    const AlbumItem = useCallback(({ item }: { item: (MediaLibrary.Asset & { originUri: string, originHeight: number, originWidth: number }) }) => {
         const imageScale = (width - 48) / 3
         const selectedIndex = selectedImages.indexOf(item)
 
@@ -343,7 +352,7 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     }, [selectedImages]);
 
 
-    const handleSendImagesViaSocket = async () => {
+    const handleSendImage = async () => {
         if (selectedImages.length === 0) {
             Alert.alert('No images selected', 'Please select at least one image to send.');
             return;
@@ -401,7 +410,7 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         <KeyboardAvoidingView
             style={{ backgroundColor: '#FFF', flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={inputHeight + 80} // 필요에 따라 조정
+            keyboardVerticalOffset={inputHeight + 80}
         >
             <FlatList
                 ref={flatListRef}
@@ -457,6 +466,11 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 animationType="slide"
             >
                 <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
+                    <Pressable style={{ flex: 1 }}
+                        onPress={() => {
+                            setModalVisible(false);
+                            setSelectedImages([]);
+                        }} />
                     <View style={{ height: 420, padding: 12, backgroundColor: "#FFF", paddingBottom: 0, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
                         <Pressable style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 120, alignSelf: 'center', marginVertical: 12, paddingBottom: 8 }}
                             onPress={() => setSelctingState(true)}>
@@ -487,7 +501,7 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         {isSelectingAlbum && <Pressable style={{ position: 'absolute', flex: 1, width: width, height: '120%', zIndex: 1 }} onPress={() => setSelctingState(false)} />}
                         {photos?.length > 0 ? <FlatList
                             data={photos}
-                            renderItem={renderModalItem}
+                            renderItem={AlbumItem}
                             keyExtractor={(item, index) => item.id + index}
                             numColumns={3}  // 3열로 이미지 배치
                             initialNumToRender={12} // 처음 렌더링할 아이템 수
@@ -513,17 +527,10 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                             </View>}
                     </View>
                     <View style={{ backgroundColor: "#FFF" }}>
-                        <View style={{ height: 8 }} />
-                        <LongButton color='red'
-                            isAble={true}
-                            innerText="닫기"
-                            onPress={() => {
-                                setModalVisible(false);
-                                setSelectedImages([]);
-                            }} />
 
                         <View style={{ height: 8 }} />
-                        <LongButton color='blue' isAble={selectedImages.length > 0} innerText={selectedImages.length > 0 ? `사진 전송 (${selectedImages.length})` : '사진 선택'} onPress={handleSendImagesViaSocket} />
+
+                        <LongButton color='blue' isAble={selectedImages.length > 0} innerText={selectedImages.length > 0 ? `사진 전송 (${selectedImages.length})` : '사진 선택'} onPress={handleSendImage} />
 
                         <View style={{ height: 24 }} />
                     </View>
