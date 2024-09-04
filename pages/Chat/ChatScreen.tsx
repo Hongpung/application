@@ -88,7 +88,6 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             const fileExists = await FileSystem.getInfoAsync(fileUri);
             if (fileExists.exists) {
                 await FileSystem.deleteAsync(fileUri);
-                console.log('Chat log file deleted');
                 setChatLog([]);
             } else {
                 console.log('Chat log file does not exist');
@@ -118,19 +117,25 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     useEffect(() => {
         const getPermission = async () => {
             if (Platform.OS === 'android') {
-                const granted = await PermissionsAndroid.request(
-                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                    {
-                        title: "Access to Photos",
-                        message: "We need access to your photos to show them in the app.",
-                        buttonNeutral: "Ask Me Later",
-                        buttonNegative: "Cancel",
-                        buttonPositive: "OK"
+                const alreadyGranted = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+
+                if (!alreadyGranted) {
+                    // 권한 요청
+                    const granted = await PermissionsAndroid.request(
+                        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                        {
+                            title: "Access to Photos",
+                            message: "We need access to your photos to show them in the app.",
+                            buttonNeutral: "Ask Me Later",
+                            buttonNegative: "Cancel",
+                            buttonPositive: "OK"
+                        }
+                    );
+
+                    if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+                        Alert.alert('Permission denied', 'We need access to your photos.');
+                        return;
                     }
-                );
-                if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-                    Alert.alert('Permission denied', 'We need access to your photos.');
-                    return;
                 }
             }
 
@@ -242,8 +247,6 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     useEffect(() => {
 
-        
-        console.log(selectedAlbum, photos)
         if (photos.length < 1)
             fetchPhotos();
 

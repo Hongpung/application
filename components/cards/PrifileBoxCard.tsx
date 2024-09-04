@@ -21,10 +21,12 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
 
     if (!user) return;
     return (
-        <View style={[styles.ProfileContainer, isCard ?{ marginHorizontal: 0, paddingHorizontal:8,paddingVertical:8 } : null]}>
+        <View style={[styles.ProfileContainer, isCard ? { marginHorizontal: 0, paddingHorizontal: 8, paddingVertical: 8 } : null]}>
             <View style={{ flex: 1, marginHorizontal: 12, marginTop: 24 }}>
                 <View style={{ flexDirection: 'row', flex: 1 }}>
-                    <View style={styles.ProfilePhoto} />
+                    {user.ProfileUri ?
+                        <Image source={{ uri: user.ProfileUri }} style={styles.ProfilePhoto} /> :
+                        <View style={[styles.ProfilePhoto, { backgroundColor: Color['grey200'], borderWidth:1, borderColor:Color['grey300']}]} />}
                     <View style={{
                         flex: 1,
                         height: 120,
@@ -86,7 +88,6 @@ const styles = StyleSheet.create({
         width: 90,
         height: 120,
         borderRadius: 5,
-        backgroundColor: Color['grey200'],
         marginRight: 16
     }, icons: {
         width: 28,

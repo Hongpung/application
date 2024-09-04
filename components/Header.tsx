@@ -19,7 +19,8 @@ const Header: React.FC<HeaderProps> = ({ leftButton, HeaderName, RightButton, Ri
                 } else {
                     LeftAction();
                 }
-                addLeftAction
+                if (addLeftAction)
+                    addLeftAction();
             }}
                 style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28, backgroundColor: Color['grey300'] }}
             >

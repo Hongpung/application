@@ -4,7 +4,6 @@ import CheckboxComponent from '../../components/checkboxs/CheckboxComponent'
 import { Color } from '../../ColorSet'
 import LongButton from '../../components/buttons/LongButton'
 import { useReservation } from '../../context/ReservationContext'
-import { instrumentOrder } from '../../UserType'
 
 const { width } = Dimensions.get('window')
 
@@ -77,7 +76,7 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>정기 연습</Text>
                     <View style={{ width: 218, height: 36, borderRadius: 5, flexDirection: 'row', alignItems: 'center' }}>
                         <Pressable style={[{ width: 108, alignItems: 'center', borderBottomLeftRadius: 5, borderTopLeftRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderRightWidth: 0.5, borderColor: reservation.isRegular ? Color['blue500'] : Color['red500'] }, reservation.isRegular && { backgroundColor: Color['blue100'] }]}
-                            onPress={() => { setIsRegular(true) }}>
+                            onPress={() => { setIsRegular(true); setIsParticipatible(false) }}>
                             <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, reservation.isRegular ? { color: Color['blue600'] } : { color: Color['red300'] }]}>
                                 예
                             </Text>
@@ -144,10 +143,33 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     <View style={{ height: 16 }} />
 
                     <Pressable style={{ marginHorizontal: 16 }}
-                    >
-                        <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderWidth: 4, height: 72, borderColor: Color['grey200'], borderStyle: 'dashed' }}>
-                            <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'] }}>+</Text>
-                        </View>
+                        onPress={() => navigation.push('ParticipantsSelect')}>
+                        {reservation.participants.length > 0 ?
+                            <View style={{ alignItems: 'center', justifyContent: 'flex-end', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                                    <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', width: 120, marginLeft: 24, bottom: 8 }}>
+                                        {reservation.participants.slice(0, 4).map(user => (user.ProfileUri ? <Image
+                                            source={{ uri: user.ProfileUri }} style={{ width: 42, height: 56, }} /> : <View style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -4 * reservation.participants.length, borderRadius: 5 }} />))}
+                                    </View>
+                                    <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', width: 152, bottom: 12 }}>
+
+                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'] }}>
+                                            {reservation.participants.slice(0, 2).map(user => `${user.name} `)}{reservation.participants.length >= 3 && `등`}
+                                        </Text>
+                                        <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                                            <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Bold', color: Color['blue500'] }}>
+                                                {reservation.participants.length}
+                                            </Text>
+                                            <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }}>
+                                                {`  명`}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
+                            : <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderWidth: 4, height: 72, borderColor: Color['grey200'], borderStyle: 'dashed' }}>
+                                <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'] }}>+</Text>
+                            </View>}
                     </Pressable>
                 </View>
 
@@ -170,11 +192,11 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         {reservation.borrowInstruments.length > 0 ?
                             <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
                                 <View style={{ flexDirection: 'row' }}>
-                                    {['쇠', '장구', '북', '소고', '새납'].map((type, index) => {
+                                    {['쇠', '장구', '북', '소고', '새납'].map((type) => {
                                         const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
                                         return (<View style={{ width: (width - 96) / 5, alignItems: 'center' }}>
                                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14 }}>{type}</Text>
-                                            <View style={{height:8}}/>
+                                            <View style={{ height: 8 }} />
                                             <Text style={instCount > 0 ? { fontFamily: 'NanumSquareNeo-Bold', fontSize: 20, color: Color['blue500'] } : { fontFamily: 'NanumSquareNeo-Bold', fontSize: 20, color: Color['grey300'] }}>{instCount > 0 ? instCount : '-'}</Text>
                                         </View>)
                                     })}
@@ -188,7 +210,7 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
                 <View style={{ height: 16 }} />
             </ScrollView>
-            <View style={{ marginHorizontal: 24, marginVertical: 8, height: 100 }}>
+            <View style={{ paddingVertical: 8, bottom:0 }}>
                 <View style={{ height: 40, alignSelf: 'center' }}>
                     <CheckboxComponent
                         innerText={reservation.hasToWait ? '예약 전날 오후10시 이전까지 자동 취소돼요' : '예약 전날 오후10시까지 수정*취소할 수 있어요'}
@@ -199,7 +221,11 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     color={reservation.hasToWait ? 'green' : 'blue'}
                     innerText={reservation.hasToWait ? '대기열에 추가하기' : '예약하기'}
                     isAble={isAgree}
-                    onPress={() => { }}
+                    onPress={() => {
+                        if (reservation.Time.startTime == 0) console.log('시간 미지정')
+                        if (reservation.name == '') console.log('이름 미지정')
+                        navigation.push('ReservationConfirm')
+                    }}
                 />
             </View>
         </View>

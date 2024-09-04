@@ -3,19 +3,17 @@ import { View, StyleSheet, Text, Pressable, Image } from "react-native"
 
 import { Color } from "../../ColorSet"
 import { User } from "../../UserType"
-import { useUser } from "../../context/UserContext"
 
 export interface MiniCardType {
     user: User
     view: "inClubView" | "inReserveView"
-    isPicked: boolean
+    isPicked: boolean,
+    onPick: (user: User) => void
 }
 
-const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked }) => {
+const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick }) => {
 
-    const { setSelectedUser, setModalVisible } = useUser();
     const [loading, setLoading] = useState(false);
-
 
     const RoleTag = () => {
         switch (user.addRole) {
@@ -43,9 +41,17 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked }) => {
     }
 
     return (
-        <View style={[styles.ProfileContainer, isPicked ? styles.PickedProfile : null,]}>
+        <Pressable style={[styles.ProfileContainer, isPicked && styles.PickedProfile]} onPress={() => { if (view == 'inReserveView') onPick(user) }}>
             <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
-                <View style={styles.ProfilePhoto} />
+                {user.ProfileUri ?
+                    <Image
+                        source={{ uri: user.ProfileUri }}
+                        style={styles.ProfilePhoto} /> :
+                    <View style={[styles.ProfilePhoto, {
+                        borderWidth: 1,
+                        borderColor: Color['grey300'],
+                        backgroundColor: Color['grey200'],
+                    }]} />}
                 <View style={{ height: 44, justifyContent: 'space-evenly' }}>
                     <View style={[{ flexDirection: 'row', flex: 1, alignItems: 'center', }, user.nickname ? { marginTop: 3 } : null]}>
                         <View style={styles.instrumnetMark} />
@@ -74,14 +80,14 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked }) => {
             </View>
             {view == 'inClubView' ?
                 <Pressable style={{ position: 'absolute', borderRadius: 200, right: 16, bottom: 8 }}
-                    onPress={() => { setSelectedUser(user); setModalVisible(true) }}>
+                    onPress={() => { onPick(user); }}>
                     <Text style={styles.moreBtn}>{`더 알아보기 >`}</Text>
                 </Pressable> :
                 <View style={{ position: 'absolute', borderRadius: 200, right: 16, bottom: 8, flexDirection: 'row', alignItems: 'flex-end' }}>
                     <Text style={[{ marginRight: 1 }, styles.clubInfo]}>{`@ ` + (user.grade > 9 ? user.grade : '0' + user.grade)}</Text>
                     <Text style={styles.clubInfo}>{user.club}</Text>
                 </View>}
-        </View>
+        </Pressable>
     )
 }
 
@@ -101,16 +107,12 @@ const styles = StyleSheet.create({
     PickedProfile: {
         backgroundColor: Color['blue100'],
         borderColor: Color['blue600'],
-        borderWidth: 2,
     },
     ProfilePhoto: {
         marginLeft: 20,
         width: 60,
         height: 80,
         borderRadius: 5,
-        borderWidth: 1,
-        borderColor: Color['grey300'],
-        backgroundColor: Color['grey200'],
         marginRight: 24
     },
     instrumnetMark: {

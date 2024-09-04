@@ -7,14 +7,6 @@ const { width } = Dimensions.get('window');
 
 const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
-    const flatListRef = useRef<FlatList>(null);
-
-    const handleMomentumScrollEnd = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-        const offsetX = event.nativeEvent.contentOffset.x;
-        const index = Math.round(offsetX / (width - 100));
-
-        flatListRef.current?.scrollToIndex({ index, animated: true });
-    };
 
 
     return (
@@ -29,7 +21,6 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 </View>
                 <View style={{ height: 12 }} />
                 <FlatList
-                    ref={flatListRef}
                     contentContainerStyle={{ alignItems: 'center' }}
                     data={[{ id: '22', title: '222' }, { id: '32', title: '222222222222222222222' }, { id: '222', title: '2222' }]}
                     horizontal

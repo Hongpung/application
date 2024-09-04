@@ -1,6 +1,8 @@
 
 export type InstrumentType = '쇠' | '장구' | '북' | '소고' | '새납';
+export const InstrumentTypes:InstrumentType[] = ['쇠' , '장구' , '북' , '소고' , '새납']
 export type club = '들녘' | '산틀' | '신명화랑' | '악반' | '기타'
+export const clubs:club[] = ['들녘', '산틀', '신명화랑', '악반', '기타']
 type Role = "상쇠" | "상장구" | "수북" | "수법고"
 
 export const instrumentOrder = (instrument: InstrumentType) => {
@@ -9,7 +11,7 @@ export const instrumentOrder = (instrument: InstrumentType) => {
 }
 
 export type Instrument = {
-    imgURL: string|null// url
+    imgURL: string | null// url
     club: '들녘' | '산틀' | '신명화랑' | '악반'
     type: InstrumentType
     name: string
@@ -28,4 +30,5 @@ export type User = {
     isCapt?: boolean
     addRole?: Role
     badge?: string//url임
+    ProfileUri?:string
 }

@@ -13,12 +13,14 @@ type ClubMembersProps = NativeStackScreenProps<HomeStackParamList, 'ClubMembersH
 
 
 const MemeberList: React.FC<{ memberList: User[] }> = ({ memberList }) => {
+    
+    const{setModalVisible,setSelectedUser}= useUser();
 
     return (
         <View style={{flex:1}}>
             {memberList.map((member) => (
                 <View style={{ marginVertical: 8, marginHorizontal:24 }}>
-                    <ProfileMiniCard key={member.name} user={member} isPicked={false} view={'inClubView'} />
+                    <ProfileMiniCard key={member.name} user={member} isPicked={false} onPick={user => {setSelectedUser(user); setModalVisible(true)}} view={'inClubView'} />
                 </View>
             ))}
         </View>

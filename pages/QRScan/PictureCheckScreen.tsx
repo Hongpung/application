@@ -6,16 +6,12 @@ import { Color } from '../../ColorSet';
 
 const { width, height } = Dimensions.get('window');
 
-const ChatMediaViewerScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
-    const { images, selectedImgId }: { images: { user: string, id: string, uri: string, originHeight: number, originWidth: number }[], selectedImgId: string } = route.params;
+const PictureCheckScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+    const { photos }: { photos: { url: string, originWidth: number, originHeight: number }[] } = route.params;
 
     const [selectedIndex, setSelectIndex] = useState(0);
     const [indicatorVisible, setIndicatorVisible] = useState(true)
 
-    useEffect(() => {
-        const index = images.findIndex(image => image.id == selectedImgId);
-        applyIndex(index);
-    }, [])
 
     const applyIndex = async (index: number) => {
         setSelectIndex(index);
@@ -31,10 +27,14 @@ const ChatMediaViewerScreen: React.FC<{ navigation: any, route: any }> = ({ navi
                 >
                     <Text style={styles.Text}>{'<-'}</Text>
                 </Pressable>
-                <View>
-                    <Text style={styles.sendUser}>{images[selectedIndex]?.user}</Text>
-                    <Text style={styles.sendDate}>2024.03.07(수)</Text>
-                </View>
+                <Pressable onPress={() => {
+                    //fetch 수행
+                    navigation.navigate('CheckOutEnd');
+                }}
+                    style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 18, right: 22, width: 48, height: 28, backgroundColor: Color['grey300'] }}
+                >
+                    <Text style={styles.Text}>{'보내기'}</Text>
+                </Pressable>
             </View>}
             {/* {indicatorVisible && selectedIndex > 0 && <Pressable style={{ position: 'absolute', left: 0, top: height / 2 - 60, width: 40, height: 40, zIndex: 5, backgroundColor: 'rgba(0,0,0,0.75)', alignItems: 'center', justifyContent: 'center' }}
                 onPress={() => { applyIndex(selectedIndex - 1); }}>
@@ -47,18 +47,18 @@ const ChatMediaViewerScreen: React.FC<{ navigation: any, route: any }> = ({ navi
             <View style={[styles.container, !indicatorVisible ? { zIndex: 2 } : { zIndex: 0 }]}
             >
                 <ImageViewer
-                    onChange={(index)=>setSelectIndex(index!)}
+                    onChange={(index) => setSelectIndex(index!)}
                     index={selectedIndex}
-                    renderIndicator={()=><View/>}
+                    renderIndicator={() => <View />}
                     enableImageZoom
                     onClick={() => setIndicatorVisible(!indicatorVisible)}
                     enableSwipeDown
                     swipeDownThreshold={10}
                     onSwipeDown={() => navigation.goBack()}
-                    imageUrls={images.map(image => ({ url: image.uri, originWidth: image.originWidth, originHeight: image.originHeight }))}
+                    imageUrls={photos.map(image => ({ url: image.url, originWidth: image.originWidth, originHeight: image.originHeight }))}
                     style={{
                         width: width, // 화면의 너비에 맞춤
-                        height: (images[selectedIndex].originHeight / images[selectedIndex].originWidth) * width,
+                        height: (photos[selectedIndex].originHeight / photos[selectedIndex].originWidth) * width,
                     }}
                 />
             </View>
@@ -67,20 +67,20 @@ const ChatMediaViewerScreen: React.FC<{ navigation: any, route: any }> = ({ navi
             >
                 <FlatList
                     horizontal
-                    data={images}
+                    data={photos}
                     renderItem={({ item, index }) => {
                         return (
                             <Pressable
-                                key={item.id + item.user}
+                                key={item.url.slice(-11,-5)+index*11}
                                 onPress={() => {
                                     applyIndex(index);
                                 }}>
                                 <Image
-                                    source={{ uri: item.uri }}
+                                    source={{ uri: item.url }}
                                     style={[{
                                         width: 75, // 화면의 너비에 맞춤
                                         height: 75, // 비율에 따라 높이 조정
-                                    }, item == images[selectedIndex] && { borderWidth: 4, borderColor: Color['blue400'] }]}></Image>
+                                    }, item == photos[selectedIndex] && { borderWidth: 4, borderColor: Color['blue400'] }]}></Image>
                             </Pressable>)
                     }}
                     ItemSeparatorComponent={() => <View style={{ width: 4 }} />}
@@ -92,7 +92,7 @@ const ChatMediaViewerScreen: React.FC<{ navigation: any, route: any }> = ({ navi
 };
 
 
-export default ChatMediaViewerScreen
+export default PictureCheckScreen
 
 const styles = StyleSheet.create({
     container: {

@@ -47,13 +47,11 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
 
     const incrementMonth = () => {
         const newDate = new Date(calendarMonth);
-        console.log('증가')
         newDate.setMonth(calendarMonth.getMonth() + 1);
         setMonth(newDate);
     };
 
     const decrementMonth = () => {
-        console.log('감소')
         const newDate = new Date(calendarMonth);
         newDate.setMonth(calendarMonth.getMonth() - 1);
         setMonth(newDate);

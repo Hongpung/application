@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Instrument } from "../UserType"
+import { Instrument, User } from "../UserType"
 
 export type Reservation = {
     date: Date;
@@ -7,7 +7,7 @@ export type Reservation = {
     name: string;
     isRegular: boolean;
     isParticipatible: boolean;
-    participants: any[];
+    participants: User[];
     borrowInstruments: Instrument[];
     hasToWait: boolean;
 };
@@ -20,7 +20,7 @@ interface ReservationContextProps {
     setName: (name: string) => void;
     setIsRegular: (isRegular: boolean) => void;
     setIsParticipatible: (isParticipatible: boolean) => void;
-    setParticipants: (participants: any[]) => void;
+    setParticipants: (participants: User[]) => void;
     setBorrowInstruments: (borrowInstruments: Instrument[]) => void;
     setHasWait: (hasToWait: boolean) => void
 }
@@ -39,12 +39,12 @@ const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         hasToWait: false
     });
 
-    const setDate = (date: Date) => setReservation(prev => ({ ...prev, date }));
+    const setDate = (date: Date) => { if (date > new Date()) setReservation(prev => ({ ...prev, date })); }
     const setTime = (startTime: number, endTime: number) => setReservation(prev => ({ ...prev, Time: { startTime, endTime } }));
     const setName = (name: string) => setReservation(prev => ({ ...prev, name }));
     const setIsRegular = (isRegular: boolean) => setReservation(prev => ({ ...prev, isRegular }));
     const setIsParticipatible = (isParticipatible: boolean) => setReservation(prev => ({ ...prev, isParticipatible }));
-    const setParticipants = (participants: any[]) => setReservation(prev => ({ ...prev, participants }));
+    const setParticipants = (participants: User[]) => setReservation(prev => ({ ...prev, participants }));
     const setBorrowInstruments = (borrowInstruments: Instrument[]) => setReservation(prev => ({ ...prev, borrowInstruments }));
     const setHasWait = (hasToWait: boolean) => setReservation(prev => ({ ...prev, hasToWait }));
 

@@ -4,7 +4,7 @@ import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import { Color } from '../../ColorSet';
 import { debounce } from 'lodash';
 
-const QRScanScreen: React.FC = () => {
+const QRScanScreen: React.FC<{navigation:any}> = ({navigation}) => {
     const [facing, setFacing] = useState<CameraType>('back');
     const [permission, requestPermission] = useCameraPermissions();
     let isScanned: boolean = false
@@ -82,7 +82,11 @@ const QRScanScreen: React.FC = () => {
                     <View style={styles.bottomOverlay} />
                 </View>
                 <View style={styles.buttonContainer}>
-                    <Pressable style={styles.button} onPress={toggleCameraFacing} />
+                    <Pressable style={styles.button} 
+                    onPress={
+                        // toggleCameraFacing
+                        ()=> navigation.push('CheckIn')
+                        } />
                     <Text style={styles.descript}>QR코드를 스캔해주세요</Text>
                 </View>
             </CameraView>

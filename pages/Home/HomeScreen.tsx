@@ -107,7 +107,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 </View>
 
                 {/* 상단 일정*/}
-                <Pressable onPress={() => navigation.push(`MySchedules`)}>
+                <Pressable onPress={() => navigation.push(`ReserveCalendar`)}>
                     <View style={styles.ScheduleOfDate}>
                         <View style={{ position: 'absolute', bottom: 12, left: 20 }}>
                             <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>오늘의 일정이 없어요</Text>
@@ -366,7 +366,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                             <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>20 분</Text>
                         </View>
                         <Pressable style={{ justifyContent: 'center' }}
-                            onPress={()=>navigation.push('UsingManage')}>
+                            onPress={()=>navigation.push('CheckOut')}>
                             <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14, backgroundColor: `rgba(0,0,0,0.4)`, padding: 16, borderRadius: 8, overflow: 'hidden' }}>{`연장/종료`}</Text>
                         </Pressable>
                     </View>

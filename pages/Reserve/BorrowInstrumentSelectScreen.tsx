@@ -6,6 +6,7 @@ import { Color } from '../../ColorSet'
 import { InstrumentProvider, useInstrument } from '../Home/MyClub/Instruments/context/InstrumentContext'
 import LongButton from '../../components/buttons/LongButton'
 import { useReservation } from '../../context/ReservationContext'
+import Header from '../../components/Header'
 
 const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const instruments: Instrument[] = [{
@@ -32,10 +33,17 @@ const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigatio
     }
     ]
 
-    const { reservation } = useReservation();
+    const { reservation,setBorrowInstruments } = useReservation();
 
+    const [originList, setOrigin] = useState<Instrument[]>([])
+
+    useEffect(() => {
+        setOrigin(reservation.borrowInstruments);
+    }, [])
+    
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+            <Header leftButton='X' HeaderName='대여 악기 선택' addLeftAction={()=>setBorrowInstruments(originList)} />
             <ScrollView contentContainerStyle={{ flex: 1, backgroundColor: '#FFF' }}>
                 <View style={{ flex: 1, marginHorizontal: 24 }}>
                     <InstrumentsList instrumentsList={instruments} />
@@ -75,6 +83,7 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[] }> = ({ instrume
     const [SogoSelected, setSogoSelected] = useState(0);
     const [ETCSelected, setETCSelected] = useState(0);
 
+
     const toggleFunction = (type: string) => {
         switch (type) {
             case '쇠': return toggleGGwang;
@@ -108,7 +117,6 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[] }> = ({ instrume
     }
 
     const haveSameInstrument = (existInstruments: Instrument[], instrument: Instrument) => existInstruments.some(existInstrument => JSON.stringify(existInstrument) === JSON.stringify(instrument));
-
 
     useEffect(() => {
         setGGwangSelected(reservation.borrowInstruments.filter((instrument) => instrument.type == '쇠').length)
@@ -210,7 +218,7 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[] }> = ({ instrume
         return rows;
     };
     return (
-        <View style={{ flex: 1, }}>
+        <View style={{ flex: 1 }}>
             <ScrollView>{renderInstruments()}</ScrollView>
         </View>
     )

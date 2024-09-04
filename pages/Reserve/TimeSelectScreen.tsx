@@ -29,7 +29,7 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             const currentDate = new Date(startDate);
             currentDate.setDate(startDate.getDate() + i);
             week.push(
-                <Pressable key={`${currentDate}`} onPress={() => currentDate >= today && setDate(currentDate)} style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] }]}>
+                <Pressable key={`${currentDate}`} onPress={() => currentDate > today && setDate(currentDate)} style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] }]}>
                     <Text style={[styles.Date, (currentDate <= today) && { color: Color['grey300'] }]}>{currentDate.getDate()}</Text>
                 </Pressable>
             )
@@ -134,6 +134,8 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const prevWeek = () => {
         const lastDay = new Date(date)
         lastDay.setDate(date.getDate() - 7);
+        if (lastDay <= today)
+            lastDay.setDate(today.getDate()+1);
         setDate(lastDay);
     }
 
@@ -157,7 +159,7 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 backgroundColor: '#FFF',
                 paddingHorizontal: 24
             }}>
-                <Pressable onPress={() => { navigation.navigate('ResrvationDateSelect', { date: date.toString() }); }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28, backgroundColor: Color['grey300'] }}>
+                <Pressable onPress={() => { navigation.navigate('ResrvationDateSelect'); }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28, backgroundColor: Color['grey300'] }}>
                     <Text style={{
                         fontFamily: "NanumSquareNeo-Bold",
                         height: 24,
@@ -172,10 +174,7 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         onPress={decrementMonth} />
                     <Pressable
                         onPress={() => {
-                            navigation.navigate('ResrvationDateSelect',
-                                {
-                                    date: date.toString(),
-                                });
+                            navigation.navigate('ResrvationDateSelect');
                         }}>
                         <Text style={styles.MonthNumber}>
                             {`${date.getMonth() + 1}월`}

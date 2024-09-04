@@ -25,6 +25,14 @@ import TimeSelectScreen from '../pages/Reserve/TimeSelectScreen';
 import BorrowInstrumentSelectScreen from '../pages/Reserve/BorrowInstrumentSelectScreen';
 import ChatMediaViewerScreen from '../pages/Chat/ChatMediaViewerScreen';
 import { ReservationProvider } from '../context/ReservationContext';
+import ParticipantsSelectScreen from '../pages/Reserve/ParticipantsSelectScreen';
+import ReservationConfirmScreen from '../pages/Reserve/ReservationConfirmScreen';
+import CheckInScreen from '../pages/QRScan/CheckInScreen';
+import CheckOutScreen from '../pages/QRScan/CheckOutScreen';
+import CheckOutDescriptScreen from '../pages/QRScan/CheckOutDescriptScreen';
+import CheckOutCameraScreen from '../pages/QRScan/CheckOutCameraScreen';
+import PictureCheckScreen from '../pages/QRScan/PictureCheckScreen';
+import CheckOutEndScreen from '../pages/QRScan/CheckOutEndScreen';
 
 // HomeStack Navigator
 const MainStack = createNativeStackNavigator();
@@ -106,7 +114,6 @@ const MainStacks = () => {
                 }}
             />
 
-
             <MainStack.Screen
                 name='ChatViewer'
                 component={ChatMediaViewerScreen}
@@ -114,6 +121,53 @@ const MainStacks = () => {
                     animationDuration: 100,
                 }}
             />
+
+            <MainStack.Screen
+                name='CheckIn'
+                component={CheckInScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => <Header leftButton='<-' />
+                }}
+            />
+
+            <MainStack.Screen
+                name='CheckOut'
+                component={CheckOutScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => <Header leftButton='<-' />
+                }}
+            />
+            <MainStack.Screen
+                name='CheckOutDescript'
+                component={CheckOutDescriptScreen}
+            />
+
+            <MainStack.Screen
+                name='CheckOutCamera'
+                component={CheckOutCameraScreen}
+            />
+
+            <MainStack.Screen
+                name='PictureCheck'
+                component={PictureCheckScreen}
+            />
+            <MainStack.Screen
+                name='CheckOutEnd'
+                component={CheckOutEndScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: ({navigation}) => <Header leftButton='X' LeftAction={()=>navigation.navigate('Home')} />
+                }}
+            />
+
+
+
+
 
         </MainStack.Navigator>
     );
@@ -154,11 +208,28 @@ const ReservationStacks = () => {
                     name='BorrowInstrumentSelect'
                     component={BorrowInstrumentSelectScreen}
                     options={{
-                        headerShown: true,
                         animationDuration: 100,
-                        header: () => <Header leftButton='X' HeaderName='대여 악기 선택' />
                     }}
                 />
+
+                <ReservationStack.Screen
+                    name='ParticipantsSelect'
+                    component={ParticipantsSelectScreen}
+                    options={{
+                        animationDuration: 100,
+                    }}
+                />
+
+                <ReservationStack.Screen
+                    name='ReservationConfirm'
+                    component={ReservationConfirmScreen}
+                    options={{
+                        headerShown: true,
+                        animation: 'none',
+                        header: ({ navigation }) => <Header leftButton='X' LeftAction={() => navigation.navigate('Reservation')} />
+                    }}
+                />
+
             </ReservationStack.Navigator>
         </ReservationProvider>
 
