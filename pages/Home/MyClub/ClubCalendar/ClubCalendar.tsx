@@ -2,6 +2,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { Color } from '../../../../ColorSet'
 import PracticeCard from '../../../../components/cards/PracticeCard'
+import { club } from '../../../../UserType'
 
 export type Reserve = {
     date: Date;
@@ -9,6 +10,7 @@ export type Reserve = {
     type: string;
     name: string;
     nickname?: string;
+    club?: club;
     startTime: 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21;
     endTime: 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22;
     personnel: number

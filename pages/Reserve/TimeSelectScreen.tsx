@@ -13,7 +13,7 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const { date, Time } = reservation;
     const [selectedTimeBlocks, setTimeBlocks] = useState<string[] | null>(null);
     const [isWeekCalendar, setWeekCalendar] = useState(true)
-    const [alertVisble, setAlertVisible] = useState(false);
+    const [alertVisible, setAlertVisible] = useState(false);
     const today = new Date()
 
     const times = ['AM10', 'AM11', 'PM12', 'PM01', 'PM02', 'PM03', 'PM04', 'PM05', 'PM06', 'PM07', 'PM08', 'PM09', 'PM10'];
@@ -274,7 +274,7 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
                     }} />
             </View>}
-            <Modal visible={alertVisble} transparent>
+            <Modal visible={alertVisible} transparent>
                 <Pressable style={{ backgroundColor: 'rgba(0,0,0,0.4)', flex: 1, justifyContent: 'center' }} onPress={() => setAlertVisible(false)}>
                     <Pressable style={{ marginHorizontal: 28, height: 200, backgroundColor: '#FFF', borderRadius: 15 }} onPress={(e) => e.stopPropagation()} >
                         <Text style={alertStyle.Header}>중복 알림</Text>

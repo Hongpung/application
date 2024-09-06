@@ -79,13 +79,13 @@ const CheckOutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
                     <View style={{ position: 'absolute', width: '100%', bottom: 16 }}>
                         <View style={{ marginHorizontal: 28, marginBottom: 12 }}>
-
                             <CheckboxComponent
+                                isChecked={isAgree}
                                 innerText='남은시간을 반납하여, 연습을 종료합니다.'
                                 onCheck={() => isAgree ? setAgree(false) : setAgree(true)}
                             ></CheckboxComponent>
                         </View>
-                        <LongButton color='red' innerText={`네, 종료할래요`} isAble={isAgree} onPress={() => { navigation.push('CheckOutDescript')}} />
+                        <LongButton color='red' innerText={`네, 종료할래요`} isAble={isAgree} onPress={() => { navigation.push('CheckOutDescript') }} />
                     </View>
                 </View>}
         </View>

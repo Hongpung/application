@@ -33,6 +33,7 @@ import CheckOutDescriptScreen from '../pages/QRScan/CheckOutDescriptScreen';
 import CheckOutCameraScreen from '../pages/QRScan/CheckOutCameraScreen';
 import PictureCheckScreen from '../pages/QRScan/PictureCheckScreen';
 import CheckOutEndScreen from '../pages/QRScan/CheckOutEndScreen';
+import ActivitiesScreen from '../pages/ExtaraActivities/ActivitiesListScreen';
 
 // HomeStack Navigator
 const MainStack = createNativeStackNavigator();
@@ -161,15 +162,31 @@ const MainStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: ({navigation}) => <Header leftButton='X' LeftAction={()=>navigation.navigate('Home')} />
+                    header: ({ navigation }) => <Header leftButton='X' LeftAction={() => navigation.navigate('Home')} />
                 }}
+            />
+
+            <MainStack.Screen
+                name='ExtaraActivities'
+                component={ExtaraActivitiesStacks}
             />
 
 
 
-
-
         </MainStack.Navigator>
+    );
+};
+
+const ExtaraActivitiesStack = createNativeStackNavigator();
+
+const ExtaraActivitiesStacks = () => {
+    return (
+        <ExtaraActivitiesStack.Navigator initialRouteName="ActivitiesList" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+            <ExtaraActivitiesStack.Screen
+                name='ActivitiesList'
+                component={ActivitiesScreen}
+            />
+        </ExtaraActivitiesStack.Navigator>
     );
 };
 

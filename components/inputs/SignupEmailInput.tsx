@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TextInput, Animated, Pressable } from 'react-native';
 import { Color } from '../../ColorSet';
 import { josa } from 'es-hangul';
+import Toast from 'react-native-toast-message';
+import { BASBASE_URL } from '@env';
 
 type InputProps = {
     label: string,
@@ -9,11 +11,46 @@ type InputProps = {
     checkValid?: (valid: boolean) => void,
     color?: string
     isEditible?: boolean
+    inputValue: string,
+    setInputValue: (email: string) => void,
 }
 
-const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkValid, isEditible = true }) => {
+const isValidEmail = async (email: string, callbackFn?: () => void) => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 10초 타임아웃
 
-    const [inputValue, setInputValue] = useState('');
+    let result = false;
+
+    try {
+        const response = await fetch(`${BASBASE_URL}/auth/email`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email }),
+            signal
+        });
+
+        clearTimeout(timeoutId); // 타임아웃 취소
+
+        if (response.ok) {
+            result = true;
+        } else {
+            console.error('서버에서 데이터 가져오기 실패: ', response.status);
+        }
+    } catch (error) {
+        console.error(error)
+    } finally {
+        callbackFn && callbackFn()
+    }
+
+    return result;
+};
+
+
+const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkValid, isEditible = true, inputValue, setInputValue }) => {
+
     const [isTyped, setIsTyped] = useState(false);
     const [isValid, setIsValid] = useState(true);
     const [isSend, setIsSend] = useState(false);
@@ -24,19 +61,23 @@ const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkVali
 
     const underlineColor = Color[`green500`];
 
-    const SendCodeHandler = () => {
+    const SendCodeHandler = async () => {
         const regex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const newCondition = regex.test(inputValue);
         setIsValid(newCondition);
         if (!newCondition) setErrorText("이메일 주소가 유효하지 않습니다")
-        else if (false) {
-            //여기에는 ID 중복 확인해서 에러처리하는 기능
-        }
         else {
-            setIsSend(true);
-            if (checkValid) checkValid(isValid);
+            const duplication = await isValidEmail(inputValue) || false
+            if (duplication) {
+                setIsValid(false);
+                if (!newCondition) setErrorText("이미 가입된 이메일 입니다.")
+            }
+            else {
+                setIsSend(true);
+                if (checkValid) checkValid(true);
+                showSendToast();
+            }
         }
-        //이하 코드 보내는 내용
     }
 
     useEffect(() => {
@@ -59,12 +100,37 @@ const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkVali
         if (inputValue.length == 0) {
             setIsTyped(false);
             setIsValid(false);
+
+            if (checkValid) checkValid(false);
+
             setErrorText(josa(label, '을/를') + ' 입력해야해요')
         } else {
             const regex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const newCondition = regex.test(inputValue);
             setIsValid(newCondition);
             if (!newCondition) setErrorText("이메일 주소가 유효하지 않습니다")
+
+            if (checkValid) checkValid(false);
+        }
+    }
+
+    const showSendToast = () => {
+        if (!isSend) {
+            Toast.show({
+                type: 'success',
+                text1: '인증번호를 전송했어요',
+                position: 'bottom',
+                bottomOffset: 60,
+                visibilityTime: 2000
+            });
+        } else {
+            Toast.show({
+                type: 'success',
+                text1: '인증번호를 재전송했어요',
+                position: 'bottom',
+                bottomOffset: 60,
+                visibilityTime: 2000
+            });
         }
     }
 

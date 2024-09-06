@@ -1,30 +1,34 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, Animated, Pressable } from 'react-native';
+import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, useCallback } from 'react';
+import { View, Text, StyleSheet, TextInput, Animated, Pressable, KeyboardTypeOptions, Platform } from 'react-native';
 import { Color } from '../../ColorSet';
 import { josa } from 'es-hangul';
 
 type InputProps = {
-    length?:number,
+    length?: number,
     label: string,
     isEncryption?: boolean,
-    validationCondition?: { validation: RegExp, errorText: string },
-    checkValid?: (valid: boolean) => void,
-    value?: string
+    validationCondition?: { validation: () => boolean, errorText: string }[]
+    checkValid?: (valid: boolean) => void
     color?: string
     isEditible?: boolean
     isRequired?: boolean
     isRequiredMark?: boolean
+    inputValue: string,
+    setInputValue?: (text: string) => void,
+    onFocus?: () => void
+    keyboardType?: KeyboardTypeOptions
+    maxLength?: number
 }
 
-const InputComponent: React.FC<InputProps> = ({ length=284,label, isEncryption, validationCondition, value, checkValid, color, isEditible = true, isRequired = true, isRequiredMark = false}) => {
+const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label, isEncryption = false, validationCondition, checkValid, color, isEditible = true, isRequired = true, isRequiredMark = false, inputValue, setInputValue, onFocus, keyboardType = 'default', maxLength = undefined }, ref) => {
 
-    const [inputValue, setInputValue] = useState(value || '');
     const [isTyped, setIsTyped] = useState(false);
     const [isValid, setIsValid] = useState(true);
     const [errorText, setErrorText] = useState(``)
     const labelAnimation = useRef(new Animated.Value(0)).current; // 애니메이션 초기 값
+    const inputRef = useRef<TextInput>(null); // 내부적으로 TextInput 참조
 
-    const [isVisible, setIsVisible] = useState(isEncryption || false);
+    const [isVisible, setIsVisible] = useState(isEncryption);
 
     const underlineColor = color ? Color[color + "500"] : Color[`blue500`];
 
@@ -36,28 +40,49 @@ const InputComponent: React.FC<InputProps> = ({ length=284,label, isEncryption, 
         }).start();
     }, [isTyped]);
 
-    const handleTextChange = (text: string) => {
-        setInputValue(text);
-    };
+    const handleTextChange = useCallback((text: string) => {
+        if (setInputValue) {
+            setInputValue(text);
+        }
+    }, [setInputValue]);
 
-    const handleFocus = () => {
+    const handleFocus = useCallback(() => {
         setIsTyped(true);
-    }
+        onFocus && onFocus();
+    }, [onFocus]);
 
-    const handleBlur = () => {
-        if (inputValue.length == 0 && isRequired) {
+    const validateInput = useCallback(() => {
+        if (inputValue.length === 0 && isRequired) {
             setIsTyped(false);
             setIsValid(false);
-            setErrorText(josa(label, '을/를') + ' 입력해야해요')
-        } else if (validationCondition?.validation) {
-            const regex: RegExp = validationCondition!.validation;
-            const newCondition = regex.test(inputValue);
-            setIsValid(newCondition);
-            if (!newCondition) setErrorText(validationCondition!.errorText)
-
-            if (checkValid) checkValid(newCondition);
+            setErrorText(josa(label, '을/를') + ' 입력해야 해요');
+            if (checkValid) checkValid(false);
+            return false;
         }
-    }
+
+        if (validationCondition && Array.isArray(validationCondition)) {
+            for (const { validation, errorText } of validationCondition) {
+                if (!validation()) {
+                    setErrorText(errorText);
+                    setIsValid(false);
+                    if (checkValid) checkValid(false);
+                    return false;
+                }
+            }
+        }
+
+        setIsValid(true);
+        if (checkValid) checkValid(true);
+        return true;
+    }, [inputValue, validationCondition, checkValid, label, isRequired]);
+
+
+    useImperativeHandle(ref, () => ({
+        ...(inputRef.current as any),// TextInput의 기본 메서드와 속성 복사
+        validate: validateInput, // 추가 메서드
+        focus: () => inputRef.current?.focus(), // 추가 메서드
+        blur: () => inputRef.current?.blur(),
+    }));
 
     const labelStyle = {
         fontSize: labelAnimation.interpolate({
@@ -69,83 +94,81 @@ const InputComponent: React.FC<InputProps> = ({ length=284,label, isEncryption, 
             outputRange: [5, 3],
         }),
     };
+
+
     return (
-        <View style={[styles.inputGroup,{ width: length+16}]}>
-            <View style={[styles.underline, { borderBottomColor: isValid ? underlineColor : Color["red500"], width: length+16 }]} />
-            {isEncryption ? <TextInput
-                style={[styles.InputBox,{ width: length}]}
-                placeholder={`${josa(label, '을/를')} 입력하세요` + `${!isRequired ? +'(공백시 본명 적용)' : ''}`}
-                value={inputValue}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                onChangeText={handleTextChange}
-                secureTextEntry={isVisible} />
-                :
-                <TextInput
-                    style={[styles.InputBox,{ width: length}]}
-                    placeholder={`${josa(label, '을/를')} 입력하세요` + `${!isRequired ? ' (공백시 본명 적용)' : ''}`}
-                    value={inputValue}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                    onChangeText={handleTextChange}
-                    editable={isEditible}
-                />
-            }
+        <View style={[styles.inputGroup, { width: length + 16 }]}>
             <Animated.Text style={[styles.labelText, labelStyle]}>{label}
                 {isRequiredMark && !isTyped && <Text style={{ color: 'red' }}>*</Text>}</Animated.Text>
-            {isEncryption ?
-                <Pressable style={{ position: 'absolute', left: 273, top: 26, width: 18, height: 18, borderWidth: 1, borderColor: "#000", backgroundColor: isVisible ? "#000" : "#FFF" }}
+            <TextInput
+                key={label}
+                ref={inputRef}
+                style={[styles.InputBox, { width: length }]}
+                placeholder={`${josa(label, '을/를')} 입력하세요` + `${!isRequired ? ' (공백시 본명 적용)' : ``}`}
+                value={inputValue}
+                onFocus={handleFocus}
+                onEndEditing={validateInput}
+                onChangeText={handleTextChange}
+                secureTextEntry={isEncryption ? isVisible : false}
+                editable={isEditible}
+                keyboardType={keyboardType}
+                maxLength={maxLength}
+                returnKeyType='done'
+            />
+            <View style={[styles.underline, { borderBottomColor: isValid ? underlineColor : Color["red500"], width: length + 16 }]} />
+
+            {isEncryption &&
+                <Pressable
+                    style={[styles.VisibleBtn, { backgroundColor: isVisible ? "#000" : "#FFF" }]}
                     onPress={() => { setIsVisible(!isVisible) }} />
-                : null}
-            {!isValid ? <Text style={styles.errorText}>{errorText}</Text> : null}
+            }
+            {!isValid && <Text style={styles.errorText}>{errorText}</Text>}
         </View>
     );
-}
+});
+
 const styles = StyleSheet.create({
     inputGroup: {
         width: 300,
-        height: 54,
-        position: 'relative',
     },
     underline: {
         width: 300,
-        height: 35,
-        position: 'absolute',
         borderBottomWidth: 1,
-        top: 19,
+        marginTop: 1,
     },
     InputBox: {
         width: 284,
-        height: 28,
-        position: 'absolute',
         color: Color['grey800'],
         fontSize: 16,
+        height: 36,
         fontFamily: 'NanumSquareNeo-Bold',
-        lineHeight: 22,
-        top: 22,
-        left: 8,
-        placeholderTextColor: Color['grey500'],
-        outline: 0,
+        paddingTop: 8,
+        marginLeft: 8,
+        placeholderTextColor: Color['grey500']
     },
     labelText: {
         width: 150,
-        height: 22,
-        position: 'absolute',
         color: Color['grey800'],
         fontSize: 10,
         fontFamily: 'NanumSquareNeo-Bold',
-        lineHeight: 22,
-        top: 0,
-        left: 4,
+        height: 12
     },
     errorText: {
-        position: 'absolute',
         color: Color['red500'],
         fontFamily: 'NanumSquareNeo-Bold',
-        top: 60,
-        left: 8,
+        marginTop: 8,
+        marginLeft: 8,
         fontSize: 14
     },
+    VisibleBtn: {
+        position: 'absolute',
+        right: 4,
+        top: 16,
+        width: 32,
+        height: 32,
+        borderWidth: 1,
+        borderColor: "#000"
+    }
 });
 
 export default InputComponent;

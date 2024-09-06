@@ -210,9 +210,10 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
                 <View style={{ height: 16 }} />
             </ScrollView>
-            <View style={{ paddingVertical: 8, bottom:0 }}>
+            <View style={{ paddingVertical: 8, bottom: 0 }}>
                 <View style={{ height: 40, alignSelf: 'center' }}>
                     <CheckboxComponent
+                        isChecked={isAgree}
                         innerText={reservation.hasToWait ? '예약 전날 오후10시 이전까지 자동 취소돼요' : '예약 전날 오후10시까지 수정*취소할 수 있어요'}
                         onCheck={() => setAgree(!isAgree)}
                     ></CheckboxComponent>

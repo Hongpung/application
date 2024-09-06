@@ -1,5 +1,5 @@
 import { Animated, View, StyleSheet, Pressable } from 'react-native'
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Color } from '../ColorSet'
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
@@ -10,8 +10,10 @@ import { PanGestureHandler, State } from 'react-native-gesture-handler';
  * @returns 
  */
 const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolean }> = ({ onChange, value }) => {
-    const translateX = useRef(new Animated.Value(value ? 40 : 0)).current;
+    const translateX = useRef(new Animated.Value(value ? 400 : 0)).current;
     const width = useRef(new Animated.Value(36)).current;
+    const [onPress, setPress] = useState(false);
+
 
     const gestureHandler = useCallback(Animated.event(
         [{ nativeEvent: { translationX: translateX } },],
@@ -20,8 +22,8 @@ const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolea
 
     const onPressHandler = useCallback(() => {
         Animated.timing(translateX, {
-            toValue: value ? -40 : 400,
-            duration: 300,
+            toValue: value ? -40 : 40,
+            duration: 400,
             useNativeDriver: false,
         }).start(() => {
             onChange(!value);
@@ -33,15 +35,17 @@ const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolea
         const newState = event.nativeEvent.state;
 
         if (newState === State.ACTIVE) {
+            setPress(true);
             Animated.timing(width, {
                 toValue: 44,
                 duration: 200,
                 useNativeDriver: false,
             }).start();
         } else {
+            setPress(false);
             Animated.timing(width, {
                 toValue: 36,
-                duration: 200,
+                duration: 300,
                 useNativeDriver: false,
             }).start();
         }
@@ -53,31 +57,58 @@ const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolea
             if (newX <= threshold && value) {
                 Animated.timing(translateX, {
                     toValue: -40,
-                    duration: 200,
+                    duration: 300,
                     useNativeDriver: false,
                 }).start(() => {
                     onChange(false);
                 });
             } else if (newX > threshold && value) {
-                Animated.timing(translateX, {
-                    toValue: 400,
-                    duration: 200,
+                if (newX > -8)
+                    Animated.sequence([Animated.timing(translateX, {
+                        toValue: -8,
+                        duration: 0,
+                        useNativeDriver: false,
+                    }), Animated.timing(translateX, {
+                        toValue: 0,
+                        duration: 300,
+                        useNativeDriver: false,
+                    })])
+                        .start(() => {
+                            onChange(true);
+                        });
+                else Animated.timing(translateX, {
+                    toValue: 0,
+                    duration: 300,
                     useNativeDriver: false,
                 }).start(() => {
                     onChange(true);
                 });
             } else if (newX >= threshold) {
-                Animated.timing(translateX, {
-                    toValue: 400,
-                    duration: 200,
-                    useNativeDriver: false,
-                }).start(() => {
-                    onChange(true);
-                });
+                if (newX > 32)
+                    Animated.sequence([Animated.timing(translateX, {
+                        toValue: 32,
+                        duration: 0,
+                        useNativeDriver: false,
+                    }), Animated.timing(translateX, {
+                        toValue: 40,
+                        duration: 300,
+                        useNativeDriver: false,
+                    })])
+                        .start(() => {
+                            onChange(true);
+                        });
+                else
+                    Animated.timing(translateX, {
+                        toValue: 40,
+                        duration: 300,
+                        useNativeDriver: false,
+                    }).start(() => {
+                        onChange(true);
+                    });
             } else if (newX < threshold) {
                 Animated.timing(translateX, {
                     toValue: 0,
-                    duration: 200,
+                    duration: 300,
                     useNativeDriver: false,
                 }).start(() => {
                     onChange(false);
@@ -103,25 +134,44 @@ const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolea
                         style={[
                             styles.switchHandle,
                             { width },
-                            value ?
-                                {
+                            onPress ?
+                                value ? {
                                     transform: [{
                                         translateX: translateX.interpolate({
-                                            inputRange: [-40, 0, 400],
-                                            outputRange: [4, 32, 40],
+                                            inputRange: [-32, 0],
+                                            outputRange: [4, 32],
                                             extrapolate: 'clamp',
                                         })
                                     }],
                                 } :
-                                {
-                                    transform: [{
-                                        translateX: translateX.interpolate({
-                                            inputRange: [0, 40, 400],
-                                            outputRange: [4, 32, 40],
-                                            extrapolate: 'clamp',
-                                        })
-                                    }],
-                                }
+                                    {
+                                        transform: [{
+                                            translateX: translateX.interpolate({
+                                                inputRange: [0, 32],
+                                                outputRange: [4, 32],
+                                                extrapolate: 'clamp',
+                                            })
+                                        }],
+                                    } :
+                                value ?
+                                    {
+                                        transform: [{
+                                            translateX: translateX.interpolate({
+                                                inputRange: [-40, 0],
+                                                outputRange: [4, 40],
+                                                extrapolate: 'clamp',
+                                            })
+                                        }],
+                                    } :
+                                    {
+                                        transform: [{
+                                            translateX: translateX.interpolate({
+                                                inputRange: [0, 40],
+                                                outputRange: [4, 40],
+                                                extrapolate: 'clamp',
+                                            })
+                                        }],
+                                    }
                         ]}
                     />
                 </PanGestureHandler>

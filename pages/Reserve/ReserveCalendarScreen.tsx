@@ -16,9 +16,9 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
         if (day == 0) return 6;
         return day - 1;
     }
-    useEffect(()=>{
-        calendarDate&&setMonth(calendarDate)
-    },[calendarDate])
+    useEffect(() => {
+        calendarDate && setMonth(calendarDate)
+    }, [calendarDate])
 
     useLayoutEffect(() => {
         const year = calendarMonth.getFullYear();
@@ -169,11 +169,14 @@ const ReserveCalendarScreen: React.FC<{ navigation: any, route: any }> = ({ navi
                     }} />
             </View>
             <View style={{ position: 'absolute', width: width, bottom: 12 }}>
-                <View style={{ marginHorizontal: 24, height: 88, backgroundColor: Color['grey200'], borderRadius: 10 }}>
+                <Pressable style={{ marginHorizontal: 24, height: 88, backgroundColor: Color['grey200'], borderRadius: 10 }}
+                    onPress={() => {
+                        navigation.replace('ExtaraActivities',{ animation: 'none' });
+                    }}>
                     <View style={{ width: 56, height: 56, backgroundColor: Color['grey700'], borderRadius: 200, top: 16, left: 12 }} />
                     <Text style={{ position: 'absolute', top: 16, right: 12, fontSize: 18, fontFamily: 'NanumSquareNeo-ExtraBold', color: Color['grey700'] }}>다른 활동을 찾고 계셨나요?</Text>
                     <Text style={{ position: 'absolute', bottom: 12, right: 12, fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{`활동 둘러보러 가기 >`}</Text>
-                </View>
+                </Pressable>
             </View>
         </View>
     )

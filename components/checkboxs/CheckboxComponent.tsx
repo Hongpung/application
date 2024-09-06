@@ -5,17 +5,16 @@ import { Color } from '../../ColorSet';
 
 interface CheckBoxProps {
     innerText?: string,
-    onCheck?: () => void,
+    onCheck: (check:boolean) => void,
+    isChecked: boolean
 }
 
-const CheckboxComponent: React.FC<CheckBoxProps> = ({ innerText, onCheck }) => {
-
-    const [isChecked, setIsChecked] = useState(false);
+const CheckboxComponent: React.FC<CheckBoxProps> = ({ innerText, onCheck, isChecked }) => {
 
     return (
         <Pressable
             style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
-            onPress={() => { setIsChecked(!isChecked); onCheck && onCheck() }}>
+            onPress={() => { onCheck(!isChecked) }}>
             <View style={styles.checkboxBorder}>
                 {isChecked ? <View style={styles.checkboxFill} /> : null}
             </View>
