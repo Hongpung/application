@@ -7,7 +7,7 @@ type InputProps = {
     length?: number,
     label: string,
     isEncryption?: boolean,
-    validationCondition?: { validation: () => boolean, errorText: string }[]
+    validationCondition?: { validation: (value:string) => boolean, errorText: string }[]
     checkValid?: (valid: boolean) => void
     color?: string
     isEditible?: boolean
@@ -47,6 +47,9 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
     }, [setInputValue]);
 
     const handleFocus = useCallback(() => {
+        if (setInputValue) {
+            setInputValue(inputValue);
+        }
         setIsTyped(true);
         onFocus && onFocus();
     }, [onFocus]);
@@ -62,7 +65,7 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
 
         if (validationCondition && Array.isArray(validationCondition)) {
             for (const { validation, errorText } of validationCondition) {
-                if (!validation()) {
+                if (!validation(inputValue)) {
                     setErrorText(errorText);
                     setIsValid(false);
                     if (checkValid) checkValid(false);
@@ -80,7 +83,7 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
     useImperativeHandle(ref, () => ({
         ...(inputRef.current as any),// TextInput의 기본 메서드와 속성 복사
         validate: validateInput, // 추가 메서드
-        focus: () => inputRef.current?.focus(), // 추가 메서드
+        focus: () => inputRef.current?.focus(), // 기존 메서드
         blur: () => inputRef.current?.blur(),
     }));
 

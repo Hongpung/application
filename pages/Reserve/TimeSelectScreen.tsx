@@ -1,8 +1,8 @@
-import { Alert, Dimensions, FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Color } from '../../ColorSet';
 import LongButton from '../../components/buttons/LongButton';
-import { ReservationProvider, useReservation } from '../../context/ReservationContext';
+import { useReservation } from '../../context/ReservationContext';
 import ShortButton from '../../components/buttons/ShortButton';
 
 const { width } = Dimensions.get(`window`)
@@ -12,7 +12,6 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     const { date, Time } = reservation;
     const [selectedTimeBlocks, setTimeBlocks] = useState<string[] | null>(null);
-    const [isWeekCalendar, setWeekCalendar] = useState(true)
     const [alertVisible, setAlertVisible] = useState(false);
     const today = new Date()
 
@@ -135,7 +134,7 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         const lastDay = new Date(date)
         lastDay.setDate(date.getDate() - 7);
         if (lastDay <= today)
-            lastDay.setDate(today.getDate()+1);
+            lastDay.setDate(today.getDate() + 1);
         setDate(lastDay);
     }
 

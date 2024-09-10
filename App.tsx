@@ -1,19 +1,21 @@
 import { Platform, StyleSheet, View, SafeAreaView as SafeView, ViewStyle, StyleProp, Text, Pressable, ActivityIndicator, Image, ImageBackground } from 'react-native';
-import Tutorial from './pages/Auth/Tutorial';
+import Tutorial from './pages/FirstInstall/Tutorial/Tutorial';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Permission from './pages/Auth/Permission';
-import LoginScreen from './pages/Auth/LoginScreen';
-import SignUp from './pages/Auth/SignUp';
+import Permission from './pages/FirstInstall/Permission/Permission';
+import LoginScreen from './pages/Auth/Login/LoginScreen';
+import SignUpScreen from './pages/Auth/SignUp/SignUpScreen';
 import Header from './components/Header';
 import MainStacks from './nav/HomeStacks';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast, { BaseToastProps } from 'react-native-toast-message';
 import { Color } from './ColorSet';
 import { AuthProvider } from './context/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SignUpProvider } from './pages/Auth/SignUp/context/SignUpContext';
 
 
 const RootStack = createNativeStackNavigator();
@@ -29,7 +31,7 @@ const fetchFonts = async () => {
 }
 
 const toastConfig = {
-  success_return: ({ text1, text2, ...rest }: BaseToastProps) => (
+  successHasReturn: ({ text1, text2, ...rest }: BaseToastProps) => (
     <View style={{ width: '100%' }}>
       <View
         style={{
@@ -106,7 +108,9 @@ const RootStacks: React.FC = () => {
       <RootStack.Screen name="Tutorial" component={Tutorial} />
       <RootStack.Screen name="Permission" component={Permission} />
       <RootStack.Screen name="Login" component={LoginScreen} options={{ animation: 'none' }} />
-      <RootStack.Screen name="SignUp" component={SignUp} options={{ headerShown: true, header: () => <Header leftButton='X' /> }} />
+      <SignUpProvider>
+        <RootStack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: true, header: () => <Header leftButton='X' /> }} />
+      </SignUpProvider>
       <RootStack.Screen name="HomeStack" component={MainStacks} options={{ animation: 'none' }} />
     </RootStack.Navigator>
   )
@@ -119,24 +123,21 @@ const App: React.FC = () => {
   const [fontLoaded, setFontLoaded] = useState(false);
   const [loginLoaded, setLoginLoaded] = useState(false);
 
+  const loadFonts = async () => {
+    await fetchFonts();
+    setFontLoaded(true);
+  };
 
+  const loadLoginData = async () => {
+    const token = await AsyncStorage.getItem('token');
+    setLoginLoaded(true)
+  }
   useEffect(() => {
-
-    const loadFonts = async () => {
-      await fetchFonts();
-      setFontLoaded(true);
-    };
-    const loadLoginData = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 4000));
-      setLoginLoaded(true)
-    }
 
     const loadResources = async () => {
       try {
 
         await loadFonts();
-
-        await loadLoginData();
 
       } catch (error) {
         console.error(error);
@@ -163,7 +164,8 @@ const App: React.FC = () => {
       </SafeView>
     )
   }
-  if (!fontLoaded || !loginLoaded) {
+
+  if (!fontLoaded) {
     return (
       <View style={{ flex: 1 }}>
         <ImageBackground source={require('./assets/splash.png')}
@@ -172,7 +174,7 @@ const App: React.FC = () => {
           onLoadEnd={SplashScreen.hideAsync} />
         <View style={{ position: 'absolute', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <ActivityIndicator size="large" color={'#FFF'} />
-          <Text style={{ position: 'absolute', bottom: 16, right: 20, color: '#FFF', fontFamily: 'NanumSquareNeo-Bold' }}>{fontLoaded ? loginLoaded ? '' : '로그인 로딩중' : `폰트 로딩중`}</Text>
+          <Text style={{ position: 'absolute', bottom: 20, right: 20, color: '#FFF', fontFamily: 'NanumSquareNeo-Bold' }}>{fontLoaded ? loginLoaded ? '' : '로그인 로딩중' : `폰트 로딩중`}</Text>
         </View>
       </View>
     );

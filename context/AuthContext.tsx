@@ -32,7 +32,6 @@ export const AuthProvider: React.FC<{ children: any }> = ({ children }) => {
               }
             const result = await response.json();
             if (result.token) {
-                await AsyncStorage.setItem('token', result.token);
                 setToken(result.token);
                 const { name,
                     nickname = null,

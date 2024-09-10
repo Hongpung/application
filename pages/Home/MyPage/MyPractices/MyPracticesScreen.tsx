@@ -1,28 +1,23 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useLayoutEffect, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { Color } from '../../../../ColorSet'
 import PracticeCard from '../../../../components/cards/PracticeCard'
 import { club } from '../../../../UserType'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useFocusEffect } from '@react-navigation/native'
+import useFetch from '../../../../hoc/useFetch'
+import { BASBASE_URL } from '@env';
+import { Reserve } from '../../MyClub/ClubCalendar/ClubCalendar'
 
-export type ReserveType = 'regular' | 'personal' | 'none';
 
-export type Reserve = {
-    date: Date;
-    title: string;
-    type: ReserveType;
-    name: string;
-    nickname?: string;
-    club?: club;
-    startTime: 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21;
-    endTime: 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22;
-    personnel: number
-}
-const ClubCalendar: React.FC<{ navigation: any }> = ({ navigation }) => {
+const MyPracticesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     const [selectedDate, setDate] = useState<Date | null>(null)
     const [reserveList, setReserveList] = useState<Reserve[] | null>(null)
     const [calendarMonth, setMonth] = useState(new Date)
-    const [reservedDate, calcDates] = useState<number[] | null>(null)
+    const [reservedDates, setReservedDates] = useState<{ [key: number]: boolean[] }>([]);
+    const [token, setToken] = useState<string | null>(null);
+
     const PrevPractices: Reserve[] = [
         {
             date: new Date('2024-08-11'),
@@ -122,14 +117,47 @@ const ClubCalendar: React.FC<{ navigation: any }> = ({ navigation }) => {
             personnel: 1
         }
     ];
+    
+    const loadToken = useCallback(() => {
+        const fetchToken = async () => {
+            const storedToken = await AsyncStorage.getItem('token');
+            setToken(storedToken);
+        };
+
+        fetchToken();
+    }, [])
+
+    useFocusEffect(() => {
+        loadToken();
+    });
+
+    const { data, loading, error } = useFetch<Reserve[]>(
+        token ? `${BASBASE_URL}/reservation/search` : ``,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+            },
+            body: JSON.stringify({ date: new Date().toISOString() })
+            //개인 예약으로 바꿔야 함
+        }, 2000, [token, calendarMonth]
+    );
 
     useEffect(() => {
         //fetchMothlyReserves
-        setDate(null);
-        const dates = PrevPractices.map(reserve => reserve.date.getDate());
-        calcDates(dates);
+        if (data) {
+            const reservedDates: { [key: number]: boolean[] } = [];
+            data.map((reserve) => {
+                const reserveDate = reserve.date.getDate();
+                if (!reservedDates[reserveDate]) reservedDates[reserveDate] = [reserve.name == '홍길동'];
+                else reservedDates[reserveDate] = [...reservedDates[reserveDate], reserve.name == '홍길동'];
+            })
+            setReservedDates(reservedDates);
+        }
 
-    }, [calendarMonth])
+    }, [data]);
+
 
     useEffect(() => {
         if (!selectedDate) setReserveList(PrevPractices)
@@ -146,7 +174,7 @@ const ClubCalendar: React.FC<{ navigation: any }> = ({ navigation }) => {
                     selectedDate={selectedDate}
                     setMonth={setMonth}
                     calendarMonth={calendarMonth}
-                    reservedDates={reservedDate} />
+                    reservedDates={reservedDates} />
                 <PrevPracticeList
                     prevPractice={reserveList}
                     onPress={(reserve: Reserve) => {
@@ -161,7 +189,7 @@ const ClubCalendar: React.FC<{ navigation: any }> = ({ navigation }) => {
     )
 }
 
-const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDate: Date | null, calendarMonth: Date, setMonth: (date: Date) => void, reservedDates: number[] | null }> = ({ onSelect, selectedDate, setMonth, calendarMonth, reservedDates }) => {
+const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDate: Date | null, calendarMonth: Date, setMonth: (date: Date) => void, reservedDates: { [key: number]: boolean[] } }> = ({ onSelect, selectedDate, setMonth, calendarMonth, reservedDates }) => {
 
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
 
@@ -220,19 +248,21 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
         daysInMonth.forEach((day, index) => {
             if (day == 0) days.push(<View style={{ width: 32, height: 32 }} />)
             else {
-                const isReserved = reservedDates?.includes(day);
+                const reserveOfDate = reservedDates[day];
                 days.push(
                     <Pressable key={`date-${day}`}
                         style={{ height: 32, width: 32, alignItems: 'center', justifyContent: 'flex-start', backgroundColor: day == selectedDate?.getDate() ? Color['blue100'] : 'transparent', borderRadius: 5 }}
                         onPress={() => {
                             if (selectedDate?.getDate() == day) onSelect(null);
-                            else isReserved && filterLogforDate(day);
+                            else reserveOfDate && filterLogforDate(day);
                         }}
                     >
-                        <Text style={[styles.CalendarText, isReserved && { color: Color['grey600'] }, day == selectedDate?.getDate() && { color: Color['blue600'] }]}>{day}</Text>
-                        {isReserved && <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 2 }}>
-                            <View style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: Color['blue500'] }} />
-                        </View>}
+                        <Text style={[styles.CalendarText, reserveOfDate && { color: Color['grey600'] }, day == selectedDate?.getDate() && { color: Color['blue600'] }]}>{day}</Text>
+                        {reserveOfDate &&
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 2 }}>
+                                {reserveOfDate.map(isReserver => (<View style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: isReserver ? Color['blue500'] : Color['green500'] }} />))}
+                            </View>
+                        }
                     </Pressable>
                 );
             }
@@ -326,7 +356,7 @@ const PrevPracticeList: React.FC<{ prevPractice: Reserve[] | null, onPress: (res
     )
 }
 
-export default ClubCalendar
+export default MyPracticesScreen
 
 const styles = StyleSheet.create({
     MonthRow: {

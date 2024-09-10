@@ -85,6 +85,7 @@ const ReservationConfirmScreen: React.FC<{ navigation: any }> = ({ navigation })
                 <View style={{ marginHorizontal: 28, marginBottom: 12 }}>
 
                     <CheckboxComponent
+                        isChecked={isAgree}
                         innerText='작성된 정보가 일치합니다.'
                         onCheck={() => setAgree(!isAgree)}
                     ></CheckboxComponent>

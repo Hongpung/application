@@ -5,8 +5,9 @@ import ProfileMiniCard from '../../components/cards/ProfileMiniCard'
 import { UserProvider } from '../../context/UserContext'
 import { User } from '../../UserType'
 import LongButton from '../../components/buttons/LongButton'
+import { debounce } from 'lodash'
 
-const UsingManageScreen:React.FC<{navigation:any}> = ({navigation}) => {
+const UsingManageScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     const users: User[] = [
         {
@@ -90,9 +91,9 @@ const UsingManageScreen:React.FC<{navigation:any}> = ({navigation}) => {
             addRole: "상장구",
         }
     ];
-    
-    const [canExtand,setExtendPossible] = useState(true);
-    const [canReturn,setcanReturnPossible] = useState(false);
+
+    const [canExtand, setExtendPossible] = useState(true);
+    const [canReturn, setcanReturnPossible] = useState(false);
 
 
     return (
@@ -119,22 +120,22 @@ const UsingManageScreen:React.FC<{navigation:any}> = ({navigation}) => {
                     <View style={{ height: 16 }} />
 
                     <View style={{ marginHorizontal: 24 }}>
-                            {users.map((member) => (
-                                <View  key={member.name+'container'} style={{ marginVertical: 4 }}>
-                                    <ProfileMiniCard key={member.name} user={member} isPicked={false} view={'inReserveView'} />
-                                </View>
-                            ))}
+                        {users.map((member) => (
+                            <View key={member.name + 'container'} style={{ marginVertical: 4 }}>
+                                <ProfileMiniCard key={member.name} user={member} isPicked={false} view={'inReserveView'} onPick={() => { }} />
+                            </View>
+                        ))}
                     </View>
                 </ScrollView>
                 <View>
 
-                <View style={{height:8}}/>
-                    {(!canExtand)&&<Text style={{alignSelf:'center', color:Color['red700'], fontSize:14, fontFamily:'NanumSquareNeo-Bold'}}>연장은 종료 30분 이전까지만 가능해요</Text>}
-                    {(!canReturn)&&<Text style={{alignSelf:'center', color:Color['red700'], fontSize:14, fontFamily:'NanumSquareNeo-Bold'}}>종료는 30분 이상 이용 후 가능해요</Text>}
-                    <View style={{height:8}}/>
-                    <LongButton color='green' innerText='연장하기' isAble={canExtand} onPress={()=>{navigation.goBack()}}/>
-                    <View style={{height:8}}/>
-                    <LongButton color='red' innerText='종료하기' isAble={canReturn} onPress={()=>{navigation.goBack()}}/>
+                    <View style={{ height: 8 }} />
+                    {(!canExtand) && <Text style={{ alignSelf: 'center', color: Color['red700'], fontSize: 14, fontFamily: 'NanumSquareNeo-Bold' }}>연장은 종료 30분 이전까지만 가능해요</Text>}
+                    {(!canReturn) && <Text style={{ alignSelf: 'center', color: Color['red700'], fontSize: 14, fontFamily: 'NanumSquareNeo-Bold' }}>종료는 30분 이상 이용 후 가능해요</Text>}
+                    <View style={{ height: 8 }} />
+                    <LongButton color='green' innerText='연장하기' isAble={canExtand} onPress={() => { debounce(navigation.goBack(), 1000, { leading: true, trailing: false }) }} />
+                    <View style={{ height: 8 }} />
+                    <LongButton color='red' innerText='종료하기' isAble={canReturn} onPress={() => { debounce(navigation.goBack(), 1000, { leading: true, trailing: false }) }} />
                 </View>
             </View>
         </UserProvider>

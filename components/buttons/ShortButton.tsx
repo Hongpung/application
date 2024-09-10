@@ -9,7 +9,7 @@ interface ShortButtonProps{
     color:string
 }
 
-const ShortButton: React.FC<ShortButtonProps>= ({innerText, onPress, isFilled, color}) => {
+const ShortButton: React.FC<ShortButtonProps>= React.memo(({innerText, onPress, isFilled, color}) => {
     const colorKey:string = `${color}500`;
     return (
         <Pressable
@@ -19,7 +19,7 @@ const ShortButton: React.FC<ShortButtonProps>= ({innerText, onPress, isFilled, c
             <Text style={[styles.basicText,{color: !isFilled?Color[colorKey]:'white'}]}>{innerText}</Text>
         </Pressable>
     )
-}
+})
 
 export default ShortButton
 

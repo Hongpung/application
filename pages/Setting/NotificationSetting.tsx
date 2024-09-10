@@ -32,11 +32,16 @@ const NotificationSettingScreen: React.FC = () => {
 
     const toggleNotification = async () => {
         if (isEnabled) {
+            const { status } = await Notifications.requestPermissionsAsync();
+            if (status === 'granted') {
+            setIsEnabled(false);
+        }else {
             Alert.alert(
-                '알림 비활성화',
-                '알림을 비활성화하려면 시스템 설정에서 직접 변경해야 합니다.',
+                '알림 권한 거부',
+                '알림 권한이 거부되었습니다. 시스템 설정에서 권한을 부여해야 알림을 받을 수 있습니다.',
                 [{ text: '확인', onPress: () => { Linking.openSettings(); } }]
             );
+        }
         } else {
             const { status } = await Notifications.requestPermissionsAsync();
             if (status === 'granted') {

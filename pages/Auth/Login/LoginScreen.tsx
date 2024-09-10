@@ -1,15 +1,16 @@
 import { Keyboard, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import InputComponent from '../../components/inputs/InputComponent'
-import { Color } from '../../ColorSet'
-import LongButton from '../../components/buttons/LongButton'
-import CheckboxComponent from '../../components/checkboxs/CheckboxComponent'
+import InputComponent from '../../../components/inputs/InputComponent'
+import { Color } from '../../../ColorSet'
+import LongButton from '../../../components/buttons/LongButton'
+import CheckboxComponent from '../../../components/checkboxs/CheckboxComponent'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../../pageTypes'
+import { RootStackParamList } from '../../../pageTypes'
 import Toast from 'react-native-toast-message'
-import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '../../../context/AuthContext'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { StackActions } from '@react-navigation/native'
+import { debounce } from 'lodash'
 
 
 
@@ -216,7 +217,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                             color={'blue'}
                             innerText={'로그인'}
                             isAble={true}
-                            onPress={LoginBtnHandler}
+                            onPress={debounce(LoginBtnHandler, 500, { leading: true, trailing: false })}
                         />
                     </View>
                     <View style={{ marginTop: 16, width: 300, height: 26, justifyContent: 'center', marginHorizontal: 48 }}>
@@ -227,7 +228,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                             color={'green'}
                             innerText={'회원가입'}
                             isAble={true}
-                            onPress={SignupBtnHandler}
+                            onPress={debounce(SignupBtnHandler, 500, { leading: true, trailing: false })}
                         />
                     </View>
                 </View>

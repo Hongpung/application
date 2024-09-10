@@ -9,7 +9,7 @@ export type LongButtonProps = {
     color: string
 }
 
-const LongButton: React.FC<LongButtonProps> = ({ innerText, onPress, isAble, color }) => {
+const LongButton: React.FC<LongButtonProps> = React.memo(({ innerText, onPress, isAble, color }) => {
     return (
         <Pressable
             style={[styles.basic, { backgroundColor: isAble ? Color[color + "500"] : Color[color + "300"] }]}
@@ -20,7 +20,7 @@ const LongButton: React.FC<LongButtonProps> = ({ innerText, onPress, isAble, col
             <Text style={[styles.basicText, { color: !isAble ? Color[color + "100"] : 'white' }]}>{innerText}</Text>
         </Pressable>
     )
-}
+})
 
 export default LongButton
 

@@ -1,21 +1,25 @@
 import { FlatList, Pressable, StyleSheet, Text, View, Animated, TouchableWithoutFeedback, Keyboard, Platform, KeyboardAvoidingView, Modal, Dimensions, ScrollView, ActivityIndicator } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../../pageTypes';
-import { Color } from '../../ColorSet'
-import InputComponent from '../../components/inputs/InputComponent';
-import LongButton from '../../components/buttons/LongButton';
-import SignUpEmailInput from '../../components/inputs/SignupEmailInput';
-import { club, clubs } from '../../UserType';
+import { RootStackParamList } from '../../../pageTypes';
+import { Color } from '../../../ColorSet'
+import InputComponent from '../../../components/inputs/InputComponent';
+import LongButton from '../../../components/buttons/LongButton';
+import SignUpEmailInput from '../../../components/inputs/SignupEmailInput';
+import { club, clubs } from '../../../UserType';
 import Toast from 'react-native-toast-message';
-import ShortButton from '../../components/buttons/ShortButton';
+import ShortButton from '../../../components/buttons/ShortButton';
 import { BASBASE_URL } from '@env';
+import { vaildatePassword } from './Utils';
+import EmailConfirmComponent from './components/EmailConfirmComponent';
+import PWInputComponent from './components/PWInputComponent';
 
 
 const { width } = Dimensions.get('window')
 type SignUpProps = NativeStackScreenProps<RootStackParamList, "SignUp">;
 
-const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
+const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
+
 
     const [onStep, setStep] = useState<"이메일 검증" | "이메일 인증" | "비밀번호 설정" | "개인 정보 입력">("개인 정보 입력");
     const [loading, setLoading] = useState(false);
@@ -189,34 +193,22 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
                         fontFamily: "NanumSquareNeo-Bold",
                     }}>회원가입</Text>
                     <View style={{ marginTop: 24, alignSelf: 'center' }}>
-                        {onStep == '이메일 검증' ? <SignUpEmailInput
-                            label='이메일'
-                            color={'green'}
-                            inputValue={Email}
-                            setInputValue={setEmail}
-                            checkValid={(value) => {
-                                if (value) setStep(`이메일 인증`);
-                                console.log(value)
-                            }}
-                        /> : onStep == '이메일 인증' ?
-                            <SignUpEmailInput
-                                label='이메일'
-                                color={'green'}
-                                inputValue={Email}
-                                isEditible={false}
-                                setInputValue={setEmail}
-                                checkValid={(value) => {
-                                    if (value) setStep(`이메일 인증`);
-                                    console.log(value)
-                                }}
-                            /> :
-                            <InputComponent
-                                label='이메일'
-                                color={'green'}
-                                inputValue={Email}
-                                setInputValue={setEmail}
-                                isEditible={false}
+                        {onStep == '이메일 검증' ?
+                            <EmailConfirmComponent
+                                setStep={setStep}
                             />
+                            : onStep == '이메일 인증' ?
+                                <EmailConfirmComponent
+                                    setStep={setStep}
+                                    isEditible={false}
+                                /> :
+                                <InputComponent
+                                    label='이메일'
+                                    color={'green'}
+                                    inputValue={Email}
+                                    setInputValue={setEmail}
+                                    isEditible={false}
+                                />
                         }
                     </View>
 
@@ -238,24 +230,8 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
                                 }
                             />}
                         {(onStep == '비밀번호 설정' || onStep == '개인 정보 입력') &&
-                            <InputComponent
-                                ref={passwordRef}
-                                label='비밀번호'
-                                color={'green'}
-                                isEncryption
-                                inputValue={password}
-                                setInputValue={setPassWord}
+                            <PWInputComponent
                                 isEditible={onStep == '비밀번호 설정'}
-                                validationCondition={
-                                    [{
-                                        validation: () => {
-                                            const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;
-                                            const newCondition = regex.test(password);
-                                            console.log(password, newCondition)
-                                            return newCondition;
-                                        },
-                                        errorText: "영문, 숫자, 특수문자(!,@,#,$,%,^,&,+,=)를\n포함한 8~12자로 구성되어야 합니다."
-                                    }]}
                             />}
                         {onStep == '비밀번호 설정' &&
                             <View style={{ marginTop: 24 }}>
@@ -404,7 +380,7 @@ const SignUp: React.FC<SignUpProps> = ({ navigation }) => {
     )
 }
 
-export default SignUp
+export default SignUpScreen
 
 const styles = StyleSheet.create({
     inputGroup: {

@@ -4,7 +4,7 @@ import { HomeStackParamList } from "../../../../pageTypes"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import InstrumentCard from "../../../../components/cards/InstrumentCard"
 import { Color } from "../../../../ColorSet"
-import { useInstrument } from "./context/InstrumentContext"
+import { useInstrument } from "../../../../context/InstrumentContext"
 
 
 type ClubInstrumentsScreenProps = NativeStackScreenProps<HomeStackParamList, 'InstrumentsHome'>

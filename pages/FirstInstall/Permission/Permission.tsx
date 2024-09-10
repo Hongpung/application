@@ -1,12 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { Color } from '../../ColorSet'
-import LongButton from '../../components/buttons/LongButton';
-import { RootStackParamList } from '../../pageTypes';
+import { Color } from '../../../ColorSet'
+import LongButton from '../../../components/buttons/LongButton';
+import { RootStackParamList } from '../../../pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as Notifications from 'expo-notifications';
 import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
+import { debounce } from 'lodash';
 
 type PermissionProps = NativeStackScreenProps<RootStackParamList, "Permission">;
 
@@ -26,7 +27,7 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
     await Notifications.requestPermissionsAsync();
     await Camera.requestCameraPermissionsAsync();
     await MediaLibrary.requestPermissionsAsync();
-    
+
     navigation.reset({
       index: 0,
       routes: [{ name: 'Login' }],
@@ -51,7 +52,20 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
               카메라 사용 권한
             </Text>
             <Text style={styles.CardDescript}>
-              {"QR코드 인식, 이용후 정리 확인 등에\n이용해요"}
+              {"QR코드 인식, 이용 후 정리 확인 등에\n이용해요"}
+            </Text>
+          </View>
+        </View>
+        <View style={styles.Card}>
+          <View style={styles.CardIcons}>
+            {/* 앨범 */}
+          </View>
+          <View>
+            <Text style={styles.CardHeaderWord}>
+              갤러리 사용 권한
+            </Text>
+            <Text style={styles.CardDescript}>
+              {"문의, 게시글 작성 등에 이용해요"}
             </Text>
           </View>
         </View>
@@ -61,23 +75,10 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
           </View>
           <View>
             <Text style={styles.CardHeaderWord}>
-              카메라 사용 권한
+              알림 사용 권한
             </Text>
             <Text style={styles.CardDescript}>
-              {"QR코드 인식, 이용후 정리 확인 등에\n이용해요"}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.Card}>
-          <View style={styles.CardIcons}>
-            {/* 카메라 */}
-          </View>
-          <View>
-            <Text style={styles.CardHeaderWord}>
-              카메라 사용 권한
-            </Text>
-            <Text style={styles.CardDescript}>
-              {"QR코드 인식, 이용후 정리 확인 등에\n이용해요"}
+              {"일정 알림, 공지사항 알림 등에\n이용해요"}
             </Text>
           </View>
         </View>
@@ -87,7 +88,7 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
           innerText={"허락하기"}
           color={"blue"}
           isAble={true}
-          onPress={PermissionHandler}
+          onPress={debounce(PermissionHandler, 500, { leading: true, trailing: false })}
         />
       </View>
     </View>

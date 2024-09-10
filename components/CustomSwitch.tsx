@@ -1,5 +1,5 @@
 import { Animated, View, StyleSheet, Pressable } from 'react-native'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { Color } from '../ColorSet'
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
@@ -9,10 +9,11 @@ import { PanGestureHandler, State } from 'react-native-gesture-handler';
  * @param value 
  * @returns 
  */
+
 const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolean }> = ({ onChange, value }) => {
-    const translateX = useRef(new Animated.Value(value ? 400 : 0)).current;
+    const translateX = useRef(new Animated.Value(value ? 40 : 0)).current;
     const width = useRef(new Animated.Value(36)).current;
-    const [onPress, setPress] = useState(false);
+    const [isPressing, setPressing] = useState(false);
 
 
     const gestureHandler = useCallback(Animated.event(
@@ -35,14 +36,14 @@ const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolea
         const newState = event.nativeEvent.state;
 
         if (newState === State.ACTIVE) {
-            setPress(true);
+            setPressing(true);
             Animated.timing(width, {
                 toValue: 44,
                 duration: 200,
                 useNativeDriver: false,
             }).start();
         } else {
-            setPress(false);
+            setPressing(false);
             Animated.timing(width, {
                 toValue: 36,
                 duration: 300,
@@ -63,7 +64,7 @@ const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolea
                     onChange(false);
                 });
             } else if (newX > threshold && value) {
-                if (newX > -8)
+                if (newX >= -8)
                     Animated.sequence([Animated.timing(translateX, {
                         toValue: -8,
                         duration: 0,
@@ -84,7 +85,7 @@ const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolea
                     onChange(true);
                 });
             } else if (newX >= threshold) {
-                if (newX > 32)
+                if (newX >= 32)
                     Animated.sequence([Animated.timing(translateX, {
                         toValue: 32,
                         duration: 0,
@@ -119,6 +120,7 @@ const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolea
 
     return (
         <Pressable style={{ flexDirection: 'row' }} onPress={onPressHandler}>
+
             <View style={styles.switchContainer}>
                 <View
                     style={[
@@ -129,12 +131,13 @@ const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolea
                 <PanGestureHandler
                     onGestureEvent={gestureHandler}
                     onHandlerStateChange={stateChangeHandler}
+
                 >
                     <Animated.View
                         style={[
                             styles.switchHandle,
                             { width },
-                            onPress ?
+                            isPressing ?
                                 value ? {
                                     transform: [{
                                         translateX: translateX.interpolate({

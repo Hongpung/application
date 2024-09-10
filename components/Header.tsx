@@ -5,7 +5,12 @@ import { useNavigation } from "@react-navigation/native";
 import { Color } from '../ColorSet';
 
 interface HeaderProps {
-    leftButton: string, HeaderName?: string, RightButton?: string, RightAction?: () => void, addLeftAction?: () => void, LeftAction?: () => void
+    leftButton: string
+    HeaderName?: string
+    RightButton?: string
+    RightAction?: () => void
+    addLeftAction?: () => void
+    LeftAction?: () => void
 }
 
 const Header: React.FC<HeaderProps> = ({ leftButton, HeaderName, RightButton, RightAction, addLeftAction, LeftAction }) => {

@@ -70,7 +70,7 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     horizontal
                     pagingEnabled={true}
                     showsHorizontalScrollIndicator={false}
-                    keyExtractor={item => item?.name ?? 'false'}
+                    keyExtractor={(item,index) => item && item[index]?.name || 'false'}
                     snapToInterval={width - 28}
                     snapToAlignment="center"
                     decelerationRate="fast"
@@ -99,7 +99,7 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             </View>
             <View style={{ position: 'absolute', bottom: 92, marginHorizontal: 24, height: 92, flexDirection: 'row', justifyContent: 'space-between', width: width - 48 }}>
                 <Pressable style={{ width: (width - 48) / 2 - 4, borderWidth: 1, borderColor: Color['grey200'], borderRadius: 10 }}
-                    onPress={() => navigation.push('ReserveCalendar')}>
+                    onPress={() => navigation.push('Reservation')}>
                     <Text style={{ position: 'absolute', left: 8, bottom: 8, fontSize: 16, fontFamily: 'NanumSquareNeo-Heavy', color: Color['grey700'] }}>연습실 예약 조회</Text>
                 </Pressable>
                 <Pressable style={{ width: (width - 48) / 2 - 4, backgroundColor: Color['grey400'], borderRadius: 10 }}

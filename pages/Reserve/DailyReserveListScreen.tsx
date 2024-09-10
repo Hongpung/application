@@ -12,7 +12,6 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
 
     const { date } = route.params;
     const [selectedDate, setDate] = useState(new Date(date))
-    const [isWeekCalendar, setWeekCalendar] = useState(true)
     const today = new Date()
 
     const times = ['AM10', 'AM11', 'PM12', 'PM01', 'PM02', 'PM03', 'PM04', 'PM05', 'PM06', 'PM07', 'PM08', 'PM09', 'PM10'];
@@ -57,6 +56,7 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
     //         </View>
     //     );
     // }
+
     const renderWeekOfDate = useCallback((selectedDate: Date) => {
         const day = selectedDate.getDay() == 0 ? 7 : selectedDate.getDay();
         const week = [];
@@ -99,10 +99,6 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
         setDate(nextDay);
     }
 
-    useEffect(() => {
-        // fetch 함수 구현
-    }, [selectedDate])
-
     return (
         <View style={{ backgroundColor: '#FFF', flex: 1 }}>
             <View style={{
@@ -133,7 +129,7 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
                     <Pressable style={styles.MonthBtn}
                         onPress={incrementMonth} />
                 </View>
-                {today <= selectedDate && <Pressable onPress={() => navigation.push('Reservation', { date: selectedDate.toDateString() })} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28, backgroundColor: Color['grey300'] }}>
+                {today <= selectedDate && <Pressable onPress={() => { navigation.push('Reservation') }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28, backgroundColor: Color['grey300'] }}>
                     <Text style={{
                         fontFamily: "NanumSquareNeo-Bold", color: Color['blue500'],
                         fontSize: 18,
@@ -188,25 +184,22 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
                 {data && data?.map((reserve) => {
                     const reserveTop = 12 + (reserve.startTime - 10) * 80;
                     const reserveHeight = 80 * (reserve.endTime - reserve.startTime)
+                    const color = reserve.type == 'regular' ? Color['blue500'] : reserve.type == 'none' ? Color['red500'] : Color['green500']
                     return (
-                        <View>
-                            <View style={{ position: 'absolute', top: reserveTop, width: width - 72 - 80, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: Color['red500'], backgroundColor: '#FFF', marginHorizontal: 36 }}>
-                                <Text style={{ position: 'absolute', top: 10, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>{reserve.title}</Text>
+                        <View style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36 }}>
+                            <Text style={{ position: 'absolute', top: 10, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>{reserve.title}</Text>
 
-                                <View style={{ position: 'absolute', top: 46, left: 14, flexDirection: 'row', alignItems: 'center' }}>
-                                    <View style={{ height: 24, width: 24, backgroundColor: Color['grey200'], marginRight: 4 }} />
-                                    <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>24</Text>
-                                </View>
+                            <View style={{ position: 'absolute', top: 46, left: 14, flexDirection: 'row', alignItems: 'center' }}>
+                                <View style={{ height: 24, width: 24, backgroundColor: Color['grey200'], marginRight: 4 }} />
+                                <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>24</Text>
+                            </View>
+                            {reserve.type == 'regular' ?
                                 <View style={{ position: 'absolute', top: 10, right: 14, alignItems: 'flex-end' }}>
                                     <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }}>{reserve.name}</Text>
                                     {reserve.nickname && <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{reserve.nickname}</Text>}
-                                </View>
-                            </View>
-                            <Pressable style={{ position: 'absolute', top: reserveTop, width: 80, height: reserveHeight, right: 0, justifyContent: 'center', alignItems: 'center', marginHorizontal: 36 }}
-                                onPress={() => { console.log('더보기') }}>
-                                <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], marginBottom: 4 }}>대기 1</Text>
-                                <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'] }}>자세히</Text>
-                            </Pressable>
+                                </View> :
+                                <View style={{ position: 'absolute', top: 0, right: 20, width: 28, height: 42, backgroundColor: Color['blue500'] }} />
+                            }
                         </View>
                     )
                 })}

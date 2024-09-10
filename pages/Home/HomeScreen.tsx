@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Modal, FlatList, Animated } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Modal, FlatList, Animated, NativeSyntheticEvent } from 'react-native';
 import { Color } from '../../ColorSet'
 import PagerView from 'react-native-pager-view';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { HomeStackParamList } from '../../pageTypes.js';
-
-type HomeScreenProps = NativeStackScreenProps<HomeStackParamList, "Home">;
+import { debounce } from 'lodash';
+import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
 
 interface Banner {
     backgroundColor: string,
@@ -13,7 +11,7 @@ interface Banner {
     Descript: string
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     const [isUsed, setUsed] = useState(true);
     const [isSlideUp, setSlide] = useState(false);
@@ -58,7 +56,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
     const bannerMass = banners.length;// 배너 수
 
-    const BannerHandler = (e: any) => {
+    const BannerHandler = (e: NativeSyntheticEvent<OnPageSelectedEventData>) => {
         const { position } = e.nativeEvent;
 
         if (position === 0) {
@@ -107,7 +105,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 </View>
 
                 {/* 상단 일정*/}
-                <Pressable onPress={() => navigation.push(`ReserveCalendar`)}>
+                <Pressable onPress={() => debounce(() => navigation.push('ReserveCalendar'), 1000, { leading: true, trailing: false })}>
                     <View style={styles.ScheduleOfDate}>
                         <View style={{ position: 'absolute', bottom: 12, left: 20 }}>
                             <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>오늘의 일정이 없어요</Text>
@@ -169,10 +167,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
                     {/* 배너 인디케이터 */}
                     <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 2, height: 20, justifyContent: 'center' }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', height: 16, width: 100 }}>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', width: 42, fontSize: 10, textAlignVertical: 'center', textAlign: 'right' }}>{bannerNum < 9 ? '0' + (bannerNum + 1) : bannerNum + 1}/{bannerMass < 10 ? '0' + bannerMass : bannerMass}</Text>
-                            <Pressable onPress={() => setModalVisible(true)}>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', height: 12, fontSize: 10, width: 56, textAlignVertical: 'center', textAlign: 'center' }}>모두보기 +</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', minWidth: 42, fontSize: 12, textAlignVertical: 'center', textAlign: 'right' }}>{bannerNum < 9 ? '0' + (bannerNum + 1) : bannerNum + 1}/{bannerMass < 10 ? '0' + bannerMass : bannerMass}</Text>
+                            <Pressable onPress={() => setModalVisible(true)} style={{ justifyContent: 'center', height: 16 }}>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 11, width: 56, textAlign: 'center' }}>모두보기 +</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -181,30 +179,30 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 <Modal transparent={true} visible={modalVisible}>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', }}>
 
-                        <Pressable style={{ flex: 1 }} onPress={() => setModalVisible(false)}>
+                        <Pressable style={{ top: 24 }} onPress={() => setModalVisible(false)}>
                             <View style={{ flexDirection: 'row', height: 64, justifyContent: 'flex-end', alignItems: 'center' }}>
                                 <Text style={{ top: 12, right: 24, color: '#FFF', fontSize: 36, textAlignVertical: 'center' }}>X</Text>
                             </View>
-                            <View style={{ flex: 1, alignItems: 'center' }} >
-                                <FlatList
-                                    style={{ paddingHorizontal: 24, paddingVertical: 4 }}
-                                    data={banners}
-                                    renderItem={({ item, index }) => (
-                                        <Pressable key={index + 1} style={{ width: 332, height: 160, marginVertical: 8, borderRadius: 5, overflow: 'hidden' }} onPress={(e) => { e.stopPropagation(); navigation.navigate('MyPage'); setModalVisible(false); }}>
-                                            <View style={[{ flex: 1, backgroundColor: item.backgroundColor }]}>
-                                                <View style={{ position: 'absolute', top: 36, left: 22 }}>
-                                                    <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{item.Title}</Text>
-                                                </View>
-
-                                                <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
-                                                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{item.Descript}</Text>
-                                                </View>
-                                            </View>
-                                        </Pressable>
-                                    )} />
-                            </View>
-                            <View style={{ height: 36 }} />
                         </Pressable>
+                        <View style={{ flex: 1 }} >
+                            <FlatList
+                                style={{ top: 24, paddingVertical: 4 }}
+                                data={banners}
+                                renderItem={({ item, index }) => (
+                                    <Pressable key={index + 1} style={{ marginHorizontal: 28, height: 160, marginVertical: 8, borderRadius: 5, overflow: 'hidden' }} onPress={(e) => { e.stopPropagation(); navigation.navigate('MyPage'); setModalVisible(false); }}>
+                                        <View style={[{ flex: 1, backgroundColor: item.backgroundColor }]}>
+                                            <View style={{ position: 'absolute', top: 36, left: 22 }}>
+                                                <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{item.Title}</Text>
+                                            </View>
+
+                                            <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
+                                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{item.Descript}</Text>
+                                            </View>
+                                        </View>
+                                    </Pressable>
+                                )} />
+                        </View>
+                        <View style={{ height: 36 }} />
                     </View>
                 </Modal>
 
@@ -366,7 +364,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                             <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>20 분</Text>
                         </View>
                         <Pressable style={{ justifyContent: 'center' }}
-                            onPress={()=>navigation.push('CheckOut')}>
+                            onPress={debounce(() => navigation.push('CheckOut'), 1000, { leading: true, trailing: false })}>
                             <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14, backgroundColor: `rgba(0,0,0,0.4)`, padding: 16, borderRadius: 8, overflow: 'hidden' }}>{`연장/종료`}</Text>
                         </Pressable>
                     </View>

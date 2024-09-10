@@ -8,6 +8,7 @@ import { useReservation } from '../../context/ReservationContext'
 const { width } = Dimensions.get('window')
 
 const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+    
     const {
         reservation,
         setName,
