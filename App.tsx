@@ -12,10 +12,10 @@ import Header from './components/Header';
 import MainStacks from './nav/HomeStacks';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast, { BaseToastProps } from 'react-native-toast-message';
-import { Color } from './ColorSet';
+import { Color } from '@hongpung/ColorSet';
 import { AuthProvider } from './context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SignUpProvider } from './pages/Auth/SignUp/context/SignUpContext';
+import { SignUpProvider } from '@hongpung/pages/Auth/SignUp/context/SignUpContext';
 
 
 const RootStack = createNativeStackNavigator();
@@ -101,6 +101,14 @@ const ContentsContainer: React.FC = () => {
   )
 }
 
+const SignUp: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+  return (
+    <SignUpProvider>
+      <SignUpScreen navigation={navigation} route={route} />
+    </SignUpProvider>
+  )
+
+}
 
 const RootStacks: React.FC = () => {
   return (
@@ -108,15 +116,15 @@ const RootStacks: React.FC = () => {
       <RootStack.Screen name="Tutorial" component={Tutorial} />
       <RootStack.Screen name="Permission" component={Permission} />
       <RootStack.Screen name="Login" component={LoginScreen} options={{ animation: 'none' }} />
-      <SignUpProvider>
-        <RootStack.Screen name="SignUp" component={SignUpScreen} options={{ headerShown: true, header: () => <Header leftButton='X' /> }} />
-      </SignUpProvider>
+      <RootStack.Screen name="SignUp" component={SignUp} options={{ headerShown: true, header: () => <Header leftButton='X' /> }} />
       <RootStack.Screen name="HomeStack" component={MainStacks} options={{ animation: 'none' }} />
     </RootStack.Navigator>
   )
 }
 
+
 SplashScreen.preventAutoHideAsync();
+
 
 const App: React.FC = () => {
 
@@ -126,18 +134,20 @@ const App: React.FC = () => {
   const loadFonts = async () => {
     await fetchFonts();
     setFontLoaded(true);
+    setLoginLoaded(true);
   };
 
   const loadLoginData = async () => {
     const token = await AsyncStorage.getItem('token');
-    setLoginLoaded(true)
   }
+  
   useEffect(() => {
 
     const loadResources = async () => {
       try {
 
         await loadFonts();
+        SplashScreen.hideAsync();
 
       } catch (error) {
         console.error(error);
@@ -181,12 +191,12 @@ const App: React.FC = () => {
   }
 
   return (
-    <SafeZone style={{ flex: 1, backgroundColor: "#FFFFFF", }}>
-      <AuthProvider>
+    <AuthProvider>
+      <SafeZone style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
         <ContentsContainer />
         <Toast config={toastConfig} />
-      </AuthProvider>
-    </SafeZone>
+      </SafeZone>
+    </AuthProvider>
   );
 }
 

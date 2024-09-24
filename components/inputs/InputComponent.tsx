@@ -62,7 +62,6 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
             if (checkValid) checkValid(false);
             return false;
         }
-
         if (validationCondition && Array.isArray(validationCondition)) {
             for (const { validation, errorText } of validationCondition) {
                 if (!validation(inputValue)) {

@@ -107,9 +107,9 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     <Text style={{ position: 'absolute', right: 8, top: 8, fontSize: 16, fontFamily: 'NanumSquareNeo-Heavy', color: '#FFF' }}>활동 조회</Text>
                 </Pressable>
             </View>
-            <View style={{ position: 'absolute', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.6)' }}>
+            {!loading&&<View style={{ position: 'absolute', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.6)' }}>
                 <ActivityIndicator size={'large'} color={'#FFF'} />
-            </View>
+            </View>}
         </View>
     )
 }

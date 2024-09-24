@@ -125,7 +125,7 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
                             })
                             }
                         </View>
-                        {reservedDates[day].length>3&& <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'], marginTop: 2 }}>+{reservedDates[day].length-3}</Text>}
+                        {reservedDates[day]?.length>3&& <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'], marginTop: 2 }}>+{reservedDates[day].length-3}</Text>}
                     </Pressable>
                 );
             }
@@ -185,7 +185,6 @@ const ReserveCalendarScreen: React.FC<{ navigation: any, route: any }> = ({ navi
         useCallback(() => {
             if (route.params?.date) {
                 const newDate = new Date(route.params.date);
-                console.log(newDate)
                 if (calendarDate.getTime() !== newDate.getTime()) {
                     setCalendarDate(newDate);
                 }

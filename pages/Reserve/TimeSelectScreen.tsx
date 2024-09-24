@@ -269,6 +269,7 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         } else {
                             setTime(parseTime(selectedTimeBlocks[0]), parseTime(selectedTimeBlocks[selectedTimeBlocks.length - 1]) + 1)
                             navigation.navigate('Reservation');
+                            setHasWait(false);
                         }
 
                     }} />

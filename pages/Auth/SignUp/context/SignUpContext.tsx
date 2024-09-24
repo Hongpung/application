@@ -16,10 +16,10 @@ interface SignUpContextProps {
     signUpInfo: SignUpInfo;
     setSignUpInfo: (info: SignUpInfo) => void;
     setEmail: (email: string) => void;
-    setConfirmPassword: (name: string) => void;
+    setConfirmPassword: (password: string) => void;
     setClub: (club: club) => void;
     setGrade: (grade: string) => void;
-    setPassword: (name: string) => void;
+    setPassword: (password: string) => void;
     setNickName: (nickname: string) => void;
     setName: (name: string) => void;
 }
@@ -38,10 +38,10 @@ const SignUpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     });
 
     const setEmail = (email: string) => { setSignUpInfo(prev => ({ ...prev, email })) }
-    const setConfirmPassword = (name: string) => void;
+    const setConfirmPassword = (confirmPassword: string) => { setSignUpInfo(prev => ({ ...prev, confirmPassword })) };
     const setClub = (club: club) => { setSignUpInfo(prev => ({ ...prev, club })) }
     const setGrade = (grade: string) => { setSignUpInfo(prev => ({ ...prev, grade })) }
-    const setPassword = (name: string) => { setSignUpInfo(prev => ({ ...prev, name })) }
+    const setPassword = (password: string) => { setSignUpInfo(prev => ({ ...prev, password })) }
     const setNickName = (nickname: string) => { setSignUpInfo(prev => ({ ...prev, nickname })) }
     const setName = (name: string) => { setSignUpInfo(prev => ({ ...prev, name })) }
 

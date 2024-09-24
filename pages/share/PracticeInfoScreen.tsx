@@ -2,7 +2,7 @@ import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-n
 import React from 'react'
 import { Color } from '../../ColorSet'
 import InstrumentCard from '../../components/cards/InstrumentCard'
-import { InstrumentProvider } from '../Home/MyClub/Instruments/context/InstrumentContext'
+import { InstrumentProvider } from '@hongpung/context/InstrumentContext'
 import LongButton from '../../components/buttons/LongButton'
 import { Reserve } from '../Home/MyClub/ClubCalendar/ClubCalendar'
 
@@ -12,7 +12,7 @@ const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
 
     const reserveData = {
         ...reserveInfo,
-        date: new Date(reserveInfo.date), 
+        date: new Date(reserveInfo.date),
     };
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
@@ -214,14 +214,16 @@ const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                             renderItem={({ item }) => {
                                 return (
                                     <View style={{ marginHorizontal: 6 }}>
-                                        <InstrumentCard instrument={{
-                                            imgURL: null,
-                                            club: '들녘',
-                                            type: '쇠',
-                                            name: 'www',
-                                            state: '대여가능',
-                                            nickname: 'ss'
-                                        }} view={'inBorrow'} />
+                                        <InstrumentCard
+                                            onSelectInstrument={() => { }}
+                                            instrument={{
+                                                imgURL: null,
+                                                club: '들녘',
+                                                type: '쇠',
+                                                name: 'www',
+                                                state: '대여가능',
+                                                nickname: 'ss'
+                                            }} view={'inBorrow'} />
                                     </View>
                                 )
                             }}

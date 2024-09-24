@@ -8,7 +8,7 @@ import { useReservation } from '../../context/ReservationContext'
 const { width } = Dimensions.get('window')
 
 const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-    
+
     const {
         reservation,
         setName,
@@ -77,13 +77,13 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>정기 연습</Text>
                     <View style={{ width: 218, height: 36, borderRadius: 5, flexDirection: 'row', alignItems: 'center' }}>
                         <Pressable style={[{ width: 108, alignItems: 'center', borderBottomLeftRadius: 5, borderTopLeftRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderRightWidth: 0.5, borderColor: reservation.isRegular ? Color['blue500'] : Color['red500'] }, reservation.isRegular && { backgroundColor: Color['blue100'] }]}
-                            onPress={() => { setIsRegular(true); setIsParticipatible(false) }}>
+                            onPress={() => { setIsRegular(true); setIsParticipatible(false); }}>
                             <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, reservation.isRegular ? { color: Color['blue600'] } : { color: Color['red300'] }]}>
                                 예
                             </Text>
                         </Pressable>
                         <Pressable style={[{ width: 108, alignItems: 'center', borderBottomRightRadius: 5, borderTopRightRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderLeftWidth: 0.5, borderColor: reservation.isRegular ? Color['blue500'] : Color['red500'] }, !reservation.isRegular && { backgroundColor: Color['red100'] }]}
-                            onPress={() => { setIsRegular(false) }}>
+                            onPress={() => setIsRegular(false)}>
                             <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, reservation.isRegular ? { color: Color['blue300'] } : { color: Color['red600'] }]}>
                                 아니오
                             </Text>
@@ -93,37 +93,24 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
                 <View style={{ height: 20 }} />
 
-                {reservation.isRegular ? <View style={{ marginHorizontal: 44, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>참여 가능</Text>
+                <View style={{ marginHorizontal: 44, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>열린 연습</Text>
                     <View style={{ width: 218, height: 36, borderRadius: 5, flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={[{ width: 108, alignItems: 'center', borderBottomLeftRadius: 5, borderTopLeftRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderRightWidth: 0.5, borderColor: Color['grey400'] }]}>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['grey300'] }}>
-                                예
-                            </Text>
-                        </View>
-                        <View style={[{ width: 108, alignItems: 'center', borderBottomRightRadius: 5, borderTopRightRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderLeftWidth: 0.5, borderColor: Color['grey400'], backgroundColor: Color['grey100'] }]}>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['grey400'] }}>
-                                아니오
-                            </Text>
-                        </View>
-                    </View>
-                </View> : <View style={{ marginHorizontal: 44, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>참여 가능</Text>
-                    <View style={{ width: 218, height: 36, borderRadius: 5, flexDirection: 'row', alignItems: 'center' }}>
-                        <Pressable style={[{ width: 108, alignItems: 'center', borderBottomLeftRadius: 5, borderTopLeftRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderRightWidth: 0.5, borderColor: reservation.isParticipatible ? Color['blue500'] : Color['red500'] }, reservation.isParticipatible && { backgroundColor: Color['blue100'] }]}
-                            onPress={() => { setIsParticipatible(true) }}>
-                            <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, reservation.isParticipatible ? { color: Color['blue600'] } : { color: Color['red300'] }]}>
+                        <Pressable style={[{ width: 108, alignItems: 'center', borderBottomLeftRadius: 5, borderTopLeftRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderRightWidth: 0.5, borderColor: reservation.isRegular ? Color['grey400'] : reservation.isParticipatible ? Color['blue500'] : Color['red500'] }, !reservation.isRegular && reservation.isParticipatible && { backgroundColor: Color['blue100'] }]}
+                            onPress={() => !reservation.isRegular && setIsParticipatible(true)}>
+                            <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, reservation.isRegular ? { color: Color['grey300'] } : reservation.isParticipatible ? { color: Color['blue600'] } : { color: Color['red300'] }]}>
                                 예
                             </Text>
                         </Pressable>
-                        <Pressable style={[{ width: 108, alignItems: 'center', borderBottomRightRadius: 5, borderTopRightRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderLeftWidth: 0.5, borderColor: reservation.isParticipatible ? Color['blue500'] : Color['red500'] }, !reservation.isParticipatible && { backgroundColor: Color['red100'] }]}
-                            onPress={() => { setIsParticipatible(false) }}>
-                            <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, reservation.isParticipatible ? { color: Color['blue300'] } : { color: Color['red600'] }]}>
+                        <Pressable style={[{ width: 108, alignItems: 'center', borderBottomRightRadius: 5, borderTopRightRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderLeftWidth: 0.5, borderColor: reservation.isRegular ? Color['grey400'] : reservation.isParticipatible ? Color['blue500'] : Color['red500'] }, reservation.isRegular ? { backgroundColor: Color['grey100'] } : !reservation.isParticipatible && { backgroundColor: Color['red100'] }]}
+                            onPress={() =>  !reservation.isRegular && setIsParticipatible(false) }>
+                            <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, reservation.isRegular ? { color: Color['grey400'] } : reservation.isParticipatible ? { color: Color['blue300'] } : { color: Color['red600'] }]}>
                                 아니오
                             </Text>
                         </Pressable>
                     </View>
-                </View>}
+                </View>
+
 
                 <View style={{ height: 24 }} />
 

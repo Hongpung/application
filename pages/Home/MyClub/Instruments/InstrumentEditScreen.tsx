@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, ScrollView, Image, Modal, Pressable } from 'rea
 import React, { useLayoutEffect, useState } from 'react'
 import { Color } from '../../../../ColorSet';
 import { Instrument } from '../../../../UserType';
-import { useInstrument } from './context/InstrumentContext';
+import { useInstrument } from '@hongpung/context/InstrumentContext';
 import LongButton from '../../../../components/buttons/LongButton';
 
 

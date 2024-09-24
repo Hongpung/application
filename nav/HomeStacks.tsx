@@ -185,7 +185,7 @@ const ReservationStack = createNativeStackNavigator();
 const ReservationStacks = () => {
     return (
         <ReservationProvider>
-            <ReservationStack.Navigator initialRouteName="Reservation" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+            <ReservationStack.Navigator initialRouteName="ReserveCalendar" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
 
                 <ReservationStack.Screen
                     name='ReserveCalendar'

@@ -3,7 +3,7 @@ import React from 'react'
 import { useRoute } from '@react-navigation/native';
 import { Color } from '../../../../ColorSet';
 import { Instrument } from '../../../../UserType';
-import { useInstrument } from './context/InstrumentContext';
+import { useInstrument } from '@hongpung/context/InstrumentContext';
 
 interface Reserve {
     date: Date
@@ -94,10 +94,14 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any }> = ({ navigation })
             <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
                 <View style={{height:12}}/>
                 <View style={styles.imageContainer}>
-                    <Image
+                    {instrument.imgURL?<Image
                         source={{ uri: instrument?.imgURL }}
                         style={styles.image}
+                    />:
+                    <View
+                    style={[styles.image, {backgroundColor:Color['grey200']}]}
                     />
+                    }
                 </View>
                 <View style={{ height: 28 }} />
                 <View style={styles.Row}>

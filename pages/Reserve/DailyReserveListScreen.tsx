@@ -172,14 +172,14 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
                         </View>)
                 })}
 
-                <Modal
+                {/* <Modal
                     visible={loading}
                     transparent
                 >
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.6)' }}>
                         <ActivityIndicator size={'large'} color={'#FFF'} />
                     </View>
-                </Modal>
+                </Modal> */}
 
                 {data && data?.map((reserve) => {
                     const reserveTop = 12 + (reserve.startTime - 10) * 80;
