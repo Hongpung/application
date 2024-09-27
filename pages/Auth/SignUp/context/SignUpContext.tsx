@@ -5,9 +5,8 @@ import { club } from '../../../../UserType';
 export type SignUpInfo = {
     email: string
     password: string
-    confirmPassword: string
     club: club | null
-    grade: string
+    enrollmentNumber: string
     name: string
     nickname: string | null
 };
@@ -16,9 +15,8 @@ interface SignUpContextProps {
     signUpInfo: SignUpInfo;
     setSignUpInfo: (info: SignUpInfo) => void;
     setEmail: (email: string) => void;
-    setConfirmPassword: (password: string) => void;
     setClub: (club: club) => void;
-    setGrade: (grade: string) => void;
+    setEnrollmentNumber: (enrollmentNumber: string) => void;
     setPassword: (password: string) => void;
     setNickName: (nickname: string) => void;
     setName: (name: string) => void;
@@ -30,19 +28,17 @@ const SignUpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [signUpInfo, setSignUpInfo] = useState<SignUpInfo>({
         email: '',
         password: '',
-        confirmPassword: '',
         club: null,
-        grade: '',
+        enrollmentNumber: '',
         name: '',
         nickname: null
     });
 
     const setEmail = (email: string) => { setSignUpInfo(prev => ({ ...prev, email })) }
-    const setConfirmPassword = (confirmPassword: string) => { setSignUpInfo(prev => ({ ...prev, confirmPassword })) };
     const setClub = (club: club) => { setSignUpInfo(prev => ({ ...prev, club })) }
-    const setGrade = (grade: string) => { setSignUpInfo(prev => ({ ...prev, grade })) }
+    const setEnrollmentNumber = (enrollmentNumber: string) => { setSignUpInfo(prev => ({ ...prev, enrollmentNumber: enrollmentNumber })) }
     const setPassword = (password: string) => { setSignUpInfo(prev => ({ ...prev, password })) }
-    const setNickName = (nickname: string) => { setSignUpInfo(prev => ({ ...prev, nickname })) }
+    const setNickName = (nickname: string) => { setSignUpInfo(prev => ({ ...prev, nickname: nickname.length > 0 ? nickname : null })) }
     const setName = (name: string) => { setSignUpInfo(prev => ({ ...prev, name })) }
 
     return (
@@ -51,9 +47,8 @@ const SignUpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
             setSignUpInfo,
             setEmail,
             setPassword,
-            setConfirmPassword,
             setClub,
-            setGrade,
+            setEnrollmentNumber,
             setName,
             setNickName,
         }

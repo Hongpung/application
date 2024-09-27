@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, TextInput, Animated, Pressable } from 'react-na
 import { Color } from '../../ColorSet';
 import { josa } from 'es-hangul';
 import Toast from 'react-native-toast-message';
-import { BASBASE_URL } from '@env';
 
 type InputProps = {
     label: string,
@@ -18,12 +17,12 @@ type InputProps = {
 const isValidEmail = async (email: string, callbackFn?: () => void) => {
     const controller = new AbortController();
     const signal = controller.signal;
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 10초 타임아웃
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃
 
     let result = false;
 
     try {
-        const response = await fetch(`${BASBASE_URL}/auth/email`, {
+        const response = await fetch(`${process.env.BASE_URL}/auth/email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -32,21 +31,76 @@ const isValidEmail = async (email: string, callbackFn?: () => void) => {
             signal
         });
 
-        clearTimeout(timeoutId); // 타임아웃 취소
+        const data = await response.json();
 
+        console.log(data)
         if (response.ok) {
-            result = true;
+
+            const { valid } = data;
+            console.log(valid)
+            result = valid;
         } else {
             console.error('서버에서 데이터 가져오기 실패: ', response.status);
         }
-    } catch (error) {
-        console.error(error)
+    } catch (error: unknown) {
+        // 에러가 Error 객체인지 확인
+        if (error instanceof Error) {
+            if (error.name === 'AbortError') {
+                console.error('요청이 타임아웃으로 인해 중단되었습니다.');
+            } else {
+                console.error('요청 중 에러 발생: ', error.message);
+            }
+        } else {
+            console.error('알 수 없는 에러 발생: ', error);
+        }
     } finally {
+        clearTimeout(timeoutId);
         callbackFn && callbackFn()
     }
 
     return result;
 };
+
+const sendVerificationCode = async (email: string) => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃
+
+    let result = 500;
+
+    try {
+        const response = await fetch(`${process.env.WEB_API}/verificationCode/send`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email }),
+            signal
+        });
+
+        if (response.ok) {
+            result = 200;
+        } else {
+            console.error('서버에서 데이터 가져오기 실패: ', response.status);
+            result = response.status;
+        }
+    } catch (error: unknown) {
+        // 에러가 Error 객체인지 확인
+        if (error instanceof Error) {
+            if (error.name === 'AbortError') {
+                console.error('요청이 타임아웃으로 인해 중단되었습니다.');
+            } else {
+                console.error('요청 중 에러 발생: ', error.message);
+            }
+        } else {
+            console.error('알 수 없는 에러 발생: ', error);
+        }
+    } finally {
+        clearTimeout(timeoutId);
+    }
+
+    return result;
+}
 
 
 const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkValid, isEditible = true, inputValue, setInputValue }) => {
@@ -68,14 +122,23 @@ const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkVali
         if (!newCondition) setErrorText("이메일 주소가 유효하지 않습니다")
         else {
             const duplication = await isValidEmail(inputValue) || false
-            if (duplication) {
+            if (!duplication) {
                 setIsValid(false);
-                if (!newCondition) setErrorText("이미 가입된 이메일 입니다.")
+                setErrorText("이미 가입된 이메일 입니다.")
             }
             else {
-                setIsSend(true);
-                if (checkValid) checkValid(true);
-                showSendToast();
+                const sendResult = await sendVerificationCode(inputValue);
+                if (sendResult == 200) {
+                    setIsSend(true);
+                    if (checkValid) checkValid(true);
+                    showSendToast();
+                }
+                else if (sendResult == 403) {
+                    //횟수 최대 도달 알럿
+                    showErrorToast(sendResult)
+                } else {
+                    showErrorToast(sendResult)
+                }
             }
         }
     }
@@ -127,6 +190,26 @@ const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkVali
             Toast.show({
                 type: 'success',
                 text1: '인증번호를 재전송했어요',
+                position: 'bottom',
+                bottomOffset: 60,
+                visibilityTime: 2000
+            });
+        }
+    }
+
+    const showErrorToast = (errorcode: number) => {
+        if (errorcode == 403) {
+            Toast.show({
+                type: 'error',
+                text1: '인증번호 전송제한에 도달했어요\n관리자에게 문의하세요',
+                position: 'bottom',
+                bottomOffset: 60,
+                visibilityTime: 2000
+            });
+        } else {
+            Toast.show({
+                type: 'error',
+                text1: '문제가 발생했어요. 잠시후에 시도해주세요',
                 position: 'bottom',
                 bottomOffset: 60,
                 visibilityTime: 2000

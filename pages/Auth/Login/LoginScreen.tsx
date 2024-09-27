@@ -64,71 +64,63 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
     const LoginBtnHandler = async () => {
         IDRef.current?.validate();
         PWRef.current?.validate();
-        // if (!checkVaildID) {
-        //     console.log('Email을 확인하세요');
 
-        //     PWRef.current?.focus();
-        //     PWRef.current?.blur();
-
-        //     IDRef.current?.focus();
-        //     IDRef.current?.blur()
-        //     IDRef.current?.focus();
-        //     return
-        // }
-
-        // if (!checkVaildPW) {
-        //     console.log('password를 확인하세요');
-        //     PWRef.current?.focus();
-        //     PWRef.current?.blur();
-        //     PWRef.current?.focus();
-        //     return
-        // }
-
-        login(Email,password);//로그인 로직임
-
-
-        //     AsyncStorage.setItem('Email', Email);
-        //     AsyncStorage.setItem('password', password);
-
-        if (autoLogin) {
-            AsyncStorage.setItem('autoLogin', 'true');
-            Toast.show({
-                type: 'success',
-                text1: '앞으로 앱 실행시 자동으로 로그인 돼요',
-                position: 'bottom',
-                bottomOffset: 60,
-                visibilityTime: 3000
-            });
+        if (!checkVaildID) {
+            IDRef.current?.focus();
+            return
         }
 
-        else if (saveID) {        //     
-            const autoLogin = await AsyncStorage.getItem('autoLogin') || false
+        if (!checkVaildPW) {
+            PWRef.current?.focus();
+            return
+        }
+        try {
+            const loginResult = await login(Email, password);
+
+            if (!loginResult) throw Error('로그인 정보 불일치')
+
             if (autoLogin) {
-                try {
-                    await AsyncStorage.removeItem('autoLogin');
-                }
-                catch (e) { console.error(e) }
+                AsyncStorage.setItem('autoLogin', 'true');
+                Toast.show({
+                    type: 'success',
+                    text1: '앞으로 앱 실행시 자동으로 로그인 돼요',
+                    position: 'bottom',
+                    bottomOffset: 60,
+                    visibilityTime: 3000
+                });
             }
-            AsyncStorage.setItem('saveID', 'true')
-            Toast.show({
-                type: 'success',
-                text1: '아이디를 저장했어요',
-                position: 'bottom',
-                bottomOffset: 60,
-                visibilityTime: 3000
-            });
-        }
-        else {
-            const loadedSaveID = await AsyncStorage.getItem('saveID') || false
-            if (loadedSaveID) {
-                try {
-                    await AsyncStorage.removeItem('saveID');
-                }
-                catch (e) { console.error(e) }
-            }
-        }
 
-         navigation.dispatch(StackActions.replace('HomeStack'))
+            else if (saveID) {        //     
+                const autoLogin = await AsyncStorage.getItem('autoLogin') || false
+                if (autoLogin) {
+                    try {
+                        await AsyncStorage.removeItem('autoLogin');
+                    }
+                    catch (e) { console.error(e) }
+                }
+                AsyncStorage.setItem('saveID', 'true')
+                Toast.show({
+                    type: 'success',
+                    text1: '아이디를 저장했어요',
+                    position: 'bottom',
+                    bottomOffset: 60,
+                    visibilityTime: 3000
+                });
+            }
+            else {
+                const loadedSaveID = await AsyncStorage.getItem('saveID') || false
+                if (loadedSaveID) {
+                    try {
+                        await AsyncStorage.removeItem('saveID');
+                    }
+                    catch (e) { console.error(e) }
+                }
+            }
+
+            navigation.dispatch(StackActions.replace('HomeStack'))
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     const SignupBtnHandler = () => {

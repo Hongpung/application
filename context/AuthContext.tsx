@@ -1,12 +1,11 @@
 import React, { createContext, useState, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from '../UserType';
-import { BASBASE_URL } from '@env';
 
 interface AuthContextType {
     token: string | null;
     loginUser: User | null;
-    login: (username: string, password: string) => Promise<void>;
+    login: (username: string, password: string) => Promise<boolean>;
     logout: () => Promise<void>;
 }
 
@@ -22,44 +21,26 @@ export const AuthProvider: React.FC<{ children: any }> = ({ children }) => {
     const login = async (email: string, password: string) => {
         const timeoutId = setTimeout(() => controller.abort(), 5000);
         try {
-            const response = await fetch(`${BASBASE_URL}/auth/login`, {
+            const response = await fetch(`${process.env.BASE_URL}/auth/login`, {
                 method: 'POST',
                 body: JSON.stringify({ email, password }),
                 signal
             });
             if (!response.ok) {
                 throw new Error('Network response was not ok');
-              }
+            }
             const result = await response.json();
             if (result.token) {
-                setToken(result.token);
-                const { name,
-                    nickname = null,
-                    club,
-                    instrument,
-                    grade,
-                    isCapt = null,
-                    addRole = null,
-                    badge = null,
-                    ProfileUri = null } = result
-                setLoginUser({
-                    name,
-                    nickname,
-                    club,
-                    instrument,
-                    grade,
-                    isCapt,
-                    addRole,
-                    badge, //url임
-                    ProfileUri
-                })
+                const { token } = result;
+                setToken(token);
+                return true;
             }
         } catch (e) {
             console.error(e)
-        }finally{
+        } finally {
             clearTimeout(timeoutId);
         }
-
+        return false;
     };
 
     const logout = async () => {

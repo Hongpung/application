@@ -9,10 +9,10 @@ import SignUpEmailInput from '../../../components/inputs/SignupEmailInput';
 import { club, clubs } from '../../../UserType';
 import Toast from 'react-native-toast-message';
 import ShortButton from '../../../components/buttons/ShortButton';
-import { BASBASE_URL } from '@env';
-import { vaildatePassword } from './Utils';
+import { vaildatePassword, verifyingEmail } from './Utils';
 import EmailConfirmComponent from './components/EmailConfirmComponent';
 import PWInputComponent from './components/PWInputComponent';
+import { useSignUp } from './context/SignUpContext';
 
 
 const { width } = Dimensions.get('window')
@@ -20,34 +20,35 @@ type SignUpProps = NativeStackScreenProps<RootStackParamList, "SignUp">;
 
 const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
 
+    const {
+        signUpInfo,
+        setEmail,
+        setPassword,
+        setClub,
+        setEnrollmentNumber,
+        setName,
+        setNickName,
+    } = useSignUp();
 
-    const [onStep, setStep] = useState<"이메일 검증" | "이메일 인증" | "비밀번호 설정" | "개인 정보 입력">("개인 정보 입력");
+    const [onStep, setStep] = useState<"이메일 검증" | "이메일 인증" | "비밀번호 설정" | "개인 정보 입력">("이메일 검증");
     const [loading, setLoading] = useState(false);
 
     const [alertVisible, setAlertVisible] = useState(false);
 
-    const [Email, setEmail] = useState('ww');
     const [verificationCode, setVerificationCode] = useState('');
     const verificationCodeRef = useRef<any | null>(null)
 
     const [isVerifiedEmail, setVerifiedEmail] = useState(false);
 
-    const [password, setPassWord] = useState('ww');
     const passwordRef = useRef<any | null>(null)
 
     const [confirmPassword, setConfirmPassword] = useState('');
     const confirmPasswordRef = useRef<any | null>(null)
 
-    const [club, setClub] = useState<club | null>(null)
 
-    const [grade, setGrade] = useState('');
     const gradeRef = useRef<any | null>(null)
 
-    const [name, setName] = useState('');
     const nameRef = useRef<any | null>(null)
-
-    const [nickkname, setNickName] = useState('');
-
 
     const [onSelectClub, setSelectClubVisible] = useState(false);
 
@@ -69,11 +70,11 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
     };
     useEffect(() => {
         Animated.timing(labelAnimation, {
-            toValue: club ? 1 : 0,
+            toValue: signUpInfo.club ? 1 : 0,
             duration: 100,
             useNativeDriver: false,
         }).start();
-    }, [club]);
+    }, [signUpInfo.club]);
 
     const checkVerifiedCode = useCallback(() => {
         const regex: RegExp = /^\d{6}$/;
@@ -82,15 +83,28 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
     }, [verificationCode])
 
     const dropdownCloseHandler = () => {
-        if (onSelectClub) club ? setClubisValid(true) : setClubisValid(false)
+        if (onSelectClub) signUpInfo.club ? setClubisValid(true) : setClubisValid(false)
         setSelectClubVisible(false)
     }
 
-    const ButtonHandler = useCallback(() => {
+    const ButtonHandler = useCallback(async () => {
         if (onStep == '이메일 인증') {
-            //여기에 처리과정 
-            if (verificationCodeRef.current?.validate())
-                setStep('비밀번호 설정')
+            if (verificationCodeRef.current?.validate()) {
+
+                const verified = await verifyingEmail(signUpInfo.email, verificationCode);
+
+                if (verified == 200) {
+                    setStep('비밀번호 설정')
+                    showEmailVirificationCompleteToast()
+                }
+                else if (verified == 405) {
+                    showUncorrectCodeToast();
+                } else if (verified == 403) {
+                    showExpiredCodeToast()
+                } else {
+                    showProblemToast()
+                }
+            }
         } if (onStep == '비밀번호 설정') {
             if (passwordRef.current?.validate() && confirmPasswordRef.current?.validate())
                 setStep('개인 정보 입력')
@@ -98,13 +112,13 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
             else if (!confirmPasswordRef.current?.validate()) confirmPasswordRef.current?.focus();
         }
         if (onStep == '개인 정보 입력') {
-            if (!club) setClubisValid(false);
+            if (!signUpInfo.club) setClubisValid(false);
             else if (!gradeRef.current?.validate()) gradeRef.current?.focus();
             else if (!nameRef.current?.validate()) nameRef.current?.focus();
-            else if (!nickkname) setAlertVisible(true);
+            else if (!signUpInfo.nickname) setAlertVisible(true);
             else { SignUp() }
         }
-    }, [isVerifiedEmail, onStep, passwordRef, club, gradeRef, nameRef, nickkname])
+    }, [signUpInfo, verificationCode])
 
 
     useEffect(() => {
@@ -112,13 +126,13 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
             setButtonAble(verificationCode.length == 6);
         }
         else if (onStep == '비밀번호 설정') {
-            if (password.length > 0 && confirmPassword.length > 0) { setButtonAble(true) }
+            if (signUpInfo.password.length > 0 && confirmPassword.length > 0) { setButtonAble(true) }
         }
         else if (onStep == '개인 정보 입력') {
-            if (isValidClub && grade.length == 2 && name.length > 1) { setButtonAble(true) }
+            if (isValidClub && signUpInfo.enrollmentNumber.length == 2 && signUpInfo.name.length > 1) { setButtonAble(true) }
         } else
             setButtonAble(false);
-    }, [onStep, verificationCode, password, confirmPassword, isValidClub, grade, name])
+    }, [onStep, verificationCode, signUpInfo.password, confirmPassword, isValidClub, signUpInfo.enrollmentNumber, signUpInfo.name])
 
 
     const ButtonText = () => {
@@ -130,10 +144,44 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
             default: return '이메일 인증'
         }
     }
-    const showSgignUpCompleteToast = () => {
+    const showSignUpCompleteToast = () => {
         Toast.show({
             type: 'success',
             text1: '회원 가입 신청을 완료했어요!',
+            position: 'bottom',
+            bottomOffset: 60,
+            visibilityTime: 2000
+        });
+    };
+    const showUncorrectCodeToast = () => {
+        Toast.show({
+            type: 'error',
+            text1: '인증번호가 틀렸어요.',
+            position: 'bottom',
+            bottomOffset: 60,
+            visibilityTime: 2000
+        });
+    };
+    const showExpiredCodeToast = () => {
+        Toast.show({
+            type: 'error',
+            text1: '만료된 인증번호에요!',
+            position: 'bottom',
+            bottomOffset: 60,
+            visibilityTime: 2000
+        });
+    }; const showEmailVirificationCompleteToast = () => {
+        Toast.show({
+            type: 'success',
+            text1: '이메일이 인증됐어요!',
+            position: 'bottom',
+            bottomOffset: 60,
+            visibilityTime: 2000
+        });
+    }; const showProblemToast = () => {
+        Toast.show({
+            type: 'error',
+            text1: '문제가 발생했어요. 잠시후에 시도해주세요',
             position: 'bottom',
             bottomOffset: 60,
             visibilityTime: 2000
@@ -143,46 +191,63 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
     const SignUp = async () => {
         const controller = new AbortController();
         const signal = controller.signal;
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 10초 타임아웃
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃
         setLoading(true);
+
         try {
-            const response = await fetch(`${BASBASE_URL}/auth/signup`, {
+            const response = await fetch(`${process.env.BASE_URL}/auth/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(
-                    {
-                        "email": Email,
-                        "username": name,
-                        "password1": password,
-                        "password2": confirmPassword,
-                        "club": club
-                    }
+                    { ...signUpInfo, enrollmentNumber: Number(signUpInfo.enrollmentNumber), club: "HWARANG", nickname: 'nullableCheck' }
                 ),
+                // 이거 넣어야함 {clubsEng[clubs.indexOf(signUpInfo.club??'기타')]}
                 signal
             });
 
-            clearTimeout(timeoutId); // 타임아웃 취소
-
             if (response.ok) {
-                showSgignUpCompleteToast();
+                showSignUpCompleteToast();
                 navigation.goBack();
             } else {
                 console.error('서버에서 데이터 가져오기 실패: ', response.status);
             }
-        } catch (error) {
-            console.error(error)
+        } catch (error: unknown) {
+            // 에러가 Error 객체인지 확인
+            if (error instanceof Error) {
+                if (error.name === 'AbortError') {
+                    console.error('요청이 타임아웃으로 인해 중단되었습니다.');
+                } else {
+                    console.error('요청 중 에러 발생: ', error.message);
+                }
+            } else {
+                console.error('알 수 없는 에러 발생: ', error);
+            }
         } finally {
+
+            clearTimeout(timeoutId); // 타임아웃 취소
             setLoading(false)
         }
 
     };
 
+    const explain = () => {
+        switch (onStep) {
+            case '비밀번호 설정':
+                return '로그인에 사용할 비밀번호를 정해요.'
+            case '개인 정보 입력':
+                return '앱 이용에 사용될 정보를 등록해요'
+            default:
+                return '로그인에 사용할 이메일을 등록하고 인증해요.'
+        }
+    }
+
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); dropdownCloseHandler(); }} >
             <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#FFF" }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}>
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+
                     <Text style={{
                         alignSelf: 'flex-start',
                         height: 40,
@@ -192,20 +257,27 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
                         lineHeight: 26,
                         fontFamily: "NanumSquareNeo-Bold",
                     }}>회원가입</Text>
-                    <View style={{ marginTop: 24, alignSelf: 'center' }}>
+                    <View style={{
+                        marginVertical: 8, paddingHorizontal: 16, marginHorizontal: 36, backgroundColor: Color['grey100'], paddingVertical: 16, borderRadius: 5
+                    }}>
+                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'] }}>
+                            {explain()}</Text>
+                    </View>
+                    <View style={{ alignSelf: 'center' }}>
                         {onStep == '이메일 검증' ?
                             <EmailConfirmComponent
                                 setStep={setStep}
+                                isEditible
                             />
                             : onStep == '이메일 인증' ?
                                 <EmailConfirmComponent
                                     setStep={setStep}
                                     isEditible={false}
-                                /> :
+                                /> : onStep != '비밀번호 설정' &&
                                 <InputComponent
                                     label='이메일'
                                     color={'green'}
-                                    inputValue={Email}
+                                    inputValue={signUpInfo.email}
                                     setInputValue={setEmail}
                                     isEditible={false}
                                 />
@@ -218,6 +290,7 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
                                 ref={verificationCodeRef}
                                 inputValue={verificationCode}
                                 setInputValue={setVerificationCode}
+                                keyboardType='number-pad'
                                 isRequired={true}
                                 label='인증번호'
                                 color={'green'}
@@ -230,9 +303,22 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
                                 }
                             />}
                         {(onStep == '비밀번호 설정' || onStep == '개인 정보 입력') &&
-                            <PWInputComponent
-                                isEditible={onStep == '비밀번호 설정'}
-                            />}
+                            <View>
+                                <InputComponent
+                                    ref={passwordRef}
+                                    label='비밀번호'
+                                    color={'green'}
+                                    isEncryption
+                                    inputValue={signUpInfo.password}
+                                    setInputValue={setPassword}
+                                    isEditible={onStep == '비밀번호 설정'}
+                                    validationCondition={
+                                        [{
+                                            validation: vaildatePassword,
+                                            errorText: "영문, 숫자, 특수문자(!,@,#,$,%,^,&,+,=)를\n포함한 8~12자로 구성되어야 합니다."
+                                        }]}
+                                />
+                            </View>}
                         {onStep == '비밀번호 설정' &&
                             <View style={{ marginTop: 24 }}>
                                 <InputComponent
@@ -245,7 +331,7 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
                                     validationCondition={[
                                         {
                                             validation: () => {
-                                                const newCondition = password == confirmPassword
+                                                const newCondition = signUpInfo.password == confirmPassword
 
                                                 console.log(confirmPassword, newCondition)
                                                 return newCondition;
@@ -263,10 +349,10 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
                                         onPress={() => { Keyboard.dismiss(); setSelectClubVisible(true); }}>
 
                                         <Animated.Text style={[styles.labelText, labelStyle]}>{'동아리'}
-                                            {!club && <Text style={{ color: 'red' }}>*</Text>}</Animated.Text>
+                                            {!signUpInfo.club && <Text style={{ color: 'red' }}>*</Text>}</Animated.Text>
 
                                         <View style={[styles.InputBox, { flexDirection: 'row', justifyContent: 'space-between', width: 126, alignItems: 'center' }]}>
-                                            <Text style={[styles.InputText, club == null && { color: Color['grey300'] }]}>{club ?? '동아리 선택'}</Text>
+                                            <Text style={[styles.InputText, signUpInfo.club == null && { color: Color['grey300'] }]}>{signUpInfo.club ?? '동아리 선택'}</Text>
                                             <View style={{ width: 24, height: 12, backgroundColor: Color["green500"] }} />
                                         </View>
 
@@ -290,8 +376,8 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
                                                     key={item + 'seletor'}
                                                     style={{ paddingVertical: 8, marginVertical: 4, width: 142 - 32, alignItems: 'flex-start', justifyContent: 'space-between', flexDirection: 'row' }}
                                                     onPress={() => { setClub(item); setSelectClubVisible(false); setClubisValid(true); }}>
-                                                    <Text style={[{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, color: club == item ? Color['green600'] : Color['grey400'] }]}>{item}</Text>
-                                                    {club == item && <View style={{ width: 16, height: 16, backgroundColor: Color['green500'] }} />}
+                                                    <Text style={[{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, color: signUpInfo.club == item ? Color['green600'] : Color['grey400'] }]}>{item}</Text>
+                                                    {signUpInfo.club == item && <View style={{ width: 16, height: 16, backgroundColor: Color['green500'] }} />}
                                                 </Pressable>
                                             )
                                         })}</ScrollView>
@@ -301,8 +387,8 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
                                         ref={gradeRef}
                                         label='학번'
                                         length={126}
-                                        inputValue={grade}
-                                        setInputValue={setGrade}
+                                        inputValue={signUpInfo.enrollmentNumber}
+                                        setInputValue={setEnrollmentNumber}
                                         color={'green'}
                                         isRequiredMark={true}
                                         isRequired
@@ -313,7 +399,7 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
                                             [{
                                                 validation: () => {
                                                     const regex: RegExp = /^[\d@]{2}$/;
-                                                    const newCondition = regex.test(grade);
+                                                    const newCondition = regex.test(signUpInfo.enrollmentNumber);
                                                     return newCondition;
                                                 },
                                                 errorText: "두 자리가 필요해요"
@@ -325,7 +411,7 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
                                     ref={nameRef}
                                     label='이름(본명)'
                                     color={'green'}
-                                    inputValue={name}
+                                    inputValue={signUpInfo.name}
                                     setInputValue={setName}
                                     isEditible={true}
                                     isRequiredMark={true}
@@ -335,7 +421,7 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
                                 <InputComponent
                                     label='패명'
                                     color={'green'}
-                                    inputValue={nickkname}
+                                    inputValue={signUpInfo.nickname ?? ''}
                                     setInputValue={setNickName}
                                     isEditible={true}
                                     isRequired={false}
