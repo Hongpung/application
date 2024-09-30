@@ -2,7 +2,6 @@ import { FlatList, StyleSheet, Text, View, Dimensions, Pressable, ActivityIndica
 import React, { useCallback, useEffect, useState } from 'react'
 import { Color } from '../../ColorSet'
 import useFetch from '../../hoc/useFetch';
-import { BASBASE_URL } from '@env';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Reserve } from '../Home/MyClub/ClubCalendar/ClubCalendar';
 import { useFocusEffect } from '@react-navigation/native';
@@ -28,7 +27,7 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     // 토큰을 불러온 후 useFetch 실행
     const { data, loading, error } = useFetch<Reserve[]>(
-        token ? `${BASBASE_URL}/reservation/search` : ``,
+        token ? `${process.env.BASE_URL}/reservation/search` : ``,
         {
             method: 'GET',
             headers: {
@@ -38,7 +37,7 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             body: JSON.stringify({ date: new Date().toISOString() })
         }, 2000, [token]
     );
-
+    
     // if (loading)
     //     return (<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
     //         <View style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.6)' }}></View>

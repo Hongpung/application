@@ -7,7 +7,7 @@ type InputProps = {
     length?: number,
     label: string,
     isEncryption?: boolean,
-    validationCondition?: { validation: (value:string) => boolean, errorText: string }[]
+    validationCondition?: { validation: (value: string) => boolean, errorText: string }[]
     checkValid?: (valid: boolean) => void
     color?: string
     isEditible?: boolean
@@ -54,6 +54,11 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
         onFocus && onFocus();
     }, [onFocus]);
 
+    const errored = useCallback((text: string) => {
+        setIsValid(false);
+        setErrorText(text)
+    }, [])
+
     const validateInput = useCallback(() => {
         if (inputValue.length === 0 && isRequired) {
             setIsTyped(false);
@@ -82,6 +87,7 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
     useImperativeHandle(ref, () => ({
         ...(inputRef.current as any),// TextInput의 기본 메서드와 속성 복사
         validate: validateInput, // 추가 메서드
+        errored: (text: string) => { errored(text) },
         focus: () => inputRef.current?.focus(), // 기존 메서드
         blur: () => inputRef.current?.blur(),
     }));
@@ -116,6 +122,10 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
                 keyboardType={keyboardType}
                 maxLength={maxLength}
                 returnKeyType='done'
+                autoCapitalize='none'
+                clearTextOnFocus={false}
+                autoComplete='off'
+                multiline={false}
             />
             <View style={[styles.underline, { borderBottomColor: isValid ? underlineColor : Color["red500"], width: length + 16 }]} />
 
@@ -124,7 +134,7 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
                     style={[styles.VisibleBtn, { backgroundColor: isVisible ? "#000" : "#FFF" }]}
                     onPress={() => { setIsVisible(!isVisible) }} />
             }
-            {!isValid && <Text style={styles.errorText}>{errorText}</Text>}
+            {!isValid && errorText.length > 0 && <Text style={styles.errorText}>{errorText}</Text>}
         </View>
     );
 });

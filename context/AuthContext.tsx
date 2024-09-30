@@ -36,6 +36,8 @@ export const AuthProvider: React.FC<{ children: any }> = ({ children }) => {
             }
             const result = await response.json();
 
+            console.log(result)
+            
             if (result.token) {
                 const { token } = result;
                 setToken(token);

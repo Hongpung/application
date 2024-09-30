@@ -1,9 +1,13 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useCallback, useLayoutEffect, useState } from 'react'
 import { Color } from '../../../ColorSet'
 import { HomeStackParamList } from '../../../pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ProfileBoxCard from "../../../components/cards/PrifileBoxCard";
+import useFetch from '@hongpung/hoc/useFetch';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '@hongpung/context/AuthContext';
 
 
 type MyPageProps = NativeStackScreenProps<HomeStackParamList, 'MyPageHome'>;
@@ -15,19 +19,34 @@ const MyPageScreen: React.FC<MyPageProps> = ({ navigation }) => {
     }
     const myActivities: subMenu[] = [{ name: '내 일정', link: 'MySchedules' }, { name: '내 활동', link: 'MyPractices' }, { name: '내 배지', link: 'MyBadges' },]
     const Settings: subMenu[] = [{ name: '알림 설정', link: 'NotificationSetting' }, { name: '로그인 설정', link: 'LoginSetting' }, { name: '암호 잠금', link: '' }, { name: '앱 설정', link: '' },]
+    const { token } = useAuth();
+
+    const { data, loading, error } = useFetch<any>(
+        token ? `${process.env.BASE_URL}/member/status` : ``,
+        {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+            }
+        }, 2000, [token]
+    );
 
     return (
         <ScrollView style={styles.container}>
+            <Modal visible={loading} transparent={true}>
+                <View style={{ flex: 1, display: 'flex', backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' }}>
+                    <ActivityIndicator size={'large'} color={'#FFF'} />
+                </View>
+            </Modal>
             <ProfileBoxCard
                 isCard={false}
                 user={{
-                    club: '산틀',
-                    name: '홍길동',
-                    grade: 18,
-                    nickname: '길동색시',
-                    addRole: '상장구',
-                    instrument: '장구',
-                    badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG"
+                    club: data?.club,
+                    name: data?.name,
+                    grade: data?.enrollmentNumber,
+                    nickname: data?.nickname,
+                    addRole: data?.role,
+                    instrument: '장구'
                 }}
             />
             <View style={{ flexDirection: 'row', height: 20, justifyContent: 'flex-start', marginTop: 20, marginBottom: 16, marginHorizontal: 24 }}>

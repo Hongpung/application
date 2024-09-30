@@ -27,6 +27,7 @@ const useFetch = <T>(url: string | null, options: UseFetchOptions = {}, timeout:
       const timeoutId = setTimeout(() => controller.abort(), timeout);
 
       try {
+        
         console.log('fetching...')
         const response = await fetch(url, { ...options, signal });
         if (!response.ok) {

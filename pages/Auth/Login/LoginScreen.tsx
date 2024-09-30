@@ -77,8 +77,6 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
         try {
             const loginResult = await login(Email, password);
 
-            console.log(loginResult)
-            
             if (!loginResult) throw Error('로그인 정보 불일치')
 
             if (autoLogin) {
@@ -120,8 +118,16 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             }
 
             navigation.dispatch(StackActions.replace('HomeStack'))
-        } catch (e) {
-            console.error(e);
+        } catch (e: unknown) {
+            if (e instanceof Error) {
+                if (e.message == '로그인 정보 불일치') {
+                    IDRef.current?.errored('');
+                    PWRef.current?.errored('로그인에 실패하였습니다.\n계정을 확인해주세요');
+                    IDRef.current?.focus()
+                }
+            }
+
+            else console.error(e)
         }
     }
 
