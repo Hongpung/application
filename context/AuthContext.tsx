@@ -5,7 +5,7 @@ import { User } from '../UserType';
 interface AuthContextType {
     token: string | null;
     loginUser: User | null;
-    login: (username: string, password: string) => Promise<boolean>;
+    login: (email: string, password: string) => Promise<boolean>;
     logout: () => Promise<void>;
 }
 
@@ -21,15 +21,21 @@ export const AuthProvider: React.FC<{ children: any }> = ({ children }) => {
     const login = async (email: string, password: string) => {
         const timeoutId = setTimeout(() => controller.abort(), 5000);
         try {
+
+            const loginData = { email, password }
+
             const response = await fetch(`${process.env.BASE_URL}/auth/login`, {
                 method: 'POST',
-                body: JSON.stringify({ email, password }),
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(loginData),
                 signal
             });
+
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('Network response was not ok' + response.status);
             }
             const result = await response.json();
+
             if (result.token) {
                 const { token } = result;
                 setToken(token);

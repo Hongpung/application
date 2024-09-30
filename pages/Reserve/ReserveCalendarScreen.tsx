@@ -4,7 +4,6 @@ import { Color } from "../../ColorSet";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useFetch from "../../hoc/useFetch";
-import { BASE_URL } from '@env';
 import { Reserve, ReserveType } from "../Home/MyClub/ClubCalendar/ClubCalendar";
 
 const { width } = Dimensions.get(`window`);
@@ -38,7 +37,7 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
 
     // 토큰을 불러온 후 useFetch 실행
     const { data, loading, error } = useFetch<Reserve[]>(
-        token ? `${BASE_URL}/reservation/search` : ``,
+        token ? `${process.env.BASE_URL}/reservation/search` : ``,
         {
             method: 'GET',
             headers: {
@@ -117,10 +116,10 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
                     >
                         <Text style={[styles.CalendarText, (day == today.getDate()) && (calendarMonth.getMonth() == today.getMonth()) ? { color: Color['blue600'] } : null]}>{day}</Text>
                         <View style={{ marginHorizontal: 2, height: 16, flexDirection: 'column-reverse', marginTop: 4 }}>
-                            {reservedDates[day] && reservedDates[day].slice(0,3).map((type) => {
+                            {reservedDates[day] && reservedDates[day].slice(0,3).map((type,index) => {
                                 const color = type == 'regular' ? Color['blue500'] : type == 'none' ? Color['red500'] : Color['green500']
                                 return (
-                                    <View style={{ height: 4, backgroundColor: color, width: 28, borderRadius: 5, marginTop: 2 }} />
+                                    <View key={day+type+index} style={{ height: 4, backgroundColor: color, width: 28, borderRadius: 5, marginTop: 2 }} />
                                 )
                             })
                             }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TextInput, Animated, Pressable } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Animated, Pressable, Modal, ActivityIndicator } from 'react-native';
 import { Color } from '../../ColorSet';
 import { josa } from 'es-hangul';
 import Toast from 'react-native-toast-message';
@@ -110,7 +110,7 @@ const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkVali
     const [isSend, setIsSend] = useState(false);
     const [errorText, setErrorText] = useState(``)
     const labelAnimation = useRef(new Animated.Value(0)).current; // 애니메이션 초기 값
-
+    const [loading, setLoading] = useState(false);
     const [isVisible, setIsVisible] = useState(isEncryption || false);
 
     const underlineColor = Color[`green500`];
@@ -127,17 +127,24 @@ const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkVali
                 setErrorText("이미 가입된 이메일 입니다.")
             }
             else {
-                const sendResult = await sendVerificationCode(inputValue);
-                if (sendResult == 200) {
-                    setIsSend(true);
-                    if (checkValid) checkValid(true);
-                    showSendToast();
-                }
-                else if (sendResult == 403) {
-                    //횟수 최대 도달 알럿
-                    showErrorToast(sendResult)
-                } else {
-                    showErrorToast(sendResult)
+                try {
+                    setLoading(true);
+                    const sendResult = await sendVerificationCode(inputValue);
+                    if (sendResult == 200) {
+                        setIsSend(true);
+                        if (checkValid) checkValid(true);
+                        showSendToast();
+                    }
+                    else if (sendResult == 403) {
+                        //횟수 최대 도달 알럿
+                        showErrorToast(sendResult)
+                    } else {
+                        showErrorToast(sendResult)
+                    }
+                } catch (e) {
+                    console.error(e)
+                } finally {
+                    setLoading(false);
                 }
             }
         }
@@ -259,6 +266,11 @@ const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkVali
                 onPress={SendCodeHandler}>
                 <Text style={styles.buttonText}>{isSend ? '인증번호\n재전송' : '인증번호\n전송'}</Text>
             </Pressable>
+            <Modal transparent visible={loading}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <ActivityIndicator size={'large'} color={'#FFF'} />
+                </View>
+            </Modal>
         </View>
     );
 }

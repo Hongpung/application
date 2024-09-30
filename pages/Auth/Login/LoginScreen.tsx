@@ -77,6 +77,8 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
         try {
             const loginResult = await login(Email, password);
 
+            console.log(loginResult)
+            
             if (!loginResult) throw Error('로그인 정보 불일치')
 
             if (autoLogin) {

@@ -91,18 +91,26 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
         if (onStep == '이메일 인증') {
             if (verificationCodeRef.current?.validate()) {
 
-                const verified = await verifyingEmail(signUpInfo.email, verificationCode);
+                try {
+                    setLoading(true);
 
-                if (verified == 200) {
-                    setStep('비밀번호 설정')
-                    showEmailVirificationCompleteToast()
-                }
-                else if (verified == 405) {
-                    showUncorrectCodeToast();
-                } else if (verified == 403) {
-                    showExpiredCodeToast()
-                } else {
-                    showProblemToast()
+                    const verified = await verifyingEmail(signUpInfo.email, verificationCode);
+
+                    if (verified == 200) {
+                        setStep('비밀번호 설정')
+                        showEmailVirificationCompleteToast()
+                    }
+                    else if (verified == 405) {
+                        showUncorrectCodeToast();
+                    } else if (verified == 403) {
+                        showExpiredCodeToast()
+                    } else {
+                        showProblemToast()
+                    }
+                } catch (e) {
+                    console.error(e)
+                } finally {
+                    setLoading(false);
                 }
             }
         } if (onStep == '비밀번호 설정') {
@@ -201,7 +209,7 @@ const SignUpScreen: React.FC<SignUpProps> = ({ navigation }) => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(
-                    { ...signUpInfo, enrollmentNumber: Number(signUpInfo.enrollmentNumber), club: "HWARANG", nickname: 'nullableCheck' }
+                    { ...signUpInfo, enrollmentNumber: Number(signUpInfo.enrollmentNumber), club: "SANTLE", nickname: '널 허용 왜 안 해' }
                 ),
                 // 이거 넣어야함 {clubsEng[clubs.indexOf(signUpInfo.club??'기타')]}
                 signal
