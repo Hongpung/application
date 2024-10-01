@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
         color: Color['grey800'],
         fontSize: 16,
         height: 36,
-        fontFamily: 'NanumSquareNeo-Bold',
+        fontFamily: 'NanumSquareNeo-Regular',
         paddingTop: 8,
         marginLeft: 8,
         placeholderTextColor: Color['grey500']

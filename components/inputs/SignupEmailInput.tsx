@@ -6,7 +6,6 @@ import Toast from 'react-native-toast-message';
 
 type InputProps = {
     label: string,
-    isEncryption?: boolean,
     checkValid?: (valid: boolean) => void,
     color?: string
     isEditible?: boolean
@@ -103,7 +102,7 @@ const sendVerificationCode = async (email: string) => {
 }
 
 
-const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkValid, isEditible = true, inputValue, setInputValue }) => {
+const SignUpEmailInput: React.FC<InputProps> = ({ label, checkValid, isEditible = true, inputValue, setInputValue }) => {
 
     const [isTyped, setIsTyped] = useState(false);
     const [isValid, setIsValid] = useState(true);
@@ -111,7 +110,6 @@ const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkVali
     const [errorText, setErrorText] = useState(``)
     const labelAnimation = useRef(new Animated.Value(0)).current; // 애니메이션 초기 값
     const [loading, setLoading] = useState(false);
-    const [isVisible, setIsVisible] = useState(isEncryption || false);
 
     const underlineColor = Color[`green500`];
 
@@ -237,30 +235,17 @@ const SignUpEmailInput: React.FC<InputProps> = ({ label, isEncryption, checkVali
     return (
         <View style={styles.inputGroup}>
             <View style={[styles.underline, { borderBottomColor: isValid ? underlineColor : Color["red500"] }]} />
-            {isEncryption ? <TextInput
+            <TextInput
                 style={styles.InputBox}
                 placeholder={josa(label, '을/를') + ' 입력하세요'}
                 value={inputValue}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 onChangeText={handleTextChange}
-                secureTextEntry={isVisible} />
-                :
-                <TextInput
-                    style={styles.InputBox}
-                    placeholder={josa(label, '을/를') + ' 입력하세요'}
-                    value={inputValue}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                    onChangeText={handleTextChange}
-                    editable={isEditible}
-                />
-            }
+                editable={isEditible}
+                multiline={false}
+            />
             <Animated.Text style={[styles.labelText, labelStyle]}>{label}</Animated.Text>
-            {isEncryption ?
-                <Pressable style={{ position: 'absolute', left: 273, top: 26, width: 18, height: 18, borderWidth: 1, borderColor: "#000", backgroundColor: isVisible ? "#000" : "#FFF" }}
-                    onPress={() => { setIsVisible(!isVisible) }} />
-                : null}
             {!isValid ? <Text style={styles.errorText}>{errorText}</Text> : null}
             <Pressable style={styles.button}
                 onPress={SendCodeHandler}>
@@ -293,7 +278,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         color: Color['grey800'],
         fontSize: 16,
-        fontFamily: 'NanumSquareNeo-Bold',
+        fontFamily: 'NanumSquareNeo-Regular',
         lineHeight: 22,
         top: 22,
         left: 8,
