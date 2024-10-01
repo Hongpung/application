@@ -1,16 +1,17 @@
-import { Keyboard, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, KeyboardAvoidingView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import InputComponent from '../../../components/inputs/InputComponent'
-import { Color } from '../../../ColorSet'
-import LongButton from '../../../components/buttons/LongButton'
-import CheckboxComponent from '../../../components/checkboxs/CheckboxComponent'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { RootStackParamList } from '../../../pageTypes'
-import Toast from 'react-native-toast-message'
-import { useAuth } from '../../../context/AuthContext'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { StackActions } from '@react-navigation/native'
+import Toast from 'react-native-toast-message'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { debounce } from 'lodash'
+
+import { RootStackParamList } from '@hongpung/pageTypes'
+import { useAuth } from '@hongpung/hoc/useAuth'
+import InputComponent from '@hongpung/components/inputs/InputComponent'
+import { Color } from '@hongpung/ColorSet'
+import LongButton from '@hongpung/components/buttons/LongButton'
+import CheckboxComponent from '@hongpung/components/checkboxs/CheckboxComponent'
 
 
 
@@ -56,9 +57,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                 }
             } catch (e) { console.error(e) }
         }
-
         loadAutoLogin()
-
     }, [])
 
     const LoginBtnHandler = async () => {
@@ -74,6 +73,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             PWRef.current?.focus();
             return
         }
+        
         try {
             const loginResult = await login(Email, password);
 
@@ -164,6 +164,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                             inputValue={Email}
                             setInputValue={setEmail}
                             label='이메일'
+                            keyboardType={'email-address'}
                             validationCondition={
                                 [{
                                     validation: () => {

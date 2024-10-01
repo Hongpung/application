@@ -15,7 +15,7 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
 
     const RoleTextRender = () => {
         if (user.isCapt) return "패짱"
-        if (user.addRole) { return user.addRole }
+        if (user.role) { return user.role }
         return "동아리원"
     }
 
@@ -24,8 +24,8 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
         <View style={[styles.ProfileContainer, isCard ? { marginHorizontal: 0, paddingHorizontal: 8, paddingVertical: 8 } : null]}>
             <View style={{ flex: 1, marginHorizontal: 12, marginTop: 24 }}>
                 <View style={{ flexDirection: 'row', flex: 1 }}>
-                    {user.ProfileUri ?
-                        <Image source={{ uri: user.ProfileUri }} style={styles.ProfilePhoto} /> :
+                    {user.profileImageUrl ?
+                        <Image source={{ uri: user.profileImageUrl }} style={styles.ProfilePhoto} /> :
                         <View style={[styles.ProfilePhoto, { backgroundColor: Color['grey200'], borderWidth:1, borderColor:Color['grey300']}]} />}
                     <View style={{
                         flex: 1,
@@ -64,10 +64,10 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
                     <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>이름(패명)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{user.name}{user.nickname ? `(${user.nickname})` : ''}</Text>
                 </View>
                 <View style={styles.info}>
-                    <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{user.club + `(${user.grade})`}</Text>
+                    <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{user.club + `(${user.enrollmentNumber})`}</Text>
                 </View>
                 <View style={styles.info}>
-                    <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>역할</Text><Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'right', color: user.addRole == '상쇠' ? Color['red500'] : Color['blue500'], }}>{RoleTextRender()}</Text>
+                    <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>역할</Text><Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'right', color: user.role == '상쇠' ? Color['red500'] : Color['blue500'], }}>{RoleTextRender()}</Text>
                 </View>
 
             </View>

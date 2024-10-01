@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, Alert, Linking, AppState } from 'react-native'
 import * as Notifications from 'expo-notifications';
 import React, { useEffect, useState } from 'react'
-import { Color } from '../../ColorSet';
-import CustomSwitch from '../../components/CustomSwitch';
+import { Color } from '@hongpung/ColorSet';
+import CustomSwitch from '@hongpung/components/CustomSwitch';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const NotificationSettingScreen: React.FC = () => {
@@ -34,14 +34,14 @@ const NotificationSettingScreen: React.FC = () => {
         if (isEnabled) {
             const { status } = await Notifications.requestPermissionsAsync();
             if (status === 'granted') {
-            setIsEnabled(false);
-        }else {
-            Alert.alert(
-                '알림 권한 거부',
-                '알림 권한이 거부되었습니다. 시스템 설정에서 권한을 부여해야 알림을 받을 수 있습니다.',
-                [{ text: '확인', onPress: () => { Linking.openSettings(); } }]
-            );
-        }
+                setIsEnabled(false);
+            } else {
+                Alert.alert(
+                    '알림 권한 거부',
+                    '알림 권한이 거부되었습니다. 시스템 설정에서 권한을 부여해야 알림을 받을 수 있습니다.',
+                    [{ text: '확인', onPress: () => { Linking.openSettings(); } }]
+                );
+            }
         } else {
             const { status } = await Notifications.requestPermissionsAsync();
             if (status === 'granted') {

@@ -1,15 +1,46 @@
 import { useRecoilState } from 'recoil';
-import { tokenState, loginUserState } from '../recoil/authState';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { User } from '../UserType';
+import { loginUserState } from '@hongpung/recoil/authState';
+import { User } from '@hongpung/UserType';
+import { deleteToken, getToken, saveToken } from '@hongpung/utils/TokenHandler';
 
 export const useAuth = () => {
-  const [token, setToken] = useRecoilState(tokenState);
   const [loginUser, setLoginUser] = useRecoilState(loginUserState);
 
   // AbortController는 여기서 생성하여 요청에 사용
   const controller = new AbortController();
   const signal = controller.signal;
+
+  const checkValidToken = async (): Promise<boolean> => {
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    try {
+      const token = await getToken('token');
+
+      if (token) {
+        const loadUser = await fetch(`${process.env.BASE_URL}/member/status`,
+          {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+            }
+          }
+        )
+
+        const userStatus = await loadUser.json() as User;
+
+        setLoginUser(userStatus);
+
+        console.log(userStatus);
+        // Recoil 상태 업데이트
+        return true;
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+    return false;
+  };
+
 
   const login = async (email: string, password: string): Promise<boolean> => {
     const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -29,12 +60,26 @@ export const useAuth = () => {
 
       const result = await response.json();
 
-      console.log(result);
-
       if (result.token) {
         const { token } = result;
-        setToken(token); // Recoil 상태 업데이트
-        await AsyncStorage.setItem('token', token); // AsyncStorage에 저장
+
+        const loadUser = await fetch(`${process.env.BASE_URL}/member/status`,
+          {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+            }
+          }
+        )
+
+        const userStatus = await loadUser.json() as User;
+
+        await saveToken('token', token);
+
+        setLoginUser(userStatus);
+
+        console.log(userStatus);
+        // Recoil 상태 업데이트
         return true;
       }
     } catch (e) {
@@ -46,15 +91,14 @@ export const useAuth = () => {
   };
 
   const logout = async () => {
-    await AsyncStorage.removeItem('token');
-    setToken(null);
+    await deleteToken('token');
     setLoginUser(null);
   };
 
   return {
-    token,
     loginUser,
     login,
     logout,
+    checkValidToken
   };
 };

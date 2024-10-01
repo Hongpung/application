@@ -241,9 +241,14 @@ const SignUpEmailInput: React.FC<InputProps> = ({ label, checkValid, isEditible 
                 value={inputValue}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
+                keyboardType='email-address'
                 onChangeText={handleTextChange}
                 editable={isEditible}
                 multiline={false}
+                autoCapitalize='none'
+                returnKeyType='done'
+                clearTextOnFocus={false}
+                autoComplete='off'
             />
             <Animated.Text style={[styles.labelText, labelStyle]}>{label}</Animated.Text>
             {!isValid ? <Text style={styles.errorText}>{errorText}</Text> : null}

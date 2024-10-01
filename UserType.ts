@@ -22,13 +22,14 @@ export type Instrument = {
 }
 
 export type User = {
+    memberId:any
     name: string
     nickname?: string
     club: club
     instrument: InstrumentType
-    grade: number
+    enrollmentNumber: number
     isCapt?: boolean
-    addRole?: Role
+    role?: Role
     badge?: string//url임
-    ProfileUri?:string
+    profileImageUrl?:string
 }

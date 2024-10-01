@@ -15,23 +15,23 @@ const UsingManageScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             nickname: "길동이",
             club: "들녘",
             instrument: "쇠",
-            grade: 3,
+            enrollmentNumber: 3,
             isCapt: true,
-            addRole: "상쇠",
+            role: "상쇠",
             badge: "https://example.com/badge1.png"
         },
         {
             name: "이영희",
             club: "산틀",
             instrument: "장구",
-            grade: 2,
+            enrollmentNumber: 2,
         },
         {
             name: "김철수",
             nickname: "철이",
             club: "신명화랑",
             instrument: "북",
-            grade: 13,
+            enrollmentNumber: 13,
             isCapt: false,
             badge: "https://example.com/badge2.png"
         },
@@ -39,8 +39,8 @@ const UsingManageScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             name: "박민수",
             club: "악반",
             instrument: "소고",
-            grade: 1,
-            addRole: "수법고",
+            enrollmentNumber: 1,
+            role: "수법고",
             badge: "https://example.com/badge3.png"
         },
         {
@@ -48,22 +48,22 @@ const UsingManageScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             nickname: "지우",
             club: "들녘",
             instrument: "새납",
-            grade: 5,
+            enrollmentNumber: 5,
         },
         {
             name: "한가영",
             club: "산틀",
             instrument: "쇠",
-            grade: 14,
+            enrollmentNumber: 14,
             isCapt: true,
-            addRole: "상쇠",
+            role: "상쇠",
         },
         {
             name: "이정수",
             nickname: "정수",
             club: "신명화랑",
             instrument: "장구",
-            grade: 9,
+            enrollmentNumber: 9,
             isCapt: false,
         },
         {
@@ -71,24 +71,24 @@ const UsingManageScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             nickname: "민호",
             club: "악반",
             instrument: "북",
-            grade: 12,
-            addRole: "수북",
+            enrollmentNumber: 12,
+            role: "수북",
             badge: "https://example.com/badge4.png"
         },
         {
             name: "박수현",
             club: "들녘",
             instrument: "소고",
-            grade: 7,
+            enrollmentNumber: 7,
         },
         {
             name: "이하나",
             nickname: "하나",
             club: "산틀",
             instrument: "새납",
-            grade: 15,
+            enrollmentNumber: 15,
             isCapt: true,
-            addRole: "상장구",
+            role: "상장구",
         }
     ];
 

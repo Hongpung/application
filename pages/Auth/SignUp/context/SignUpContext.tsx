@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { club } from '../../../../UserType';
 
 
@@ -10,9 +10,12 @@ export type SignUpInfo = {
     name: string
     nickname: string | null
 };
+type step = "이메일 인증" | "비밀번호 설정" | "개인 정보 입력";
 
 interface SignUpContextProps {
     signUpInfo: SignUpInfo;
+    onStep: step;
+    setStep: (step: step) => void;
     setSignUpInfo: (info: SignUpInfo) => void;
     setEmail: (email: string) => void;
     setClub: (club: club) => void;
@@ -33,6 +36,7 @@ const SignUpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         name: '',
         nickname: null
     });
+    const [onStep, setStep] = useState<step>('이메일 인증')
 
     const setEmail = (email: string) => { setSignUpInfo(prev => ({ ...prev, email })) }
     const setClub = (club: club) => { setSignUpInfo(prev => ({ ...prev, club })) }
@@ -41,8 +45,14 @@ const SignUpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const setNickName = (nickname: string) => { setSignUpInfo(prev => ({ ...prev, nickname: nickname.length > 0 ? nickname : null })) }
     const setName = (name: string) => { setSignUpInfo(prev => ({ ...prev, name })) }
 
+
+    useEffect(() => {
+        console.log(signUpInfo)
+    }, [onStep])
     return (
         <SignUpContext.Provider value={{
+            onStep,
+            setStep,
             signUpInfo,
             setSignUpInfo,
             setEmail,

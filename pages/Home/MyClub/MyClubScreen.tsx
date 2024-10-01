@@ -67,9 +67,9 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                                 user={{
                                     name: '홍길동',
                                     nickname: '길동색시',
-                                    addRole: '상장구',
+                                    role: '상장구',
                                     club: '기타',
-                                    grade: 20,
+                                    enrollmentNumber: 20,
                                     instrument: '장구'
                                 }}
                                 isPicked={false}
@@ -87,9 +87,9 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                                     name: '임꺽정',
                                     isCapt: true,
                                     nickname: '길동색시',
-                                    addRole: '상쇠',
+                                    role: '상쇠',
                                     club: '기타',
-                                    grade: 14,
+                                    enrollmentNumber: 14,
                                     instrument: '새납'
                                 }}
                                 isPicked={false}

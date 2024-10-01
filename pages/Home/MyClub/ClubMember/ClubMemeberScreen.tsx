@@ -35,31 +35,31 @@ const ClubMemeberScreen: React.FC<ClubMembersProps> = ({ navigation }) => {
         nickname: '길동색시',
         badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG",
         club: "산틀",
-        grade: 18,
+        enrollmentNumber: 18,
         instrument: '소고',
         isCapt: true
     }, {
         name: "임꺽정",
         badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG",
         club: "산틀",
-        grade: 18,
+        enrollmentNumber: 18,
         instrument: "장구",
         isCapt: false,
-        addRole: '상장구'
+        role: '상장구'
     }, {
         name: "북꺽정",
         badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG",
         club: "산틀",
-        grade: 18,
+        enrollmentNumber: 18,
         instrument: '북',
         isCapt: false,
-        addRole: '수북'
+        role: '수북'
     }, {
         name: "임꺽정",
         club: "산틀",
-        grade: 18,
+        enrollmentNumber: 18,
         instrument: '쇠',
-        addRole: '상쇠'
+        role: '상쇠'
     }
     ]
 

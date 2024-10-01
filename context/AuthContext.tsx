@@ -1,9 +1,8 @@
 import React, { createContext, useState, useContext } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from '../UserType';
+import { deleteToken, saveToken } from '@hongpung/utils/TokenHandler';
 
 interface AuthContextType {
-    token: string | null;
     loginUser: User | null;
     login: (email: string, password: string) => Promise<boolean>;
     logout: () => Promise<void>;
@@ -12,7 +11,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: any }> = ({ children }) => {
-    const [token, setToken] = useState<string | null>(null);
     const [loginUser, setLoginUser] = useState<User | null>(null)
 
     const controller = new AbortController();
@@ -37,10 +35,10 @@ export const AuthProvider: React.FC<{ children: any }> = ({ children }) => {
             const result = await response.json();
 
             console.log(result)
-            
+
             if (result.token) {
                 const { token } = result;
-                setToken(token);
+                await saveToken('token', token);
                 return true;
             }
         } catch (e) {
@@ -52,13 +50,12 @@ export const AuthProvider: React.FC<{ children: any }> = ({ children }) => {
     };
 
     const logout = async () => {
-        await AsyncStorage.removeItem('token');
-        setToken(null);
+        await deleteToken('token');
         setLoginUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ token, loginUser, login, logout }}>
+        <AuthContext.Provider value={{ loginUser, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

@@ -8,6 +8,7 @@ import * as Notifications from 'expo-notifications';
 import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import { debounce } from 'lodash';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type PermissionProps = NativeStackScreenProps<RootStackParamList, "Permission">;
 
@@ -28,6 +29,8 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
     await Camera.requestCameraPermissionsAsync();
     await MediaLibrary.requestPermissionsAsync();
 
+    await AsyncStorage.setItem('isLaunched','true');
+    
     navigation.reset({
       index: 0,
       routes: [{ name: 'Login' }],

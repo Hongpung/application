@@ -136,8 +136,8 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                             <View style={{ alignItems: 'center', justifyContent: 'flex-end', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                                     <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', width: 120, marginLeft: 24, bottom: 8 }}>
-                                        {reservation.participants.slice(0, 4).map(user => (user.ProfileUri ? <Image
-                                            source={{ uri: user.ProfileUri }} style={{ width: 42, height: 56, }} /> : <View style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -4 * reservation.participants.length, borderRadius: 5 }} />))}
+                                        {reservation.participants.slice(0, 4).map(user => (user.profileImageUrl ? <Image
+                                            source={{ uri: user.profileImageUrl }} style={{ width: 42, height: 56, }} /> : <View style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -4 * reservation.participants.length, borderRadius: 5 }} />))}
                                     </View>
                                     <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', width: 152, bottom: 12 }}>
 

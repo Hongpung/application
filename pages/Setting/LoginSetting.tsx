@@ -1,12 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Color } from '../../ColorSet';
-import CustomSwitch from '../../components/CustomSwitch';
+import { Color } from '@hongpung/ColorSet';
+import CustomSwitch from '@hongpung/components/CustomSwitch';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import LongButton from '../../components/buttons/LongButton';
+import LongButton from '@hongpung/components/buttons/LongButton';
 import { StackActions } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '@hongpung/hoc/useAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginSettingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -17,23 +17,19 @@ const LoginSettingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         const getAutoLogin = async () => {
             try {
                 const prevAutoLogin = await AsyncStorage.getItem('autoLogin') ?? null
-
                 setAutoLogin(prevAutoLogin != null ?? false);
-
             } catch (e) {
                 console.error(e)
                 setAutoLogin(false)
             }
         }
-
         getAutoLogin();
-
     }, []);
 
     useEffect(() => {
         const removeAutoLogin = async () => {
             try {
-               await AsyncStorage.removeItem('autoLogin')
+                await AsyncStorage.removeItem('autoLogin')
             } catch (e) {
                 console.error(e)
                 setAutoLogin(false)
@@ -55,7 +51,6 @@ const LoginSettingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             visibilityTime: 3000
         });
     };
-
     const LogOutHandler = () => {
         logout();
         showLogOutToast();
@@ -80,6 +75,4 @@ const LoginSettingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     );
 }
 
-export default LoginSettingScreen
-
-const styles = StyleSheet.create({})
+export default LoginSettingScreen;
