@@ -1,10 +1,8 @@
-import { ActivityIndicator, Dimensions, FlatList, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
-import { Color } from '../../ColorSet';
-import useFetch from '../../hoc/useFetch';
-import { Reserve } from '../Home/MyClub/ClubCalendar/ClubCalendar';
-import { BASBASE_URL } from '@env';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ActivityIndicator, Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useCallback, useState } from 'react'
+import { Color } from '@hongpung/ColorSet';
+import useFetch from '@hongpung/hoc/useFetch';
+import { Reserve } from '@hongpung/pages/Home/MyClub/ClubCalendar/ClubCalendar';
 
 const { width } = Dimensions.get(`window`)
 
@@ -15,34 +13,14 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
     const today = new Date()
 
     const times = ['AM10', 'AM11', 'PM12', 'PM01', 'PM02', 'PM03', 'PM04', 'PM05', 'PM06', 'PM07', 'PM08', 'PM09', 'PM10'];
-    const [token, setToken] = useState<string | null>(null);
 
-    const loadToken = useCallback(() => {
-        const fetchToken = async () => {
-            const storedToken = await AsyncStorage.getItem('token');
-            setToken(storedToken);
-        };
-
-        fetchToken();
-    }, [])
-
-    useEffect(() => {
-        loadToken();
-    }, []);
-
-    // 토큰을 불러온 후 useFetch 실행
-    const { data, loading, error } = useFetch<Reserve[]>(
-        token ? `${BASBASE_URL}/reservation/search` : null,
+    const { data, loading, error } = useFetch<any[]>(
+        `${process.env.BASE_URL}/reservation/day?date=${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${(selectedDate.getDate()).toString().padStart(2, '0')}`,
         {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
-            },
-            body: JSON.stringify({ date: selectedDate.toISOString() })
-        }, 2000, [token, selectedDate]
-    );
+        }, 2000, [selectedDate]
+    )
 
+    console.log(data);
     // if (loading)
     //     return (<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
     //         <View style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.6)' }}></View>
@@ -129,7 +107,7 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
                     <Pressable style={styles.MonthBtn}
                         onPress={incrementMonth} />
                 </View>
-                {today <= selectedDate && <Pressable onPress={() => { navigation.push('Reservation') }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28, backgroundColor: Color['grey300'] }}>
+                {today <= selectedDate && <Pressable onPress={() => { navigation.push('Reservation', { date: new Date(date) }) }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28, backgroundColor: Color['grey300'] }}>
                     <Text style={{
                         fontFamily: "NanumSquareNeo-Bold", color: Color['blue500'],
                         fontSize: 18,
@@ -181,55 +159,37 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
                     </View>
                 </Modal> */}
 
-                {data && data?.map((reserve) => {
-                    const reserveTop = 12 + (reserve.startTime - 10) * 80;
-                    const reserveHeight = 80 * (reserve.endTime - reserve.startTime)
-                    const color = reserve.type == 'regular' ? Color['blue500'] : reserve.type == 'none' ? Color['red500'] : Color['green500']
+                {data?.length! > 0 && data?.map((reserve) => {
+                    const reserveTop = 12 + (Number(reserve.startTime.slice(0, 2)) - 10) * 80 ?? 0;
+                    const reserveHeight = 80 * (Number(reserve.endTime.slice(0, 2)) - Number(reserve.startTime.slice(0, 2))) ?? 5;
+                    console.log(reserve.reservationId)
+                    const color = reserve.type == '정기연습' ? Color['blue500'] : reserve.participationAvailable ? Color['green500'] : Color['red500'];
                     return (
-                        <View style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36 }}>
-                            <Text style={{ position: 'absolute', top: 10, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>{reserve.title}</Text>
+                        <Pressable style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36 }}
+                            onPress={() => { navigation.navigate('ReservationDetail', { reservationId: reserve.reservationId }) }}>
+                            <Text numberOfLines={1} style={{ position: 'absolute', width: width / 2, top: 10, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>{reserve.message}</Text>
 
                             <View style={{ position: 'absolute', top: 46, left: 14, flexDirection: 'row', alignItems: 'center' }}>
                                 <View style={{ height: 24, width: 24, backgroundColor: Color['grey200'], marginRight: 4 }} />
                                 <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>24</Text>
                             </View>
-                            {reserve.type == 'regular' ?
-                                <View style={{ position: 'absolute', top: 10, right: 14, alignItems: 'flex-end' }}>
-                                    <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }}>{reserve.name}</Text>
-                                    {reserve.nickname && <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{reserve.nickname}</Text>}
-                                </View> :
+                            {reserve.type == '정기연습' ?
                                 <View style={{ position: 'absolute', top: 0, right: 20, width: 28, height: 42, backgroundColor: Color['blue500'] }} />
+                                :
+                                <View style={{ position: 'absolute', top: 10, right: 14, alignItems: 'flex-end' }}>
+                                    <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }}>{reserve.creatorName}</Text>
+                                    {reserve.nickname && <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{reserve.nickname}</Text>}
+                                </View>
                             }
-                        </View>
+                        </Pressable>
                     )
                 })}
-
-                <View style={{ position: 'absolute', top: 92, width: width - 72, height: 80, borderRadius: 10, borderWidth: 2, borderColor: Color['blue500'], backgroundColor: '#FFF', marginHorizontal: 36 }}>
-                    <Text style={{ position: 'absolute', top: 10, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>설장구 연습</Text>
-
-                    <View style={{ position: 'absolute', top: 46, left: 14, flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={{ height: 24, width: 24, backgroundColor: Color['grey200'], marginRight: 4 }} />
-                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>24</Text>
-                    </View>
-                    <View style={{ position: 'absolute', top: 0, right: 20, width: 28, height: 42, backgroundColor: Color['blue500'] }} />
-                </View>
-
-                <View style={{ position: 'absolute', top: 332, width: width - 72, height: 200, borderRadius: 10, borderWidth: 2, borderColor: Color['green500'], backgroundColor: '#FFF', marginHorizontal: 36 }}>
-                    <Text style={{ position: 'absolute', top: 10, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>설장구 연습</Text>
-                    <View style={{ position: 'absolute', top: 46, left: 14, flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={{ height: 24, width: 24, backgroundColor: Color['grey200'], marginRight: 4 }} />
-                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>24</Text>
-                    </View>
-                    <View style={{ position: 'absolute', top: 10, right: 14, alignItems: 'flex-end' }}>
-                        <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }}>홍길동</Text>
-                        <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>길동색시</Text>
-                    </View>
-                    <Text style={{ position: 'absolute', bottom: 8, right: 14, fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>
-                        14:00~16:30
-                    </Text>
-                </View>
             </ScrollView>
-
+            <Modal visible={loading} transparent>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.8)' }}>
+                    <ActivityIndicator size={'large'} color={'#FFF'} />
+                </View>
+            </Modal>
             <View style={{ height: 20 }} />
         </View>
     )

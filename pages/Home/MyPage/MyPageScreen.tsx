@@ -1,10 +1,13 @@
 import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useCallback, useLayoutEffect, useMemo, useState } from 'react'
-import { Color } from '../../../ColorSet'
-import { HomeStackParamList } from '../../../pageTypes';
+import React, { useLayoutEffect, useMemo, useState } from 'react'
+import { Color } from '@hongpung/ColorSet'
+import { HomeStackParamList } from '@hongpung/pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import ProfileBoxCard from "../../../components/cards/PrifileBoxCard";
-import { useAuth } from '@hongpung/hoc/useAuth';
+import ProfileBoxCard from "@hongpung/components/cards/PrifileBoxCard";
+import { useRecoilCallback } from 'recoil';
+import { loginUserState } from '@hongpung/recoil/authState'
+import { User } from '@hongpung/UserType';
+import { StackActions } from '@react-navigation/native';
 
 
 type MyPageProps = NativeStackScreenProps<HomeStackParamList, 'MyPageHome'>;
@@ -14,10 +17,37 @@ const MyPageScreen: React.FC<MyPageProps> = ({ navigation }) => {
         name: string,
         link: string
     }
-    const myActivities: subMenu[] = useMemo(() => [{ name: '내 일정', link: 'MySchedules' }, { name: '내 활동', link: 'MyPractices' }, { name: '내 배지', link: 'MyBadges' },], [])
+    const myActivities: subMenu[] = useMemo(() => [{ name: '내 일정', link: 'MySchedules' }, { name: '내 활동', link: 'MyPractices' },], [])
     const Settings: subMenu[] = useMemo(() => [{ name: '알림 설정', link: 'NotificationSetting' }, { name: '로그인 설정', link: 'LoginSetting' }, { name: '암호 잠금', link: '' }, { name: '앱 설정', link: '' },], [])
+    const [loginUser, setUser] = useState<User | null>(null);
+    const [isloading, setLoading] = useState(true);
 
-    const { loginUser } = useAuth();
+    const loadUser = useRecoilCallback(({ snapshot }) => async () => {
+        const user = await snapshot.getPromise(loginUserState); // Recoil 상태 읽기
+        return user;
+    }, []);
+
+    useLayoutEffect(() => {
+        const checkUser = async () => {
+            const loadedUser = await loadUser(); // Recoil 상태 값 가져오기
+            if (!loadedUser) {
+                navigation.dispatch(StackActions.replace('Login')); // 로그인 페이지로 이동
+            } else {
+                setUser(loadedUser);
+            }
+            setLoading(false)
+        }
+        
+        checkUser();
+    }, [])
+
+
+    if (isloading)
+        return (
+            <View style={styles.container}>
+                <ActivityIndicator size={'large'} color={'#fff'} />
+            </View>
+        )
 
     return (
         <ScrollView style={styles.container}>

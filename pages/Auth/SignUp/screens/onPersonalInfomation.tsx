@@ -1,6 +1,6 @@
 import { Color } from "@hongpung/ColorSet";
 import InputComponent from "@hongpung/components/inputs/InputComponent";
-import { club, clubs } from "@hongpung/UserType";
+import { club, clubs, clubsEng } from "@hongpung/UserType";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, TouchableWithoutFeedback, View, Text, Pressable, ScrollView, Modal, ActivityIndicator, Dimensions } from "react-native";
 import { useSignUp } from "../context/SignUpContext";
@@ -9,7 +9,7 @@ import ShortButton from "@hongpung/components/buttons/ShortButton";
 import { showSignUpCompleteToast } from "../toasts/sign-up-toast";
 import { useNavigation } from "@react-navigation/native";
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 interface ClubSeletorProps {
 
@@ -87,7 +87,7 @@ const ClubSeletor: React.FC<ClubSeletorProps> = ({ club, setClub, isValidClub, s
     )
 }
 
-export const PersonalInformationCheck:React.FC = () => {
+export const PersonalInformationCheck: React.FC = () => {
 
     const navigation = useNavigation();
 
@@ -124,7 +124,7 @@ export const PersonalInformationCheck:React.FC = () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(
-                    { ...signUpInfo, enrollmentNumber: Number(signUpInfo.enrollmentNumber), club: "SANTLE", nickname: '널 허용 왜 안 해' }
+                    { ...signUpInfo, enrollmentNumber: Number(signUpInfo.enrollmentNumber), club: clubsEng[clubs.indexOf(signUpInfo.club!)], nickname: '널 허용 왜 안 해' }
                 ),
                 // 이거 넣어야함 {clubsEng[clubs.indexOf(signUpInfo.club??'기타')]}
                 signal

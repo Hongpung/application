@@ -1,44 +1,11 @@
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Color } from '../../ColorSet'
-import { club, clubs, InstrumentType, InstrumentTypes, User } from '../../UserType'
-import ProfileMiniCard from '../../components/cards/ProfileMiniCard'
-import { useReservation } from '../../context/ReservationContext'
-import LongButton from '../../components/buttons/LongButton'
-import Header from '../../components/Header'
-
-const originUsers: User[] = [{
-    name: "홍길동",
-    nickname: '길동색시',
-    badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG",
-    club: "산틀",
-    enrollmentNumber: 18,
-    instrument: '소고',
-    isCapt: true
-}, {
-    name: "임꺽정",
-    badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG",
-    club: "산틀",
-    enrollmentNumber: 11,
-    instrument: "장구",
-    isCapt: false,
-    role: '상장구'
-}, {
-    name: "북꺽정",
-    badge: "https://image.genie.co.kr/Y/IMAGE/IMG_ARTIST/042/307/533/42307533_1683708946356_31_600x600.JPG",
-    club: "산틀",
-    enrollmentNumber: 13,
-    instrument: '북',
-    isCapt: false,
-    role: '수북'
-}, {
-    name: "임꺽정",
-    club: "산틀",
-    enrollmentNumber: 12,
-    instrument: '쇠',
-    role: '상쇠'
-}
-]
+import { Color } from '../../../ColorSet'
+import { club, clubs, InstrumentType, InstrumentTypes, User } from '../../../UserType'
+import ProfileMiniCard from '../../../components/cards/ProfileMiniCard'
+import { useReservation } from '../../../context/ReservationContext'
+import LongButton from '../../../components/buttons/LongButton'
+import Header from '../../../components/Header'
 
 const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
@@ -56,14 +23,14 @@ const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation })
     }, [])
 
     useEffect(() => {
-        let newUsers = [...originUsers];
+        let newUsers = [...originList];
 
         if (userInstrumentType && club) {
-            newUsers = originUsers.filter(user => user.instrument === userInstrumentType && user.club === club);
+            newUsers = originList.filter(user => user.instrument === userInstrumentType && user.club === club);
         } else if (userInstrumentType) {
-            newUsers = originUsers.filter(user => user.instrument === userInstrumentType);
+            newUsers = originList.filter(user => user.instrument === userInstrumentType);
         } else if (club) {
-            newUsers = originUsers.filter(user => user.club === club);
+            newUsers = originList.filter(user => user.club === club);
         }
 
         if (descendingOrder) {
@@ -74,7 +41,7 @@ const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation })
 
         fiterUser(newUsers);
 
-    }, [club, userInstrumentType, descendingOrder, originUsers]);
+    }, [club, userInstrumentType, descendingOrder, originList]);
 
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>

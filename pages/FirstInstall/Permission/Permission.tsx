@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
     lineHeight: 14
   },
   CTA: {
+    width:'100%',
     position: 'absolute',
     bottom: 32
   }

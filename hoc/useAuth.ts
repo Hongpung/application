@@ -2,15 +2,17 @@ import { useRecoilState } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';
 import { User } from '@hongpung/UserType';
 import { deleteToken, getToken, saveToken } from '@hongpung/utils/TokenHandler';
+import { StackActions, useNavigation } from '@react-navigation/native';
 
 export const useAuth = () => {
   const [loginUser, setLoginUser] = useRecoilState(loginUserState);
+  const navigation = useNavigation();
 
   // AbortController는 여기서 생성하여 요청에 사용
   const controller = new AbortController();
   const signal = controller.signal;
 
-  const checkValidToken = async (): Promise<boolean> => {
+  const getUserInfo = async () => {
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
       const token = await getToken('token');
@@ -29,16 +31,13 @@ export const useAuth = () => {
 
         setLoginUser(userStatus);
 
-        console.log(userStatus);
-        // Recoil 상태 업데이트
-        return true;
       }
     } catch (e) {
       console.error(e);
+      navigation.dispatch(StackActions.replace('Login'))
     } finally {
       clearTimeout(timeoutId);
     }
-    return false;
   };
 
 
@@ -63,22 +62,8 @@ export const useAuth = () => {
       if (result.token) {
         const { token } = result;
 
-        const loadUser = await fetch(`${process.env.BASE_URL}/member/status`,
-          {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
-            }
-          }
-        )
-
-        const userStatus = await loadUser.json() as User;
-
         await saveToken('token', token);
-
-        setLoginUser(userStatus);
-
-        console.log(userStatus);
+        await getUserInfo();
         // Recoil 상태 업데이트
         return true;
       }
@@ -99,6 +84,6 @@ export const useAuth = () => {
     loginUser,
     login,
     logout,
-    checkValidToken
+    getUserInfo
   };
 };

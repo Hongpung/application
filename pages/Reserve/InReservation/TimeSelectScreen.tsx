@@ -1,11 +1,25 @@
 import { Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Color } from '../../ColorSet';
-import LongButton from '../../components/buttons/LongButton';
-import { useReservation } from '../../context/ReservationContext';
-import ShortButton from '../../components/buttons/ShortButton';
+import { Color } from '@hongpung/ColorSet';
+import LongButton from '@hongpung/components/buttons/LongButton';
+import { useReservation } from '@hongpung/context/ReservationContext';
+import ShortButton from '@hongpung/components/buttons/ShortButton';
+import useFetch from '@hongpung/hoc/useFetch';
+import { Reserve } from '@hongpung/pages/Home/MyClub/ClubCalendar/ClubCalendar';
 
 const { width } = Dimensions.get(`window`)
+
+interface briefReservation {
+    reservationId: number;              // 예약 ID
+    creatorName: string;                // 생성자 이름
+    date: string;                       // 예약 날짜 (YYYY-MM-DD 형식)
+    type: string;                       // 예약 유형
+    startTime: string;                  // 시작 시간 (HH:MM:SS 형식)
+    endTime: string;                    // 종료 시간 (HH:MM:SS 형식)
+    message: string;                    // 예약 메시지
+    participationAvailable: boolean;    // 참여 가능 여부
+    lastmodified: string;               // 마지막 수정 시간 (ISO 8601 형식)
+}
 
 const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const { reservation, setDate, setTime, setHasWait } = useReservation();
@@ -16,7 +30,7 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const today = new Date()
 
     const times = ['AM10', 'AM11', 'PM12', 'PM01', 'PM02', 'PM03', 'PM04', 'PM05', 'PM06', 'PM07', 'PM08', 'PM09', 'PM10'];
-    const occupiedTimes = ['AM10', 'AM11', 'PM06', 'PM07', 'PM08']
+    const [occupiedTimes, setOccupiedTimes] = useState<string[]>([])
 
     const renderWeekOfDate = useCallback((selectedDate: Date) => {
         const day = selectedDate.getDay() == 0 ? 7 : selectedDate.getDay();
@@ -34,7 +48,7 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             )
         }
         return week;
-    }, [])
+    }, [date])
 
     const formatTime = useCallback((hour: number): string => {
         let period = "AM";
@@ -82,6 +96,22 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             setTimeBlocks(loadedTimes);
         }
     }, [])
+
+    const { data, loading, error } = useFetch<briefReservation[]>(
+        `${process.env.BASE_URL}/reservation/day?date=${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${(date.getDate()).toString().padStart(2, '0')}`,
+        {
+        }, 2000, [date]
+    )
+
+    useEffect(() => {
+        const occupied: string[] = [];
+        data?.forEach(reserve => {
+            for (let i = Number(reserve.startTime.slice(0, 2)); i < Number(reserve.endTime.slice(0, 2)); i++)
+                occupied.push(formatTime(i))
+        }
+        )
+        setOccupiedTimes(occupied);
+    }, [data])
 
     const toggleTime = useCallback((time: string) => {
         // selectedTimes를 정렬된 상태로 유지

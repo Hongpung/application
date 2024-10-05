@@ -4,6 +4,7 @@ import { Color } from '../../ColorSet'
 import PagerView from 'react-native-pager-view';
 import { debounce } from 'lodash';
 import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
+import { useAuth } from '@hongpung/hoc/useAuth';
 
 interface Banner {
     backgroundColor: string,
@@ -13,16 +14,13 @@ interface Banner {
 
 const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
+    const { loginUser, getUserInfo } = useAuth();
+
     const [isUsed, setUsed] = useState(true);
     const [isSlideUp, setSlide] = useState(false);
     const [bannerNum, setBannerNum] = useState<number>(0);
     const [modalVisible, setModalVisible] = useState<boolean>(false);
     const pagerRef = useRef<PagerView>(null);//러페런스 추가
-
-    const user = {
-        name: `홍길동`,
-        club: `산틀`
-    }
     const today = new Date();
     const animatedValue = useRef(new Animated.Value(-82)).current; // 초기 bottom 값
 
@@ -76,7 +74,16 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
 
     useEffect(() => {
-        setUsed(true)
+        const loadUserinfo = async () => {
+
+            await getUserInfo();
+        }
+
+        setUsed(false)
+
+        if (!loginUser) {
+            loadUserinfo();
+        }
     }, [])
 
     return (
@@ -101,7 +108,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 {/* 상단 문구*/}
                 <View style={styles.textRow}>
                     <Text style={styles.dateText}>{today.getFullYear()}년 {today.getMonth() + 1}월 {today.getDate()}일</Text>
-                    <Text style={styles.greetingText}>{user.name}님 안녕하세요</Text>
+                    <Text style={styles.greetingText}>{loginUser?.name}님 안녕하세요</Text>
                 </View>
 
                 {/* 상단 일정*/}

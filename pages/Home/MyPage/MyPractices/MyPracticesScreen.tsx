@@ -1,13 +1,9 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react'
-import { Color } from '../../../../ColorSet'
-import PracticeCard from '../../../../components/cards/PracticeCard'
-import { club } from '../../../../UserType'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useFocusEffect } from '@react-navigation/native'
-import useFetch from '../../../../hoc/useFetch'
-import { BASBASE_URL } from '@env';
-import { Reserve } from '../../MyClub/ClubCalendar/ClubCalendar'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
+import { Color } from '@hongpung/ColorSet'
+import PracticeCard from '@hongpung/components/cards/PracticeCard'
+import useFetch from '@hongpung/hoc/useFetch'
+import { Reserve } from '@hongpung/pages/Home/MyClub/ClubCalendar/ClubCalendar'
 
 
 const MyPracticesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -16,132 +12,19 @@ const MyPracticesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [reserveList, setReserveList] = useState<Reserve[] | null>(null)
     const [calendarMonth, setMonth] = useState(new Date)
     const [reservedDates, setReservedDates] = useState<{ [key: number]: boolean[] }>([]);
-    const [token, setToken] = useState<string | null>(null);
 
-    const PrevPractices: Reserve[] = [
-        {
-            date: new Date('2024-08-11'),
-            title: '그냥 연습',
-            type: 'regular',
-            name: '홍길동',
-            nickname: '길동색시',
-            startTime: 17,
-            endTime: 19,
-            personnel: 10
-        },
-        {
-            date: new Date('2024-08-12'),
-            title: '개인 연습',
-            type: 'personal',
-            name: '이순신',
-            nickname: '이장군',
-            startTime: 10,
-            endTime: 12,
-            personnel: 10
-        },
-        {
-            date: new Date('2024-08-14'),
-            title: '정기 연습',
-            type: 'regular',
-            name: '김유신',
-            nickname: '김장군',
-            startTime: 15,
-            endTime: 18,
-            personnel: 12
-        },
-        {
-            date: new Date('2024-08-14'),
-            title: '개인 연습',
-            type: 'personal',
-            name: '유관순',
-            startTime: 18,
-            endTime: 21,
-            personnel: 9
-        },
-        {
-            date: new Date('2024-08-15'),
-            title: '정기 연습',
-            type: 'regular',
-            name: '안중근',
-            startTime: 14,
-            endTime: 17,
-            personnel: 10
-        },
-        {
-            date: new Date('2024-08-16'),
-            title: '개인 연습',
-            type: 'personal',
-            name: '윤봉길',
-            startTime: 12,
-            endTime: 14,
-            personnel: 12
-        },
-        {
-            date: new Date('2024-08-17'),
-            title: '정기 연습',
-            type: 'regular',
-            name: '장보고',
-            nickname: '장해적',
-            startTime: 16,
-            endTime: 19,
-            personnel: 82
-        },
-        {
-            date: new Date('2024-08-13'),
-            title: '개인 연습',
-            type: 'personal',
-            name: '이성계',
-            nickname: '태조',
-            startTime: 11,
-            endTime: 14,
-            personnel: 10
-        },
-        {
-            date: new Date('2024-08-19'),
-            title: '정기 연습',
-            type: 'regular',
-            name: '세종대왕',
-            nickname: '세종',
-            startTime: 13,
-            endTime: 16,
-            personnel: 11
-        },
-        {
-            date: new Date('2024-08-20'),
-            title: '개인 연습',
-            type: 'personal',
-            name: '광개토대왕',
-            nickname: '광개토',
-            startTime: 19,
-            endTime: 21,
-            personnel: 1
-        }
-    ];
-    
-    const loadToken = useCallback(() => {
-        const fetchToken = async () => {
-            const storedToken = await AsyncStorage.getItem('token');
-            setToken(storedToken);
-        };
 
-        fetchToken();
-    }, [])
-
-    useFocusEffect(() => {
-        loadToken();
-    });
 
     const { data, loading, error } = useFetch<Reserve[]>(
-        token ? `${BASBASE_URL}/reservation/search` : ``,
+        `${process.env.BASE_URL}/reservation/search`,
         {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({ date: new Date().toISOString() })
-            //개인 예약으로 바꿔야 함
-        }, 2000, [token, calendarMonth]
+
+        }, 2000, [calendarMonth]
     );
 
     useEffect(() => {
@@ -160,9 +43,10 @@ const MyPracticesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
 
     useEffect(() => {
-        if (!selectedDate) setReserveList(PrevPractices)
+        if (!selectedDate) setReserveList(data)
         else {
-            setReserveList(PrevPractices.filter((reserve) => reserve.date.getDate() == selectedDate.getDate()))
+            if (data)
+                setReserveList(data.filter((reserve) => reserve.date.getDate() == selectedDate.getDate()))
         }
     }, [selectedDate])
 

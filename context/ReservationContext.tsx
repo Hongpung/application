@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Instrument, User } from "../UserType"
+import { getToken } from '@hongpung/utils/TokenHandler';
+import { StackActions, useNavigation } from '@react-navigation/native';
 
 export type Reservation = {
     date: Date;
@@ -28,8 +30,10 @@ interface ReservationContextProps {
 const ReservationContext = createContext<ReservationContextProps | undefined>(undefined);
 
 const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+    const today = new Date();
+    today.setDate(today.getDate() + 1)
     const [reservation, setReservation] = useState<Reservation>({
-        date: new Date(),
+        date: today,
         Time: { startTime: 0, endTime: 0 },
         name: '',
         isRegular: false,
@@ -38,7 +42,6 @@ const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         borrowInstruments: [],
         hasToWait: false
     });
-
     const setDate = (date: Date) => { if (date > new Date()) setReservation(prev => ({ ...prev, date })); }
     const setTime = (startTime: number, endTime: number) => setReservation(prev => ({ ...prev, Time: { startTime, endTime } }));
     const setName = (name: string) => setReservation(prev => ({ ...prev, name }));

@@ -27,16 +27,12 @@ const MySchedulesScreen: React.FC = () => {
     const DateFormat = (selectedDate: Date): string => {
         return `${selectedDate.getUTCFullYear() + '.' + (selectedDate.getMonth() + 1) + '.' + selectedDate.getDate()}`
     }
-    const { token } = useAuth();
 
     const { data, loading, error } = useFetch<any>(
-        token ? `${process.env.BASE_URL}/reservation/todo` : ``,
+        `${process.env.BASE_URL}/reservation/todo`,
         {
             method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
-            }
-        }, 2000, [token]
+        }, 2000, []
     );
     // const RenderDailySchedules: React.FC = (ScheduleData: any) => {
 
@@ -81,7 +77,7 @@ const MySchedulesScreen: React.FC = () => {
     console.log(data, data?.length > 0)
     const renderBlankDay = () => {
         return (
-            <View style={[styles.Container,{justifyContent:'center'}]}>
+            <View style={[styles.Container, { justifyContent: 'center' }]}>
                 <View style={{ height: 70, marginTop: -120, justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={{ fontSize: 24, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey800'] }}>오늘 예정된 일정이 없어요!</Text>
                     <Pressable>

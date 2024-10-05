@@ -1,5 +1,5 @@
 import { FlatList, StyleSheet, Text, View, Dimensions, Pressable, ActivityIndicator, Modal } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Color } from '../../ColorSet'
 import useFetch from '../../hoc/useFetch';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,32 +10,16 @@ import { useFocusEffect } from '@react-navigation/native';
 const { width } = Dimensions.get('window');
 
 const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-    const [token, setToken] = useState<string | null>(null);
 
-    const loadToken = useCallback(() => {
-        const fetchToken = async () => {
-            const storedToken = await AsyncStorage.getItem('token');
-            setToken(storedToken);
-        };
-
-        fetchToken();
-    }, [])
-
-    useFocusEffect(() => {
-        loadToken();
-    });
-
-    // 토큰을 불러온 후 useFetch 실행
+    const today = new Date();
     const { data, loading, error } = useFetch<Reserve[]>(
-        token ? `${process.env.BASE_URL}/reservation/search` : ``,
+       `${process.env.BASE_URL}/reservation/day?date=${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()).toString().padStart(2, '0')}`,
         {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
-            },
-            body: JSON.stringify({ date: new Date().toISOString() })
-        }, 2000, [token]
+            }
+        }, 2000, []
     );
     
     // if (loading)
@@ -65,11 +49,11 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <View style={{ height: 12 }} />
                 <FlatList
                     contentContainerStyle={{ alignItems: 'center' }}
-                    data={[data]}
+                    data={data}
                     horizontal
                     pagingEnabled={true}
                     showsHorizontalScrollIndicator={false}
-                    keyExtractor={(item,index) => item && item[index]?.name || 'false'}
+                    keyExtractor={(item,index) => item && item?.name || 'false' + index}
                     snapToInterval={width - 28}
                     snapToAlignment="center"
                     decelerationRate="fast"
@@ -106,7 +90,7 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     <Text style={{ position: 'absolute', right: 8, top: 8, fontSize: 16, fontFamily: 'NanumSquareNeo-Heavy', color: '#FFF' }}>활동 조회</Text>
                 </Pressable>
             </View>
-            {!loading&&<View style={{ position: 'absolute', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.6)' }}>
+            {loading&&<View style={{ position: 'absolute', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.6)' }}>
                 <ActivityIndicator size={'large'} color={'#FFF'} />
             </View>}
         </View>

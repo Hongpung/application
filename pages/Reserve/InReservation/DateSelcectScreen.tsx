@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useState } from 'react'
-import { Calendar } from './ReserveCalendarScreen'
+import { Calendar } from '../ReserveCalendarScreen'
 import { useFocusEffect } from '@react-navigation/native';
-import { useReservation } from '../../context/ReservationContext';
+import { useReservation } from '../../../context/ReservationContext';
 
-const DateSelcectScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+const DateSelcectScreen: React.FC<{ navigation: any,  }> = ({ navigation  }) => {
 
     const [calendarDate, setCalendarDate] = useState(new Date())
     const { reservation, setDate } = useReservation();

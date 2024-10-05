@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Color } from '@hongpung/ColorSet';
 import CustomSwitch from '@hongpung/components/CustomSwitch';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -51,7 +51,11 @@ const LoginSettingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             visibilityTime: 3000
         });
     };
+
+    const autoLoginOff = useCallback(async () => { await AsyncStorage.removeItem('autoLogin') }, [])
+    
     const LogOutHandler = () => {
+        autoLoginOff();
         logout();
         showLogOutToast();
         navigation.dispatch(StackActions.replace('Login'));

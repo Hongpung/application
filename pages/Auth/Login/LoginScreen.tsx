@@ -33,30 +33,29 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
     useEffect(() => {
         const loadAutoLogin = async () => {
             try {
-                const loadedAutoLogin = await AsyncStorage.getItem('autoLogin')
-                setAutoLogin(loadedAutoLogin != null);
+                const loadedAutoLogin = await AsyncStorage.getItem('autoLogin')//오토 로그인 로두
+                setAutoLogin(loadedAutoLogin != null); 
 
                 if (loadedAutoLogin == null) {
-                    const loadedSaveID = await AsyncStorage.getItem('saveID')
+                    const loadedSaveID = await AsyncStorage.getItem('saveID')//오토
                     setSaveID(loadedSaveID != null);
 
                     if (loadedSaveID) {
-                        const loadedEmail = await AsyncStorage.getItem('Email') || '저장된 아이디';
+                        const loadedEmail = await AsyncStorage.getItem('Email') || '';
                         setEmail(loadedEmail)
                     }
 
                     return
                 }
                 else {
-                    const loadedEmail = await AsyncStorage.getItem('Email') || '저장된 아이디';
+                    const loadedEmail = await AsyncStorage.getItem('Email') || '';
                     setEmail(loadedEmail)
-                    const loadedPassWord = await AsyncStorage.getItem('password') || '저장된 비밀번호';
-                    setPassWord(loadedPassWord)
 
                     return
                 }
             } catch (e) { console.error(e) }
         }
+
         loadAutoLogin()
     }, [])
 
@@ -73,7 +72,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             PWRef.current?.focus();
             return
         }
-        
+
         try {
             const loginResult = await login(Email, password);
 
@@ -81,6 +80,9 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
             if (autoLogin) {
                 AsyncStorage.setItem('autoLogin', 'true');
+                await AsyncStorage.setItem('saveID', 'true')
+                await AsyncStorage.setItem('Email', Email)
+                
                 Toast.show({
                     type: 'success',
                     text1: '앞으로 앱 실행시 자동으로 로그인 돼요',
@@ -90,7 +92,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                 });
             }
 
-            else if (saveID) {        //     
+            else if (saveID) {
                 const autoLogin = await AsyncStorage.getItem('autoLogin') || false
                 if (autoLogin) {
                     try {
@@ -98,7 +100,8 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                     }
                     catch (e) { console.error(e) }
                 }
-                AsyncStorage.setItem('saveID', 'true')
+                await AsyncStorage.setItem('saveID', 'true')
+                await AsyncStorage.setItem('Email', Email)
                 Toast.show({
                     type: 'success',
                     text1: '아이디를 저장했어요',
@@ -107,8 +110,10 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                     visibilityTime: 3000
                 });
             }
+
             else {
                 const loadedSaveID = await AsyncStorage.getItem('saveID') || false
+
                 if (loadedSaveID) {
                     try {
                         await AsyncStorage.removeItem('saveID');
@@ -123,7 +128,6 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                 if (e.message == '로그인 정보 불일치') {
                     IDRef.current?.errored('');
                     PWRef.current?.errored('로그인에 실패하였습니다.\n계정을 확인해주세요');
-                    IDRef.current?.focus()
                 }
             }
 

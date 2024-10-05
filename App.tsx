@@ -16,7 +16,7 @@ import { Color } from '@hongpung/ColorSet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SignUpProvider } from '@hongpung/pages/Auth/SignUp/context/SignUpContext';
 import { RecoilRoot } from 'recoil';
-import { deleteToken } from './utils/TokenHandler';
+import { deleteToken, getToken } from './utils/TokenHandler';
 import { useAuth } from './hoc/useAuth';
 
 
@@ -106,7 +106,7 @@ const toastConfig = {
         }}
         {...rest}
       >
-        <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold', fontFamily: "NanumSquareNeo-Bold", textAlign: 'center' }}>
+        <Text style={{ color: '#FFF', fontSize: 14, fontFamily: "NanumSquareNeo-Bold", textAlign: 'center', lineHeight:20 }}>
           {text1}
         </Text>
       </View>
@@ -118,7 +118,7 @@ const toastConfig = {
 const ContentsContainer: React.FC<{ startDomain: string }> = ({ startDomain }) => {
   return (
     <NavigationContainer>
-      <RootStacks startDomain='Login' />
+      <RootStacks startDomain={startDomain} />
     </NavigationContainer>
   )
 }
@@ -145,7 +145,6 @@ const RootStacks: React.FC<{ startDomain: string }> = ({ startDomain }) => {
 }
 
 const App: React.FC = () => {
-  const { checkValidToken } = useAuth();
   const [fontLoaded, setFontLoaded] = useState(false);
   const [firstScreen, setFirstScreen] = useState<"Tutorial" | "Login" | "HomeStack" | null>(null);
 
@@ -156,16 +155,18 @@ const App: React.FC = () => {
 
   const FirstScreenSetting = async () => {
     const launchFlag = await AsyncStorage.getItem('isLaunched');
+
     if (!launchFlag) setFirstScreen("Tutorial")
     else {
       const autoLogin = await AsyncStorage.getItem('autoLogin');
       if (autoLogin) {
-        const validToken = await checkValidToken()
-        if (validToken) {
+
+        const token = await getToken('token');
+        if (token) {
           setFirstScreen('HomeStack')
           Toast.show({
             type: 'success',
-            text1: '자동 로그인 되었어요'+`(${(new Date().getMonth()+1).toString().padStart(2,'0')}.${(new Date().getDate()).toString().padStart(2,'0')})`,
+            text1: '자동 로그인 되었어요' + `(${(new Date().getMonth() + 1).toString().padStart(2, '0')}월${(new Date().getDate()).toString().padStart(2, '0')})일`,
             position: 'bottom',
             bottomOffset: 60,
             visibilityTime: 3000
@@ -175,7 +176,7 @@ const App: React.FC = () => {
           setFirstScreen('Login')
           Toast.show({
             type: 'fail',
-            text1: '자동 로그인이 만료되었어요. 다시 로그인 해주세요.',
+            text1: '자동 로그인이 만료되었어요.\n다시 로그인 해주세요.',
             position: 'bottom',
             bottomOffset: 60,
             visibilityTime: 3000

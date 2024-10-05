@@ -1,12 +1,11 @@
-import { Pressable, ScrollView, StyleSheet, Text, View, Image } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
-import { Instrument, instrumentOrder } from '../../UserType'
-import InstrumentCard from '../../components/cards/InstrumentCard'
-import { Color } from '../../ColorSet'
-import { InstrumentProvider, useInstrument } from '../Home/MyClub/Instruments/context/InstrumentContext'
-import LongButton from '../../components/buttons/LongButton'
-import { useReservation } from '../../context/ReservationContext'
-import Header from '../../components/Header'
+import { Pressable, ScrollView, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Instrument, instrumentOrder } from '../../../UserType'
+import InstrumentCard from '../../../components/cards/InstrumentCard'
+import { Color } from '../../../ColorSet'
+import LongButton from '../../../components/buttons/LongButton'
+import { useReservation } from '../../../context/ReservationContext'
+import Header from '../../../components/Header'
 
 const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const instruments: Instrument[] = [{

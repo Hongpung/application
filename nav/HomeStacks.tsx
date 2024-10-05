@@ -1,40 +1,42 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Header from '../components/Header';
-import NotificationScreen from '../pages/Home/Notification/NotificationScreen';
-import MyPageScreen from '../pages/Home/MyPage/MyPageScreen';
-import MySchedulesScreen from '../pages/Home/MyPage/MySchedule/MySchedulesScreen';
-import MyBadgeScreen from '../pages/Home/MyPage/MyBadge/MyBadgeScreen';
+import Header from '@hongpung/components/Header';
+import NotificationScreen from '@hongpung/pages/Home/Notification/NotificationScreen';
+import MyPageScreen from '@hongpung/pages/Home/MyPage/MyPageScreen';
+import MySchedulesScreen from '@hongpung/pages/Home/MyPage/MySchedule/MySchedulesScreen';
+import MyBadgeScreen from '@hongpung/pages/Home/MyPage/MyBadge/MyBadgeScreen';
 import BottomNav from './BottomNav';
-import MyClubScreen from '../pages/Home/MyClub/MyClubScreen';
-import ClubMemeberScreen from '../pages/Home/MyClub/ClubMember/ClubMemeberScreen';
-import ClubInstrumentsScreen from '../pages/Home/MyClub/Instruments/ClubInstrumentsScreen';
-import InstrumentSpecificScreen from '../pages/Home/MyClub/Instruments/InstrumentSpecificScreen';
-import InstrumentEditScreen from '../pages/Home/MyClub/Instruments/InstrumentEditScreen';
-import { InstrumentProvider, useInstrument } from "../context/InstrumentContext"
-import ClubCalendar from '../pages/Home/MyClub/ClubCalendar/ClubCalendar';
-import PracticeInfoScreen from '../pages/share/PracticeInfoScreen';
-import UsingManageScreen from '../pages/Home/UsingManageScreen';
-import NotificationSettingScreen from '../pages/Setting/NotificationSetting';
-import LoginSettingScreen from '../pages/Setting/LoginSetting';
-import ReserveCalendarScreen from '../pages/Reserve/ReserveCalendarScreen';
-import DailyReserveListScreen from '../pages/Reserve/DailyReserveListScreen';
-import ReservationScreen from '../pages/Reserve/ReservationScreen';
-import DateSelcectScreen from '../pages/Reserve/DateSelcectScreen';
-import TimeSelectScreen from '../pages/Reserve/TimeSelectScreen';
-import BorrowInstrumentSelectScreen from '../pages/Reserve/BorrowInstrumentSelectScreen';
-import ChatMediaViewerScreen from '../pages/Chat/ChatMediaViewerScreen';
-import { ReservationProvider } from '../context/ReservationContext';
-import ParticipantsSelectScreen from '../pages/Reserve/ParticipantsSelectScreen';
-import ReservationConfirmScreen from '../pages/Reserve/ReservationConfirmScreen';
-import CheckInScreen from '../pages/QRScan/CheckInScreen';
-import CheckOutScreen from '../pages/QRScan/CheckOutScreen';
-import CheckOutDescriptScreen from '../pages/QRScan/CheckOutDescriptScreen';
-import CheckOutCameraScreen from '../pages/QRScan/CheckOutCameraScreen';
-import PictureCheckScreen from '../pages/QRScan/PictureCheckScreen';
-import CheckOutEndScreen from '../pages/QRScan/CheckOutEndScreen';
-import ActivitiesScreen from '../pages/ExtaraActivities/ActivitiesListScreen';
-import MyPracticesScreen from '../pages/Home/MyPage/MyPractices/MyPracticesScreen';
+import MyClubScreen from '@hongpung/pages/Home/MyClub/MyClubScreen';
+import ClubMemeberScreen from '@hongpung/pages/Home/MyClub/ClubMember/ClubMemeberScreen';
+import ClubInstrumentsScreen from '@hongpung/pages/Home/MyClub/Instruments/ClubInstrumentsScreen';
+import InstrumentSpecificScreen from '@hongpung/pages/Home/MyClub/Instruments/InstrumentSpecificScreen';
+import InstrumentEditScreen from '@hongpung/pages/Home/MyClub/Instruments/InstrumentEditScreen';
+import { InstrumentProvider, useInstrument } from "@hongpung/context/InstrumentContext"
+import ClubCalendar from '@hongpung/pages/Home/MyClub/ClubCalendar/ClubCalendar';
+import PracticeInfoScreen from '@hongpung/pages/share/PracticeInfoScreen';
+import UsingManageScreen from '@hongpung/pages/Home/UsingManageScreen';
+import NotificationSettingScreen from '@hongpung/pages/Setting/NotificationSetting';
+import LoginSettingScreen from '@hongpung/pages/Setting/LoginSetting';
+import ReserveCalendarScreen from '@hongpung/pages/Reserve/ReserveCalendarScreen';
+import DailyReserveListScreen from '@hongpung/pages/Reserve/DailyReserveListScreen';
+import ReservationScreen from '@hongpung/pages/Reserve/InReservation/ReservationScreen';
+import DateSelcectScreen from '@hongpung/pages/Reserve/InReservation/DateSelcectScreen';
+import TimeSelectScreen from '@hongpung/pages/Reserve/InReservation/TimeSelectScreen';
+import BorrowInstrumentSelectScreen from '@hongpung/pages/Reserve/InReservation/BorrowInstrumentSelectScreen';
+import ChatMediaViewerScreen from '@hongpung/pages/Chat/ChatMediaViewerScreen';
+import { ReservationProvider } from '@hongpung/context/ReservationContext';
+import ParticipantsSelectScreen from '@hongpung/pages/Reserve/InReservation/ParticipantsSelectScreen';
+import ReservationConfirmScreen from '@hongpung/pages/Reserve/InReservation/ReservationConfirmScreen';
+import CheckInScreen from '@hongpung/pages/QRScan/CheckInScreen';
+import CheckOutScreen from '@hongpung/pages/QRScan/CheckOutScreen';
+import CheckOutDescriptScreen from '@hongpung/pages/QRScan/CheckOutDescriptScreen';
+import CheckOutCameraScreen from '@hongpung/pages/QRScan/CheckOutCameraScreen';
+import PictureCheckScreen from '@hongpung/pages/QRScan/PictureCheckScreen';
+import CheckOutEndScreen from '@hongpung/pages/QRScan/CheckOutEndScreen';
+import ActivitiesScreen from '@hongpung/pages/ExtaraActivities/ActivitiesListScreen';
+import MyPracticesScreen from '@hongpung/pages/Home/MyPage/MyPractices/MyPracticesScreen';
+import ReservationDetailScreen from '@hongpung/pages/Reserve/ViewDetailReservation/ReservationDetailScreen';
+import { NavigationContainer } from '@react-navigation/native';
 
 // HomeStack Navigator
 const MainStack = createNativeStackNavigator();
@@ -42,7 +44,9 @@ const MainStack = createNativeStackNavigator();
 const MainStacks = () => {
     return (
         <MainStack.Navigator initialRouteName="BottomNav" screenOptions={{ headerShown: false, animationDuration: 50, animation: 'slide_from_right' }}>
+            
             <MainStack.Screen name="BottomNav" component={BottomNav} options={{}} />
+            
             <MainStack.Screen
                 name="Notification"
                 component={NotificationScreen}
@@ -52,6 +56,7 @@ const MainStacks = () => {
                     header: () => <Header leftButton='X' HeaderName='알림' />
                 }}
             />
+            
             <MainStack.Screen
                 name="MyPage"
                 component={MyPageStacks}
@@ -87,7 +92,7 @@ const MainStacks = () => {
                     animation: 'none',
                 }} />
 
-                {/* 채팅 사진 화면 */}
+            {/* 채팅 사진 화면 */}
             <MainStack.Screen
                 name='ChatViewer'
                 component={ChatMediaViewerScreen}
@@ -193,7 +198,10 @@ const ReservationStacks = () => {
                     options={{
                         headerShown: true,
                         header: ({ navigation }) => <Header leftButton='<-' HeaderName='연습실 예약 조회' RightButton='예약'
-                            RightAction={() => navigation.push('Reservation')} />
+                            RightAction={() => {
+                                const newDate = new Date();
+                                navigation.push('Reservation', { date: newDate.setDate(newDate.getDate() + 1) })
+                            }} />
                     }}
                 />
                 <ReservationStack.Screen
@@ -201,6 +209,16 @@ const ReservationStacks = () => {
                     component={DailyReserveListScreen}
                     options={{
                         animation: 'none',
+                    }}
+                />
+
+                <ReservationStack.Screen
+                    name='ReservationDetail'
+                    component={ReservationDetailScreen}
+                    options={{
+                        animation: 'none',
+                        headerShown: true,
+                        header: () => <Header leftButton='X' HeaderName='연습실 예약 조회' />
                     }}
                 />
 

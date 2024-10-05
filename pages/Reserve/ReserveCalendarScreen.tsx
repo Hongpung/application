@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import { Pressable, View, Text, StyleSheet, Dimensions } from "react-native";
+import { Pressable, View, Text, StyleSheet, Dimensions, ActivityIndicator, Modal } from "react-native";
 import { Color } from "../../ColorSet";
 import { useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -12,7 +12,7 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
 
     const [calendarMonth, setMonth] = useState(calendarDate ?? new Date())
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
-    const [reservedDates, setReservedDates] = useState<{ [key: number]: ReserveType[] }>([]);
+    const [reservedDates, setReservedDates] = useState<{ [key: number]: any[] }>([]);
 
     const today = new Date();
 
@@ -20,41 +20,25 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
         if (day == 0) return 6;
         return day - 1;
     }
-    const [token, setToken] = useState<string | null>(null);
-
-    const loadToken = useCallback(() => {
-        const fetchToken = async () => {
-            const storedToken = await AsyncStorage.getItem('token');
-            setToken(storedToken);
-        };
-
-        fetchToken();
-    }, [])
-
-    useFocusEffect(() => {
-        loadToken();
-    });
 
     // 토큰을 불러온 후 useFetch 실행
-    const { data, loading, error } = useFetch<Reserve[]>(
-        token ? `${process.env.BASE_URL}/reservation/search` : ``,
+    const { data, loading, error } = useFetch<any[]>(
+        `${process.env.BASE_URL}/reservation/year-month?year=${new Date().getFullYear()}&month=${new Date().getMonth() + 1}`,
         {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
-            },
-            body: JSON.stringify({ date: new Date().toISOString() })
-        }, 2000, [token]
+                'Content-Type': 'application/json'
+            }
+        }, 2000, []
     );
 
     useEffect(() => {
         if (data) {
-            const reservedDates: { [key: number]: ReserveType[] } = [];
+            const reservedDates: { [key: number]: any[] } = [];
             data.map((reserve) => {
-                const reserveDate = reserve.date.getDate();
-                if (!reservedDates[reserveDate]) reservedDates[reserveDate] = [reserve.type];
-                else reservedDates[reserveDate] = [...reservedDates[reserveDate], reserve.type];
+                const reserveDate = new Date(reserve.date).getDate();
+                if (!reservedDates[reserveDate]) reservedDates[reserveDate] = [{ isRegular: reserve.type, isParticipable: reserve.participationAvailable }];
+                else reservedDates[reserveDate] = [...reservedDates[reserveDate], { isRegular: reserve.type, isParticipable: reserve.participationAvailable }];
             })
             setReservedDates(reservedDates);
         }
@@ -116,15 +100,15 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
                     >
                         <Text style={[styles.CalendarText, (day == today.getDate()) && (calendarMonth.getMonth() == today.getMonth()) ? { color: Color['blue600'] } : null]}>{day}</Text>
                         <View style={{ marginHorizontal: 2, height: 16, flexDirection: 'column-reverse', marginTop: 4 }}>
-                            {reservedDates[day] && reservedDates[day].slice(0,3).map((type,index) => {
-                                const color = type == 'regular' ? Color['blue500'] : type == 'none' ? Color['red500'] : Color['green500']
+                            {reservedDates[day] && reservedDates[day].slice(0, 3).map((obj, index) => {
+                                const color = obj.isRegular == '정기연습' ? Color['blue500'] : obj.isParticipable == 'none' ? Color['red500'] : Color['green500']
                                 return (
-                                    <View key={day+type+index} style={{ height: 4, backgroundColor: color, width: 28, borderRadius: 5, marginTop: 2 }} />
+                                    <View key={calendarMonth.getMonth() + day + index} style={{ height: 4, backgroundColor: color, width: 28, borderRadius: 5, marginTop: 2 }} />
                                 )
                             })
                             }
                         </View>
-                        {reservedDates[day]?.length>3&& <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'], marginTop: 2 }}>+{reservedDates[day].length-3}</Text>}
+                        {reservedDates[day]?.length > 3 && <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'], marginTop: 2 }}>+{reservedDates[day].length - 3}</Text>}
                     </Pressable>
                 );
             }
@@ -146,6 +130,11 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
 
     return (
         <View>
+            <Modal visible={loading} transparent>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor:'rgba(0,0,0,0.8)' }}>
+                    <ActivityIndicator size={'large'} color={'#FFF'} />
+                </View>
+            </Modal>
             <Text style={{ textAlign: 'center', fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{`${calendarMonth.getFullYear()}년`}</Text>
             <View style={{ height: 8 }} />
             <View style={styles.MonthRow}>
@@ -184,7 +173,7 @@ const ReserveCalendarScreen: React.FC<{ navigation: any, route: any }> = ({ navi
         useCallback(() => {
             if (route.params?.date) {
                 const newDate = new Date(route.params.date);
-                if (calendarDate.getTime() !== newDate.getTime()) {
+                if (calendarDate.getDate() != newDate.getDate()) {
                     setCalendarDate(newDate);
                 }
             }
@@ -213,7 +202,7 @@ const ReserveCalendarScreen: React.FC<{ navigation: any, route: any }> = ({ navi
                 <Calendar
                     calendarDate={calendarDate}
                     onClickDate={(date: Date) => {
-                        navigation.push(`DailyReserveList`, { date: date.getTime() })
+                        navigation.push(`DailyReserveList`, { date: date })
                     }} />
             </View>
             <View style={{ position: 'absolute', width: width, bottom: 12 }}>

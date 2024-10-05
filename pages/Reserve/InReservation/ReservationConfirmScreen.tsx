@@ -1,14 +1,19 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useState } from 'react'
-import LongButton from '../../components/buttons/LongButton'
-import { Color } from '../../ColorSet'
-import { useReservation } from '../../context/ReservationContext'
-import CheckboxComponent from '../../components/checkboxs/CheckboxComponent'
+import LongButton from '../../../components/buttons/LongButton'
+import { Color } from '../../../ColorSet'
+import { useReservation } from '../../../context/ReservationContext'
+import CheckboxComponent from '../../../components/checkboxs/CheckboxComponent'
+import { useRecoilValue } from 'recoil'
+import { loginUserState } from '@hongpung/recoil/authState'
+import { getToken } from '@hongpung/utils/TokenHandler'
 
 const ReservationConfirmScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
     const [isAgree, setAgree] = useState(false)
+
+    const loginUser = useRecoilValue(loginUserState);
 
     const DateString = useCallback((selectedDate: Date) => {
         return `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}.${selectedDate.getDate().toString().padStart(2, '0')}(${daysOfWeek[selectedDate.getDay()]})`;
@@ -17,18 +22,58 @@ const ReservationConfirmScreen: React.FC<{ navigation: any }> = ({ navigation })
     const { reservation } = useReservation();
 
     const ConfirmHandler = () => {
-        /**
-         * 여기에 fetch해서 전송
-            const data=
-                    {date: `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`
-                     startTime : '14:00'
-                     endTime: '16:30'
-                     
+
+        //  여기에 fetch해서 전송
+        const data =
+        {
+            date: `${reservation.date.getFullYear()}-${(reservation.date.getMonth() + 1).toString().padStart(2, '0')}-${reservation.date.getDate().toString().padStart(2, '0')}`,
+            startTime: `TIME_${(reservation.Time.startTime).toString().padStart(2, '0')}00`,
+            endTime: `TIME_${(reservation.Time.endTime).toString().padStart(2, '0')}00`,
+            message: `${reservation.name.length > 0 ? reservation.name : `${loginUser?.nickname ? `${loginUser?.name}(${loginUser.nickname})` : loginUser?.name}의 연습`}`,
+            participationAvailable: reservation.isParticipatible,
+            type: `${reservation.isRegular ? 'FIXED_TIME' : 'NOT_FIXED_TIME'}`,
+            participaterIds: [...reservation.participants]
+        }
+
+        const sendFormat = JSON.stringify(data)
+
+        const createReservation = async () => {
+            const controller = new AbortController();
+            const signal = controller.signal;
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            try {
+                const token = await getToken('token');
+
+                console.log(sendFormat)
+                const response = await fetch(
+                    `${process.env.BASE_URL}/reservation`
+                    , {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`,
+                        },
+                        body: sendFormat,
+                        signal
+                    })
+
+                if (!response.ok) {
+                    console.log(response.status + response.statusText)
+                    throw new Error('Network response was not ok');
+                }
+                const result: any = await response.json();
+
+                if (result != null)
+                    navigation.navigate('DailyReserveList', { date: reservation.date.toISOString() })
             }
-            
-            const sendFormat = JSON.stringfy(data)
-        */
-        navigation.navigate('DailyReserveList', { date: reservation.date.toISOString() })
+            catch (e) {
+                console.error(e)
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        createReservation();
     };
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
@@ -44,11 +89,11 @@ const ReservationConfirmScreen: React.FC<{ navigation: any }> = ({ navigation })
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
                 <Text style={styles.leftText}>예약자</Text>
-                <Text style={styles.rightText}>{'홍길동'}</Text>
+                <Text style={styles.rightText}>{`${loginUser?.nickname ? `${loginUser?.name}(${loginUser.nickname})` : loginUser?.name}`}</Text>
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
                 <Text style={styles.leftText}>예약명</Text>
-                <Text style={styles.rightText}>{reservation.name || '정기연습'}</Text>
+                <Text style={styles.rightText}>{reservation.name.length > 0 ? reservation.name : `${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`}</Text>
             </View>
             <View style={{ height: 16, backgroundColor: Color['grey100'], marginVertical: 10 }} />
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
