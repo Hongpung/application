@@ -3,6 +3,7 @@ import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { Color } from '../../../../ColorSet'
 import PracticeCard from '../../../../components/cards/PracticeCard'
 import { club } from '../../../../UserType'
+import { Icons } from '@hongpung/components/Icon'
 
 export type ReserveType = 'regular' | 'personal' | 'none';
 
@@ -259,12 +260,16 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
             </Text>
             <View style={styles.MonthRow}>
                 <Pressable style={styles.MonthBtn}
-                    onPress={decrementMonth} />
+                    onPress={decrementMonth} >
+                    <Icons size={20} name='chevron-back' color={Color['blue500']} />
+                </Pressable>
                 <Text style={styles.MonthNumber}>
                     {calendarMonth.getMonth() + 1}월
                 </Text>
                 <Pressable style={styles.MonthBtn}
-                    onPress={incrementMonth} />
+                    onPress={incrementMonth} >
+                    <Icons size={20} name='chevron-forward' color={Color['blue500']} />
+                </Pressable>
             </View>
             <View style={{ height: 12 }} />
             <View style={{ alignItems: 'center', }}>
@@ -346,9 +351,11 @@ const styles = StyleSheet.create({
         color: Color['grey700']
     },
     MonthBtn: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         width: 28,
         height: 28,
-        backgroundColor: Color['grey400']
     },
     DayText: {
         width: 28,

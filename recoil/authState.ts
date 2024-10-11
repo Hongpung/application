@@ -6,3 +6,13 @@ export const loginUserState = atom<User | null>({
   key: 'loginUserState',
   default: null,
 });
+
+export const todayReservation = atom<any[]>({
+  key:'todayReservation',
+  default:[]
+})
+
+export const isOnReserve = atom<boolean>({
+  key:'userOnReserve',
+  default:false
+})

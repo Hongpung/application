@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState } from 'react';
-import { Instrument } from '../../../../../UserType';
+import { briefInstrument, Instrument } from '@hongpung/UserType';
 
 interface IndstrumentContextProps {
-    selectedInstrument: Instrument | null;
-    setSelectedInstrument: (instrument: Instrument | null) => void;
+    selectedInstrument: briefInstrument | null;
+    setSelectedInstrument: (instrument: briefInstrument | null) => void;
     modalVisible: boolean;
     setModalVisible: (visible: boolean) => void;
 }
@@ -11,7 +11,7 @@ interface IndstrumentContextProps {
 const InstrumentContext = createContext<IndstrumentContextProps | undefined>(undefined);
 
 const InstrumentProvider: React.FC<{children:any}> = ({ children }) => {
-    const [selectedInstrument, setSelectedInstrument] = useState<Instrument | null>(null);
+    const [selectedInstrument, setSelectedInstrument] = useState<briefInstrument | null>(null);
     const [modalVisible, setModalVisible] = useState(false);
 
     return (

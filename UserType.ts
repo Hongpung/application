@@ -1,9 +1,10 @@
 
 export type InstrumentType = '쇠' | '장구' | '북' | '소고' | '새납';
 export const InstrumentTypes: InstrumentType[] = ['쇠', '장구', '북', '소고', '새납']
-export type club = '들녘' | '산틀' | '신명화랑' | '악반' | '기타'
-export const clubs: club[] = ['들녘', '산틀', '신명화랑', '악반', '기타']
-export const clubsEng: string[] = ['DEULNEOK', 'SANTLE', 'HWARANG', 'AKBAN', 'ETC']
+export type club = '들녘' | '산틀' | '화랑' | '악반' | '기타'
+export const clubs: club[] = ['들녘', '산틀', '화랑', '악반', '기타']//표시할 정보
+export const clubsEng: string[] = ['DEULNEOK', 'SANTLE', 'HWARANG', 'AKBAN', 'ETC']//실제로 가야하는 정보
+
 type Role = "상쇠" | "상장구" | "수북" | "수법고"
 
 export const instrumentOrder = (instrument: InstrumentType) => {
@@ -11,18 +12,25 @@ export const instrumentOrder = (instrument: InstrumentType) => {
     return instruments.indexOf(instrument);
 }
 
-export type Instrument = {
-    imgURL: string | null// url
-    club: Omit<club, '기타'>,
-    type: InstrumentType
-    name: string
-    nickname?: string
-    owner?: string//User
-    reserves?: any[] | null
-    state?: `대여가능` | `분실`
+interface borrowHistory {
+    borrowerName: string
+    borrowerNickname?: string
+    borrowDate: string
 }
 
-export type User = {
+export type briefInstrument = Omit<Instrument, 'borrowHistory'>;
+
+export interface Instrument {
+    instrumentId: number
+    imgURL?: string  // url
+    name: string
+    type: InstrumentType
+    club: Omit<club, '기타'>
+    available: boolean,
+    borrowHistory: borrowHistory[]
+}
+
+export interface User {
     memberId: any
     name: string
     nickname?: string
@@ -30,8 +38,15 @@ export type User = {
     email: string,
     instrument: InstrumentType
     enrollmentNumber: number
-    isCapt?: boolean
     role?: Role
-    badge?: string//url임
     profileImageUrl?: string
+}
+
+export interface signUpInfo {
+    email: string
+    name: string
+    nickname?: string
+    password: string
+    club: string
+    enrollmentNumber: number
 }

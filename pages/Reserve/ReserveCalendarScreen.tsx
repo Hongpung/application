@@ -1,35 +1,36 @@
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { Pressable, View, Text, StyleSheet, Dimensions, ActivityIndicator, Modal } from "react-native";
 import { Color } from "../../ColorSet";
-import { useFocusEffect } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+
 import useFetch from "../../hoc/useFetch";
-import { Reserve, ReserveType } from "../Home/MyClub/ClubCalendar/ClubCalendar";
+import { Icons } from "@hongpung/components/Icon";
 
 const { width } = Dimensions.get(`window`);
 
-const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Date }> = ({ onClickDate, calendarDate }) => {
+export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Date }> = ({ onClickDate, calendarDate }) => {
 
     const [calendarMonth, setMonth] = useState(calendarDate ?? new Date())
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
     const [reservedDates, setReservedDates] = useState<{ [key: number]: any[] }>([]);
+    const isFocusing = useIsFocused();
 
     const today = new Date();
 
-    const prevDays = (day: number) => {
+    const prevDays = useCallback((day: number) => {
         if (day == 0) return 6;
         return day - 1;
-    }
+    }, [])
 
     // 토큰을 불러온 후 useFetch 실행
     const { data, loading, error } = useFetch<any[]>(
-        `${process.env.BASE_URL}/reservation/year-month?year=${new Date().getFullYear()}&month=${new Date().getMonth() + 1}`,
+        `${process.env.BASE_URL}/reservation/year-month?year=${calendarMonth.getFullYear()}&month=${calendarMonth.getMonth() + 1}`,
         {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
             }
-        }, 2000, []
+        }, 2000, [calendarMonth, isFocusing]
     );
 
     useEffect(() => {
@@ -44,10 +45,6 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
         }
     }
         , [data])
-
-    useEffect(() => {
-        calendarDate && setMonth(calendarDate)
-    }, [calendarDate])
 
     useLayoutEffect(() => {
         const year = calendarMonth.getFullYear();
@@ -78,20 +75,22 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
         const newDate = new Date(calendarMonth);
         newDate.setMonth(calendarMonth.getMonth() + 1);
         setMonth(newDate);
+        setReservedDates([]);
     };
 
     const decrementMonth = () => {
         const newDate = new Date(calendarMonth);
         newDate.setMonth(calendarMonth.getMonth() - 1);
         setMonth(newDate);
+        setReservedDates([]);
     };
 
-    const renderWeeks = () => {
+    const renderWeeks = useCallback(() => {
         const weeks: any[] = [];
         let days: any[] = [];
 
         daysInMonth.forEach((day, index) => {
-            if (day == 0) days.push(<View style={{ width: 32, height: 32 }} />)
+            if (day == 0) days.push(<View key={'empty' + index} style={{ width: 32, height: 32 }} />)
             else {
                 days.push(
                     <Pressable key={`date-${day}`}
@@ -101,7 +100,7 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
                         <Text style={[styles.CalendarText, (day == today.getDate()) && (calendarMonth.getMonth() == today.getMonth()) ? { color: Color['blue600'] } : null]}>{day}</Text>
                         <View style={{ marginHorizontal: 2, height: 16, flexDirection: 'column-reverse', marginTop: 4 }}>
                             {reservedDates[day] && reservedDates[day].slice(0, 3).map((obj, index) => {
-                                const color = obj.isRegular == '정기연습' ? Color['blue500'] : obj.isParticipable == 'none' ? Color['red500'] : Color['green500']
+                                const color = obj.isRegular == '정기연습' ? Color['blue500'] : obj.isParticipable ? Color['green500'] : Color['red500']
                                 return (
                                     <View key={calendarMonth.getMonth() + day + index} style={{ height: 4, backgroundColor: color, width: 28, borderRadius: 5, marginTop: 2 }} />
                                 )
@@ -125,13 +124,13 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
         });
 
         return weeks;
-    };
+    }, [reservedDates]);
 
 
     return (
         <View>
             <Modal visible={loading} transparent>
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor:'rgba(0,0,0,0.8)' }}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.8)' }}>
                     <ActivityIndicator size={'large'} color={'#FFF'} />
                 </View>
             </Modal>
@@ -139,12 +138,17 @@ const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Dat
             <View style={{ height: 8 }} />
             <View style={styles.MonthRow}>
                 <Pressable style={styles.MonthBtn}
-                    onPress={decrementMonth} />
+                    onPress={decrementMonth} >
+
+                    <Icons size={24} name={'chevron-back'} color={Color['blue500']} />
+                </Pressable>
                 <Text style={styles.MonthNumber}>
                     {`${calendarMonth.getMonth() + 1}월`}
                 </Text>
                 <Pressable style={styles.MonthBtn}
-                    onPress={incrementMonth} />
+                    onPress={incrementMonth} >
+                    <Icons size={24} name={'chevron-forward'} color={Color['blue500']} />
+                </Pressable>
             </View>
             <View style={{ height: 32 }} />
             <View>
@@ -202,7 +206,7 @@ const ReserveCalendarScreen: React.FC<{ navigation: any, route: any }> = ({ navi
                 <Calendar
                     calendarDate={calendarDate}
                     onClickDate={(date: Date) => {
-                        navigation.push(`DailyReserveList`, { date: date })
+                        navigation.push(`DailyReserveList`, { date: date.toISOString() })
                     }} />
             </View>
             <View style={{ position: 'absolute', width: width, bottom: 12 }}>
@@ -221,8 +225,6 @@ const ReserveCalendarScreen: React.FC<{ navigation: any, route: any }> = ({ navi
 
 export default ReserveCalendarScreen;
 
-export { Calendar }
-
 
 const styles = StyleSheet.create({
     MonthRow: {
@@ -232,16 +234,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     MonthNumber: {
+        width: 56,
         textAlign: 'center',
         fontSize: 20,
-        marginHorizontal: 4,
         fontFamily: 'NanumSquareNeo-Bold',
         color: Color['grey700']
     },
     MonthBtn: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         width: 28,
         height: 28,
-        backgroundColor: Color['blue500']
     },
     DayText: {
         width: 28,

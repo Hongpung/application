@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useState } from 'react'
 import { Calendar } from '../ReserveCalendarScreen'
 import { useFocusEffect } from '@react-navigation/native';
-import { useReservation } from '../../../context/ReservationContext';
+import { useReservation } from '../context/ReservationContext';
 
 const DateSelcectScreen: React.FC<{ navigation: any,  }> = ({ navigation  }) => {
 

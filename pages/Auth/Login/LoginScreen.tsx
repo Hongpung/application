@@ -31,13 +31,13 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
     const PWRef = useRef<any | null>(null);
 
     useEffect(() => {
-        const loadAutoLogin = async () => {
+        const loadLoginSetting = async () => {
             try {
                 const loadedAutoLogin = await AsyncStorage.getItem('autoLogin')//오토 로그인 로두
                 setAutoLogin(loadedAutoLogin != null); 
 
                 if (loadedAutoLogin == null) {
-                    const loadedSaveID = await AsyncStorage.getItem('saveID')//오토
+                    const loadedSaveID = await AsyncStorage.getItem('saveID')//아이디 세이브인지 확인
                     setSaveID(loadedSaveID != null);
 
                     if (loadedSaveID) {
@@ -45,18 +45,18 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                         setEmail(loadedEmail)
                     }
 
-                    return
+                    return;
                 }
                 else {
                     const loadedEmail = await AsyncStorage.getItem('Email') || '';
                     setEmail(loadedEmail)
 
-                    return
+                    return;
                 }
             } catch (e) { console.error(e) }
         }
 
-        loadAutoLogin()
+        loadLoginSetting()
     }, [])
 
     const LoginBtnHandler = async () => {
@@ -65,12 +65,12 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
         if (!checkVaildID) {
             IDRef.current?.focus();
-            return
+            return;
         }
 
         if (!checkVaildPW) {
             PWRef.current?.focus();
-            return
+            return;
         }
 
         try {
@@ -123,11 +123,13 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             }
 
             navigation.dispatch(StackActions.replace('HomeStack'))
+
         } catch (e: unknown) {
+
             if (e instanceof Error) {
                 if (e.message == '로그인 정보 불일치') {
                     IDRef.current?.errored('');
-                    PWRef.current?.errored('로그인에 실패하였습니다.\n계정을 확인해주세요');
+                    PWRef.current?.errored('비밀번호가 틀리거나 가입되지 않은 이메일이에요.');
                 }
             }
 
@@ -243,12 +245,3 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 }
 
 export default LoginScreen
-
-const styles = StyleSheet.create({
-    title: {
-        flex: 1,
-        fontFamily: "NanumSquareNeo-Bold",
-        fontSize: 24,
-        marginLeft: 20
-    }
-})

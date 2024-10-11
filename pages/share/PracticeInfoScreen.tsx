@@ -5,6 +5,7 @@ import InstrumentCard from '../../components/cards/InstrumentCard'
 import { InstrumentProvider } from '@hongpung/context/InstrumentContext'
 import LongButton from '../../components/buttons/LongButton'
 import { Reserve } from '../Home/MyClub/ClubCalendar/ClubCalendar'
+import { Icons } from '@hongpung/components/Icon'
 
 const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
 
@@ -44,9 +45,13 @@ const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                             color: Color['grey400']
                         }}>{reserveData.startTime}:00~{reserveData.endTime}:00</Text>
 
-                        {reserveData.type == 'regular' ? < View style={{
-                            position: 'absolute', right: 24, top: -1, width: 26, height: 36, backgroundColor: Color['blue500']
-                        }} /> :
+                        {reserveData.type == 'regular' ?
+                            <View style={{
+                                position: 'absolute', right: 12, top: -4, width: 48, height: 48
+                            }} >
+                                <Icons name="bookmark-sharp" size={40} color={Color['blue500']} />
+                            </View> 
+                            :
                             <View style={{
                                 position: 'absolute', right: 20, top: 12,
                             }}>

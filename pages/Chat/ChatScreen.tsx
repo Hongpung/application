@@ -5,6 +5,7 @@ import * as MediaLibrary from 'expo-media-library';
 import LongButton from '../../components/buttons/LongButton';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
+import { Icons } from '@hongpung/components/Icon';
 
 
 //채팅 스크린
@@ -36,7 +37,9 @@ const ChatMessage = React.memo(({ message, timestamp, isUser }: { message: strin
 
 
 
-const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const ChatScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+    const { roomId, roomName } = route?.params
+
     const [isTyped, setType] = useState(false);
     const [typedMessage, setMessage] = useState<string>("");
     const [inputHeight, setInputHeight] = useState<number>(48);
@@ -47,6 +50,7 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [hasMore, setHasMore] = useState(true);
 
     const flatListRef = useRef<FlatList>(null);
+    const messageRef = useRef<TextInput>(null)
 
     const [photos, setPhotos] = useState<(MediaLibrary.Asset & { originUri: string, originHeight: number, originWidth: number })[]>([]);
     const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -402,6 +406,7 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             const now = new Date();
             setChatLog([...chatLog, { user: 'user', message: typedMessage, time: now.toISOString() }]);
             setMessage('');
+            messageRef.current?.blur();
         }
     };
     const selectAlbum = (item: MediaLibrary.Album | null) => {
@@ -415,6 +420,44 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             keyboardVerticalOffset={inputHeight + 80}
         >
+            <View style={{
+                height: 50,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#FFF',
+                paddingHorizontal: 24
+            }}>
+                <Pressable
+                    style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28 }}
+                    onPress={() => navigation.goBack()}
+                >
+                    <Icons size={24} name={'arrow-back'} color={Color['blue500']} />
+                </Pressable>
+                <View style={{}}>
+
+                    <Text style={{
+                        fontFamily: "NanumSquareNeo-Bold",
+                        color: Color['grey800'],
+                        fontSize: 20
+                    }}>
+                        {roomName}
+                    </Text>
+
+                </View>
+                {<Pressable onPress={() => {
+                    navigation.navigate('Reservation', {
+
+                    });
+                }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}>
+                    <Text style={{
+                        fontFamily: "NanumSquareNeo-Bold", color: Color['blue500'],
+                        fontSize: 18,
+                        textAlign: 'right',
+                        textAlignVertical: 'center'
+                    }}>{'추가'}</Text>
+                </Pressable>}
+            </View>
             <FlatList
                 ref={flatListRef}
                 data={chatLog}
@@ -425,25 +468,27 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             />
             <View style={{ justifyContent: 'center', height: inputHeight + 40, backgroundColor: `#FFF` }}>
                 <View style={{ marginHorizontal: 12, paddingHorizontal: 2, paddingVertical: 2, borderWidth: 1, borderRadius: 20, borderColor: Color['grey200'], flexDirection: 'row', height: inputHeight, maxHeight: 78, minHeight: 48, backgroundColor: '#FFF' }}>
-                    {typedMessage == "" && !isTyped && <Pressable
-                        style={{ backgroundColor: Color['blue500'], marginVertical: 2, marginHorizontal: 2, width: 50, height: 40, borderRadius: 16, alignSelf: 'center', alignItems: 'center', justifyContent: 'center' }}
-                        onPress={() => { setMenuOpen(!isMenuOpen); }}>
-                        <Text style={{ color: '#FFF', fontSize: 24, textAlignVertical: 'center' }}>{isMenuOpen ? `x` : `+`}</Text>
-                    </Pressable>
+                    {typedMessage == "" && !isTyped &&
+                        <Pressable
+                            style={{ backgroundColor: Color['blue500'], marginVertical: 2, marginHorizontal: 2, width: 50, height: 40, borderRadius: 16, alignSelf: 'center', alignItems: 'center', justifyContent: 'center' }}
+                            onPress={() => { setMenuOpen(!isMenuOpen); }}>
+                            <Icons name={isMenuOpen ? 'close' : 'add'} color={'#FFF'} size={24} />
+                        </Pressable>
                     }
                     {isMenuOpen && <View style={{ position: 'absolute', top: -48, height: 40, flexDirection: 'row', }}>
                         <Pressable
                             style={{ height: 40, width: 50, borderRadius: 16, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderColor: Color['grey200'], borderWidth: 1, marginHorizontal: 4, backgroundColor: `#FFF` }}
                             onPress={() => { setModalVisible(true) }}>
-                            <View style={{ backgroundColor: Color['blue500'], width: 20, height: 20 }} />
+                            <Icons name='albums' color={Color['grey400']} size={24} />
                         </Pressable>
                         <Pressable
                             style={{ height: 40, width: 50, borderRadius: 16, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderColor: Color['grey200'], borderWidth: 1, backgroundColor: `#FFF` }}
                             onPress={async () => await clearChatLogFile()}>
-                            <View style={{ backgroundColor: Color['red500'], width: 20, height: 20 }} />
+                            <Icons name='camera' color={Color['grey400']} size={24} />
                         </Pressable>
                     </View>}
                     <TextInput
+                        ref={messageRef}
                         onChangeText={(text) => setMessage(text)}
                         value={typedMessage}
                         multiline={true}
@@ -458,12 +503,14 @@ const ChatScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     {(typedMessage != "" || isTyped) && <Pressable
                         style={{ backgroundColor: Color['blue500'], marginVertical: 2, marginHorizontal: 2, width: 50, height: 40, alignSelf: 'center', borderRadius: 16, alignItems: 'center', justifyContent: 'center' }}
                         onPress={handleSend}>
-                        <View style={{ backgroundColor: '#FFF', width: 20, height: 20 }} />
+                        <Icons name='arrow-up' color={'#FFF'} size={20} />
                     </Pressable>
                     }
                 </View>
-
             </View>
+
+
+
             <Modal visible={ModalVisible}
                 transparent
                 animationType="slide"

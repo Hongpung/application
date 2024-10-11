@@ -127,7 +127,6 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
         <Swipeable
             renderRightActions={renderRightActions}
             dragOffsetFromRightEdge={16}
-            onSwipeableWillOpen={() => { if (DragX <= -210) onDelete() }}
         >
             <View style={[styles.NotificationCard]}>
                 <View style={{ margin: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>

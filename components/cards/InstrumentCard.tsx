@@ -1,26 +1,26 @@
 import React from "react"
 import { View, StyleSheet, Text, Pressable, Image } from "react-native"
 
-import { Color } from "../../ColorSet"
-import { Instrument } from "../../UserType"
+import { Color } from "@hongpung/ColorSet"
+import { briefInstrument } from "@hongpung/UserType"
 
 
-const InstrumentTag: React.FC<{ state: string }> = ({ state }) => {
+const InstrumentTag: React.FC<{ state: boolean }> = ({ state }) => {
     return (
         <View style={[styles.tag, {
-            backgroundColor: state == '분실' ? Color['red100'] : Color['blue100']
+            backgroundColor: state ? Color['blue100'] : Color['red100']
         }]}>
-            <Text style={[styles.tagText, { color: state == '분실' ? Color['red500'] : Color['blue500'] }]}>
-                {'분실'}
+            <Text style={[styles.tagText, { color: state? Color['blue500'] : Color['red500'] }]}>
+                {state? '대여 가능' : '분실'}
             </Text>
         </View>
     )
 }
 
 interface instrumentCardProps {
-    instrument: Instrument,
+    instrument: briefInstrument,
     view: "inManage" | "inBorrow",
-    onSelectInstrument: (instrument: Instrument) => void,
+    onSelectInstrument: (instrument: briefInstrument) => void,
     isPicked?: boolean
 }
 
@@ -28,7 +28,7 @@ const InstrumentCard: React.FC<instrumentCardProps> = ({ instrument, view, onSel
     return (
         <Pressable
             onPress={() => onSelectInstrument(instrument)}
-            style={[styles.card, { height: instrument?.nickname ? 172 : 156 }, isPicked && { borderColor: Color['blue500'], backgroundColor: Color['blue100'], borderWidth: 1, }]}>
+            style={[styles.card, { height: 156 }, isPicked && { borderColor: Color['blue500'], backgroundColor: Color['blue100'], borderWidth: 1, }]}>
             <View>
                 <View style={styles.imageContainer}>
                     {instrument.imgURL ? <Image
@@ -41,7 +41,7 @@ const InstrumentCard: React.FC<instrumentCardProps> = ({ instrument, view, onSel
 
                 <View style={styles.tagContainer}>
                     {view == `inManage` ?
-                        instrument?.state && <InstrumentTag state={instrument.state} />
+                        instrument?.available && <InstrumentTag state={instrument.available} />
                         :
                         <Text style={styles.clubText}>
                             {'@ ' + instrument.club}
@@ -52,11 +52,6 @@ const InstrumentCard: React.FC<instrumentCardProps> = ({ instrument, view, onSel
                         {instrument.name}
                     </Text>
                 </View>
-                {instrument.nickname && <View style={styles.nickNameContainer}>
-                    <Text style={styles.nickNameText}>
-                        {instrument.nickname}
-                    </Text>
-                </View>}
             </View>
         </Pressable>
     );

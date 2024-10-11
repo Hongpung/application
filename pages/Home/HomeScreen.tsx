@@ -1,10 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Modal, FlatList, Animated, NativeSyntheticEvent } from 'react-native';
-import { Color } from '../../ColorSet'
+import { Color } from '@hongpung/ColorSet'
 import PagerView from 'react-native-pager-view';
 import { debounce } from 'lodash';
 import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
 import { useAuth } from '@hongpung/hoc/useAuth';
+import { Icons } from '@hongpung/components/Icon';
+import useFetch from '@hongpung/hoc/useFetch';
+import { useUserReserve } from '@hongpung/hoc/useUserReserve';
 
 interface Banner {
     backgroundColor: string,
@@ -15,7 +18,10 @@ interface Banner {
 const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     const { loginUser, getUserInfo } = useAuth();
+    const { userReservations, loadUserReservation } = useUserReserve();
 
+    console.log(userReservations)
+    const hasReservation = useMemo(() => userReservations.length > 0, [userReservations])
     const [isUsed, setUsed] = useState(true);
     const [isSlideUp, setSlide] = useState(false);
     const [bannerNum, setBannerNum] = useState<number>(0);
@@ -47,9 +53,6 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         { backgroundColor: Color[`blue400`], Title: '배너로 활동을 홍보하세요!', Descript: '활동 인원을 모집하고\n공연 관객을 모집해보세요!' },
         { backgroundColor: Color[`green400`], Title: '홍풍 앱 출시 이벤트', Descript: '후기가 담긴 인스타 게시물을 업로드 해주세요\n추첨을 통해 스타벅스 기프티콘을 드립니다' },
         { backgroundColor: Color[`red400`], Title: '홍풍 마당놀이 모집중!', Descript: '2022년 금상, 2023년 대상에 이어 나갈\n홍풍 회원님들을 모집합니다!' },
-        { backgroundColor: Color[`blue400`], Title: '배너로 활동을 홍보하세요!', Descript: '활동 인원을 모집하고\n공연 관객을 모집해보세요!' },
-        { backgroundColor: Color[`green400`], Title: '홍풍 앱 출시 이벤트', Descript: '후기가 담긴 인스타 게시물을 업로드 해주세요\n추첨을 통해 스타벅스 기프티콘을 드립니다' },
-        { backgroundColor: Color[`red400`], Title: '홍풍 마당놀이 모집중!', Descript: '2022년 금상, 2023년 대상에 이어 나갈\n홍풍 회원님들을 모집합니다!' }
     ];
 
     const bannerMass = banners.length;// 배너 수
@@ -75,14 +78,18 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     useEffect(() => {
         const loadUserinfo = async () => {
-
             await getUserInfo();
+        }
+
+        const loadReservationData = async () => {
+            await loadUserReservation();
         }
 
         setUsed(false)
 
         if (!loginUser) {
             loadUserinfo();
+            loadReservationData();
         }
     }, [])
 
@@ -95,12 +102,13 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         <Pressable
                             style={styles.icons}
                             onPress={() => { navigation.navigate('Notification'); }}>
-                            <Text>Bell</Text>
+                            <Icons size={28} name={'notifications'} color={Color['blue500']} />
+                            {true&&<View style={{position:'absolute', width:8,height:8, backgroundColor:'orange', bottom:4, right:4, borderRadius:100}}/>}
                         </Pressable>
                         <Pressable
                             style={styles.icons}
                             onPress={() => { navigation.navigate('MyPage'); }}>
-                            <Text>Profile</Text>
+                            <Icons size={32} name={'person'} color={Color['blue500']} />
                         </Pressable>
                     </View>
                 </View>
@@ -114,11 +122,17 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 {/* 상단 일정*/}
                 <Pressable onPress={() => debounce(() => navigation.push('ReserveCalendar'), 1000, { leading: true, trailing: false })}>
                     <View style={styles.ScheduleOfDate}>
-                        <View style={{ position: 'absolute', bottom: 12, left: 20 }}>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>오늘의 일정이 없어요</Text>
-                            <View style={{ height: 4 }} />
-                            <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 18 }}>새로운 일정 예약하러 가기</Text>
-                        </View>
+                        {hasReservation ?
+                            <View style={{ position: 'absolute', bottom: 12, left: 20 }}>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>오늘의 일정이 있어요</Text>
+                                <View style={{ height: 4 }} />
+                                <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 18 }}>예약 확인하러 가기</Text>
+                            </View> :
+                            <View style={{ position: 'absolute', bottom: 12, left: 20 }}>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>오늘의 일정이 없어요</Text>
+                                <View style={{ height: 4 }} />
+                                <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 18 }}>새로운 일정 예약하러 가기</Text>
+                            </View>}
                     </View>
                 </Pressable>
 
@@ -177,7 +191,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', minWidth: 42, fontSize: 12, textAlignVertical: 'center', textAlign: 'right' }}>{bannerNum < 9 ? '0' + (bannerNum + 1) : bannerNum + 1}/{bannerMass < 10 ? '0' + bannerMass : bannerMass}</Text>
                             <Pressable onPress={() => setModalVisible(true)} style={{ justifyContent: 'center', height: 16 }}>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 11, width: 56, textAlign: 'center' }}>모두보기 +</Text>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 11, width: 56, textAlign: 'center' }}>{`모두보기 >`}</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -187,8 +201,8 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', }}>
 
                         <Pressable style={{ top: 24 }} onPress={() => setModalVisible(false)}>
-                            <View style={{ flexDirection: 'row', height: 64, justifyContent: 'flex-end', alignItems: 'center' }}>
-                                <Text style={{ top: 12, right: 24, color: '#FFF', fontSize: 36, textAlignVertical: 'center' }}>X</Text>
+                            <View style={{ flexDirection: 'row', height: 64, marginHorizontal: 32, marginTop: 16, justifyContent: 'flex-end', alignItems: 'center' }}>
+                                <Icons name='close' color={'#FFF'} size={36} />
                             </View>
                         </Pressable>
                         <View style={{ flex: 1 }} >
@@ -398,12 +412,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         height: 30,
         width: 78,
-        justifyContent: 'space-between'
+        gap: 4,
+        justifyContent: 'flex-end'
     },
     icons: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         width: 36,
         height: 36,
-        backgroundColor: Color['grey400']
     },
     textRow: {
         paddingHorizontal: 24,

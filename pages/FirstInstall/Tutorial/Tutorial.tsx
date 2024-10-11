@@ -1,11 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useRef, useState } from 'react'
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import ShortButton from '../../../components/buttons/ShortButton';
-import LongButton from '../../../components/buttons/LongButton';
-import { Color } from '../../../ColorSet';
-import { TutorialEx } from '../../../ExplainSet';
-import { RootStackParamList } from '../../../pageTypes';
+import ShortButton from '@hongpung/components/buttons/ShortButton';
+import LongButton from '@hongpung/components/buttons/LongButton';
+import { Color } from '@hongpung/ColorSet';
+import { TutorialEx } from '@hongpung/ExplainSet';
+import { RootStackParamList } from '@hongpung/pageTypes';
 import PagerView from 'react-native-pager-view';
 
 type TutorialProps = NativeStackScreenProps<RootStackParamList, "Tutorial">;
@@ -117,12 +117,14 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
                             />
                         </>
                     ) : (
+                        <View style={{flexGrow:1}}>
                         <LongButton
                             innerText={'이해했어요'}
                             isAble={true}
                             color={'blue'}
                             onPress={SkipHandler}
                         />
+                        </View>
                     )}
                 </View>
             </View>
@@ -179,7 +181,10 @@ const styles = StyleSheet.create({
         position: 'absolute',
         flexDirection: 'row',
         bottom: 72,
-        justifyContent: 'space-between', width: 320
+        paddingHorizontal:32,
+        width:'100%',
+        justifyContent: 'space-around',
+        flex:1,
     }
 })
 

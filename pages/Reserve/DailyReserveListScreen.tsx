@@ -1,26 +1,33 @@
 import { ActivityIndicator, Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Color } from '@hongpung/ColorSet';
 import useFetch from '@hongpung/hoc/useFetch';
-import { Reserve } from '@hongpung/pages/Home/MyClub/ClubCalendar/ClubCalendar';
+import { useIsFocused } from '@react-navigation/native';
+import { Icons } from '@hongpung/components/Icon';
 
 const { width } = Dimensions.get(`window`)
 
 const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
 
-    const { date } = route.params;
+    const isFocusing = useIsFocused();
+    const today = useMemo(() => new Date(),[isFocusing])
+    const { date } = route.params ?? { date: today.toISOString() };
+
     const [selectedDate, setDate] = useState(new Date(date))
-    const today = new Date()
 
-    const times = ['AM10', 'AM11', 'PM12', 'PM01', 'PM02', 'PM03', 'PM04', 'PM05', 'PM06', 'PM07', 'PM08', 'PM09', 'PM10'];
+    const TimesRef = useRef<any>(null)
+    const times = useMemo(() => ['AM10', 'AM11', 'PM12', 'PM01', 'PM02', 'PM03', 'PM04', 'PM05', 'PM06', 'PM07', 'PM08', 'PM09', 'PM10'], []);
+    console.log(selectedDate, date, 'param-date')
 
+    useEffect(() => { if (date != null) setDate(new Date(date)) }, [isFocusing])
+    useEffect(()=>{TimesRef.current?.scrollTo({ y: 0, animated: false })},[selectedDate])
+    
     const { data, loading, error } = useFetch<any[]>(
         `${process.env.BASE_URL}/reservation/day?date=${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${(selectedDate.getDate()).toString().padStart(2, '0')}`,
         {
-        }, 2000, [selectedDate]
+        }, 2000, [selectedDate, isFocusing]
     )
 
-    console.log(data);
     // if (loading)
     //     return (<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
     //         <View style={{ position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.6)' }}></View>
@@ -46,7 +53,7 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
             currentDate.setDate(startDate.getDate() + i);
             week.push(
                 <Pressable key={`${currentDate}`} onPress={() => setDate(currentDate)} style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] }]}>
-                    <Text style={[styles.Date, selectedDate.getMonth() != currentDate.getMonth() && { color: Color['grey300'] }]}>{currentDate.getDate()}</Text>
+                    <Text style={[styles.Date, selectedDate.getDate() == currentDate.getDate() && { color: Color['blue600'] }, selectedDate.getMonth() != currentDate.getMonth() && { color: Color['grey300'] }]}>{currentDate.getDate()}</Text>
                 </Pressable>
             )
         }
@@ -87,27 +94,29 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
                 backgroundColor: '#FFF',
                 paddingHorizontal: 24
             }}>
-                <Pressable onPress={() => { navigation.navigate('ReserveCalendar', { date: selectedDate.toString() }); }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28, backgroundColor: Color['grey300'] }}>
-                    <Text style={{
-                        fontFamily: "NanumSquareNeo-Bold",
-                        height: 24,
-                        color: Color['blue500'],
-                        fontSize: 18,
-                        textAlign: 'right',
-                        textAlignVertical: 'center'
-                    }}>{'<-'}</Text>
+                <Pressable onPress={() => { navigation.navigate('ReserveCalendar', { date: selectedDate.toString() }); }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28 }}>
+                    <Icons size={24} name={'arrow-back'} color={Color['blue500']} />
                 </Pressable>
                 <View style={styles.MonthRow}>
                     <Pressable style={styles.MonthBtn}
-                        onPress={decrementMonth} />
+                        onPress={decrementMonth}>
+                        <Icons size={24} name={'caret-back'} color={Color['grey300']} />
+                    </Pressable>
 
                     <Text style={styles.MonthNumber}>
                         {`${selectedDate.getMonth() + 1}월`}
                     </Text>
                     <Pressable style={styles.MonthBtn}
-                        onPress={incrementMonth} />
+                        onPress={incrementMonth} >
+                        <Icons size={24} name={'caret-forward'} color={Color['grey300']} />
+                    </Pressable>
                 </View>
-                {today <= selectedDate && <Pressable onPress={() => { navigation.push('Reservation', { date: new Date(date) }) }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28, backgroundColor: Color['grey300'] }}>
+                {today <= selectedDate && <Pressable onPress={() => {
+                    navigation.navigate('Reservation', {
+                        screen: 'inReservation',
+                        params: { date: selectedDate.toISOString().split('T')[0] }, // 전달할 params
+                    });
+                }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}>
                     <Text style={{
                         fontFamily: "NanumSquareNeo-Bold", color: Color['blue500'],
                         fontSize: 18,
@@ -129,25 +138,32 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
                 </View>
                 <View style={{ height: 4 }} />
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Pressable style={{ height: 32, width: 32, backgroundColor: Color['grey200'] }} onPress={prevWeek} />
+                    <Pressable style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, width: 32, }} onPress={prevWeek} >
+                        <Icons size={24} name={'chevron-back'} color={Color['blue500']} />
+                    </Pressable>
                     <View style={{ height: 32, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 264, marginHorizontal: 8 }}>
                         {renderWeekOfDate(selectedDate)}
                     </View>
-                    <Pressable style={{ height: 32, width: 32, backgroundColor: Color['grey200'] }} onPress={nextWeek} />
+                    <Pressable style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, width: 32, }} onPress={nextWeek} >
+                        <Icons size={24} name={'chevron-forward'} color={Color['blue500']} />
+                    </Pressable>
                 </View>
             </View>
             <View style={{ height: 20 }} />
-            <ScrollView>
+            <ScrollView ref={TimesRef}>
                 {times.map((time, index) => {
                     return (
-                        <View>
+                        <>
                             <View key={time + index} style={{ flexDirection: 'row', marginHorizontal: 24, alignItems: 'center', height: 24 }}>
                                 <View style={{ height: 1, backgroundColor: Color.grey200, width: (width - 48) / 2 - 28, overflow: 'visible' }} />
                                 <Text style={{ alignSelf: 'center', fontSize: 16, width: 56, textAlign: 'center', color: Color[`grey300`], fontFamily: 'NanumSquareNeo-Regular' }}>{time}</Text>
                                 <View style={{ height: 1, backgroundColor: Color.grey200, width: (width - 48) / 2 - 28, overflow: 'visible' }} />
                             </View>
-                            {index < times.length - 1 && <View style={{ height: 56 }} />}
-                        </View>)
+                            {index < times.length - 1 &&
+                                <View style={{ height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <View style={{ height: 0, borderWidth: 1, borderStyle: 'dotted', borderColor: Color[`grey100`], width: (width - 48) }} />
+                                </View>}
+                        </>)
                 })}
 
                 {/* <Modal
@@ -160,21 +176,26 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
                 </Modal> */}
 
                 {data?.length! > 0 && data?.map((reserve) => {
-                    const reserveTop = 12 + (Number(reserve.startTime.slice(0, 2)) - 10) * 80 ?? 0;
-                    const reserveHeight = 80 * (Number(reserve.endTime.slice(0, 2)) - Number(reserve.startTime.slice(0, 2))) ?? 5;
-                    console.log(reserve.reservationId)
+                    const [startHour, startMinnute] = reserve.startTime.split(':').map((time: string) => Number(time))
+                    const [endHour, endMinnute] = reserve.endTime.split(':').map((time: string) => Number(time))
+
+                    const Timegap = endHour * 60 - startHour * 60 + endMinnute - startMinnute
+                    const reserveTop = 12 + (Number(startHour) - 10) * 80 + (startMinnute > 0 ? 40 : 0);
+                    const reserveHeight = 40 * (Timegap / 30);
                     const color = reserve.type == '정기연습' ? Color['blue500'] : reserve.participationAvailable ? Color['green500'] : Color['red500'];
                     return (
-                        <Pressable style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36 }}
+                        <Pressable style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36, overflow: 'hidden' }}
                             onPress={() => { navigation.navigate('ReservationDetail', { reservationId: reserve.reservationId }) }}>
                             <Text numberOfLines={1} style={{ position: 'absolute', width: width / 2, top: 10, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>{reserve.message}</Text>
 
-                            <View style={{ position: 'absolute', top: 46, left: 14, flexDirection: 'row', alignItems: 'center' }}>
-                                <View style={{ height: 24, width: 24, backgroundColor: Color['grey200'], marginRight: 4 }} />
+                            <View style={{ position: 'absolute', top: 46, left: 14, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                <Icons size={24} name={'people'} color={Color['grey300']} />
                                 <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>24</Text>
                             </View>
                             {reserve.type == '정기연습' ?
-                                <View style={{ position: 'absolute', top: 0, right: 20, width: 28, height: 42, backgroundColor: Color['blue500'] }} />
+                                <View style={{ position: 'absolute', top: -4, right: 8, }} >
+                                    <Icons size={48} name={'bookmark-sharp'} color={Color['blue500']} />
+                                </View>
                                 :
                                 <View style={{ position: 'absolute', top: 10, right: 14, alignItems: 'flex-end' }}>
                                     <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }}>{reserve.creatorName}</Text>
@@ -212,21 +233,24 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         color: Color['grey500'],
     }, MonthRow: {
+        gap: 8,
         height: 24,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center'
     },
     MonthNumber: {
+        width: 44,
         textAlign: 'center',
         fontSize: 20,
-        marginHorizontal: 16,
         fontFamily: 'NanumSquareNeo-Bold',
         color: Color['grey700']
     },
     MonthBtn: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         width: 28,
         height: 28,
-        backgroundColor: Color['blue500']
     },
 })

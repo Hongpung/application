@@ -1,26 +1,66 @@
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Color } from '../../../ColorSet'
 import { club, clubs, InstrumentType, InstrumentTypes, User } from '../../../UserType'
 import ProfileMiniCard from '../../../components/cards/ProfileMiniCard'
-import { useReservation } from '../../../context/ReservationContext'
+import { useReservation } from '../context/ReservationContext'
 import LongButton from '../../../components/buttons/LongButton'
 import Header from '../../../components/Header'
+import { getToken } from '@hongpung/utils/TokenHandler'
+
 
 const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
+    const { reservation, setParticipants } = useReservation();
+
+    const [prevUserPicked, setPrevUserPick] = useState<User[]>([])
     const [originList, setOrigin] = useState<User[]>([])
     const [fiteredUsers, fiterUser] = useState<User[]>([])
     const [descendingOrder, setDescendingOrder] = useState(true)
     const [club, setClub] = useState<club | null>(null)
     const [userInstrumentType, setUserInstermentType] = useState<InstrumentType | null>(null)
-    const [onSelect, setSelctFilter] = useState<`club` | 'instruement' | 'grade' | null>(null)
-    const { reservation, setParticipants } = useReservation();
-
+    const [onSelect, setSelctFilter] = useState<`club` | 'instruement' | 'enrollmentNumber' | null>(null)
+    const [isLoading, setLoading] = useState(false)
     useEffect(() => {
-        setOrigin(reservation.participants);
-        
+        setPrevUserPick(reservation.participants)
+        const load = async () => {
+            const controller = new AbortController();
+            const signal = controller.signal;
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            try {
+                setLoading(true);
+                const token = await getToken('token');
+                if (!token) throw Error('token is not valid')
+                const response = await fetch(`${process.env.BASE_URL}/member`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application',
+                            'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+                        },
+                        signal
+                    }
+                )
+                const loadedUsers = await response.json() as User[];
+                console.log('is on Load')
+
+                setOrigin(loadedUsers.map((user: any) => { if (user.club == '화랑') return { ...user, club: '신명화랑' }; return user }));
+            } catch (e) {
+                console.error(e);
+                navigation.goBack();
+            } finally {
+                setLoading(false);
+                clearTimeout(timeoutId);
+            }
+
+        }
+
+
+        load();
+
     }, [])
+
+
 
     useEffect(() => {
         let newUsers = [...originList];
@@ -43,9 +83,16 @@ const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation })
 
     }, [club, userInstrumentType, descendingOrder, originList]);
 
+    if (isLoading)
+        return (
+            <View style={{ backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+                <ActivityIndicator size={'large'} color={Color['blue500']}></ActivityIndicator>
+            </View>
+        )
+
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
-            <Header leftButton='X' HeaderName='인원 선택' addLeftAction={() => setParticipants(originList)} />
+            <Header leftButton='close' HeaderName='인원 선택' addLeftAction={() => setParticipants(prevUserPicked)} />
             {onSelect && (
                 <Pressable
                     style={{ position: 'absolute', zIndex: 2, width: '100%', height: '100%' }}
@@ -70,7 +117,7 @@ const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation })
                         </Pressable>
                     )}
                     <Pressable style={[fiterBar.box, { flexDirection: 'row', alignItems: 'center' }]}
-                        onPress={() => {setDescendingOrder(!descendingOrder); }}>
+                        onPress={() => { setDescendingOrder(!descendingOrder); }}>
                         <Text style={fiterBar.text}>학번순</Text>
                         <View style={{ width: 24, height: 24, backgroundColor: descendingOrder ? Color['blue300'] : Color['grey300'], alignSelf: 'center' }} />
                     </Pressable>

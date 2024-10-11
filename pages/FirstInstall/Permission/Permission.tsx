@@ -1,14 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { Color } from '../../../ColorSet'
-import LongButton from '../../../components/buttons/LongButton';
-import { RootStackParamList } from '../../../pageTypes';
+import { Color } from '@hongpung/ColorSet'
+import LongButton from '@hongpung/components/buttons/LongButton';
+import { RootStackParamList } from '@hongpung/pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import * as Notifications from 'expo-notifications';
 import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import { debounce } from 'lodash';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Icons } from '@hongpung/components/Icon';
 
 type PermissionProps = NativeStackScreenProps<RootStackParamList, "Permission">;
 
@@ -29,8 +30,8 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
     await Camera.requestCameraPermissionsAsync();
     await MediaLibrary.requestPermissionsAsync();
 
-    await AsyncStorage.setItem('isLaunched','true');
-    
+    await AsyncStorage.setItem('isLaunched', 'true');
+
     navigation.reset({
       index: 0,
       routes: [{ name: 'Login' }],
@@ -48,7 +49,7 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
       <View style={{ marginTop: 80, flex: 1, alignItems: 'center' }}>
         <View style={styles.Card}>
           <View style={styles.CardIcons}>
-            {/* 카메라 */}
+            <Icons name='camera-outline' size={48} color={Color['blue700']}></Icons>
           </View>
           <View>
             <Text style={styles.CardHeaderWord}>
@@ -61,7 +62,7 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
         </View>
         <View style={styles.Card}>
           <View style={styles.CardIcons}>
-            {/* 앨범 */}
+            <Icons name='albums-outline' size={48} color={Color['blue700']}></Icons>
           </View>
           <View>
             <Text style={styles.CardHeaderWord}>
@@ -74,7 +75,7 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
         </View>
         <View style={styles.Card}>
           <View style={styles.CardIcons}>
-            {/* 카메라 */}
+          <Icons name='notifications-outline' size={48} color={Color['blue700']}></Icons>
           </View>
           <View>
             <Text style={styles.CardHeaderWord}>
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
     lineHeight: 14
   },
   CTA: {
-    width:'100%',
+    width: '100%',
     position: 'absolute',
     bottom: 32
   }

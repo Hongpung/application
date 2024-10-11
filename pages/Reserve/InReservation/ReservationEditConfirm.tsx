@@ -1,39 +1,40 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useState } from 'react'
-import LongButton from '../../../components/buttons/LongButton'
-import { Color } from '../../../ColorSet'
+import LongButton from '@hongpung/components/buttons/LongButton'
+import { Color } from '@hongpung/ColorSet'
 import { useReservation } from '../context/ReservationContext'
-import CheckboxComponent from '../../../components/checkboxs/CheckboxComponent'
+import CheckboxComponent from '@hongpung/components/checkboxs/CheckboxComponent'
 import { useRecoilValue } from 'recoil'
 import { loginUserState } from '@hongpung/recoil/authState'
 import { getToken } from '@hongpung/utils/TokenHandler'
-import { parseToReservationDetail, parseToReservationForm, ReservationDTO, ReservationSubmitForm } from '../ReserveInterface'
+import { findReservationDifferences } from '../ReserveInterface'
 
-const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+const ReservationEditConfirmScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+
+    const { reservation, preReservation } = useReservation();
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
     const [isAgree, setAgree] = useState(false);
 
     const loginUser = useRecoilValue(loginUserState);
+    const [difference, setDifference] = useState<{ [key: string]: any }>(findReservationDifferences(preReservation, reservation))
 
     const DateString = useCallback((selectedDate: Date) => {
         return `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}.${selectedDate.getDate().toString().padStart(2, '0')}(${daysOfWeek[selectedDate.getDay()]})`;
     }, [])
 
-    const { reservation } = useReservation();
-
+    console.log(difference)
     const ConfirmHandler = () => {
-        const createReservation = async () => {
+        const editReservation = async () => {
+            console.log(difference)
 
-            const data = parseToReservationForm(reservation)
-
-            if (data.message.length == 0) {
-                data.message = `${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`
+            if (difference?.message && difference?.message.length == 0) {
+                difference.message = `${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`
             }
 
-            const sendFormat = JSON.stringify(data)
+            const sendFormat = JSON.stringify(difference)
 
-            console.log(data);
+            console.log(sendFormat, preReservation.reservationId);
 
             const controller = new AbortController();
             const signal = controller.signal;
@@ -44,9 +45,9 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
 
                 console.log(sendFormat)
                 const response = await fetch(
-                    `${process.env.BASE_URL}/reservation`
+                    `${process.env.BASE_URL}/reservation/${preReservation.reservationId}`
                     , {
-                        method: 'POST',
+                        method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`,
@@ -62,7 +63,7 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
                 const result: any = await response.json();
 
                 if (result != null)
-                    navigation.navigate('DailyReserveList', { date: reservation.date.toISOString() })
+                    navigation.navigate('DailyReserveList', { date: reservation.date?.toISOString() })
             }
             catch (e) {
                 console.error(e)
@@ -71,17 +72,23 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
             }
         }
 
-        createReservation();
+        editReservation();
     };
+
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <View style={{ height: 88 }} />
             <Text style={{ textAlign: 'center', fontFamily: 'NanumSquareNeo-Bold', fontSize: 20, marginBottom: 34 }}>예약 정보 확인</Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
+            {Object.keys(difference)?.map((key: any) =>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
+                    <Text style={styles.leftText}>{key}</Text>
+                    <Text style={styles.rightText}>{difference[key]}</Text>
+                </View>)}
+            {/*<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
                 <Text style={styles.leftText}>예약 일자</Text>
                 <Text style={styles.rightText}>{DateString(reservation.date)}</Text>
             </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
+             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
                 <Text style={styles.leftText}>예약 시간</Text>
                 <Text style={styles.rightText}>{`${reservation.Time.startTime.toString().slice(5, 7)}:${reservation.Time.startTime.toString().slice(7)} ~ ${reservation.Time.endTime.toString().slice(5, 7)}:${reservation.Time.endTime.toString().slice(7)}`}</Text>
             </View>
@@ -123,7 +130,7 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
                     fontSize: 16,
                     color: Color['grey400']
                 }}>{'>'}</Text></Pressable>}
-            </View>
+            </View> */}
             <View style={{ position: 'absolute', bottom: 0, paddingVertical: 8, width: '100%' }}>
                 <View style={{ marginHorizontal: 28, marginBottom: 12 }}>
 
@@ -139,7 +146,7 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
     )
 }
 
-export default ReservationConfirmScreen
+export default ReservationEditConfirmScreen
 
 const styles = StyleSheet.create({
     leftText: {

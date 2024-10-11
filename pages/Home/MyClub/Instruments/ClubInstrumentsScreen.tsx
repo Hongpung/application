@@ -1,19 +1,21 @@
 import { ScrollView, View, Text } from "react-native"
-import { Instrument, instrumentOrder } from "../../../../UserType"
-import { HomeStackParamList } from "../../../../pageTypes"
+import { briefInstrument, instrumentOrder } from "@hongpung/UserType"
+import { HomeStackParamList } from "@hongpung/pageTypes"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import InstrumentCard from "../../../../components/cards/InstrumentCard"
-import { Color } from "../../../../ColorSet"
-import { useInstrument } from "../../../../context/InstrumentContext"
+import InstrumentCard from "@hongpung/components/cards/InstrumentCard"
+import { Color } from "@hongpung/ColorSet"
+import { useInstrument } from "@hongpung/context/InstrumentContext"
+import { useEffect, useState } from "react"
+import useFetch from "@hongpung/hoc/useFetch"
 
 
 type ClubInstrumentsScreenProps = NativeStackScreenProps<HomeStackParamList, 'InstrumentsHome'>
 
-const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any }> = ({ instrumentsList, navigation }) => {
+const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[], navigation: any }> = ({ instrumentsList, navigation }) => {
     const { setSelectedInstrument } = useInstrument();
     const renderInstruments = () => {
         const rows = [];
-        let cnt = instrumentOrder(instrumentsList[0].type) - 1;
+        let cnt = instrumentOrder(instrumentsList[0]?.type) - 1;
         for (let i = 0; i < instrumentsList.length;) {
             let sliceCnt = 2;
             if (instrumentsList[i].type != instrumentsList[i + 1]?.type) sliceCnt = 1;
@@ -37,7 +39,6 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
                             key={instrument.name + index}
                             instrument={instrument}
                             view="inManage"
-                            navigation={navigation}
                             onSelectInstrument={(instrument) => { setSelectedInstrument(instrument); navigation.push('InstrumentSpecific'); }}
                         />
                     ))}
@@ -48,33 +49,35 @@ const InstrumentsList: React.FC<{ instrumentsList: Instrument[], navigation: any
         }
         return rows;
     };
+
     return (
         <View style={{ flex: 1 }}>
-            {renderInstruments()}
+            {instrumentsList&&renderInstruments()}
         </View>
     )
 }
 
 const ClubInstrumentsScreen: React.FC<ClubInstrumentsScreenProps> = ({ navigation }) => {
 
-    const instruments: Instrument[] = [{
-        imgURL: 'https://postfiles.pstatic.net/MjAyNDA3MDdfMjQy/MDAxNzIwMzYwODg3Mzg3.siw5LvdkA7a4MPbS07jHAIFKw7GzlIdHbvJ4qvMeoJog.fiYaRMvdmmfUe56jgp-hQ8C5kWM20zJB1kLzAEQXakIg.JPEG/KakaoTalk_20240707_225628831_01.jpg?type=w386',
-        name: "길동무",
-        type: '쇠',
-        club: '들녘',
-        nickname: '바보',
-        owner: '홍길동'
-    }, {
-        imgURL: 'https://postfiles.pstatic.net/MjAyNDA3MDdfMjQy/MDAxNzIwMzYwODg3Mzg3.siw5LvdkA7a4MPbS07jHAIFKw7GzlIdHbvJ4qvMeoJog.fiYaRMvdmmfUe56jgp-hQ8C5kWM20zJB1kLzAEQXakIg.JPEG/KakaoTalk_20240707_225628831_01.jpg?type=w386',
-        name: "길동무",
-        type: '장구',
-        club: '들녘',
-        nickname: '바보',
-        owner: '홍길동'
-    }
-    ]
 
-    instruments.sort((a, b) => instrumentOrder(a.type) - instrumentOrder(b.type))
+    const [instruments, setInstruments] = useState<briefInstrument[]>([])
+
+    const { data, loading, error } = useFetch<briefInstrument[]>(
+        `${process.env.BASE_URL}/instrument/list`,
+        {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }, 2000, []
+    )
+
+    useEffect(() => {
+        const clubInstruements = data??[];
+        console.log(data);
+        clubInstruements?.sort((a, b) => instrumentOrder(a.type) - instrumentOrder(b.type))
+        setInstruments(clubInstruements ?? [])
+    }, [data])
 
     return (
         <View style={{

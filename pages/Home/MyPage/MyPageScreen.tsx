@@ -8,6 +8,7 @@ import { useRecoilCallback } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState'
 import { User } from '@hongpung/UserType';
 import { StackActions } from '@react-navigation/native';
+import { Icons } from '@hongpung/components/Icon';
 
 
 type MyPageProps = NativeStackScreenProps<HomeStackParamList, 'MyPageHome'>;
@@ -54,6 +55,7 @@ const MyPageScreen: React.FC<MyPageProps> = ({ navigation }) => {
             <ProfileBoxCard
                 isCard={false}
                 user={{
+                    email: loginUser!.email,
                     memberId: loginUser!.memberId,
                     club: loginUser!.club,
                     name: loginUser!.name,
@@ -68,7 +70,8 @@ const MyPageScreen: React.FC<MyPageProps> = ({ navigation }) => {
             </View>
             {myActivities.map((subMenu: subMenu, index: number) => {
                 return (<Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => { navigation.push(subMenu.link) }}>
-                    <Text style={styles.subMenuTitle}>{subMenu.name}</Text><Text style={styles.subMenuArrow}>{'>'}</Text>
+                    <Text style={styles.subMenuTitle}>{subMenu.name}</Text>
+                    <Icons size={20} name='chevron-forward' color={Color['grey400']} />
                 </Pressable>)
             })}
             <View style={{ flexDirection: 'row', height: 20, justifyContent: 'flex-start', marginTop: 20, marginBottom: 16, marginHorizontal: 24 }}>
@@ -76,7 +79,8 @@ const MyPageScreen: React.FC<MyPageProps> = ({ navigation }) => {
             </View>
             {Settings.map((submenu: subMenu, index: number) => {
                 return (<Pressable key={submenu.name + index} style={styles.subMenu} onPress={() => { navigation.push(submenu.link) }}>
-                    <Text style={styles.subMenuTitle}>{submenu.name}</Text><Text style={styles.subMenuArrow}>{'>'}</Text>
+                    <Text style={styles.subMenuTitle}>{submenu.name}</Text>
+                    <Icons size={20} name='chevron-forward' color={Color['grey400']} />
                 </Pressable>)
             })}
             <View style={styles.footer}>

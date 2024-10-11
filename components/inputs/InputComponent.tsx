@@ -169,8 +169,8 @@ const styles = StyleSheet.create({
         color: Color['red500'],
         fontFamily: 'NanumSquareNeo-Bold',
         marginTop: 8,
-        marginLeft: 8,
-        fontSize: 14
+        marginLeft: 10,
+        fontSize: 12
     },
     VisibleBtn: {
         position: 'absolute',

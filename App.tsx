@@ -17,7 +17,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SignUpProvider } from '@hongpung/pages/Auth/SignUp/context/SignUpContext';
 import { RecoilRoot } from 'recoil';
 import { deleteToken, getToken } from './utils/TokenHandler';
-import { useAuth } from './hoc/useAuth';
 
 
 const RootStack = createNativeStackNavigator();
@@ -138,7 +137,7 @@ const RootStacks: React.FC<{ startDomain: string }> = ({ startDomain }) => {
       <RootStack.Screen name="Tutorial" component={Tutorial} />
       <RootStack.Screen name="Permission" component={Permission} />
       <RootStack.Screen name="Login" component={LoginScreen} options={{ animation: 'none' }} />
-      <RootStack.Screen name="SignUp" component={SignUp} options={{ headerShown: true, header: () => <Header leftButton='X' /> }} />
+      <RootStack.Screen name="SignUp" component={SignUp} options={{ headerShown: true, header: () => <Header leftButton='close' /> }} />
       <RootStack.Screen name="HomeStack" component={MainStacks} options={{ animation: 'none' }} />
     </RootStack.Navigator>
   )
@@ -172,6 +171,7 @@ const App: React.FC = () => {
             visibilityTime: 3000
           });
         }
+        
         else {
           setFirstScreen('Login')
           Toast.show({

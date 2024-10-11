@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, Pressable, Linking } from "react-native"
 
 import { Color } from "../../ColorSet"
 import { User } from "../../UserType"
+import { Icons } from "../Icon"
 
 
 interface ProfileBoxProps {
@@ -14,62 +15,42 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
     const [loading, setLoading] = useState(true);
 
     const RoleTextRender = () => {
-        if (user.isCapt) return "패짱"
         if (user.role) { return user.role }
         return "동아리원"
     }
 
     if (!user) return;
+
     return (
-        <View style={[styles.ProfileContainer, isCard ? { marginHorizontal: 0, paddingHorizontal: 8, paddingVertical: 8 } : null]}>
-            <View style={{ flex: 1, marginHorizontal: 12, marginTop: 24 }}>
-                <View style={{ flexDirection: 'row', flex: 1 }}>
-                    {user.profileImageUrl ?
-                        <Image source={{ uri: user.profileImageUrl }} style={styles.ProfilePhoto} /> :
-                        <View style={[styles.ProfilePhoto, { backgroundColor: Color['grey200'], borderWidth:1, borderColor:Color['grey300']}]} />}
-                    <View style={{
-                        flex: 1,
-                        height: 120,
-                    }}>
-                        <View style={{ flexDirection: 'row', height: 80, justifyContent: 'space-between' }} >
-                            <View style={{ flexDirection: 'row', width: 64, justifyContent: 'space-between' }}>
-                                <Pressable style={styles.icons}
-                                    onPress={() => {
-                                        Linking.openURL('https://www.instagram.com/younho10.3/')
-                                            .catch((err) => { console.error('Failed to open URL:', err); })
-                                    }}>
-                                    <Text>insta</Text>
-                                </Pressable>
-                            </View>
-                            {user?.badge && <View style={styles.Badge}>
-                                <Image
-                                    source={{ uri: user.badge }}
-                                    style={styles.Badge}
-                                    onLoadEnd={() => setLoading(false)} />
-                            </View>}
-                        </View>
-                        <View style={{ height: 40 }}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginBottom: 6 }}>
-                                <Text style={{ fontSize: 18, fontFamily: "NanumSquareNeo-Regular", color: Color['grey700'] }}>Lv.1</Text>
-                                <Text style={{ fontSize: 10, textAlign: 'right', fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'] }}>12/20</Text>
-                            </View>
-                            <View style={{ height: 8, marginHorizontal: 0, borderColor: Color['blue500'], borderWidth: 0.5, borderRadius: 2, overflow: 'hidden' }}>
-                                <View style={{ position: "absolute", height: 8, paddingRight: 36, left: 0, backgroundColor: Color['blue500'] }}></View>
-                            </View>
-                        </View>
+        <View style={{ position: 'relative', flex: 1, flexDirection: 'column', display: 'flex', marginHorizontal: 36, gap: 24, marginVertical: 16 }}>
+            <View style={{ position: 'relative', flexDirection: 'row', flex: 1 }}>
+                {user.profileImageUrl ?
+                    <Image source={{ uri: user.profileImageUrl }} style={styles.ProfilePhoto} /> :
+                    <View style={[styles.ProfilePhoto, { backgroundColor: Color['grey200'], borderWidth: 1, borderColor: Color['grey300'] }]} />}
+
+                <View style={{ flexDirection: 'column', flex:1, height: 120, justifyContent: 'space-between', paddingVertical: 12 }}>
+                    <View style={{ display: 'flex', gap: 4 }}>
+                        <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>{user.name}</Text>
+                        {user?.nickname && <Text style={{ fontSize: 14, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>{user?.nickname}</Text>}
+                    </View>
+                    <View style={{ flexDirection: 'row', width: 64, justifyContent: 'flex-start', gap: 4 }}>
+                        <Pressable style={styles.icons}
+                            onPress={() => {
+                                Linking.openURL('https://www.instagram.com/younho10.3/')
+                                    .catch((err) => { console.error('Failed to open URL:', err); })
+                            }}>
+                            <Icons name="logo-instagram" size={24} color={Color['grey400']} />
+                        </Pressable>
                     </View>
                 </View>
-                <View style={{ height: 8 }} />
-                <View style={styles.info}>
-                    <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>이름(패명)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{user.name}{user.nickname ? `(${user.nickname})` : ''}</Text>
-                </View>
-                <View style={styles.info}>
-                    <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{user.club + `(${user.enrollmentNumber})`}</Text>
-                </View>
-                <View style={styles.info}>
-                    <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>역할</Text><Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'right', color: user.role == '상쇠' ? Color['red500'] : Color['blue500'], }}>{RoleTextRender()}</Text>
-                </View>
-
+            </View>
+            <View style={styles.info}>
+                <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text>
+                <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{`${user.club == '화랑' ? '신명화랑' : user.club}` + `(${user.enrollmentNumber})`}</Text>
+            </View>
+            <View style={styles.info}>
+                <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>역할</Text>
+                <Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'right', color: user.role == '상쇠' ? Color['red500'] : Color['blue500'], }}>{RoleTextRender()}</Text>
             </View>
         </View>
     )
@@ -79,8 +60,9 @@ export default ProfileBoxCard;
 
 const styles = StyleSheet.create({
     ProfileContainer: {
+        position: 'relative',
+        display: 'flex',
         flex: 1,
-        height: 292,
         borderRadius: 15,
         backgroundColor: 'white',
         marginHorizontal: 24
@@ -90,9 +72,11 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         marginRight: 16
     }, icons: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
         width: 28,
         height: 28,
-        backgroundColor: Color['grey200']
     }, Badge: {
         width: 80,
         height: 80,
@@ -105,9 +89,9 @@ const styles = StyleSheet.create({
         paddingTop: 32,
         marginTop: 32
     }, info: {
+        position: 'relative',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginVertical: 12
     },
     subMenu: {
         width: 312,

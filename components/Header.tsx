@@ -1,11 +1,13 @@
 
 import { StyleSheet, Text, View, Pressable } from 'react-native'
-import React from 'react'
+import React, { ComponentProps } from 'react'
 import { useNavigation } from "@react-navigation/native";
 import { Color } from '../ColorSet';
+import { Ionicons } from '@expo/vector-icons';
+import { Icons } from './Icon';
 
 interface HeaderProps {
-    leftButton: string
+    leftButton: ComponentProps<typeof Ionicons>['name']
     HeaderName?: string
     RightButton?: string
     RightAction?: () => void
@@ -27,12 +29,12 @@ const Header: React.FC<HeaderProps> = ({ leftButton, HeaderName, RightButton, Ri
                 if (addLeftAction)
                     addLeftAction();
             }}
-                style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28, backgroundColor: Color['grey300'] }}
+                style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28 }}
             >
-                <Text style={styles.Text}>{leftButton}</Text>
+                <Icons size={24} name={leftButton??'close'} color={Color['blue500']} />
             </Pressable>
             <Text style={styles.Title}>{HeaderName}</Text>
-            {RightButton && <Pressable onPress={RightAction} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28, backgroundColor: Color['grey300'] }}>
+            {RightButton && <Pressable onPress={RightAction} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28}}>
                 <Text style={styles.Text}>{RightButton}</Text>
             </Pressable>}
         </View>

@@ -1,34 +1,31 @@
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Instrument, instrumentOrder } from '../../../UserType'
-import InstrumentCard from '../../../components/cards/InstrumentCard'
-import { Color } from '../../../ColorSet'
-import LongButton from '../../../components/buttons/LongButton'
-import { useReservation } from '../../../context/ReservationContext'
-import Header from '../../../components/Header'
+import { briefInstrument, Instrument, instrumentOrder } from '@hongpung/UserType'
+import InstrumentCard from '@hongpung/components/cards/InstrumentCard'
+import { Color } from '@hongpung/ColorSet'
+import LongButton from '@hongpung/components/buttons/LongButton'
+import { useReservation } from '@hongpung/pages/Reserve/context/ReservationContext'
+import Header from '@hongpung/components/Header'
 
 const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-    const instruments: Instrument[] = [{
+    const instruments:  Omit<briefInstrument,'available'>[] = [{
         imgURL: 'https://postfiles.pstatic.net/MjAyNDA3MDdfMjQy/MDAxNzIwMzYwODg3Mzg3.siw5LvdkA7a4MPbS07jHAIFKw7GzlIdHbvJ4qvMeoJog.fiYaRMvdmmfUe56jgp-hQ8C5kWM20zJB1kLzAEQXakIg.JPEG/KakaoTalk_20240707_225628831_01.jpg?type=w386',
         name: "길동무1",
         type: '쇠',
         club: '들녘',
-        nickname: '바보',
-        owner: '홍길동'
+        instrumentId:1
     }, {
         imgURL: 'https://postfiles.pstatic.net/MjAyNDA3MDdfMjQy/MDAxNzIwMzYwODg3Mzg3.siw5LvdkA7a4MPbS07jHAIFKw7GzlIdHbvJ4qvMeoJog.fiYaRMvdmmfUe56jgp-hQ8C5kWM20zJB1kLzAEQXakIg.JPEG/KakaoTalk_20240707_225628831_01.jpg?type=w386',
         name: "길동무2",
         type: '쇠',
         club: '들녘',
-        nickname: '바보',
-        owner: '홍길동'
+        instrumentId:2
     }, {
         imgURL: 'https://postfiles.pstatic.net/MjAyNDA3MDdfMjQy/MDAxNzIwMzYwODg3Mzg3.siw5LvdkA7a4MPbS07jHAIFKw7GzlIdHbvJ4qvMeoJog.fiYaRMvdmmfUe56jgp-hQ8C5kWM20zJB1kLzAEQXakIg.JPEG/KakaoTalk_20240707_225628831_01.jpg?type=w386',
         name: "길동무3",
         type: '장구',
         club: '들녘',
-        nickname: '바보',
-        owner: '홍길동'
+        instrumentId:3
     }
     ]
 
@@ -60,7 +57,7 @@ const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigatio
     )
 }
 
-const InstrumentsList: React.FC<{ instrumentsList: Instrument[] }> = ({ instrumentsList }) => {
+const InstrumentsList: React.FC<{ instrumentsList: Omit<briefInstrument,'available'>[] }> = ({ instrumentsList }) => {
 
     const { setBorrowInstruments, reservation } = useReservation();
 

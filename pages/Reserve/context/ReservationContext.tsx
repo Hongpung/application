@@ -1,24 +1,14 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Instrument, User } from "../UserType"
-import { getToken } from '@hongpung/utils/TokenHandler';
-import { StackActions, useNavigation } from '@react-navigation/native';
-
-export type Reservation = {
-    date: Date;
-    Time: { startTime: number, endTime: number };
-    name: string;
-    isRegular: boolean;
-    isParticipatible: boolean;
-    participants: User[];
-    borrowInstruments: Instrument[];
-    hasToWait: boolean;
-};
+import { Instrument, User } from "../../../UserType"
+import { Reservation } from '../ReserveInterface'
 
 interface ReservationContextProps {
+    preReservation: Reservation;
+    setPreReservation: (reservation: Reservation) => void;
     reservation: Reservation;
     setReservation: (reservation: Reservation) => void;
     setDate: (date: Date) => void;
-    setTime: (startTime: number, endTime: number) => void;
+    setTime: (startTime: string, endTime: string) => void;
     setName: (name: string) => void;
     setIsRegular: (isRegular: boolean) => void;
     setIsParticipatible: (isParticipatible: boolean) => void;
@@ -30,12 +20,23 @@ interface ReservationContextProps {
 const ReservationContext = createContext<ReservationContextProps | undefined>(undefined);
 
 const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const today = new Date();
-    today.setDate(today.getDate() + 1)
+
     const [reservation, setReservation] = useState<Reservation>({
-        date: today,
-        Time: { startTime: 0, endTime: 0 },
-        name: '',
+        userEmail: '',
+        userName: '',
+        Time: { startTime: '', endTime: '' },
+        reservationName: '',
+        isRegular: false,
+        isParticipatible: true,
+        participants: [],
+        borrowInstruments: [],
+        hasToWait: false
+    });
+    const [preReservation, setPreReservation] = useState<Reservation>({
+        userEmail: '',
+        userName: '',
+        Time: { startTime: '', endTime: '' },
+        reservationName: '',
         isRegular: false,
         isParticipatible: true,
         participants: [],
@@ -43,8 +44,8 @@ const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         hasToWait: false
     });
     const setDate = (date: Date) => { if (date > new Date()) setReservation(prev => ({ ...prev, date })); }
-    const setTime = (startTime: number, endTime: number) => setReservation(prev => ({ ...prev, Time: { startTime, endTime } }));
-    const setName = (name: string) => setReservation(prev => ({ ...prev, name }));
+    const setTime = (startTime: string, endTime: string) => setReservation(prev => ({ ...prev, Time: { startTime, endTime } }));
+    const setName = (name: string) => setReservation(prev => ({ ...prev, reservationName: name }));
     const setIsRegular = (isRegular: boolean) => setReservation(prev => ({ ...prev, isRegular }));
     const setIsParticipatible = (isParticipatible: boolean) => setReservation(prev => ({ ...prev, isParticipatible }));
     const setParticipants = (participants: User[]) => setReservation(prev => ({ ...prev, participants }));
@@ -53,6 +54,8 @@ const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     return (
         <ReservationContext.Provider value={{
+            preReservation,
+            setPreReservation,
             reservation,
             setReservation,
             setDate,

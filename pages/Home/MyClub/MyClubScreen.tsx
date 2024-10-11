@@ -7,6 +7,7 @@ import ProfileMiniCard from '../../../components/cards/ProfileMiniCard'
 import { UserProvider } from '../../../context/UserContext';
 import { UserModal } from './ClubMember/ClubMemeberScreen';
 import { throttle } from 'lodash';
+import { Icons } from '@hongpung/components/Icon';
 
 
 type MyClubProps = NativeStackScreenProps<HomeStackParamList, 'MyClubHome'>;
@@ -15,12 +16,12 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
 
     const throttledNavigation = useMemo(
         () =>
-            throttle((ScreenName:any) => {
-            navigation.push(ScreenName);  // 원하는 화면으로 navigation
-          }, 2000,
-          { leading: true, trailing: false }),
+            throttle((ScreenName: any) => {
+                navigation.push(ScreenName);  // 원하는 화면으로 navigation
+            }, 2000,
+                { leading: true, trailing: false }),
         [navigation]
-      );
+    );
     interface subMenu {
         name: string,
         link: string
@@ -48,8 +49,9 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                             <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>동아리 관리</Text>
                         </View>
                         {manageClubMenu.map((subMenu: subMenu, index: number) => {
-                            return (<Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => {throttledNavigation(subMenu.link)}}>
-                                <Text style={styles.subMenuTitle}>{subMenu.name}</Text><Text style={styles.subMenuArrow}>{'>'}</Text>
+                            return (<Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => { throttledNavigation(subMenu.link) }}>
+                                <Text style={styles.subMenuTitle}>{subMenu.name}</Text>
+                                <Icons size={20} name='chevron-forward' color={Color['grey400']} />
                             </Pressable>)
                         })}
                         <View style={{ height: 24, alignSelf: 'flex-start', justifyContent: 'space-between', marginHorizontal: 24, marginTop: 20, marginBottom: 16 }}>

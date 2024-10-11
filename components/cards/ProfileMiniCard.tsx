@@ -61,22 +61,15 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick 
                 </View>
             </View>
             <View style={{ position: 'absolute', flexDirection: 'row', left: 104, bottom: 16, alignItems: 'center', justifyContent: 'flex-start' }}>
-                {user.isCapt && <View>
-                    <View style={{ height: 16, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4, backgroundColor: Color['blue100'], borderRadius: 5, marginRight: 4 }}>
-                        <Text style={{ fontSize: 12, fontFamily: "NanumSquareNeo-Bold", color: Color['blue600'], }}>
-                            {'패짱'}
-                        </Text>
-                    </View>
-                </View>}
                 {user.role && RoleTag()}
             </View>
             <View style={{ position: 'absolute', width: 56, height: 56, borderRadius: 200, overflow: 'hidden', borderWidth: loading ? 1 : 0, borderColor: Color['grey500'], justifyContent: 'center', alignItems: 'center', right: 16, top: 24 }}>
-                {user.badge &&
+                {/* {user.badge &&
                     <Image
                         source={{ uri: user.badge }}
                         style={{ height: 56, width: 56, borderRadius: 200, }}
                         onLoadEnd={() => { setLoading(false) }}
-                    />}
+                    />} */}
             </View>
             {view == 'inClubView' ?
                 <Pressable style={{ position: 'absolute', borderRadius: 200, right: 16, bottom: 8 }}

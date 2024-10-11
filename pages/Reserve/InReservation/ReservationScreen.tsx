@@ -1,34 +1,110 @@
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, Image, Dimensions } from 'react-native'
-import React, { useCallback, useState } from 'react'
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, Image, Dimensions, ActivityIndicator, Alert } from 'react-native'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import CheckboxComponent from '@hongpung/components/checkboxs/CheckboxComponent'
 import { Color } from '@hongpung/ColorSet'
 import LongButton from '@hongpung/components/buttons/LongButton'
-import { useReservation } from '@hongpung/context/ReservationContext'
+import { useReservation } from '@hongpung/pages/Reserve/context/ReservationContext'
 import { loginUserState } from '@hongpung/recoil/authState'
 import { useRecoilValue } from 'recoil'
+import { getToken } from '@hongpung/utils/TokenHandler'
+import { areReservationsEqual, parseToReservation } from '../ReserveInterface'
+import { useFocusEffect } from '@react-navigation/native'
+import { Icons } from '@hongpung/components/Icon'
 
 const { width } = Dimensions.get('window')
 
-const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-
+const ReservationScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+    const today = new Date();
     const {
         reservation,
+        preReservation,
+        setPreReservation,
+        setReservation,
         setName,
         setIsRegular,
         setIsParticipatible,
         setParticipants,
-        setBorrowInstruments
+        setBorrowInstruments,
+        setDate
     } = useReservation();
 
+    const date = preReservation?.date;
+    const { reservationId } = route?.params ?? { reservationId: preReservation?.reservationId };
+    console.log(date, reservationId, route?.params)
+    const [isLoading, setLoading] = useState(false);
     const loginUser = useRecoilValue(loginUserState);
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
-    const [isAgree, setAgree] = useState(false)
+    const [isAgree, setAgree] = useState(false);
+
+    useFocusEffect(
+        useCallback(() => {
+            setAgree(false)
+        }, [])
+    );
 
     const DateString = useCallback((selectedDate: Date) => {
         return `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1)}.${selectedDate.getDate()}(${daysOfWeek[selectedDate.getDay()]})`
     }, [])
 
+    const TimeGapText = useMemo(() => {
+        const eTime = Number(reservation.Time.endTime.toString().slice(5, 7)) * 60 + Number(reservation.Time.endTime.toString().slice(7));
+        const sTime = Number(reservation.Time.startTime.toString().slice(5, 7)) * 60 + Number(reservation.Time.startTime.toString().slice(7));
+
+        const timeGap = eTime - sTime;
+
+        console.log(timeGap / 60)
+        const hourGap = timeGap / 60;
+        const minnuteGap = timeGap % 60;
+
+        return `${hourGap >= 1 ? `${Math.floor(hourGap)}시간` : ''}${minnuteGap > 0 && hourGap >= 1 ? `\n` : ''}${minnuteGap > 0 ? `${minnuteGap}분` : ''}`
+    }, [reservation.Time])
+
+    useEffect(() => {
+        const load = async () => {
+            const controller = new AbortController();
+            const signal = controller.signal;
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            try {
+                setLoading(true);
+                const token = await getToken('token');
+                if (!token) throw Error('token is not valid')
+                const response = await fetch(`${process.env.BASE_URL}/reservation/${reservationId}`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application',
+                            'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+                        },
+                        signal
+                    }
+                )
+                const loadedReservation = await response.json();
+                const parsedReservation = parseToReservation(loadedReservation);
+
+                setReservation(parsedReservation)
+                setPreReservation(parsedReservation)
+            } catch (e) {
+                console.error(e);
+                navigation.goBack();
+            } finally {
+                setLoading(false);
+                clearTimeout(timeoutId);
+            }
+
+        }
+
+        reservationId && load();
+        date && setDate(new Date(date))
+
+    }, [reservationId])
+
+    if (isLoading)
+        return (
+            <View style={{ backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+                <ActivityIndicator size={'large'} color={Color['blue500']}></ActivityIndicator>
+            </View>
+        )
     return (
         <View style={{ backgroundColor: '#FFF', flex: 1 }}>
             <ScrollView>
@@ -37,25 +113,31 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <View style={{ height: 16 }} />
                 <Pressable style={{ height: 100, marginHorizontal: 40, backgroundColor: Color['grey100'], borderRadius: 10 }}
                     onPress={() => {
-                        if (reservation.date)
+                        if (reservation?.date)
                             navigation.push('TimeSelect')
                         else navigation.push('ResrvationDateSelect')
                     }}>
                     <View style={{ flexDirection: 'row', marginTop: 8, marginLeft: 8, alignItems: 'center' }}>
-                        <View style={{ height: 24, width: 24, backgroundColor: Color['grey300'], marginRight: 6 }} />
-                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey700'] }}>{reservation.date && DateString(reservation.date)}</Text>
+                        {reservation?.date && <View style={{ height: 24, width: 24, marginRight: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }} >
+                            <Icons name='calendar-outline' size={20} color={Color['grey400']} />
+                        </View>}
+                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey700'] }}>{reservation.date && DateString(new Date(reservation.date))}</Text>
                     </View>
                     {reservation.Time.startTime && reservation.Time.endTime ?
-                        <View style={{ flexDirection: 'row', marginTop: 12, alignItems: 'center', justifyContent: 'space-evenly' }}>
-                            <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'] }}>{reservation.Time.startTime}:00</Text>
-                            <View style={{ width: 72, paddingVertical: 8, alignItems: 'center', backgroundColor: '#FFF', borderRadius: 5 }}>
-                                <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Light', color: Color['grey700'] }}>{reservation.Time.endTime - reservation.Time.startTime}시간</Text>
+                        <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'space-evenly' }}>
+                            <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'] }}>{`${reservation.Time.startTime.toString().slice(5, 7)}:${reservation.Time.startTime.toString().slice(7)}`}</Text>
+                            <View style={{ width: 64, paddingVertical: 8, alignItems: 'center', backgroundColor: '#FFF', borderRadius: 5 }}>
+                                <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', textAlign: 'center', color: Color['grey700'] }}>{TimeGapText}</Text>
                             </View>
-                            <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'] }}>{reservation.Time.endTime}:00</Text>
+                            <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'] }}>{`${reservation.Time.endTime.toString().slice(5, 7)}:${reservation.Time.endTime.toString().slice(7)}`}</Text>
                         </View> :
-                        <View style={{ flexDirection: 'row', marginTop: 12, alignItems: 'center', justifyContent: 'space-evenly' }}>
-                            <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Light', color: Color['grey700'] }}>시간 선택하러 가기</Text>
-                        </View>}
+                        reservation?.date ?
+                            <View style={{ flexDirection: 'row', marginTop: 20, alignItems: 'center', justifyContent: 'space-evenly' }}>
+                                <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Light', color: Color['grey700'] }}>시간 선택하러 가기</Text>
+                            </View> :
+                            <View style={{ flexDirection: 'row', marginTop: 20, alignItems: 'center', justifyContent: 'space-evenly' }}>
+                                <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Light', color: Color['grey700'] }}>예약 일시 선택하러 가기</Text>
+                            </View>}
                 </Pressable>
 
                 <View style={{ height: 28 }} />
@@ -67,7 +149,7 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <View style={{ marginHorizontal: 24 }}>
                     <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey500'] }}>예약명</Text>
                     <View style={{ marginTop: 20, marginHorizontal: 16, borderBottomWidth: 1 }}>
-                        <TextInput textAlign='right' placeholder={`${loginUser?.nickname?loginUser.nickname:loginUser?.name}의 연습`} value={reservation.name} style={{ marginHorizontal: 12, paddingVertical: 4, fontSize: 16 }} onChangeText={value => setName(value)} />
+                        <TextInput textAlign='right' placeholder={`${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`} value={reservation.reservationName} style={{ marginHorizontal: 12, paddingVertical: 4, fontSize: 16 }} onChangeText={value => setName(value)} />
                     </View>
                 </View>
 
@@ -107,7 +189,7 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                             </Text>
                         </Pressable>
                         <Pressable style={[{ width: 108, alignItems: 'center', borderBottomRightRadius: 5, borderTopRightRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderLeftWidth: 0.5, borderColor: reservation.isRegular ? Color['grey400'] : reservation.isParticipatible ? Color['blue500'] : Color['red500'] }, reservation.isRegular ? { backgroundColor: Color['grey100'] } : !reservation.isParticipatible && { backgroundColor: Color['red100'] }]}
-                            onPress={() =>  !reservation.isRegular && setIsParticipatible(false) }>
+                            onPress={() => !reservation.isRegular && setIsParticipatible(false)}>
                             <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, reservation.isRegular ? { color: Color['grey400'] } : reservation.isParticipatible ? { color: Color['blue300'] } : { color: Color['red600'] }]}>
                                 아니오
                             </Text>
@@ -125,9 +207,9 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <View style={{ marginHorizontal: 24 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey500'] }}>참여자</Text>
-                        <Pressable style={{ flexDirection: 'row', alignItems: 'center' }}
+                        <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}
                             onPress={() => setParticipants([])}>
-                            <View style={{ height: 16, width: 16, backgroundColor: Color['grey300'] }} />
+                            <Icons name='refresh' size={16} color={Color['grey400']} />
                             <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey300'] }}>초기화</Text>
                         </Pressable>
                     </View>
@@ -145,15 +227,15 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                                     </View>
                                     <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', width: 152, bottom: 12 }}>
 
-                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'] }}>
+                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Bold', marginRight: 24, color: Color['grey400'] }} numberOfLines={1}>
                                             {reservation.participants.slice(0, 2).map(user => `${user.name} `)}{reservation.participants.length >= 3 && `등`}
                                         </Text>
-                                        <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginRight: 24 }}>
                                             <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Bold', color: Color['blue500'] }}>
                                                 {reservation.participants.length}
                                             </Text>
                                             <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }}>
-                                                {`  명`}
+                                                {` 명`}
                                             </Text>
                                         </View>
                                     </View>
@@ -170,9 +252,9 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <View style={{ marginHorizontal: 24 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey500'] }}>대여 악기</Text>
-                        <Pressable style={{ flexDirection: 'row', alignItems: 'center' }}
+                        <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}
                             onPress={() => setBorrowInstruments([])}>
-                            <View style={{ height: 16, width: 16, backgroundColor: Color['grey300'] }} />
+                            <Icons name='refresh' size={16} color={Color['grey400']} />
                             <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey300'] }}>초기화</Text>
                         </Pressable>
                     </View>
@@ -212,12 +294,29 @@ const ReservationScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 </View>
                 <LongButton
                     color={reservation.hasToWait ? 'green' : 'blue'}
-                    innerText={reservation.hasToWait ? '대기열에 추가하기' : '예약하기'}
+                    innerText={reservationId ? '수정하기' : reservation.hasToWait ? '대기열에 추가하기' : '예약하기'}
                     isAble={isAgree}
                     onPress={() => {
-                        if (reservation.Time.startTime == 0) console.log('시간 미지정')
-                        if (reservation.name == '') console.log('이름 미지정')
-                        navigation.push('ReservationConfirm')
+                        const showAlert = (message: string) => {
+                            Alert.alert(
+                                '예약 오류', // 타이틀
+                                message, // 내용
+                                [
+                                    {
+                                        text: '확인', // 두 번째 버튼 (확인)
+                                        onPress: () => setAgree(false)
+                                    },
+                                ],
+                            );
+                        };
+                        if (areReservationsEqual(reservation, preReservation)) showAlert("기존 예약과 동일합니다.");
+                        else {
+                            if (reservation.Time.startTime == '') { showAlert("예약 시간이 지정되지 않았습니다.") }
+                            else {
+                                if (reservationId) navigation.navigate('ReservationEditConfirm')
+                                else navigation.navigate('ReservationConfirm')
+                            }
+                        }
                     }}
                 />
             </View>

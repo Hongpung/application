@@ -26,9 +26,8 @@ export const useAuth = () => {
             }
           }
         )
-
         const userStatus = await loadUser.json() as User;
-
+        
         setLoginUser(userStatus);
 
       }

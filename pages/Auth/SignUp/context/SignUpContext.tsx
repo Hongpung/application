@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { club } from '../../../../UserType';
+import { club } from '@hongpung/UserType';
 
 
-export type SignUpInfo = {
+export interface SignUpInfo {
     email: string
     password: string
     club: club | null
@@ -46,9 +46,6 @@ const SignUpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const setName = (name: string) => { setSignUpInfo(prev => ({ ...prev, name })) }
 
 
-    useEffect(() => {
-        console.log(signUpInfo)
-    }, [onStep])
     return (
         <SignUpContext.Provider value={{
             onStep,

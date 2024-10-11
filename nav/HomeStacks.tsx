@@ -24,7 +24,7 @@ import DateSelcectScreen from '@hongpung/pages/Reserve/InReservation/DateSelcect
 import TimeSelectScreen from '@hongpung/pages/Reserve/InReservation/TimeSelectScreen';
 import BorrowInstrumentSelectScreen from '@hongpung/pages/Reserve/InReservation/BorrowInstrumentSelectScreen';
 import ChatMediaViewerScreen from '@hongpung/pages/Chat/ChatMediaViewerScreen';
-import { ReservationProvider } from '@hongpung/context/ReservationContext';
+import { ReservationProvider } from '@hongpung/pages/Reserve/context/ReservationContext';
 import ParticipantsSelectScreen from '@hongpung/pages/Reserve/InReservation/ParticipantsSelectScreen';
 import ReservationConfirmScreen from '@hongpung/pages/Reserve/InReservation/ReservationConfirmScreen';
 import CheckInScreen from '@hongpung/pages/QRScan/CheckInScreen';
@@ -37,6 +37,8 @@ import ActivitiesScreen from '@hongpung/pages/ExtaraActivities/ActivitiesListScr
 import MyPracticesScreen from '@hongpung/pages/Home/MyPage/MyPractices/MyPracticesScreen';
 import ReservationDetailScreen from '@hongpung/pages/Reserve/ViewDetailReservation/ReservationDetailScreen';
 import { NavigationContainer } from '@react-navigation/native';
+import ReservationEditConfirmScreen from '@hongpung/pages/Reserve/InReservation/ReservationEditConfirm';
+import ChatScreen from '@hongpung/pages/Chat/ChatScreen';
 
 // HomeStack Navigator
 const MainStack = createNativeStackNavigator();
@@ -44,19 +46,19 @@ const MainStack = createNativeStackNavigator();
 const MainStacks = () => {
     return (
         <MainStack.Navigator initialRouteName="BottomNav" screenOptions={{ headerShown: false, animationDuration: 50, animation: 'slide_from_right' }}>
-            
+
             <MainStack.Screen name="BottomNav" component={BottomNav} options={{}} />
-            
+
             <MainStack.Screen
                 name="Notification"
                 component={NotificationScreen}
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: () => <Header leftButton='X' HeaderName='알림' />
+                    header: () => <Header leftButton='close' HeaderName='알림' />
                 }}
             />
-            
+
             <MainStack.Screen
                 name="MyPage"
                 component={MyPageStacks}
@@ -81,7 +83,7 @@ const MainStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: () => <Header leftButton='X' HeaderName='현재 정보' />
+                    header: () => <Header leftButton='close' HeaderName='현재 정보' />
                 }}
             />
 
@@ -107,7 +109,7 @@ const MainStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: () => <Header leftButton='<-' />
+                    header: () => <Header leftButton='arrow-back' />
                 }}
             />
 
@@ -124,7 +126,13 @@ const MainStacks = () => {
                 component={ExtaraActivitiesStacks}
             />
 
-
+            <MainStack.Screen
+                name="ChatRoom"
+                component={ChatScreen}
+                options={{
+                    animation: 'none',
+                }}
+            />
 
         </MainStack.Navigator>
     );
@@ -141,7 +149,7 @@ const CheckOutStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: () => <Header leftButton='<-' />
+                    header: () => <Header leftButton='arrow-back' />
                 }}
             />
 
@@ -165,89 +173,60 @@ const CheckOutStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: ({ navigation }) => <Header leftButton='X' LeftAction={() => navigation.navigate('Home')} />
+                    header: ({ navigation }) => <Header leftButton='close' LeftAction={() => navigation.navigate('Home')} />
                 }}
             />
         </CheckOutStack.Navigator>
     );
 };
 
-const ExtaraActivitiesStack = createNativeStackNavigator();
+const EclosetaraActivitiesStack = createNativeStackNavigator();
 
 const ExtaraActivitiesStacks = () => {
     return (
-        <ExtaraActivitiesStack.Navigator initialRouteName="ActivitiesList" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
-            <ExtaraActivitiesStack.Screen
+        <EclosetaraActivitiesStack.Navigator initialRouteName="ActivitiesList" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+            <EclosetaraActivitiesStack.Screen
                 name='ActivitiesList'
                 component={ActivitiesScreen}
             />
-        </ExtaraActivitiesStack.Navigator>
+        </EclosetaraActivitiesStack.Navigator>
     );
 };
 
 const ReservationStack = createNativeStackNavigator();
 
-const ReservationStacks = () => {
+const InReservationStack = createNativeStackNavigator();
+
+const InReservationStacks = () => {
     return (
         <ReservationProvider>
-            <ReservationStack.Navigator initialRouteName="ReserveCalendar" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
-
-                <ReservationStack.Screen
-                    name='ReserveCalendar'
-                    component={ReserveCalendarScreen}
-                    options={{
-                        headerShown: true,
-                        header: ({ navigation }) => <Header leftButton='<-' HeaderName='연습실 예약 조회' RightButton='예약'
-                            RightAction={() => {
-                                const newDate = new Date();
-                                navigation.push('Reservation', { date: newDate.setDate(newDate.getDate() + 1) })
-                            }} />
-                    }}
-                />
-                <ReservationStack.Screen
-                    name='DailyReserveList'
-                    component={DailyReserveListScreen}
-                    options={{
-                        animation: 'none',
-                    }}
-                />
-
-                <ReservationStack.Screen
-                    name='ReservationDetail'
-                    component={ReservationDetailScreen}
-                    options={{
-                        animation: 'none',
-                        headerShown: true,
-                        header: () => <Header leftButton='X' HeaderName='연습실 예약 조회' />
-                    }}
-                />
-
-                <ReservationStack.Screen
-                    name='Reservation'
+            <InReservationStack.Navigator initialRouteName='inReservation' screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+                <InReservationStack.Screen
+                    name='inReservation'
                     component={ReservationScreen}
                     options={{
                         animation: 'none',
                         headerShown: true,
-                        header: () => <Header leftButton='X' HeaderName='연습실 예약' />
+                        header: () => <Header leftButton='close' HeaderName='연습실 예약' />
                     }}
                 />
-                <ReservationStack.Screen
+                <InReservationStack.Screen
                     name='ResrvationDateSelect'
                     component={DateSelcectScreen}
                     options={{
                         headerShown: true,
                         animation: 'none',
-                        header: ({ navigation }) => <Header leftButton='<-' HeaderName='예약 일시 선택' LeftAction={() => navigation.navigate('Reservation')} />
+                        header: ({ navigation }) => <Header leftButton='close' HeaderName='예약 일시 선택' LeftAction={() => navigation.navigate('inReservation')} />
                     }}
                 />
-                <ReservationStack.Screen
+                <InReservationStack.Screen
                     name='TimeSelect'
                     component={TimeSelectScreen}
                     options={{
                         animation: 'none',
                     }}
                 />
-                <ReservationStack.Screen
+                <InReservationStack.Screen
                     name='BorrowInstrumentSelect'
                     component={BorrowInstrumentSelectScreen}
                     options={{
@@ -255,7 +234,7 @@ const ReservationStacks = () => {
                     }}
                 />
 
-                <ReservationStack.Screen
+                <InReservationStack.Screen
                     name='ParticipantsSelect'
                     component={ParticipantsSelectScreen}
                     options={{
@@ -263,19 +242,69 @@ const ReservationStacks = () => {
                     }}
                 />
 
-                <ReservationStack.Screen
+                <InReservationStack.Screen
                     name='ReservationConfirm'
                     component={ReservationConfirmScreen}
                     options={{
                         headerShown: true,
                         animation: 'none',
-                        header: ({ navigation }) => <Header leftButton='X' LeftAction={() => navigation.navigate('Reservation')} />
+                        header: () => <Header leftButton='close' />
+                    }}
+                />
+                <InReservationStack.Screen
+                    name='ReservationEditConfirm'
+                    component={ReservationEditConfirmScreen}
+                    options={{
+                        headerShown: true,
+                        animation: 'none',
+                        header: () => <Header leftButton='close' />
                     }}
                 />
 
-            </ReservationStack.Navigator>
+            </InReservationStack.Navigator>
         </ReservationProvider>
+    )
+}
 
+const ReservationStacks = () => {
+    return (
+        <ReservationStack.Navigator initialRouteName="ReserveCalendar" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+            <ReservationStack.Screen
+                name='ReserveCalendar'
+                component={ReserveCalendarScreen}
+                options={{
+                    headerShown: true,
+                    header: ({ navigation }) => <Header leftButton='close' HeaderName='연습실 예약 조회' RightButton='예약'
+                        RightAction={() => {
+                            const newDate = new Date();
+                            navigation.push('Reservation', { date: newDate.setDate(newDate.getDate() + 1) })
+                        }}
+                    />
+                }}
+            />
+            <ReservationStack.Screen
+                name='DailyReserveList'
+                component={DailyReserveListScreen}
+                options={{
+                    animation: 'none',
+                }}
+            />
+
+            <ReservationStack.Screen
+                name='ReservationDetail'
+                component={ReservationDetailScreen}
+                options={{
+                    animation: 'none',
+                    headerShown: true,
+                    header: () => <Header leftButton='close' HeaderName='예약 조회' />
+                }}
+            />
+
+            <ReservationStack.Screen
+                name='Reservation'
+                component={InReservationStacks}
+            />
+        </ReservationStack.Navigator>
     );
 };
 
@@ -291,7 +320,7 @@ const MyPageStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: () => <Header leftButton='X' HeaderName='마이페이지' />
+                    header: () => <Header leftButton='close' HeaderName='마이페이지' />
                 }}
             />
             <MyPageStack.Screen
@@ -300,7 +329,7 @@ const MyPageStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: () => <Header leftButton='<-' HeaderName='내 일정' />
+                    header: () => <Header leftButton='arrow-back' HeaderName='내 일정' />
                 }}
             />
             <MyPageStack.Screen
@@ -309,7 +338,7 @@ const MyPageStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: () => <Header leftButton='<-' HeaderName='내 배지' />
+                    header: () => <Header leftButton='arrow-back' HeaderName='내 배지' />
                 }}
             />
             <MyPageStack.Screen
@@ -317,7 +346,7 @@ const MyPageStacks = () => {
                 component={MyPracticesScreen}
                 options={{
                     headerShown: true,
-                    header: () => <Header leftButton='<-' HeaderName='내 활동' />
+                    header: () => <Header leftButton='arrow-back' HeaderName='내 활동' />
                 }}
             />
 
@@ -326,7 +355,7 @@ const MyPageStacks = () => {
                 component={NotificationSettingScreen}
                 options={{
                     headerShown: true,
-                    header: () => <Header leftButton='<-' HeaderName='알림 설정' />
+                    header: () => <Header leftButton='arrow-back' HeaderName='알림 설정' />
                 }}
             />
 
@@ -335,7 +364,7 @@ const MyPageStacks = () => {
                 component={LoginSettingScreen}
                 options={{
                     headerShown: true,
-                    header: () => <Header leftButton='<-' HeaderName='로그인 설정' />
+                    header: () => <Header leftButton='arrow-back' HeaderName='로그인 설정' />
                 }}
             />
 
@@ -355,7 +384,7 @@ const MyClubStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: () => <Header leftButton='<-' HeaderName='우리 동아리' />
+                    header: () => <Header leftButton='arrow-back' HeaderName='우리 동아리' />
                 }}
             />
             <MyClubStack.Screen
@@ -371,7 +400,7 @@ const MyClubStacks = () => {
                 component={ClubCalendar}
                 options={{
                     headerShown: true,
-                    header: () => <Header leftButton='<-' HeaderName='연습 기록 보기' />
+                    header: () => <Header leftButton='arrow-back' HeaderName='연습 기록 보기' />
                 }}
             />
             <MyClubStack.Screen
@@ -379,7 +408,7 @@ const MyClubStacks = () => {
                 component={PracticeInfoScreen}
                 options={{
                     headerShown: true,
-                    header: () => <Header leftButton='<-' HeaderName='연습 상세 기록' />
+                    header: () => <Header leftButton='arrow-back' HeaderName='연습 상세 기록' />
                 }}
             />
 
@@ -399,14 +428,14 @@ const MyClubMembersStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: () => <Header leftButton='<-' HeaderName='우리 동아리' />
+                    header: () => <Header leftButton='arrow-back' HeaderName='우리 동아리' />
                 }}
             />
         </MyClubMembersStack.Navigator>
     );
 };
 
-// InstrumentStack Navigator with Context
+// InstrumentStack Navigator with Contecloset
 const InstrumentStack = createNativeStackNavigator();
 
 const InstrumentStacks = () => {
@@ -419,7 +448,7 @@ const InstrumentStacks = () => {
                     options={{
                         headerShown: true,
                         animation: 'none',
-                        header: () => <Header leftButton='<-' HeaderName='악기 관리' />
+                        header: ({navigation}) => <Header leftButton='arrow-back' HeaderName='악기 관리' RightButton='추가' RightAction={()=> navigation.navigate('InstrumentEdit')} />
                     }}
                 />
                 <InstrumentStack.Screen
@@ -430,7 +459,7 @@ const InstrumentStacks = () => {
                         animation: 'none',
                         header: () => (
                             <Header
-                                leftButton='X'
+                                leftButton='close'
                                 HeaderName='악기 상세'
                                 RightButton='수정'
                                 RightAction={() => navigation.push('InstrumentEdit')}
@@ -450,7 +479,7 @@ const InstrumentStacks = () => {
                         animation: 'none',
                         header: () => (
                             <Header
-                                leftButton='<-'
+                                leftButton='arrow-back'
                                 HeaderName='악기 수정'
                             />
                         )
