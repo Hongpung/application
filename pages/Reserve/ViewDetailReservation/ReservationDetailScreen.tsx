@@ -7,6 +7,7 @@ import { useRecoilValue } from 'recoil'
 import { getToken } from '@hongpung/utils/TokenHandler'
 import { Reservation, parseToReservation } from '../ReserveInterface'
 import { Icons } from '@hongpung/components/Icon'
+import Toast from 'react-native-toast-message'
 
 const { width } = Dimensions.get('window')
 
@@ -55,6 +56,47 @@ const ReservationDetailScreen: React.FC<{ navigation: any, route: any }> = ({ na
         load();
     }, [reservationId])
 
+    const onDelete = () => {
+        const deleteReservation = async () => {
+            const controller = new AbortController();
+            const signal = controller.signal;
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            try {
+                setLoading(true);
+                const token = await getToken('token');
+                if (!token) throw Error('token is not valid')
+                const response = await fetch(`${process.env.BASE_URL}/reservation/${reservationId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+                        },
+                        signal
+                    }
+                )
+
+                if (!response.ok) throw Error('삭제 실패' + response.status)
+
+                Toast.show({
+                    type: 'success',
+                    text1: '연습 삭제를 완료했어요!',
+                    position: 'bottom',
+                    bottomOffset: 60,
+                    visibilityTime: 2000
+                });
+
+                navigation.goBack();
+            } catch (e) {
+                console.error(e);
+            } finally {
+                setLoading(false);
+                clearTimeout(timeoutId);
+            }
+
+        }
+
+        deleteReservation();
+    }
     const TimeGapText = useMemo(() => {
         const eTime = Number(reservation?.Time.endTime.toString().slice(5, 7)) * 60 + Number(reservation?.Time.endTime.toString().slice(7));
         const sTime = Number(reservation?.Time.startTime.toString().slice(5, 7)) * 60 + Number(reservation?.Time.startTime.toString().slice(7));
@@ -91,7 +133,7 @@ const ReservationDetailScreen: React.FC<{ navigation: any, route: any }> = ({ na
                         <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey700'] }}>{reservation.date && DateString(new Date(reservation.date))}</Text>
                     </View>
 
-                    <View style={{ flexDirection: 'row', flex:1, alignItems: 'center', justifyContent: 'space-evenly' }}>
+                    <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'space-evenly' }}>
                         <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'] }}>{`${reservation.Time.startTime.toString().slice(5, 7)}:${reservation.Time.startTime.toString().slice(7)}`}</Text>
                         <View style={{ width: 64, paddingVertical: 8, alignItems: 'center', backgroundColor: '#FFF', borderRadius: 5 }}>
                             <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', textAlign: 'center', color: Color['grey700'] }}>{TimeGapText}</Text>
@@ -232,9 +274,17 @@ const ReservationDetailScreen: React.FC<{ navigation: any, route: any }> = ({ na
                     </View>
                 </View>
 
-                <View style={{ height: 16 }} />
+                <View style={{ height: 24 }} />
+                {loginUser?.email == reservation.userEmail && reservation.date! > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
+                    <LongButton
+                        color={'red'}
+                        innerText={'취소하기'}
+                        isAble={true}
+                        onPress={onDelete}
+                    />
+                </View>}
             </ScrollView>
-            {loginUser?.email == reservation.userEmail && reservation.date > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
+            {loginUser?.email == reservation.userEmail && reservation.date! > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
                 <LongButton
                     color={'green'}
                     innerText={'수정하기'}

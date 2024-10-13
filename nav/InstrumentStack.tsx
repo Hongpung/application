@@ -1,0 +1,48 @@
+import { InstrumentProvider, useInstrument } from "@hongpung/context/InstrumentContext";
+import ClubInstrumentsScreen from "@hongpung/pages/Home/MyClub/Instruments/ClubInstrumentsScreen";
+import InstrumentEditScreen from "@hongpung/pages/Home/MyClub/Instruments/InstrumentEditScreen";
+import InstrumentSpecificScreen from "@hongpung/pages/Home/MyClub/Instruments/InstrumentSpecificScreen";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Header from '@hongpung/components/Header';
+
+const InstrumentStack = createNativeStackNavigator();
+
+const InstrumentStacks = () => {
+    return (
+        <InstrumentStack.Navigator initialRouteName="InstrumentsHome" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+            <InstrumentStack.Screen
+                name="InstrumentsHome"
+                component={ClubInstrumentsScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: ({ navigation }) => <Header leftButton='arrow-back' HeaderName='악기 관리' RightButton='추가' RightAction={() => navigation.navigate('InstrumentEdit')} />
+                }}
+            />
+            <InstrumentStack.Screen
+                name="InstrumentSpecific"
+                component={InstrumentSpecificScreen}
+                options={{
+                    headerShown: false,
+                    animation: 'none',
+                }}
+            />
+            <InstrumentStack.Screen
+                name="InstrumentEdit"
+                component={InstrumentEditScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => (
+                        <Header
+                            leftButton='arrow-back'
+                            HeaderName='악기 수정'
+                        />
+                    )
+                }}
+            />
+        </InstrumentStack.Navigator>
+    );
+};
+
+export default InstrumentStacks;

@@ -7,12 +7,12 @@ import { Color } from "@hongpung/ColorSet"
 import { useInstrument } from "@hongpung/context/InstrumentContext"
 import { useEffect, useState } from "react"
 import useFetch from "@hongpung/hoc/useFetch"
+import { useIsFocused } from "@react-navigation/native"
 
 
 type ClubInstrumentsScreenProps = NativeStackScreenProps<HomeStackParamList, 'InstrumentsHome'>
 
 const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[], navigation: any }> = ({ instrumentsList, navigation }) => {
-    const { setSelectedInstrument } = useInstrument();
     const renderInstruments = () => {
         const rows = [];
         let cnt = instrumentOrder(instrumentsList[0]?.type) - 1;
@@ -39,7 +39,7 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[], navigation
                             key={instrument.name + index}
                             instrument={instrument}
                             view="inManage"
-                            onSelectInstrument={(instrument) => { setSelectedInstrument(instrument); navigation.push('InstrumentSpecific'); }}
+                            onSelectInstrument={(instrument) => { navigation.push('InstrumentSpecific', { instrumentId: instrument.instrumentId }); }}
                         />
                     ))}
                     {group.length % 2 == 1 && <View style={{ height: 168, width: 154 }} />}
@@ -52,14 +52,14 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[], navigation
 
     return (
         <View style={{ flex: 1 }}>
-            {instrumentsList&&renderInstruments()}
+            {instrumentsList && renderInstruments()}
         </View>
     )
 }
 
 const ClubInstrumentsScreen: React.FC<ClubInstrumentsScreenProps> = ({ navigation }) => {
 
-
+    const isFocusing = useIsFocused();
     const [instruments, setInstruments] = useState<briefInstrument[]>([])
 
     const { data, loading, error } = useFetch<briefInstrument[]>(
@@ -69,11 +69,11 @@ const ClubInstrumentsScreen: React.FC<ClubInstrumentsScreenProps> = ({ navigatio
             headers: {
                 'Content-Type': 'application/json'
             }
-        }, 2000, []
+        }, 2000, [isFocusing]
     )
 
     useEffect(() => {
-        const clubInstruements = data??[];
+        const clubInstruements = data ?? [];
         console.log(data);
         clubInstruements?.sort((a, b) => instrumentOrder(a.type) - instrumentOrder(b.type))
         setInstruments(clubInstruements ?? [])

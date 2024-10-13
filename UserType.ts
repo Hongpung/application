@@ -1,6 +1,6 @@
 
-export type InstrumentType = '쇠' | '장구' | '북' | '소고' | '새납';
-export const InstrumentTypes: InstrumentType[] = ['쇠', '장구', '북', '소고', '새납']
+export type InstrumentType = '꽹과리' | '장구' | '북' | '소고' | '징' | '기타';
+export const InstrumentTypes: InstrumentType[] = ['꽹과리', '장구', '북', '소고', '징' , '기타']
 export type club = '들녘' | '산틀' | '화랑' | '악반' | '기타'
 export const clubs: club[] = ['들녘', '산틀', '화랑', '악반', '기타']//표시할 정보
 export const clubsEng: string[] = ['DEULNEOK', 'SANTLE', 'HWARANG', 'AKBAN', 'ETC']//실제로 가야하는 정보

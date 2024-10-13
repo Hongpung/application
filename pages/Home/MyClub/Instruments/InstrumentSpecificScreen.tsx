@@ -1,77 +1,53 @@
-import { StyleSheet, Text, View, ScrollView, Image } from 'react-native'
-import React from 'react'
-import { useRoute } from '@react-navigation/native';
+import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator } from 'react-native'
+import React, { useMemo } from 'react'
+import { useIsFocused, useRoute } from '@react-navigation/native';
 import { Color } from '../../../../ColorSet';
 import { Instrument } from '../../../../UserType';
 import { useInstrument } from '@hongpung/context/InstrumentContext';
+import useFetch from '@hongpung/hoc/useFetch';
+import Header from '@hongpung/components/Header';
 
-interface Reserve {
-    date: Date
-    user: string,
-    reserveName: string,
-    nickname?: string
-}
 
-const InstrumentSpecificScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-    const {selectedInstrument} = useInstrument();
-    const instrument:Instrument = selectedInstrument!;
+
+const InstrumentSpecificScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+    const { instrumentId } = route?.params;
+
+    const daysOfWeek = useMemo(() => ['일', '월', '화', '수', '목', '금', '토'], [])
+
+    const isFocusing = useIsFocused();
+    const { data, loading, error } = useFetch<Instrument>(
+        `${process.env.BASE_URL}/instrument/${instrumentId}`
+        , {}, 5000, [instrumentId,isFocusing]
+    )
+
     
-    const preReserves: Reserve[] = [
-        {
-            date: new Date('2023-11-30'),
-            user: '김기동',
-            reserveName: '따로 연습',
-        },
-        {
-            date: new Date('2023-11-21'),
-            user: '이정효',
-            nickname: '광주 감독',
-            reserveName: '광주 연승',
-        },
-        {
-            date: new Date('2023-11-13'),
-            user: '이정효',
-            nickname: '광주 감독',
-            reserveName: '광주 연승',
-        },
-        {
-            date: new Date('2023-11-22'),
-            user: '이정효',
-            nickname: '광주 감독',
-            reserveName: '광주 연승',
-        },
-        {
-            date: new Date('2023-11-11'),
-            user: '이정효',
-            nickname: '광주 감독',
-            reserveName: '광주 연승',
-        }
-    ]
+
     const reservesList = () => {
         const Cards = []
-        preReserves.sort((a, b) => a.date.getTime() - b.date.getTime())
-        for (const reserve of preReserves) {
+        data?.borrowHistory.sort((a, b) => new Date(a.borrowDate).getTime() - new Date(b.borrowDate).getTime())
+        for (const reserve of data!.borrowHistory) {
+            const borrowDate = new Date(reserve.borrowDate);
             Cards.push(
-                <View key={reserve.reserveName+reserve.date} style={{ width: 320, height: 76, borderRadius: 5, borderWidth: 1, borderColor: Color['grey200'], marginVertical: 6 }}>
+                <View key={reserve.borrowerName + reserve.borrowDate} style={{ width: 320, height: 76, borderRadius: 5, borderWidth: 1, borderColor: Color['grey200'], marginVertical: 6 }}>
                     <View style={{ flexDirection: 'row', alignItems: 'flex-end', position: 'absolute', left: 14, top: 12 }}>
                         <Text style={{
                             fontSize: 16,
                             fontFamily: "NanumSquareNeo-Regular",
                             color: Color['grey700'],
                             marginRight: 2
-                        }}>{reserve.user}</Text>
-                        {reserve?.nickname && <Text style={{
+                        }}>{reserve.borrowerName}</Text>
+                        {reserve?.borrowerNickname && <Text style={{
                             fontSize: 14,
                             fontFamily: "NanumSquareNeo-Regular",
                             color: Color['grey400']
-                        }}>{reserve.nickname}</Text>}
+                        }}>{reserve.borrowerNickname}</Text>}
                     </View>
                     <View style={{ position: 'absolute', left: 14, bottom: 12 }}>
                         <Text style={{
                             fontSize: 16,
                             fontFamily: "NanumSquareNeo-Regular",
                             color: Color['grey400']
-                        }}>{reserve.reserveName}</Text>
+                        }}>{reserve.borrowerName}</Text>
                     </View>
                     <View style={{ position: 'absolute', right: 12, bottom: 12 }}>
                         <Text style={{
@@ -79,7 +55,7 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any }> = ({ navigation })
                             fontSize: 14,
                             fontFamily: "NanumSquareNeo-Regular",
                             color: Color['grey400']
-                        }}>{reserve.date.getFullYear() + '.' + (reserve.date.getMonth() + 1 < 9 ? '0' : '') + (reserve.date.getMonth() + 1) + '.' + (reserve.date.getDate() < 9 ? '0' : '') + (reserve.date.getDate()) + '(금)'}</Text>
+                        }}>{borrowDate.getFullYear() + '.' + (borrowDate.getMonth() + 1 < 9 ? '0' : '') + (borrowDate.getMonth() + 1) + '.' + (borrowDate.getDate() < 9 ? '0' : '') + '(' + (daysOfWeek[borrowDate.getDay()]) + ')'}</Text>
                     </View>
                 </View>
             )
@@ -87,49 +63,62 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any }> = ({ navigation })
         return Cards;
     }
 
-    if (instrument == undefined)
+    if (loading)
+        return (<View style={{ flex: 1, backgroundColor: `#FFF` }}>
+            <ActivityIndicator size={'large'} color={Color['blue500']}/>
+            </View>)
+
+    if (!data)
         return (<View><Text>Error:Can't find the instrument</Text></View>)
     return (
-        <View style={{ flex: 1, backgroundColor:`#FFF`}}>
+        <View style={{ flex: 1, backgroundColor: `#FFF` }}>
+            <Header
+                leftButton='close'
+                HeaderName='악기 상세'
+                RightButton='수정'
+                RightAction={() => navigation.push('InstrumentEdit',{instrumentInform:JSON.stringify(data)})}
+            />
             <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
-                <View style={{height:12}}/>
+                <View style={{ height: 12 }} />
                 <View style={styles.imageContainer}>
-                    {instrument.imgURL?<Image
-                        source={{ uri: instrument?.imgURL }}
+                    {data.imgURL ? <Image
+                        source={{ uri: data?.imgURL }}
                         style={styles.image}
-                    />:
-                    <View
-                    style={[styles.image, {backgroundColor:Color['grey200']}]}
-                    />
+                    /> :
+                        <View
+                            style={[styles.image, { backgroundColor: Color['grey200'] }]}
+                        />
                     }
                 </View>
                 <View style={{ height: 28 }} />
                 <View style={styles.Row}>
 
-                    <Text style={styles.RowLeft}>{`악기`}</Text>
-                    <Text style={styles.RowRight}>{instrument.name}</Text>
+                    <Text style={styles.RowLeft}>{`악기 이름`}</Text>
+                    <Text style={styles.RowRight}>{data.name}</Text>
 
                 </View>
+
+                <View style={{ height: 14 }} />
 
                 <View style={styles.Row}>
 
                     <Text style={styles.RowLeft}>{`악기 타입`}</Text>
-                    <Text style={styles.RowRight}>{instrument.type}</Text>
+                    <Text style={styles.RowRight}>{data.type}</Text>
 
                 </View>
 
-                <View style={styles.Row}>
+                {/* <View style={styles.Row}>
 
                     <Text style={styles.RowLeft}>{`할당 치배`}</Text>
-                    <Text style={styles.RowRight}>{instrument.owner ?? '-'}</Text>
+                    <Text style={styles.RowRight}>{data.owner ?? '-'}</Text>
 
                 </View>
-                {instrument.nickname && <View style={styles.Row}>
+                {data.nickname && <View style={styles.Row}>
 
                     <Text style={styles.RowLeft}>{`별명`}</Text>
-                    <Text style={styles.RowRight}>{instrument.nickname}</Text>
+                    <Text style={styles.RowRight}>{data.nickname}</Text>
 
-                </View>}
+                </View>} */}
 
                 <View style={{ height: 20 }} />
                 <View style={{ alignSelf: 'flex-start', paddingHorizontal: 28 }}>
@@ -138,9 +127,9 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any }> = ({ navigation })
                     </View>
                 </View>
                 <View style={{ paddingVertical: 6 }}>
-                    {preReserves && reservesList()}
+                    {data.borrowHistory.length > 0 && reservesList()}
                 </View>
-                <View style={{height:18}}/>
+                <View style={{ height: 18 }} />
             </ScrollView>
         </View>
     )

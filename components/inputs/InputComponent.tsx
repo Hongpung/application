@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, us
 import { View, Text, StyleSheet, TextInput, Animated, Pressable, KeyboardTypeOptions, Platform } from 'react-native';
 import { Color } from '../../ColorSet';
 import { josa } from 'es-hangul';
+import { Icons } from '../Icon';
 
 type InputProps = {
     length?: number,
@@ -117,7 +118,7 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
                 onFocus={handleFocus}
                 onEndEditing={validateInput}
                 onChangeText={handleTextChange}
-                secureTextEntry={isEncryption ? isVisible : false}
+                secureTextEntry={isEncryption ? !isVisible : false}
                 editable={isEditible}
                 keyboardType={keyboardType}
                 maxLength={maxLength}
@@ -131,8 +132,10 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
 
             {isEncryption &&
                 <Pressable
-                    style={[styles.VisibleBtn, { backgroundColor: isVisible ? "#000" : "#FFF" }]}
-                    onPress={() => { setIsVisible(!isVisible) }} />
+                    style={[styles.VisibleBtn]}
+                    onPress={() => { setIsVisible(!isVisible) }} >
+                    <Icons name={isVisible ? 'eye-outline' : 'eye-off-outline'}></Icons>
+                </Pressable>
             }
             {!isValid && errorText.length > 0 && <Text style={styles.errorText}>{errorText}</Text>}
         </View>
@@ -177,9 +180,7 @@ const styles = StyleSheet.create({
         right: 4,
         top: 16,
         width: 32,
-        height: 32,
-        borderWidth: 1,
-        borderColor: "#000"
+        height: 32
     }
 });
 

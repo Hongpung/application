@@ -51,7 +51,7 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
           <View style={styles.CardIcons}>
             <Icons name='camera-outline' size={48} color={Color['blue700']}></Icons>
           </View>
-          <View>
+          <View style={{display:'flex', gap:4}}>
             <Text style={styles.CardHeaderWord}>
               카메라 사용 권한
             </Text>
@@ -64,7 +64,7 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
           <View style={styles.CardIcons}>
             <Icons name='albums-outline' size={48} color={Color['blue700']}></Icons>
           </View>
-          <View>
+          <View style={{display:'flex', gap:4}}>
             <Text style={styles.CardHeaderWord}>
               갤러리 사용 권한
             </Text>
@@ -77,7 +77,7 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
           <View style={styles.CardIcons}>
           <Icons name='notifications-outline' size={48} color={Color['blue700']}></Icons>
           </View>
-          <View>
+          <View style={{display:'flex', gap:4}}>
             <Text style={styles.CardHeaderWord}>
               알림 사용 권한
             </Text>
@@ -117,7 +117,6 @@ const styles = StyleSheet.create({
     marginRight: 24,
     height: 48,
     width: 48,
-    backgroundColor: "#000"
   },
   CardHeaderWord: {
     fontFamily: "NanumSquareNeo-ExtraBold",

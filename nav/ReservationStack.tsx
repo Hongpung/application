@@ -1,0 +1,130 @@
+import { ReservationProvider } from "@hongpung/pages/Reserve/context/ReservationContext";
+import DailyReserveListScreen from "@hongpung/pages/Reserve/DailyReserveListScreen";
+import BorrowInstrumentSelectScreen from "@hongpung/pages/Reserve/InReservation/BorrowInstrumentSelectScreen";
+import DateSelcectScreen from "@hongpung/pages/Reserve/InReservation/DateSelcectScreen";
+import ParticipantsSelectScreen from "@hongpung/pages/Reserve/InReservation/ParticipantsSelectScreen";
+import ReservationConfirmScreen from "@hongpung/pages/Reserve/InReservation/ReservationConfirmScreen";
+import ReservationEditConfirmScreen from "@hongpung/pages/Reserve/InReservation/ReservationEditConfirm";
+import ReservationScreen from "@hongpung/pages/Reserve/InReservation/ReservationScreen";
+import TimeSelectScreen from "@hongpung/pages/Reserve/InReservation/TimeSelectScreen";
+import ReserveCalendarScreen from "@hongpung/pages/Reserve/ReserveCalendarScreen";
+import ReservationDetailScreen from "@hongpung/pages/Reserve/ViewDetailReservation/ReservationDetailScreen";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Header from '@hongpung/components/Header';
+
+const ReservationStack = createNativeStackNavigator();
+
+const InReservationStack = createNativeStackNavigator();
+
+const InReservationStacks = () => {
+    return (
+        <ReservationProvider>
+            <InReservationStack.Navigator initialRouteName='inReservation' screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+                <InReservationStack.Screen
+                    name='inReservation'
+                    component={ReservationScreen}
+                    options={{
+                        animation: 'none',
+                        headerShown: true,
+                        header: () => <Header leftButton='close' HeaderName='연습실 예약' />
+                    }}
+                />
+                <InReservationStack.Screen
+                    name='ResrvationDateSelect'
+                    component={DateSelcectScreen}
+                    options={{
+                        headerShown: true,
+                        animation: 'none',
+                        header: ({ navigation }) => <Header leftButton='close' HeaderName='예약 일시 선택' LeftAction={() => navigation.navigate('inReservation')} />
+                    }}
+                />
+                <InReservationStack.Screen
+                    name='TimeSelect'
+                    component={TimeSelectScreen}
+                    options={{
+                        animation: 'none',
+                    }}
+                />
+                <InReservationStack.Screen
+                    name='BorrowInstrumentSelect'
+                    component={BorrowInstrumentSelectScreen}
+                    options={{
+                        animationDuration: 100,
+                    }}
+                />
+
+                <InReservationStack.Screen
+                    name='ParticipantsSelect'
+                    component={ParticipantsSelectScreen}
+                    options={{
+                        animationDuration: 100,
+                    }}
+                />
+
+                <InReservationStack.Screen
+                    name='ReservationConfirm'
+                    component={ReservationConfirmScreen}
+                    options={{
+                        headerShown: true,
+                        animation: 'none',
+                        header: () => <Header leftButton='close' />
+                    }}
+                />
+                <InReservationStack.Screen
+                    name='ReservationEditConfirm'
+                    component={ReservationEditConfirmScreen}
+                    options={{
+                        headerShown: true,
+                        animation: 'none',
+                        header: () => <Header leftButton='close' />
+                    }}
+                />
+
+            </InReservationStack.Navigator>
+        </ReservationProvider>
+    )
+}
+
+const ReservationStacks = () => {
+    return (
+        <ReservationStack.Navigator initialRouteName="ReserveCalendar" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+            <ReservationStack.Screen
+                name='ReserveCalendar'
+                component={ReserveCalendarScreen}
+                options={{
+                    headerShown: true,
+                    header: ({ navigation }) => <Header leftButton='close' HeaderName='연습실 예약 조회' RightButton='예약'
+                        RightAction={() => {
+                            const newDate = new Date();
+                            navigation.push('Reservation', { date: newDate.setDate(newDate.getDate() + 1) })
+                        }}
+                    />
+                }}
+            />
+            <ReservationStack.Screen
+                name='DailyReserveList'
+                component={DailyReserveListScreen}
+                options={{
+                    animation: 'none',
+                }}
+            />
+
+            <ReservationStack.Screen
+                name='ReservationDetail'
+                component={ReservationDetailScreen}
+                options={{
+                    animation: 'none',
+                    headerShown: true,
+                    header: () => <Header leftButton='close' HeaderName='예약 조회' />
+                }}
+            />
+
+            <ReservationStack.Screen
+                name='Reservation'
+                component={InReservationStacks}
+            />
+        </ReservationStack.Navigator>
+    );
+};
+
+export default ReservationStacks;

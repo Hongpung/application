@@ -10,7 +10,7 @@ const { width } = Dimensions.get(`window`)
 const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
 
     const isFocusing = useIsFocused();
-    const today = useMemo(() => new Date(),[isFocusing])
+    const today = useMemo(() => new Date(), [isFocusing])
     const { date } = route.params ?? { date: today.toISOString() };
 
     const [selectedDate, setDate] = useState(new Date(date))
@@ -20,8 +20,8 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
     console.log(selectedDate, date, 'param-date')
 
     useEffect(() => { if (date != null) setDate(new Date(date)) }, [isFocusing])
-    useEffect(()=>{TimesRef.current?.scrollTo({ y: 0, animated: false })},[selectedDate])
-    
+    useEffect(() => { TimesRef.current?.scrollTo({ y: 0, animated: false }) }, [selectedDate])
+
     const { data, loading, error } = useFetch<any[]>(
         `${process.env.BASE_URL}/reservation/day?date=${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${(selectedDate.getDate()).toString().padStart(2, '0')}`,
         {
@@ -52,8 +52,11 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
             const currentDate = new Date(startDate);
             currentDate.setDate(startDate.getDate() + i);
             week.push(
-                <Pressable key={`${currentDate}`} onPress={() => setDate(currentDate)} style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] }]}>
-                    <Text style={[styles.Date, selectedDate.getDate() == currentDate.getDate() && { color: Color['blue600'] }, selectedDate.getMonth() != currentDate.getMonth() && { color: Color['grey300'] }]}>{currentDate.getDate()}</Text>
+                <Pressable key={`${currentDate}`}
+                    style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] } ]}
+                    onPress={() => setDate(currentDate)}
+                >
+                    <Text style={[styles.Date, selectedDate.getDate() == currentDate.getDate() && { color: Color['blue600'] }, selectedDate.getMonth() != currentDate.getMonth() && { color: Color['grey300'] },today >= currentDate &&{color: Color['grey300']}]}>{currentDate.getDate()}</Text>
                 </Pressable>
             )
         }

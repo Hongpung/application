@@ -1,5 +1,5 @@
 import { loginUserState } from '@hongpung/recoil/authState'
-import { User, Instrument } from '@hongpung/UserType'
+import { User, Instrument, briefInstrument } from '@hongpung/UserType'
 import { useRecoilValue } from 'recoil'
 
 export interface Reservation {
@@ -10,7 +10,7 @@ export interface Reservation {
     isRegular: boolean
     isParticipatible: boolean
     participants: User[]
-    borrowInstruments: Instrument[]
+    borrowInstruments: briefInstrument[]
     hasToWait: boolean
     userEmail: string
     userName: string

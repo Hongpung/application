@@ -8,6 +8,8 @@ import { useAuth } from '@hongpung/hoc/useAuth';
 import { Icons } from '@hongpung/components/Icon';
 import useFetch from '@hongpung/hoc/useFetch';
 import { useUserReserve } from '@hongpung/hoc/useUserReserve';
+import { useRecoilValue } from 'recoil';
+import { loginUserState } from '@hongpung/recoil/authState';
 
 interface Banner {
     backgroundColor: string,
@@ -17,7 +19,8 @@ interface Banner {
 
 const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
-    const { loginUser, getUserInfo } = useAuth();
+    const { getUserInfo } = useAuth();
+    const loginUser = useRecoilValue(loginUserState);
     const { userReservations, loadUserReservation } = useUserReserve();
 
     console.log(userReservations)
@@ -103,7 +106,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                             style={styles.icons}
                             onPress={() => { navigation.navigate('Notification'); }}>
                             <Icons size={28} name={'notifications'} color={Color['blue500']} />
-                            {true&&<View style={{position:'absolute', width:8,height:8, backgroundColor:'orange', bottom:4, right:4, borderRadius:100}}/>}
+                            {true && <View style={{ position: 'absolute', width: 8, height: 8, backgroundColor: 'orange', bottom: 4, right: 4, borderRadius: 100 }} />}
                         </Pressable>
                         <Pressable
                             style={styles.icons}

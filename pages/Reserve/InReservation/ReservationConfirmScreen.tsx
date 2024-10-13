@@ -25,10 +25,10 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
     const ConfirmHandler = () => {
         const createReservation = async () => {
 
-            const data = parseToReservationForm(reservation)
+            const data = parseToReservationForm(reservation) as any
 
             if (data.message.length == 0) {
-                data.message = `${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`
+                data.message =null
             }
 
             const sendFormat = JSON.stringify(data)
@@ -62,7 +62,7 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
                 const result: any = await response.json();
 
                 if (result != null)
-                    navigation.navigate('DailyReserveList', { date: reservation.date.toISOString() })
+                    navigation.navigate('DailyReserveList', { date: reservation.date!.toISOString() })
             }
             catch (e) {
                 console.error(e)
