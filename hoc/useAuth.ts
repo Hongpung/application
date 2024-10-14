@@ -7,8 +7,6 @@ import { StackActions, useNavigation } from '@react-navigation/native';
 export const useAuth = () => {
   const [loginUser, setLoginUser] = useRecoilState(loginUserState);
   const navigation = useNavigation();
-
-  // AbortController는 여기서 생성하여 요청에 사용
   const controller = new AbortController();
   const signal = controller.signal;
 

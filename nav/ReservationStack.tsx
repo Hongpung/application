@@ -65,18 +65,14 @@ const InReservationStacks = () => {
                     name='ReservationConfirm'
                     component={ReservationConfirmScreen}
                     options={{
-                        headerShown: true,
-                        animation: 'none',
-                        header: () => <Header leftButton='close' />
+                        animation: 'none'
                     }}
                 />
                 <InReservationStack.Screen
                     name='ReservationEditConfirm'
                     component={ReservationEditConfirmScreen}
                     options={{
-                        headerShown: true,
-                        animation: 'none',
-                        header: () => <Header leftButton='close' />
+                        animation: 'none'
                     }}
                 />
 
@@ -95,8 +91,7 @@ const ReservationStacks = () => {
                     headerShown: true,
                     header: ({ navigation }) => <Header leftButton='close' HeaderName='연습실 예약 조회' RightButton='예약'
                         RightAction={() => {
-                            const newDate = new Date();
-                            navigation.push('Reservation', { date: newDate.setDate(newDate.getDate() + 1) })
+                            navigation.push('ReservationStack')
                         }}
                     />
                 }}
@@ -120,7 +115,7 @@ const ReservationStacks = () => {
             />
 
             <ReservationStack.Screen
-                name='Reservation'
+                name='ReservationStack'
                 component={InReservationStacks}
             />
         </ReservationStack.Navigator>

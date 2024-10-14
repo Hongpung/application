@@ -17,7 +17,6 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
 
     const TimesRef = useRef<any>(null)
     const times = useMemo(() => ['AM10', 'AM11', 'PM12', 'PM01', 'PM02', 'PM03', 'PM04', 'PM05', 'PM06', 'PM07', 'PM08', 'PM09', 'PM10'], []);
-    console.log(selectedDate, date, 'param-date')
 
     useEffect(() => { if (date != null) setDate(new Date(date)) }, [isFocusing])
     useEffect(() => { TimesRef.current?.scrollTo({ y: 0, animated: false }) }, [selectedDate])
@@ -53,10 +52,10 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
             currentDate.setDate(startDate.getDate() + i);
             week.push(
                 <Pressable key={`${currentDate}`}
-                    style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] } ]}
+                    style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] }]}
                     onPress={() => setDate(currentDate)}
                 >
-                    <Text style={[styles.Date, selectedDate.getDate() == currentDate.getDate() && { color: Color['blue600'] }, selectedDate.getMonth() != currentDate.getMonth() && { color: Color['grey300'] },today >= currentDate &&{color: Color['grey300']}]}>{currentDate.getDate()}</Text>
+                    <Text style={[styles.Date, selectedDate.getDate() == currentDate.getDate() && { color: Color['blue600'] }, selectedDate.getMonth() != currentDate.getMonth() && { color: Color['grey300'] }, today >= currentDate && { color: Color['grey300'] }]}>{currentDate.getDate()}</Text>
                 </Pressable>
             )
         }
@@ -116,8 +115,11 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
                 </View>
                 {today <= selectedDate && <Pressable onPress={() => {
                     navigation.navigate('Reservation', {
-                        screen: 'inReservation',
-                        params: { date: selectedDate.toISOString().split('T')[0] }, // 전달할 params
+                        screen: 'ReservationStack',
+                        params: {
+                            screen: 'inReservation',
+                            params: { date: selectedDate.toISOString().split('T')[0] }
+                        }, // 전달할 params
                     });
                 }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}>
                     <Text style={{

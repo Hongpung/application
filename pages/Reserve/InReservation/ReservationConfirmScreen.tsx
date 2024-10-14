@@ -8,6 +8,7 @@ import { useRecoilValue } from 'recoil'
 import { loginUserState } from '@hongpung/recoil/authState'
 import { getToken } from '@hongpung/utils/TokenHandler'
 import { parseToReservationDetail, parseToReservationForm, ReservationDTO, ReservationSubmitForm } from '../ReserveInterface'
+import { Icons } from '@hongpung/components/Icon'
 
 const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
 
@@ -28,7 +29,7 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
             const data = parseToReservationForm(reservation) as any
 
             if (data.message.length == 0) {
-                data.message =null
+                data.message = `${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`
             }
 
             const sendFormat = JSON.stringify(data)
@@ -74,58 +75,81 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
         createReservation();
     };
     return (
-        <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+        <View style={{ flex: 1, backgroundColor: Color['grey100'] }}>
+            <View style={{
+                height: 50,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingHorizontal: 24
+            }}>
+                <Pressable onPress={() => {
+                    navigation.goBack();
+                }}
+                    style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28 }}
+                >
+                    <Icons size={24} name={'close'} color={Color['blue500']} />
+                </Pressable>
+            </View>
             <View style={{ height: 88 }} />
-            <Text style={{ textAlign: 'center', fontFamily: 'NanumSquareNeo-Bold', fontSize: 20, marginBottom: 34 }}>예약 정보 확인</Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
-                <Text style={styles.leftText}>예약 일자</Text>
-                <Text style={styles.rightText}>{DateString(reservation.date)}</Text>
+            <Text style={{ textAlign: 'center', fontFamily: 'NanumSquareNeo-Bold', fontSize: 20, marginBottom: 24 }}>예약 정보 확인</Text>
+            <View style={{ borderRadius: 15, marginHorizontal: 16, paddingHorizontal: 16, paddingVertical: 4, backgroundColor: '#FFF' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                    <Text style={styles.leftText}>예약 일자</Text>
+                    <Text style={styles.rightText}>{DateString(reservation.date!)}</Text>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                    <Text style={styles.leftText}>예약 시간</Text>
+                    <Text style={styles.rightText}>{`${reservation.Time.startTime.toString().slice(5, 7)}:${reservation.Time.startTime.toString().slice(7)} ~ ${reservation.Time.endTime.toString().slice(5, 7)}:${reservation.Time.endTime.toString().slice(7)}`}</Text>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                    <Text style={styles.leftText}>예약자</Text>
+                    <Text style={styles.rightText}>{`${loginUser?.nickname ? `${loginUser?.name}(${loginUser.nickname})` : loginUser?.name}`}</Text>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                    <Text style={styles.leftText}>예약명</Text>
+                    <Text style={styles.rightText}>{reservation.reservationName.length > 0 ? reservation.reservationName : `${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`}</Text>
+                </View>
             </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
-                <Text style={styles.leftText}>예약 시간</Text>
-                <Text style={styles.rightText}>{`${reservation.Time.startTime.toString().slice(5, 7)}:${reservation.Time.startTime.toString().slice(7)} ~ ${reservation.Time.endTime.toString().slice(5, 7)}:${reservation.Time.endTime.toString().slice(7)}`}</Text>
+
+            <View style={{ height: 24, }} />
+
+            <View style={{ borderRadius: 15, marginHorizontal: 16, paddingHorizontal: 16, paddingVertical: 4, backgroundColor: '#FFF' }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                    <Text style={styles.leftText}>예약 유형</Text>
+                    <Text style={styles.rightText}>{reservation.isRegular ? '정기 연습' : '개인 연습'} ({reservation.isParticipatible ? '참여 가능' : '참여 불가'})</Text>
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                    <Text style={styles.leftText}>참여자</Text>
+                    <Text style={styles.rightText}>
+                        {reservation.participants.length > 0 ? `${reservation.participants.slice(0, reservation.participants.length > 3 ? 3 : reservation.participants.length).map(user => `${user.name} `)}${reservation.participants.length >= 3 ? `외 ${reservation.participants?.length} 명` : ''}` : '없음'}
+                    </Text>
+                    {reservation.participants.length > 0 && <Pressable style={{ position: 'absolute', right: -16 }}><Text style={{
+                        fontFamily: 'NanumSquareNeo-ExtarBold',
+                        fontSize: 16,
+                        color: Color['grey400']
+                    }}>{'>'}</Text></Pressable>}
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                    <Text style={styles.leftText}>대여악기</Text>
+                    <Text style={styles.rightText}>
+                        {reservation.borrowInstruments.length > 0 ? ['쇠', '장구', '북', '소고', '새납'].map((type) => {
+                            const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
+                            if (instCount > 0)
+                                return `${type} ${instCount}`
+                        }) : '없음'}
+                    </Text>
+                    {reservation.borrowInstruments.length > 0 && <Pressable style={{ position: 'absolute', right: -16 }}><Text style={{
+                        fontFamily: 'NanumSquareNeo-ExtarBold',
+                        fontSize: 16,
+                        color: Color['grey400']
+                    }}>{'>'}</Text></Pressable>}
+                </View>
             </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
-                <Text style={styles.leftText}>예약자</Text>
-                <Text style={styles.rightText}>{`${loginUser?.nickname ? `${loginUser?.name}(${loginUser.nickname})` : loginUser?.name}`}</Text>
-            </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
-                <Text style={styles.leftText}>예약명</Text>
-                <Text style={styles.rightText}>{reservation.reservationName.length > 0 ? reservation.reservationName : `${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`}</Text>
-            </View>
-            <View style={{ height: 16, backgroundColor: Color['grey100'], marginVertical: 10 }} />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
-                <Text style={styles.leftText}>예약 유형</Text>
-                <Text style={styles.rightText}>{reservation.isRegular ? '정기 연습' : '개인 연습'} ({reservation.isParticipatible ? '참여 가능' : '참여 불가'})</Text>
-            </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
-                <Text style={styles.leftText}>참여자</Text>
-                <Text style={styles.rightText}>
-                    {reservation.participants.length > 0 ? `${reservation.participants.slice(0, reservation.participants.length > 3 ? 3 : reservation.participants.length).map(user => `${user.name} `)}${reservation.participants.length >= 3 ? `외 ${reservation.participants?.length} 명` : ''}` : '없음'}
-                </Text>
-                {reservation.participants.length > 0 && <Pressable style={{ position: 'absolute', right: -16 }}><Text style={{
-                    fontFamily: 'NanumSquareNeo-ExtarBold',
-                    fontSize: 16,
-                    color: Color['grey400']
-                }}>{'>'}</Text></Pressable>}
-            </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
-                <Text style={styles.leftText}>대여악기</Text>
-                <Text style={styles.rightText}>
-                    {reservation.borrowInstruments.length > 0 ? ['쇠', '장구', '북', '소고', '새납'].map((type) => {
-                        const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
-                        if (instCount > 0)
-                            return `${type} ${instCount}`
-                    }) : '없음'}
-                </Text>
-                {reservation.borrowInstruments.length > 0 && <Pressable style={{ position: 'absolute', right: -16 }}><Text style={{
-                    fontFamily: 'NanumSquareNeo-ExtarBold',
-                    fontSize: 16,
-                    color: Color['grey400']
-                }}>{'>'}</Text></Pressable>}
-            </View>
-            <View style={{ position: 'absolute', bottom: 0, paddingVertical: 8, width: '100%' }}>
-                <View style={{ marginHorizontal: 28, marginBottom: 12 }}>
+
+
+            <View style={{ position: 'absolute', bottom: 0, backgroundColor: '#FFF', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingVertical: 8, width: '100%' }}>
+                <View style={{ marginHorizontal: 28, marginBottom: 12, marginTop: 8 }}>
 
                     <CheckboxComponent
                         isChecked={isAgree}

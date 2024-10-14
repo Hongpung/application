@@ -32,6 +32,7 @@ const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         borrowInstruments: [],
         hasToWait: false
     });
+
     const [preReservation, setPreReservation] = useState<Reservation>({
         userEmail: '',
         userName: '',
@@ -43,6 +44,7 @@ const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         borrowInstruments: [],
         hasToWait: false
     });
+    
     const setDate = (date: Date) => { if (date > new Date()) setReservation(prev => ({ ...prev, date })); }
     const setTime = (startTime: string, endTime: string) => setReservation(prev => ({ ...prev, Time: { startTime, endTime } }));
     const setName = (name: string) => setReservation(prev => ({ ...prev, reservationName: name }));

@@ -7,7 +7,8 @@ import CheckboxComponent from '@hongpung/components/checkboxs/CheckboxComponent'
 import { useRecoilValue } from 'recoil'
 import { loginUserState } from '@hongpung/recoil/authState'
 import { getToken } from '@hongpung/utils/TokenHandler'
-import { findReservationDifferences } from '../ReserveInterface'
+import { findReservationDifferences, parseToReservationForm } from '../ReserveInterface'
+import { Icons } from '@hongpung/components/Icon'
 
 const ReservationEditConfirmScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
@@ -23,6 +24,8 @@ const ReservationEditConfirmScreen: React.FC<{ navigation: any }> = ({ navigatio
         return `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}.${selectedDate.getDate().toString().padStart(2, '0')}(${daysOfWeek[selectedDate.getDay()]})`;
     }, [])
 
+    const preReservationDTO = parseToReservationForm(preReservation);
+    const newReservationDTO = parseToReservationForm(reservation);
     console.log(difference)
     const ConfirmHandler = () => {
         const editReservation = async () => {
@@ -76,14 +79,43 @@ const ReservationEditConfirmScreen: React.FC<{ navigation: any }> = ({ navigatio
     };
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+        <View style={{ flex: 1, backgroundColor: Color['grey100'] }}>
+            <View style={{
+                height: 50,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                paddingHorizontal: 24
+            }}>
+                <Pressable onPress={() => {
+                    navigation.goBack();
+                }}
+                    style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28 }}
+                >
+                    <Icons size={24} name={'close'} color={Color['blue500']} />
+                </Pressable>
+            </View>
             <View style={{ height: 88 }} />
-            <Text style={{ textAlign: 'center', fontFamily: 'NanumSquareNeo-Bold', fontSize: 20, marginBottom: 34 }}>예약 정보 확인</Text>
-            {Object.keys(difference)?.map((key: any) =>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
-                    <Text style={styles.leftText}>{key}</Text>
-                    <Text style={styles.rightText}>{difference[key]}</Text>
-                </View>)}
+            <Text style={{ textAlign: 'center', fontFamily: 'NanumSquareNeo-Bold', fontSize: 20, marginBottom: 34 }}>예약 정보 변경 확인</Text>
+            <View style={{ paddingHorizontal: 18, marginHorizontal: 24, borderRadius: 15, paddingVertical: 8, backgroundColor: '#FFF' }}>
+                {Object.keys(difference)?.map((key: string) => {
+                    return (
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                            <Text style={styles.leftText}>{key}</Text>
+                            <Text style={[styles.rightText, { color: Color['grey300'] }]}>{preReservationDTO[key]}</Text>
+                        </View>)
+                })}
+            </View>
+            <View style={{ alignSelf: 'center', paddingVertical: 16 }}>
+                <Icons name='arrow-down' color={Color['red500']} />
+            </View>
+            <View style={{ paddingHorizontal: 18, marginHorizontal: 24, borderRadius: 15, paddingVertical: 8, backgroundColor: '#FFF' }}>
+                {Object.keys(difference)?.map((key: string) =>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                        <Text style={styles.leftText}>{key}</Text>
+                        <Text style={[styles.rightText, { color: Color['blue500'] }]}>{newReservationDTO[key]}</Text>
+                    </View>)}
+            </View>
             {/*<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
                 <Text style={styles.leftText}>예약 일자</Text>
                 <Text style={styles.rightText}>{DateString(reservation.date)}</Text>
@@ -131,8 +163,8 @@ const ReservationEditConfirmScreen: React.FC<{ navigation: any }> = ({ navigatio
                     color: Color['grey400']
                 }}>{'>'}</Text></Pressable>}
             </View> */}
-            <View style={{ position: 'absolute', bottom: 0, paddingVertical: 8, width: '100%' }}>
-                <View style={{ marginHorizontal: 28, marginBottom: 12 }}>
+            <View style={{ position: 'absolute', bottom: 0, backgroundColor: '#FFF', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingVertical: 8, width: '100%' }}>
+                <View style={{ marginHorizontal: 28, marginBottom: 12, marginTop:8 }}>
 
                     <CheckboxComponent
                         isChecked={isAgree}

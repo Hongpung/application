@@ -126,16 +126,17 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <Pressable onPress={() => debounce(() => navigation.push('ReserveCalendar'), 1000, { leading: true, trailing: false })}>
                     <View style={styles.ScheduleOfDate}>
                         {hasReservation ?
-                            <View style={{ position: 'absolute', bottom: 12, left: 20 }}>
+                            <TouchableOpacity style={{ position: 'absolute', bottom: 12, left: 20 }}
+                                onPress={() => navigation.navigate('MyPage', { screen: 'MySchedules' })}>
                                 <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>오늘의 일정이 있어요</Text>
                                 <View style={{ height: 4 }} />
                                 <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 18 }}>예약 확인하러 가기</Text>
-                            </View> :
-                            <View style={{ position: 'absolute', bottom: 12, left: 20 }}>
+                            </TouchableOpacity> :
+                            <TouchableOpacity style={{ position: 'absolute', bottom: 12, left: 20 }}>
                                 <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>오늘의 일정이 없어요</Text>
                                 <View style={{ height: 4 }} />
                                 <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 18 }}>새로운 일정 예약하러 가기</Text>
-                            </View>}
+                            </TouchableOpacity>}
                     </View>
                 </Pressable>
 

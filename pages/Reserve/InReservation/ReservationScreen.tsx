@@ -14,7 +14,7 @@ import { Icons } from '@hongpung/components/Icon'
 const { width } = Dimensions.get('window')
 
 const ReservationScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
-    const today = new Date();
+
     const {
         reservation,
         preReservation,
@@ -28,9 +28,9 @@ const ReservationScreen: React.FC<{ navigation: any, route: any }> = ({ navigati
         setDate
     } = useReservation();
 
-    const date = preReservation?.date;
+    const { date } = route?.params ?? { date: preReservation?.date };
     const { reservationId } = route?.params ?? { reservationId: preReservation?.reservationId };
-    console.log(date, reservationId, route?.params)
+
     const [isLoading, setLoading] = useState(false);
     const loginUser = useRecoilValue(loginUserState);
 
@@ -48,12 +48,11 @@ const ReservationScreen: React.FC<{ navigation: any, route: any }> = ({ navigati
     }, [])
 
     const TimeGapText = useMemo(() => {
-        const eTime = Number(reservation.Time.endTime.toString().slice(5, 7)) * 60 + Number(reservation.Time.endTime.toString().slice(7));
-        const sTime = Number(reservation.Time.startTime.toString().slice(5, 7)) * 60 + Number(reservation.Time.startTime.toString().slice(7));
+        const endTime = Number(reservation.Time.endTime.toString().slice(5, 7)) * 60 + Number(reservation.Time.endTime.toString().slice(7));
+        const startTime = Number(reservation.Time.startTime.toString().slice(5, 7)) * 60 + Number(reservation.Time.startTime.toString().slice(7));
 
-        const timeGap = eTime - sTime;
+        const timeGap = endTime - startTime;
 
-        console.log(timeGap / 60)
         const hourGap = timeGap / 60;
         const minnuteGap = timeGap % 60;
 

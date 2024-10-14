@@ -4,7 +4,7 @@ import { Calendar } from '../ReserveCalendarScreen'
 import { useFocusEffect } from '@react-navigation/native';
 import { useReservation } from '../context/ReservationContext';
 
-const DateSelcectScreen: React.FC<{ navigation: any,  }> = ({ navigation  }) => {
+const DateSelcectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     const [calendarDate, setCalendarDate] = useState(new Date())
     const { reservation, setDate } = useReservation();
@@ -13,11 +13,12 @@ const DateSelcectScreen: React.FC<{ navigation: any,  }> = ({ navigation  }) => 
     useFocusEffect(
         useCallback(() => {
 
-            const newDate = reservation.date
+            const newDate = reservation.date ? new Date(reservation.date) : new Date();
             setCalendarDate(newDate);
 
         }, [reservation.date])
     );
+
     return (
         <View style={{ backgroundColor: '#FFF', flex: 1 }}>
             <Calendar

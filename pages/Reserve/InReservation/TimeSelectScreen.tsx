@@ -142,13 +142,10 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 occupied.push(times[i])
         }
         )
-        console.log(data, occupied, `${process.env.BASE_URL}/reservation/day?date=${date!.getFullYear()}-${(date!.getMonth() + 1).toString().padStart(2, '0')}-${(date!.getDate()).toString().padStart(2, '0')}`)
         setOccupiedTimes(occupied);
     }, [data])
 
     const toggleTime = useCallback((time: string) => {
-        
-        console.log('toggle',selectedTimeBlocks);
         // selectedTimes를 정렬된 상태로 유지
         //if (selectedTimeBlocks.length == 0) return;
         const lastTimes = selectedTimeBlocks?.sort((a, b) => times.indexOf(a) - times.indexOf(b)) ?? [];
@@ -176,7 +173,6 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             if (index > -1) {
                 if ((index === 0 && timeIndex === firstSelectedTimeIndex) || (index === lastTimes.length - 1 && timeIndex === lastSelectedTimeIndex)) {
                     lastTimes.splice(index, 1);
-                    console.log(lastTimes, 'called')
                     setTimeBlocks([...lastTimes]);
                 }
             }
@@ -259,7 +255,7 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 </View>
                 <View style={{ height: 4 }} />
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Pressable style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, width: 32, }} onPress={nextWeek} >
+                    <Pressable style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, width: 32, }} onPress={prevWeek} >
                         <Icons size={24} name={'chevron-back'} color={Color['blue500']} />
                     </Pressable>
                     <View style={{ height: 32, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 264, marginHorizontal: 8 }}>

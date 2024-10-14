@@ -290,7 +290,7 @@ const ReservationDetailScreen: React.FC<{ navigation: any, route: any }> = ({ na
                     innerText={'수정하기'}
                     isAble={true}
                     onPress={() => {
-                        navigation.navigate('Reservation', { screen: 'inReservation', params: { reservationId } })
+                        navigation.push('ReservationStack', { screen: 'inReservation', params: { reservationId } })
                     }}
                 />
             </View>}

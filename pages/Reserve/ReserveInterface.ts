@@ -15,6 +15,7 @@ export interface Reservation {
     userEmail: string
     userName: string
     lastmodified?: Date
+    [key:string]:any
 };
 
 export function areReservationsEqual(r1: Reservation, r2: Reservation): boolean {
@@ -80,6 +81,7 @@ export interface ReservationDTO extends Omit<ReservationSubmitForm, 'participate
     email: string;                    // 생성자 이메일
     lastmodified: string;             // 마지막 수정 날짜 (ISO 형식)
     participators: User[]
+    [key:string]:any
 }
 
 export interface ReservationSubmitForm {
@@ -90,6 +92,7 @@ export interface ReservationSubmitForm {
     type: string;                     // 예약 유형 (정기연습, 특별행사 등)
     participationAvailable: boolean;  // 참여 가능 여부
     participaterIds: number[];    // 참여자 목록 (Participator 배열)
+    [key:string]:any
 }
 
 export const parseToReservationDetail = (reservation: Reservation, user: User): ReservationDTO => {
