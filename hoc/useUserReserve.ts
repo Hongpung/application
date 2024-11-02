@@ -41,7 +41,7 @@ export const useUserReserve = () => {
 
         } catch (e) {
             console.error(e);
-            navigation.dispatch(StackActions.replace('Login'))
+            // navigation.dispatch(StackActions.replace('Login'))
         } finally {
             clearTimeout(timeoutId);
         }

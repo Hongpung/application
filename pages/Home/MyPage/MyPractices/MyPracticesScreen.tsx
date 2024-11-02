@@ -2,7 +2,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
 import PracticeCard from '@hongpung/components/cards/PracticeCard'
-import useFetch from '@hongpung/hoc/useFetch'
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { Reserve } from '@hongpung/pages/Home/MyClub/ClubCalendar/ClubCalendar'
 import { Icons } from '@hongpung/components/Icon'
 
@@ -16,7 +16,7 @@ const MyPracticesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
 
 
-    const { data, loading, error } = useFetch<Reserve[]>(
+    const { data, loading, error } = useFetchUsingToken<Reserve[]>(
         `${process.env.BASE_URL}/reservation/search`,
         {
             method: 'GET',

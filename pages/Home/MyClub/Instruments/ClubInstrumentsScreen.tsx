@@ -6,7 +6,7 @@ import InstrumentCard from "@hongpung/components/cards/InstrumentCard"
 import { Color } from "@hongpung/ColorSet"
 import { useInstrument } from "@hongpung/context/InstrumentContext"
 import { useEffect, useState } from "react"
-import useFetch from "@hongpung/hoc/useFetch"
+import useFetchUsingToken from "@hongpung/hoc/useFetchUsingToken"
 import { useIsFocused } from "@react-navigation/native"
 
 
@@ -62,7 +62,7 @@ const ClubInstrumentsScreen: React.FC<ClubInstrumentsScreenProps> = ({ navigatio
     const isFocusing = useIsFocused();
     const [instruments, setInstruments] = useState<briefInstrument[]>([])
 
-    const { data, loading, error } = useFetch<briefInstrument[]>(
+    const { data, loading, error } = useFetchUsingToken<briefInstrument[]>(
         `${process.env.BASE_URL}/instrument/list`,
         {
             method: 'GET',

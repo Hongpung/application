@@ -7,7 +7,7 @@ import { instrumentOrder, User } from "../../../../UserType";
 import { HomeStackParamList } from "../../../../pageTypes";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { UserProvider, useUser } from "../../../../context/UserContext";
-import useFetch from "@hongpung/hoc/useFetch";
+import useFetchUsingToken from "@hongpung/hoc/useFetchUsingToken";
 import { useRecoilValue } from "recoil";
 import { loginUserState } from "@hongpung/recoil/authState";
 import { Icons } from "@hongpung/components/Icon";
@@ -36,7 +36,7 @@ const ClubMemeberScreen: React.FC<ClubMembersProps> = ({ navigation }) => {
     const [users, setUsers] = useState<User[]>([])
     const loginUser = useRecoilValue(loginUserState)
 
-    const { data, loading, error } = useFetch<User[]>(
+    const { data, loading, error } = useFetchUsingToken<User[]>(
         `${process.env.BASE_URL}/member`,
         {
             method: 'GET',

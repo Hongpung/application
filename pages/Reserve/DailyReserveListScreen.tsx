@@ -1,7 +1,7 @@
 import { ActivityIndicator, Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Color } from '@hongpung/ColorSet';
-import useFetch from '@hongpung/hoc/useFetch';
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import { useIsFocused } from '@react-navigation/native';
 import { Icons } from '@hongpung/components/Icon';
 
@@ -21,7 +21,7 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
     useEffect(() => { if (date != null) setDate(new Date(date)) }, [isFocusing])
     useEffect(() => { TimesRef.current?.scrollTo({ y: 0, animated: false }) }, [selectedDate])
 
-    const { data, loading, error } = useFetch<any[]>(
+    const { data, loading, error } = useFetchUsingToken<any[]>(
         `${process.env.BASE_URL}/reservation/day?date=${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${(selectedDate.getDate()).toString().padStart(2, '0')}`,
         {
         }, 2000, [selectedDate, isFocusing]

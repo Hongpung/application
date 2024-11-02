@@ -4,7 +4,7 @@ import { Color } from '@hongpung/ColorSet';
 import LongButton from '@hongpung/components/buttons/LongButton';
 import { useReservation } from '@hongpung/pages/Reserve/context/ReservationContext';
 import ShortButton from '@hongpung/components/buttons/ShortButton';
-import useFetch from '@hongpung/hoc/useFetch';
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import { Icons } from '@hongpung/components/Icon';
 
 const { width } = Dimensions.get(`window`)
@@ -120,7 +120,7 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     }, [selectedTimeBlocks])
 
 
-    const { data, loading, error } = useFetch<briefReservation[]>(
+    const { data, loading, error } = useFetchUsingToken<briefReservation[]>(
         `${process.env.BASE_URL}/reservation/day?date=${date!.getFullYear()}-${(date!.getMonth() + 1).toString().padStart(2, '0')}-${(date!.getDate()).toString().padStart(2, '0')}`,
         {
         }, 2000, [date]

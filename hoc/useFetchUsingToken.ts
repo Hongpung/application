@@ -4,17 +4,17 @@ import { useEffect, useState } from 'react';
 import { UseFetchOptions, UseFetchResult } from '@hongpung/hoc/types/FetchTypes';
 
 
-const useFetch = <T>(url: string | null, options: UseFetchOptions = {}, timeout: number = 5000, dependencies: any[] = []): UseFetchResult<T> => {
+const useFetchUsingToken = <T>(url: string | null, options: UseFetchOptions = {}, timeout: number = 5000, dependencies: any[] = []): UseFetchResult<T> => {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const controller = new AbortController();
     const signal = controller.signal;
 
     const fetching = async () => {
-
       setLoading(true); // 요청 시작 시 loading을 true로 설정
       const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -22,11 +22,16 @@ const useFetch = <T>(url: string | null, options: UseFetchOptions = {}, timeout:
 
         if (!url) throw Error('invalid url');;
 
+        const token = await getToken('token');
+
+        if (!token) { throw Error('invalid Token'); }
+
         console.log('fetching...')
         const response = await fetch(url, {
           ...options,
           headers: {
             ...options.headers,
+            Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
           },
           signal
         })
@@ -41,6 +46,12 @@ const useFetch = <T>(url: string | null, options: UseFetchOptions = {}, timeout:
 
       } catch (err: unknown) {
         if (err instanceof Error) {
+          // `invalid Token` 메시지일 경우 처리
+          if (err.message === 'invalid Token') {
+            setError('Invalid Token - Please login again.');
+            navigation.dispatch(StackActions.replace('Login'))
+            return;
+          }
           // `AbortError`일 경우 처리
           if (err.name === 'AbortError') {
             const status = (err as any).status ?? ''; // status가 있으면 사용, 없으면 빈 문자열
@@ -69,4 +80,4 @@ const useFetch = <T>(url: string | null, options: UseFetchOptions = {}, timeout:
   return { data, error, loading };
 };
 
-export default useFetch;
+export default useFetchUsingToken;

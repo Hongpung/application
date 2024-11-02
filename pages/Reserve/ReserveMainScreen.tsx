@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { BlurView } from 'expo-blur';
 
 import { Color } from '@hongpung//ColorSet'
-import useFetch from '@hongpung//hoc/useFetch';
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import { Icons } from '@hongpung/components/Icon';
 
 import { parseToReservation, Reservation, ReservationDTO } from './ReserveInterface';
@@ -18,7 +18,8 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [loadData, setData] = useState<Reservation[]>([]);
     const [isOnAir, setOnAir] = useState(false);
     const [isParticipatible, setParticipatible] = useState(false);
-    const { data, loading, error } = useFetch<ReservationDTO[]>(
+    
+    const { data, loading, error } = useFetchUsingToken<ReservationDTO[]>(
         `${process.env.BASE_URL}/reservation/day?date=${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${(today.getDate()).toString().padStart(2, '0')}`,
         {
             method: 'GET',
@@ -29,7 +30,7 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     );
 
     useEffect(() => {
-        
+
         if (data && data?.length > 0) {
             const parsedData = data.map(reservationDTO => parseToReservation(reservationDTO))
             parsedData.sort((a, b) => Number(a.Time.startTime.slice(5, 7)) - Number(b.Time.startTime.slice(5, 7)))
@@ -145,9 +146,10 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     <Text style={{ position: 'absolute', right: 8, top: 8, fontSize: 16, fontFamily: 'NanumSquareNeo-Heavy', color: '#FFF' }}>활동 조회</Text>
                 </Pressable>
             </View>
-            {loading && <View style={{ position: 'absolute', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.6)' }}>
-                <ActivityIndicator size={'large'} color={'#FFF'} />
-            </View>}
+            {loading &&
+                <View style={{ position: 'absolute', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.6)' }}>
+                    <ActivityIndicator size={'large'} color={'#FFF'} />
+                </View>}
         </View>
     )
 }

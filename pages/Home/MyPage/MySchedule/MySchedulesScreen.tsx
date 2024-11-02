@@ -4,7 +4,7 @@ import { HomeStackParamList } from '../../../../pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Color } from '../../../../ColorSet';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
-import useFetch from '@hongpung/hoc/useFetch';
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import { Icons } from '@hongpung/components/Icon';
 import { loginUserState, todayReservation } from '@hongpung/recoil/authState';
 import { useRecoilValue } from 'recoil';

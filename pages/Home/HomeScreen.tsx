@@ -6,7 +6,6 @@ import { debounce } from 'lodash';
 import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
 import { useAuth } from '@hongpung/hoc/useAuth';
 import { Icons } from '@hongpung/components/Icon';
-import useFetch from '@hongpung/hoc/useFetch';
 import { useUserReserve } from '@hongpung/hoc/useUserReserve';
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';
@@ -194,8 +193,9 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 2, height: 20, justifyContent: 'center' }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', minWidth: 42, fontSize: 12, textAlignVertical: 'center', textAlign: 'right' }}>{bannerNum < 9 ? '0' + (bannerNum + 1) : bannerNum + 1}/{bannerMass < 10 ? '0' + bannerMass : bannerMass}</Text>
-                            <Pressable onPress={() => setModalVisible(true)} style={{ justifyContent: 'center', height: 16 }}>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 11, width: 56, textAlign: 'center' }}>{`모두보기 >`}</Text>
+                            <Pressable onPress={() => setModalVisible(true)} style={{ justifyContent: 'flex-end', height: 16 , width:64, gap:4, flexDirection:'row', alignItems:'center'}}>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 11, textAlign: 'center' }}>모두보기</Text>
+                                <Icons name='chevron-forward-outline' color={Color['grey400']} size={12}></Icons>
                             </Pressable>
                         </View>
                     </View>
@@ -259,14 +259,15 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                             인원을 모으는 중인 활동
                         </Text>
 
-                        <Pressable>
+                        <Pressable style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Text style={{
                                 fontSize: 14,
                                 fontFamily: 'NanumSquareNeo-Light',
                                 height: 16
                             }}>
-                                더 알아보기 {'>'}
+                                더 알아보기
                             </Text>
+                            <Icons name='chevron-forward-outline' color={Color['grey400']} size={18}></Icons>
                         </Pressable>
                     </View>
 
@@ -280,9 +281,10 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                                         style={{ height: 126, width: 136, borderColor: Color['grey100'], borderRadius: 10, marginHorizontal: 6, borderWidth: 1 }}
                                     >
                                         <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'], fontSize: 14, marginHorizontal: 8, marginTop: 12 }} numberOfLines={2} ellipsizeMode='tail'>인인 활동입니다</Text>
-                                        <View style={{ marginHorizontal: 10, flexDirection: 'row', alignItems: 'center', bottom: 32, position: 'absolute' }}>
-                                            <View style={{ width: 24, height: 24, backgroundColor: Color['grey200'], }} />
-                                            <View style={{ width: 4 }} />
+                                        <View style={{ marginHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 4, bottom: 32, position: 'absolute' }}>
+                                            <View style={{ width: 24, height: 24 }}>
+                                                <Icons name='people' color={Color['grey200']} size={24}></Icons>
+                                            </View>
                                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], fontSize: 14 }}>{`24`}</Text>
                                         </View>
                                         <View style={{ marginHorizontal: 6, flexDirection: 'row', bottom: 12, position: 'absolute' }}>
@@ -298,7 +300,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                                 style={{ height: 126, width: 82, borderRadius: 10, marginHorizontal: 6, justifyContent: 'center', alignItems: 'center' }}
                             >
                                 <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 16, marginBottom: 8 }}>더보기</Text>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 20 }}>{'->'}</Text>
+                                <Icons name='arrow-forward-circle' color={Color['grey300']}></Icons>
                             </View>
                         </View>
                         <View style={{ marginRight: 18 }} />
@@ -317,14 +319,15 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         }}>
                             공연 홍보
                         </Text>
-                        <Pressable>
+                        <Pressable style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <Text style={{
                                 fontSize: 14,
                                 fontFamily: 'NanumSquareNeo-Light',
                                 height: 16
                             }}>
-                                더 알아보기 {'>'}
+                                더 알아보기
                             </Text>
+                            <Icons name='chevron-forward-outline' color={Color['grey400']} size={18}></Icons>
                         </Pressable>
                     </View>
 
@@ -339,9 +342,10 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                                     >
                                         <View style={{ height: 148, backgroundColor: Color['blue100'] }} />
                                         <Text style={{ marginHorizontal: 8, marginTop: 8, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 14 }}>산틀-산데렐라</Text>
-                                        <View style={{ marginHorizontal: 10, flexDirection: 'row', alignItems: 'center', bottom: 4, position: 'absolute' }}>
-                                            <View style={{ width: 20, height: 20, backgroundColor: Color['red200'], }} />
-                                            <View style={{ width: 4 }} />
+                                        <View style={{ marginHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 4, bottom: 4, position: 'absolute' }}>
+                                            <View style={{ width: 20, height: 20 }} >
+                                                <Icons name='people' color={Color['red200']} size={20}></Icons>
+                                            </View>
                                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['red400'], fontSize: 12 }}>{`24`}</Text>
                                         </View>
                                     </View>
@@ -353,7 +357,7 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                                 style={{ height: 208, width: 82, borderRadius: 10, marginHorizontal: 6, justifyContent: 'center', alignItems: 'center' }}
                             >
                                 <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 16, marginBottom: 8 }}>더보기</Text>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 20 }}>{'->'}</Text>
+                                <Icons name='arrow-forward-circle' color={Color['grey300']}></Icons>
                             </View>
                             <View style={{ marginRight: 18 }} />
                         </View>

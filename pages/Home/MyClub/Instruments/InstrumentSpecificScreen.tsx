@@ -4,7 +4,7 @@ import { useIsFocused, useRoute } from '@react-navigation/native';
 import { Color } from '../../../../ColorSet';
 import { Instrument } from '../../../../UserType';
 import { useInstrument } from '@hongpung/context/InstrumentContext';
-import useFetch from '@hongpung/hoc/useFetch';
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import Header from '@hongpung/components/Header';
 
 
@@ -15,7 +15,7 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any, route: any }> = ({ n
     const daysOfWeek = useMemo(() => ['일', '월', '화', '수', '목', '금', '토'], [])
 
     const isFocusing = useIsFocused();
-    const { data, loading, error } = useFetch<Instrument>(
+    const { data, loading, error } = useFetchUsingToken<Instrument>(
         `${process.env.BASE_URL}/instrument/${instrumentId}`
         , {}, 5000, [instrumentId,isFocusing]
     )

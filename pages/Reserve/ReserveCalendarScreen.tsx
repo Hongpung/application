@@ -3,7 +3,7 @@ import { Pressable, View, Text, StyleSheet, Dimensions, ActivityIndicator, Modal
 import { Color } from "../../ColorSet";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 
-import useFetch from "../../hoc/useFetch";
+import useFetchUsingToken from "../../hoc/useFetchUsingToken";
 import { Icons } from "@hongpung/components/Icon";
 
 const { width } = Dimensions.get(`window`);
@@ -23,7 +23,7 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
     }, [])
 
     // 토큰을 불러온 후 useFetch 실행
-    const { data, loading, error } = useFetch<any[]>(
+    const { data, loading, error } = useFetchUsingToken<any[]>(
         `${process.env.BASE_URL}/reservation/year-month?year=${calendarMonth.getFullYear()}&month=${calendarMonth.getMonth() + 1}`,
         {
             method: 'GET',

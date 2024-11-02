@@ -1,17 +1,17 @@
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { briefInstrument, Instrument, instrumentOrder } from '@hongpung/UserType'
+import { briefInstrument, instrumentOrder } from '@hongpung/UserType'
 import InstrumentCard from '@hongpung/components/cards/InstrumentCard'
 import { Color } from '@hongpung/ColorSet'
 import LongButton from '@hongpung/components/buttons/LongButton'
 import { useReservation } from '@hongpung/pages/Reserve/context/ReservationContext'
 import Header from '@hongpung/components/Header'
-import useFetch from '@hongpung/hoc/useFetch'
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { Icons } from '@hongpung/components/Icon'
 
 const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
-    const { data, loading, error } = useFetch<briefInstrument[]>(
+    const { data, loading, error } = useFetchUsingToken<briefInstrument[]>(
         `${process.env.BASE_URL}/instrument/list`, {}, 5000, []
     )
 

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, ScrollView, View, Pressable, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
-import useFetch from '@hongpung/hoc/useFetch'
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { Color } from '@hongpung/ColorSet'
 import { getToken } from '@hongpung/utils/TokenHandler'
 import { useIsFocused } from '@react-navigation/native'
@@ -16,7 +16,7 @@ const ChatListScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [roomName, setName] = useState<string>('');
     const [chatMember, setMember] = useState<number[]>([loginUser?.memberId]);
 
-    const { data, loading, error } = useFetch<any[]>(
+    const { data, loading, error } = useFetchUsingToken<any[]>(
         `${process.env.BASE_URL}/chat`,
         {},
         5000

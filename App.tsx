@@ -133,7 +133,7 @@ const SignUp: React.FC<{ navigation: any, route: any }> = () => {
 
 const RootStacks: React.FC<{ startDomain: string }> = ({ startDomain }) => {
   return (
-    <RootStack.Navigator initialRouteName={startDomain} screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+    <RootStack.Navigator initialRouteName={"HomeStack"} screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
       <RootStack.Screen name="Tutorial" component={Tutorial} />
       <RootStack.Screen name="Permission" component={Permission} />
       <RootStack.Screen name="Login" component={LoginScreen} options={{ animation: 'none' }} />
