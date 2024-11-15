@@ -4,20 +4,31 @@ import { Color } from '@hongpung/ColorSet';
 import CustomSwitch from '@hongpung/components/CustomSwitch';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LongButton from '@hongpung/components/buttons/LongButton';
-import { StackActions } from '@react-navigation/native';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { useAuth } from '@hongpung/hoc/useAuth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MyPageParamList } from '@hongpung/nav/MyPageStack';
 
-const LoginSettingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+
+
+
+type LoginSettingProps = NativeStackNavigationProp<MyPageParamList, 'LoginSetting'>;
+
+const LoginSettingScreen: React.FC = () => {
+
+    const navigation = useNavigation<LoginSettingProps>();
+
     const { logout } = useAuth();
     const [autoLogin, setAutoLogin] = useState(false);
+
 
     useEffect(() => {
         const getAutoLogin = async () => {
             try {
-                const prevAutoLogin = await AsyncStorage.getItem('autoLogin') ?? null
-                setAutoLogin(prevAutoLogin != null ?? false);
+                const prevAutoLogin = await AsyncStorage.getItem('autoLogin') || null
+                setAutoLogin(!!prevAutoLogin || false);
             } catch (e) {
                 console.error(e)
                 setAutoLogin(false)
@@ -53,7 +64,7 @@ const LoginSettingScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     };
 
     const autoLoginOff = useCallback(async () => { await AsyncStorage.removeItem('autoLogin') }, [])
-    
+
     const LogOutHandler = () => {
         autoLoginOff();
         logout();

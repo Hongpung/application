@@ -15,7 +15,7 @@ export interface Reservation {
     userEmail: string
     userName: string
     lastmodified?: Date
-    [key:string]:any
+    [key: string]: any
 };
 
 export function areReservationsEqual(r1: Reservation, r2: Reservation): boolean {
@@ -47,8 +47,8 @@ function deepEqual(obj1: any, obj2: any): boolean {
     return keys1.every((key) => deepEqual(obj1[key], obj2[key]));
 }
 
-export function findReservationDifferences(preReservation: Reservation, newReservation: Reservation): Partial<ReservationSubmitForm|any> {
-    const differences: Partial<ReservationSubmitForm|any> = {};
+export function findReservationDifferences(preReservation: Reservation, newReservation: Reservation): Partial<ReservationSubmitForm | any> {
+    const differences: Partial<ReservationSubmitForm | any> = {};
     const preResevationForm = parseToReservationForm(preReservation)
     const newResevationForm = parseToReservationForm(newReservation)
 
@@ -58,17 +58,27 @@ export function findReservationDifferences(preReservation: Reservation, newReser
 
         if (!deepEqual(oldValue, newValue)) {
             if (key as keyof ReservationSubmitForm == 'participaterIds') {
-                console.log(oldValue,newValue)
-                const added =  newValue.filter((item:number) => !oldValue.includes(item));
-                const removed = oldValue.filter((item:number) => !newValue.includes(item));
-                
-                console.log(added,removed,'ww')
-                if(added.length>0) differences['addedParticipatorIds'] = added;
-                if(removed.length>0)differences['removedParticipatorIds'] = removed;
+                console.log(oldValue, newValue)
+                const added = newValue.filter((item: number) => !oldValue.includes(item));
+                const removed = oldValue.filter((item: number) => !newValue.includes(item));
+
+                console.log(added, removed, 'ww')
+                if (added.length > 0) differences['addedParticipatorIds'] = added;
+                if (removed.length > 0) differences['removedParticipatorIds'] = removed;
+
+            }
+            else if (key as keyof ReservationSubmitForm == 'borrowInstrumentIds') {
+                console.log(oldValue, newValue)
+                const added = newValue.filter((item: number) => !oldValue.includes(item));
+                const removed = oldValue.filter((item: number) => !newValue.includes(item));
+
+                console.log(added, removed, 'ww')
+                if (added.length > 0) differences['addedBorrowInstrumentIds'] = added;
+                if (removed.length > 0) differences['removedBorrowInstrumentIds'] = removed;
 
             }
             else
-            differences[key as keyof ReservationSubmitForm] = newValue as any;
+                differences[key as keyof ReservationSubmitForm] = newValue as any;
         }
     });
     return differences;
@@ -81,7 +91,7 @@ export interface ReservationDTO extends Omit<ReservationSubmitForm, 'participate
     email: string;                    // 생성자 이메일
     lastmodified: string;             // 마지막 수정 날짜 (ISO 형식)
     participators: User[]
-    [key:string]:any
+    [key: string]: any
 }
 
 export interface ReservationSubmitForm {
@@ -91,8 +101,9 @@ export interface ReservationSubmitForm {
     message: string;                  // 예약 메시지 또는 설명
     type: string;                     // 예약 유형 (정기연습, 특별행사 등)
     participationAvailable: boolean;  // 참여 가능 여부
-    participaterIds: number[];    // 참여자 목록 (Participator 배열)
-    [key:string]:any
+    participaterIds: number[];        // 참여자 목록
+    borrowInstrumentIds?: number[];    // 대여악기 목록 
+    [key: string]: any
 }
 
 export const parseToReservationDetail = (reservation: Reservation, user: User): ReservationDTO => {
@@ -100,7 +111,7 @@ export const parseToReservationDetail = (reservation: Reservation, user: User): 
         creatorName: user.name,
         email: user.email,  // Reservation 타입에는 없는 필드
         date: reservation.date!.toISOString().split("T")[0],  // `Date` 객체를 `YYYY-MM-DD` 형식으로 변환
-        type: reservation.isRegular ? "FIXED_TIME" : "NOT_FIXED_TIME",  // 예약 유형 변환
+        type: reservation.isRegular ? "REGULAR" : "COMMON",  // 예약 유형 변환
         startTime: reservation.Time.startTime,  // Enum -> HH:MM:SS 변환
         endTime: reservation.Time.endTime,      // Enum -> HH:MM:SS 변환
         message: reservation.reservationName,  // 필요시 채워야 함
@@ -113,15 +124,15 @@ export const parseToReservationDetail = (reservation: Reservation, user: User): 
 export const parseToReservationForm = (reservation: Reservation): ReservationSubmitForm => {
     return {
         date: reservation.date!.toISOString().split("T")[0],  // `Date` 객체를 `YYYY-MM-DD` 형식으로 변환
-        type: reservation.isRegular ? "FIXED_TIME" : "NOT_FIXED_TIME",  // 예약 유형 변환
+        type: reservation.isRegular ? "REGULAR" : "COMMON",  // 예약 유형 변환
         startTime: reservation.Time.startTime,  // Enum -> HH:MM:SS 변환
         endTime: reservation.Time.endTime,      // Enum -> HH:MM:SS 변환
+        participaterIds: reservation.participants.map(user => user.memberId),
         message: reservation.reservationName,  // 필요시 채워야 함
         participationAvailable: reservation.isParticipatible,
-        participaterIds: reservation.participants.map(user => user.memberId),
+        borrowInstrumentIds:[]
     };
 }
-
 // ReservationDetail -> Reservation 변환 함수
 export function parseToReservation(reservationDTO: ReservationDTO): Reservation {
 

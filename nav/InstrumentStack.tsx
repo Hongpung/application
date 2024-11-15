@@ -5,7 +5,16 @@ import InstrumentSpecificScreen from "@hongpung/pages/Home/MyClub/Instruments/In
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Header from '@hongpung/components/Header';
 
-const InstrumentStack = createNativeStackNavigator();
+
+export type ClubInstrumentStackParamList = {
+    InstrumentsHome:undefined;
+    InstrumentSpecific:{ instrumentId: number };
+    InstrumentCreate: { instrumentInform: string };
+    InstrumentEdit: { instrumentInform: string };
+};
+
+
+const InstrumentStack = createNativeStackNavigator<ClubInstrumentStackParamList>();
 
 const InstrumentStacks = () => {
     return (

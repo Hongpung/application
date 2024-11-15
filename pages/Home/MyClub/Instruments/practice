@@ -1,0 +1,15 @@
+imstrumentEditScreen
+
+--state
+    load: instrumentId?
+
+    upload: instrumentImage?
+
+    Form{
+    instrumnetName
+    instrumnetType
+    instrumentClub
+    instrumnetAvailable
+    }
+
+    load: borrowLog? []

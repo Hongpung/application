@@ -101,7 +101,7 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
                     backgroundColor: Color[`red500`],
                     marginVertical: 6,
                     marginRight: 28,
-                    marginLeft:-20,
+                    marginLeft: -20,
                     borderRadius: 5,
                     width: 140,
                     opacity: opacity
@@ -189,9 +189,7 @@ const NotificationList: React.FC<NotificationList> = ({ notifications, onDelete 
     )
 }
 
-type NotificationProps = NativeStackScreenProps<HomeStackParamList, 'Notification'>;
-
-const NotificationScreen: React.FC<NotificationProps> = ({ navigation }) => {
+const NotificationScreen: React.FC= () => {
     const [Notifications, setNotifications] = useState<Notification[]>([]);
     const handleDelete = (id: any) => {
         setNotifications(Notifications.filter(notification => notification.id !== id));

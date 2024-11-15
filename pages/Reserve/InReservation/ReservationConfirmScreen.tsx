@@ -34,8 +34,6 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
 
             const sendFormat = JSON.stringify(data)
 
-            console.log(data);
-
             const controller = new AbortController();
             const signal = controller.signal;
             const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -43,7 +41,7 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
             try {
                 const token = await getToken('token');
 
-                console.log(sendFormat)
+                console.log(sendFormat,`${process.env.BASE_URL}/reservation`)
                 const response = await fetch(
                     `${process.env.BASE_URL}/reservation`
                     , {

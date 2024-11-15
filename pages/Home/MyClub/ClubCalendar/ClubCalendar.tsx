@@ -7,7 +7,7 @@ import { Icons } from '@hongpung/components/Icon'
 
 export type ReserveType = 'regular' | 'personal' | 'none';
 
-export type Reserve = {
+export interface Reserve{
     date: Date;
     title: string;
     type: ReserveType;
@@ -18,6 +18,19 @@ export type Reserve = {
     endTime: 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22;
     personnel: number
 }
+
+export interface SerializedReserve{
+    date: string;
+    title: string;
+    type: ReserveType;
+    name: string;
+    nickname?: string;
+    club?: club;
+    startTime: 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21;
+    endTime: 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22;
+    personnel: number
+}
+
 const ClubCalendar: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     const [selectedDate, setDate] = useState<Date | null>(null)

@@ -1,28 +1,43 @@
-import { StyleSheet, Text, ScrollView, View, Pressable, TouchableOpacity } from 'react-native'
+import { Text, ScrollView, View, Pressable, TouchableOpacity, Modal, TextInput } from 'react-native'
 import React, { useState } from 'react'
+import { useRecoilValue } from 'recoil'
+
+import { useIsFocused, useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { MainStackParamList } from '@hongpung/nav/HomeStacks'
+
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { Color } from '@hongpung/ColorSet'
 import { getToken } from '@hongpung/utils/TokenHandler'
-import { useIsFocused } from '@react-navigation/native'
-import { useRecoilValue } from 'recoil'
 import { loginUserState } from '@hongpung/recoil/authState'
 import { Icons } from '@hongpung/components/Icon'
+import LongButton from '@hongpung/components/buttons/LongButton'
 
+interface ChatRoom {
+    chatroomId: number
+    roomName: string
+    memberCount: number
+}
 
-const ChatListScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type RootNavigationProp = NativeStackNavigationProp<MainStackParamList, 'ChatRoomStack'>;
+
+const ChatListScreen: React.FC = () => {
+
+    const navigation = useNavigation<RootNavigationProp>();
 
     const isFocusing = useIsFocused();
     const loginUser = useRecoilValue(loginUserState);
-    const [roomName, setName] = useState<string>('');
+
+    const [madeModal, setMadeState] = useState(false); //chat room 만드는 모달
+    const [roomName, setRoomName] = useState<string>('');
     const [chatMember, setMember] = useState<number[]>([loginUser?.memberId]);
 
-    const { data, loading, error } = useFetchUsingToken<any[]>(
+    const { data, loading, error } = useFetchUsingToken<ChatRoom[]>(
         `${process.env.BASE_URL}/chat`,
         {},
         5000
         , [isFocusing]
     )
-    console.log(data)
 
     const createRoom = () => {
         const fetchData = async () => {
@@ -52,8 +67,13 @@ const ChatListScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 }
                 const answer = await response.json();
 
-                navigation.navigate('ChatRoom', { roomId: answer.chatroomId, roomName: answer.roomName })
-                console.log(answer)
+                setMadeState(false);
+                setRoomName('')
+                setMember([])
+                
+                navigation.navigate('ChatRoomStack', { screen: 'ChatRoom', params: { roomId: answer.chatroomId, roomName: answer.roomName } })
+
+
             } catch (err: any) {
                 if (err.name === 'AbortError') {
                     console.error('Request was canceled' + err.status);
@@ -70,7 +90,7 @@ const ChatListScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     return (
         <View style={{ position: 'relative', flex: 1, backgroundColor: '#FFF' }}>
             <Pressable style={{ position: 'absolute', width: 48, height: 48, bottom: 80, right: 20, zIndex: 2 }}
-                onPress={createRoom}>
+                onPress={() => setMadeState(true)}>
                 <View style={{ position: 'relative', width: '100%', height: '100%' }}>
                     <View style={{ position: 'absolute' }}>
                         <Icons name='chatbox' size={48} color={Color['blue500']}></Icons>
@@ -80,11 +100,31 @@ const ChatListScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     </View>
                 </View>
             </Pressable>
+
+            <Modal visible={madeModal} transparent>
+                <Pressable style={{ backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', flex: 1, justifyContent: 'center' }}
+                    onPress={() => setMadeState(false)}>
+                    <Pressable style={{ display: 'flex', flexDirection: 'column', gap: 24, marginHorizontal: 12, paddingVertical: 32, borderRadius: 24, backgroundColor: 'white' }}
+                    onPress={(e)=>e.isDefaultPrevented()}>
+                        <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 36, justifyContent: 'space-between' }}>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'], fontSize: 16 }}>채팅방 이름</Text>
+                            <TextInput placeholder='제목 입력' value={roomName} onChangeText={(newText) => setRoomName(newText)} textAlign='right' style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey500'], fontSize: 16 }}></TextInput>
+                        </View>
+                        <LongButton
+                            color='blue'
+                            isAble
+                            innerText='생성하기'
+                            onPress={createRoom}>
+                        </LongButton>
+                    </Pressable>
+                </Pressable>
+
+            </Modal>
             <ScrollView contentContainerStyle={{ flex: 1, backgroundColor: '#FFF' }}>
                 {data?.map(data =>
                 (<TouchableOpacity
-                    style={{ height: 64, backgroundColor:'#FFF', alignItems: 'center', paddingHorizontal: 24, display: 'flex', flexDirection: 'row' }}
-                    onPress={() => navigation.navigate('ChatRoom', { roomId: data.chatroomId, roomName: data.roomName ?? 'test' })}
+                    style={{ height: 64, backgroundColor: '#FFF', alignItems: 'center', paddingHorizontal: 24, display: 'flex', flexDirection: 'row' }}
+                    onPress={() => navigation.navigate('ChatRoomStack', { screen: 'ChatRoom', params: { roomId: data.chatroomId, roomName: data.roomName ?? 'test' } })}
                 >
                     <View style={{ height: 48, width: 48, backgroundColor: Color['grey200'], borderRadius: 12 }} />
                     <View style={{ justifyContent: 'center', paddingHorizontal: 12, display: 'flex', gap: 4 }}>
@@ -101,5 +141,3 @@ const ChatListScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 }
 
 export default ChatListScreen
-
-const styles = StyleSheet.create({})

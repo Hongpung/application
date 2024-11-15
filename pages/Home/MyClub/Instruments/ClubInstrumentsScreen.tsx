@@ -1,18 +1,20 @@
 import { ScrollView, View, Text } from "react-native"
-import { briefInstrument, instrumentOrder } from "@hongpung/UserType"
-import { HomeStackParamList } from "@hongpung/pageTypes"
-import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import InstrumentCard from "@hongpung/components/cards/InstrumentCard"
-import { Color } from "@hongpung/ColorSet"
-import { useInstrument } from "@hongpung/context/InstrumentContext"
 import { useEffect, useState } from "react"
+import { useIsFocused, useNavigation } from "@react-navigation/native"
+
+import InstrumentCard from "@hongpung/components/cards/InstrumentCard"
+import { briefInstrument, instrumentOrder } from "@hongpung/UserType"
+import { Color } from "@hongpung/ColorSet"
 import useFetchUsingToken from "@hongpung/hoc/useFetchUsingToken"
-import { useIsFocused } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { ClubInstrumentStackParamList } from "@hongpung/nav/InstrumentStack"
 
+type InstrumentNavParams = NativeStackNavigationProp<ClubInstrumentStackParamList,'InstrumentsHome'>
 
-type ClubInstrumentsScreenProps = NativeStackScreenProps<HomeStackParamList, 'InstrumentsHome'>
+const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ instrumentsList }) => {
 
-const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[], navigation: any }> = ({ instrumentsList, navigation }) => {
+    const navigation = useNavigation<InstrumentNavParams>();
+    
     const renderInstruments = () => {
         const rows = [];
         let cnt = instrumentOrder(instrumentsList[0]?.type) - 1;
@@ -39,7 +41,7 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[], navigation
                             key={instrument.name + index}
                             instrument={instrument}
                             view="inManage"
-                            onSelectInstrument={(instrument) => { navigation.push('InstrumentSpecific', { instrumentId: instrument.instrumentId }); }}
+                            onSelectInstrument={(instrument) => { navigation.navigate('InstrumentSpecific', { instrumentId: instrument.instrumentId }); }}
                         />
                     ))}
                     {group.length % 2 == 1 && <View style={{ height: 168, width: 154 }} />}
@@ -57,7 +59,7 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[], navigation
     )
 }
 
-const ClubInstrumentsScreen: React.FC<ClubInstrumentsScreenProps> = ({ navigation }) => {
+const ClubInstrumentsScreen: React.FC = () => {
 
     const isFocusing = useIsFocused();
     const [instruments, setInstruments] = useState<briefInstrument[]>([])
@@ -89,7 +91,7 @@ const ClubInstrumentsScreen: React.FC<ClubInstrumentsScreenProps> = ({ navigatio
                 alignItems: 'center',
                 backgroundColor: '#fff',
             }}>
-                {instruments && <InstrumentsList instrumentsList={instruments} navigation={navigation} />}
+                {instruments && <InstrumentsList instrumentsList={instruments} />}
             </ScrollView>
         </View>
     )

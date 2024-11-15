@@ -3,32 +3,29 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Modal,
 import { Color } from '@hongpung/ColorSet'
 import PagerView from 'react-native-pager-view';
 import { debounce } from 'lodash';
-import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
 import { useAuth } from '@hongpung/hoc/useAuth';
 import { Icons } from '@hongpung/components/Icon';
 import { useUserReserve } from '@hongpung/hoc/useUserReserve';
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';
+import NoticePartition from '@hongpung/components/home/Notice';
+import Banner from '@hongpung/components/home/Banner';
+import TodaySchedule from '@hongpung/components/home/TodaySchedule';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MainStackParamList } from '@hongpung/nav/HomeStacks';
+import { useNavigation } from '@react-navigation/native';
 
-interface Banner {
-    backgroundColor: string,
-    Title: string,
-    Descript: string
-}
 
-const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type HomeNavProps = NativeStackNavigationProp<MainStackParamList,'Home'>
 
+const HomeScreen: React.FC = () => {
+
+    const navigation = useNavigation<HomeNavProps>()
     const { getUserInfo } = useAuth();
     const loginUser = useRecoilValue(loginUserState);
-    const { userReservations, loadUserReservation } = useUserReserve();
 
-    console.log(userReservations)
-    const hasReservation = useMemo(() => userReservations.length > 0, [userReservations])
     const [isUsed, setUsed] = useState(true);
     const [isSlideUp, setSlide] = useState(false);
-    const [bannerNum, setBannerNum] = useState<number>(0);
-    const [modalVisible, setModalVisible] = useState<boolean>(false);
-    const pagerRef = useRef<PagerView>(null);//러페런스 추가
     const today = new Date();
     const animatedValue = useRef(new Animated.Value(-82)).current; // 초기 bottom 값
 
@@ -51,47 +48,18 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         }
     };
 
-    const banners: Banner[] = [
-        { backgroundColor: Color[`blue400`], Title: '배너로 활동을 홍보하세요!', Descript: '활동 인원을 모집하고\n공연 관객을 모집해보세요!' },
-        { backgroundColor: Color[`green400`], Title: '홍풍 앱 출시 이벤트', Descript: '후기가 담긴 인스타 게시물을 업로드 해주세요\n추첨을 통해 스타벅스 기프티콘을 드립니다' },
-        { backgroundColor: Color[`red400`], Title: '홍풍 마당놀이 모집중!', Descript: '2022년 금상, 2023년 대상에 이어 나갈\n홍풍 회원님들을 모집합니다!' },
-    ];
-
-    const bannerMass = banners.length;// 배너 수
-
-    const BannerHandler = (e: NativeSyntheticEvent<OnPageSelectedEventData>) => {
-        const { position } = e.nativeEvent;
-
-        if (position === 0) {
-            setBannerNum(banners.length - 1);
-            setTimeout(() => {
-                pagerRef.current?.setPageWithoutAnimation(banners.length);
-            }, 200)
-        } else if (position === banners.length + 1) {
-            setBannerNum(0);
-            setTimeout(() => {
-                pagerRef.current?.setPageWithoutAnimation(1);
-            }, 200)
-        } else {
-            setBannerNum(position - 1)
-        }
-    }
-
 
     useEffect(() => {
         const loadUserinfo = async () => {
             await getUserInfo();
         }
 
-        const loadReservationData = async () => {
-            await loadUserReservation();
-        }
+
 
         setUsed(false)
 
         if (!loginUser) {
             loadUserinfo();
-            loadReservationData();
         }
     }, [])
 
@@ -122,114 +90,15 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 </View>
 
                 {/* 상단 일정*/}
-                <Pressable onPress={() => debounce(() => navigation.push('ReserveCalendar'), 1000, { leading: true, trailing: false })}>
-                    <View style={styles.ScheduleOfDate}>
-                        {hasReservation ?
-                            <TouchableOpacity style={{ position: 'absolute', bottom: 12, left: 20 }}
-                                onPress={() => navigation.navigate('MyPage', { screen: 'MySchedules' })}>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>오늘의 일정이 있어요</Text>
-                                <View style={{ height: 4 }} />
-                                <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 18 }}>예약 확인하러 가기</Text>
-                            </TouchableOpacity> :
-                            <TouchableOpacity style={{ position: 'absolute', bottom: 12, left: 20 }}>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>오늘의 일정이 없어요</Text>
-                                <View style={{ height: 4 }} />
-                                <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 18 }}>새로운 일정 예약하러 가기</Text>
-                            </TouchableOpacity>}
-                    </View>
-                </Pressable>
 
-                {/* 배너 부분*/}
-                <View style={styles.AdvertiseBanner}>
-                    {/* 배너 확인 */}
-                    <View style={{
-                        flex: 1,
-                    }}>
-                        <PagerView style={{
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }} initialPage={1}
-                            onPageSelected={(e) => {
-                                BannerHandler(e)
-                            }}
-                            ref={pagerRef}>
-                            <View style={[{ flex: 1, backgroundColor: banners[banners.length - 1].backgroundColor }]}>
-                                <View style={{ position: 'absolute', top: 36, left: 22 }}>
-                                    <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{banners[banners.length - 1].Title}</Text>
-                                </View>
-
-                                <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
-                                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{banners[banners.length - 1].Descript}</Text>
-                                </View>
-                            </View>
-                            {banners.map((page, index) => (
-                                <View key={index + 1} style={{ flex: 1 }}>
-                                    <View style={[{ flex: 1, backgroundColor: page.backgroundColor }]}>
-                                        <View style={{ position: 'absolute', top: 36, left: 22 }}>
-                                            <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{page.Title}</Text>
-                                        </View>
-
-                                        <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
-                                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{page.Descript}</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            ))}
-                            <View style={[{ flex: 1, backgroundColor: banners[0].backgroundColor }]}>
-                                <View style={{ position: 'absolute', top: 36, left: 22 }}>
-                                    <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{banners[0].Title}</Text>
-                                </View>
-
-                                <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
-                                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{banners[0].Descript}</Text>
-                                </View>
-                            </View>
-                        </PagerView>
-                    </View>
-
-
-                    {/* 배너 인디케이터 */}
-                    <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 2, height: 20, justifyContent: 'center' }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', minWidth: 42, fontSize: 12, textAlignVertical: 'center', textAlign: 'right' }}>{bannerNum < 9 ? '0' + (bannerNum + 1) : bannerNum + 1}/{bannerMass < 10 ? '0' + bannerMass : bannerMass}</Text>
-                            <Pressable onPress={() => setModalVisible(true)} style={{ justifyContent: 'flex-end', height: 16 , width:64, gap:4, flexDirection:'row', alignItems:'center'}}>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: '#FFF', fontSize: 11, textAlign: 'center' }}>모두보기</Text>
-                                <Icons name='chevron-forward-outline' color={Color['grey400']} size={12}></Icons>
-                            </Pressable>
-                        </View>
-                    </View>
+                <View style={{ marginHorizontal: 24, marginTop: 12 }}>
+                    <TodaySchedule />
                 </View>
 
-                <Modal transparent={true} visible={modalVisible}>
-                    <View style={{ flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.5)', }}>
-
-                        <Pressable style={{ top: 24 }} onPress={() => setModalVisible(false)}>
-                            <View style={{ flexDirection: 'row', height: 64, marginHorizontal: 32, marginTop: 16, justifyContent: 'flex-end', alignItems: 'center' }}>
-                                <Icons name='close' color={'#FFF'} size={36} />
-                            </View>
-                        </Pressable>
-                        <View style={{ flex: 1 }} >
-                            <FlatList
-                                style={{ top: 24, paddingVertical: 4 }}
-                                data={banners}
-                                renderItem={({ item, index }) => (
-                                    <Pressable key={index + 1} style={{ marginHorizontal: 28, height: 160, marginVertical: 8, borderRadius: 5, overflow: 'hidden' }} onPress={(e) => { e.stopPropagation(); navigation.navigate('MyPage'); setModalVisible(false); }}>
-                                        <View style={[{ flex: 1, backgroundColor: item.backgroundColor }]}>
-                                            <View style={{ position: 'absolute', top: 36, left: 22 }}>
-                                                <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>{item.Title}</Text>
-                                            </View>
-
-                                            <View style={{ position: 'absolute', bottom: 36, left: 22 }}>
-                                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>{item.Descript}</Text>
-                                            </View>
-                                        </View>
-                                    </Pressable>
-                                )} />
-                        </View>
-                        <View style={{ height: 36 }} />
-                    </View>
-                </Modal>
+                {/* 배너 부분*/}
+                <View style={{ marginHorizontal: 24, marginTop: 20 }}>
+                    <Banner />
+                </View>
 
                 {/* 우리 동아리 */}
                 <View style={{ marginHorizontal: 24, marginTop: 32, }}>
@@ -247,6 +116,9 @@ const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
 
+                <View style={{ marginHorizontal: 24, marginTop: 24 }}>
+                    <NoticePartition />
+                </View>
 
                 {/* 일정 홍보 */}
                 <View style={{ marginTop: 32 }}>
@@ -464,7 +336,7 @@ const styles = StyleSheet.create({
     AdvertiseBanner: {
         marginTop: 28,
         marginHorizontal: 24,
-        height: 150,
+        height: 120,
         borderRadius: 10,
         overflow: 'hidden'
     },

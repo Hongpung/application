@@ -10,10 +10,14 @@ import { getToken } from '@hongpung/utils/TokenHandler'
 import { areReservationsEqual, parseToReservation } from '../ReserveInterface'
 import { useFocusEffect } from '@react-navigation/native'
 import { Icons } from '@hongpung/components/Icon'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { InReservationStackParamList } from '@hongpung/nav/ReservationStack'
 
 const { width } = Dimensions.get('window')
 
-const ReservationScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+type inReservationProps = NativeStackScreenProps<InReservationStackParamList, 'inReservation'>
+
+const ReservationScreen: React.FC<inReservationProps>= ({ navigation, route }) => {
 
     const {
         reservation,

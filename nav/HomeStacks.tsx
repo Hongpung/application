@@ -18,12 +18,44 @@ import ChatScreen from '@hongpung/pages/Chat/ChatScreen';
 
 //nav
 import BottomTab from './BottomNav';
-import MyClubStacks from './MyClubStack';
-import ReservationStacks from './ReservationStack';
-import MyPageStacks from './MyPageStack';
+import MyClubStacks, { MyClubStackStackParamList } from './MyClubStack';
+import ReservationStacks, { ReservationStackParamList } from './ReservationStack';
+import MyPageStacks, { MyPageParamList } from './MyPageStack';
 import ExtraActivitiesStacks from './ExtraActivitiesStack';
+import BannersScreen from '@hongpung/pages/Home/Banners/BannersScreen';
+import NoticesPage from '@hongpung/pages/Home/Notices/NoticesPage';
+import NoticeDetailPage from '@hongpung/pages/Home/Notices/NoticeDetailPage';
 
-const MainStack = createNativeStackNavigator();
+import { View } from 'react-native';
+
+export type ScreenParams<StackParamList> = {
+    [K in keyof StackParamList]: StackParamList[K] extends undefined
+    ? { screen: K }
+    : { screen: K; params: StackParamList[K] }
+}[keyof StackParamList];
+
+export type MainStackParamList = {
+    Home: undefined;
+    BottomTab: undefined;
+
+    Notification: undefined; // Home은 파라미터가 없음
+    UsingManage: undefined;
+    Banners: undefined;
+
+    CheckIn: undefined; // 예시로 Profile 화면에 userId가 필요하다고 가정    
+
+    MyPage: ScreenParams<MyPageParamList>
+    MyClub: ScreenParams<MyClubStackStackParamList>
+    Reservation: ScreenParams<ReservationStackParamList>
+    CheckOut: undefined
+
+    NoticeStack?: ScreenParams<NoticeStackParamList>;
+    ChatRoomStack?: ScreenParams<ChatStackParamList>;
+
+    ExtraActivities: undefined
+};
+
+const MainStack = createNativeStackNavigator<MainStackParamList>();
 
 const MainStacks = () => {
     return (
@@ -36,27 +68,42 @@ const MainStacks = () => {
                 component={NotificationScreen}
                 options={{
                     headerShown: true,
-                    animation: 'none',
-                    header: () => <Header leftButton='close' HeaderName='알림' />,
+                    animation: 'slide_from_bottom',
+                    header: () => <View style={{ paddingVertical: 8, backgroundColor: '#FFF' }}><Header leftButton='close' HeaderName='알림' /></View>,
+                    presentation: 'modal'
                 }}
             />
 
             <MainStack.Screen
                 name="MyPage"
                 component={MyPageStacks}
-                options={{
-                    animation: 'none',
-                }}
             />
 
 
             <MainStack.Screen
                 name="MyClub"
                 component={MyClubStacks}
+            />
+
+
+            <MainStack.Screen
+                name="Banners"
+                component={BannersScreen}
                 options={{
-                    animation: 'none',
+                    animationDuration: 200,
+                    headerShown: true,
+                    animation: 'slide_from_bottom',
+                    presentation: 'containedTransparentModal',
+                    header: () => <Header leftButton='close' HeaderName='이벤트 및 홍보' />,
                 }}
             />
+
+            <MainStack.Screen
+                name="NoticeStack"
+                component={NoticeStacks}
+            />
+
+
 
             <MainStack.Screen
                 name="Reservation"
@@ -82,7 +129,16 @@ const MainStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: () => <Header leftButton='close' HeaderName='현재 정보' />
+                    header: () => <Header leftButton='close' HeaderName='현재 정보' />,
+                    presentation: 'modal'
+                }}
+            />
+
+            <MainStack.Screen
+                name="ChatRoomStack"
+                component={ChatStacks}
+                options={{
+                    animation: 'none',
                 }}
             />
 
@@ -99,7 +155,55 @@ const MainStacks = () => {
                 component={ExtraActivitiesStacks}
             />
 
-            <MainStack.Screen
+
+        </MainStack.Navigator>
+    );
+};
+
+
+export type NoticeStackParamList = {
+    Notices: undefined;
+    NoticeDetail: { infoId: number }
+};
+
+const NoticeStack = createNativeStackNavigator<NoticeStackParamList>();
+
+const NoticeStacks = () => {
+    return (
+        <NoticeStack.Navigator initialRouteName="Notices" screenOptions={{ headerShown: false, animationDuration: 50, animation: 'slide_from_right' }}>
+            <NoticeStack.Screen
+                name='Notices'
+                component={NoticesPage}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => <Header leftButton='close' HeaderName='공지사항' />,
+                }}
+            />
+
+            <NoticeStack.Screen
+                name="NoticeDetail"
+                component={NoticeDetailPage}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='arrow-back' HeaderName='공지사항' />,
+                }}
+            />
+        </NoticeStack.Navigator>
+    )
+}
+
+export type ChatStackParamList = {
+    ChatRoom: { roomId: number, roomName: string };
+    ChatViewer: { images: { user: string, id: string, uri: string, originHeight: number, originWidth: number }[], selectedImgId: string }
+};
+
+const ChatStack = createNativeStackNavigator<ChatStackParamList>();
+
+const ChatStacks = () => {
+    return (
+        <ChatStack.Navigator screenOptions={{ headerShown: false, animationDuration: 50, animation: 'slide_from_right' }}>
+            <ChatStack.Screen
                 name="ChatRoom"
                 component={ChatScreen}
                 options={{
@@ -107,17 +211,16 @@ const MainStacks = () => {
                 }}
             />
 
-            <MainStack.Screen
+            <ChatStack.Screen
                 name='ChatViewer'
                 component={ChatMediaViewerScreen}
                 options={{
                     animationDuration: 100,
                 }}
             />
-
-        </MainStack.Navigator>
-    );
-};
+        </ChatStack.Navigator>
+    )
+}
 
 
 const CheckOutStack = createNativeStackNavigator();

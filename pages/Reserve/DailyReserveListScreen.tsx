@@ -4,10 +4,14 @@ import { Color } from '@hongpung/ColorSet';
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import { useIsFocused } from '@react-navigation/native';
 import { Icons } from '@hongpung/components/Icon';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ReservationStackParamList } from '@hongpung/nav/ReservationStack';
 
 const { width } = Dimensions.get(`window`)
 
-const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+type DailyReserveProps = NativeStackScreenProps<ReservationStackParamList, 'DailyReserveList'>
+
+const DailyReserveListScreen: React.FC<DailyReserveProps> = ({ navigation, route }) => {
 
     const isFocusing = useIsFocused();
     const today = useMemo(() => new Date(), [isFocusing])
@@ -114,13 +118,7 @@ const DailyReserveListScreen: React.FC<{ navigation: any, route: any }> = ({ nav
                     </Pressable>
                 </View>
                 {today <= selectedDate && <Pressable onPress={() => {
-                    navigation.navigate('Reservation', {
-                        screen: 'ReservationStack',
-                        params: {
-                            screen: 'inReservation',
-                            params: { date: selectedDate.toISOString().split('T')[0] }
-                        }, // 전달할 params
-                    });
+                    navigation.navigate('ReservationStack', { screen: 'inReservation', params: { date: selectedDate.toISOString().split('T')[0] } });
                 }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}>
                     <Text style={{
                         fontFamily: "NanumSquareNeo-Bold", color: Color['blue500'],

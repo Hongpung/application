@@ -11,10 +11,22 @@ import ReserveCalendarScreen from "@hongpung/pages/Reserve/ReserveCalendarScreen
 import ReservationDetailScreen from "@hongpung/pages/Reserve/ViewDetailReservation/ReservationDetailScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Header from '@hongpung/components/Header';
+import { ScreenParams } from "./HomeStacks";
 
-const ReservationStack = createNativeStackNavigator();
 
-const InReservationStack = createNativeStackNavigator();
+
+export type InReservationStackParamList = {
+    inReservation?: { reservationId?: number, date?: string };
+    ResrvationDateSelect: undefined;
+    TimeSelect: undefined;
+    BorrowInstrumentSelect: undefined;
+
+    ParticipantsSelect: never;
+    ReservationConfirm: undefined;
+    ReservationEditConfirm: undefined;
+};
+
+const InReservationStack = createNativeStackNavigator<InReservationStackParamList>();
 
 const InReservationStacks = () => {
     return (
@@ -80,6 +92,20 @@ const InReservationStacks = () => {
         </ReservationProvider>
     )
 }
+
+
+
+export type ReservationStackParamList = {
+    ReserveCalendar?: { date?: string };
+    DailyReserveList?: { date: string }
+    ReservationDetail: { reservationId: number }
+
+    ReservationStack?: ScreenParams<InReservationStackParamList>;
+
+};
+
+const ReservationStack = createNativeStackNavigator<ReservationStackParamList>();
+
 
 const ReservationStacks = () => {
     return (

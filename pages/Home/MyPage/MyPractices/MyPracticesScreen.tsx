@@ -5,10 +5,17 @@ import PracticeCard from '@hongpung/components/cards/PracticeCard'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { Reserve } from '@hongpung/pages/Home/MyClub/ClubCalendar/ClubCalendar'
 import { Icons } from '@hongpung/components/Icon'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { MyPageParamList } from '@hongpung/nav/MyPageStack'
+import { useNavigation } from '@react-navigation/native'
 
 
-const MyPracticesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type MyPracticesProps = NativeStackNavigationProp<MyPageParamList, 'MyPractices'>;
 
+
+const MyPracticesScreen: React.FC = () => {
+
+    const navigation = useNavigation<MyPracticesProps>();
     const [selectedDate, setDate] = useState<Date | null>(null)
     const [reserveList, setReserveList] = useState<Reserve[] | null>(null)
     const [calendarMonth, setMonth] = useState(new Date)
@@ -67,7 +74,7 @@ const MyPracticesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                             ...reserve,
                             date: reserve.date.toISOString(),
                         };
-                        navigation.push('PracticeInfo', { reserveInfo: serializedReserve });
+                        navigation.push('MyPracticeInfo', { reserveInfo: serializedReserve });
                     }} />
             </ScrollView>
         </View>

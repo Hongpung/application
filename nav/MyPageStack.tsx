@@ -6,8 +6,20 @@ import LoginSettingScreen from "@hongpung/pages/Setting/LoginSetting";
 import NotificationSettingScreen from "@hongpung/pages/Setting/NotificationSetting";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Header from '@hongpung/components/Header';
+import PracticeInfoScreen from "@hongpung/pages/share/PracticeInfoScreen";
+import { SerializedReserve } from "@hongpung/pages/Home/MyClub/ClubCalendar/ClubCalendar";
 
-const MyPageStack = createNativeStackNavigator();
+
+export type MyPageParamList = {
+    MyPageHome: undefined
+    MySchedules: undefined
+    MyPractices: undefined
+    NotificationSetting: undefined
+    LoginSetting: undefined
+    MyPracticeInfo: { reserveInfo: SerializedReserve }
+}
+
+const MyPageStack = createNativeStackNavigator<MyPageParamList>();
 
 const MyPageStacks = () => {
     return (
@@ -30,7 +42,7 @@ const MyPageStacks = () => {
                     header: () => <Header leftButton='arrow-back' HeaderName='내 일정' />
                 }}
             />
-            <MyPageStack.Screen
+            {/* <MyPageStack.Screen
                 name="MyBadges"
                 component={MyBadgeScreen}
                 options={{
@@ -38,10 +50,19 @@ const MyPageStacks = () => {
                     animation: 'none',
                     header: () => <Header leftButton='arrow-back' HeaderName='내 배지' />
                 }}
-            />
+            /> */}
             <MyPageStack.Screen
                 name='MyPractices'
                 component={MyPracticesScreen}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='arrow-back' HeaderName='내 활동' />
+                }}
+            />
+
+            <MyPageStack.Screen
+                name='MyPracticeInfo'
+                component={PracticeInfoScreen}
                 options={{
                     headerShown: true,
                     header: () => <Header leftButton='arrow-back' HeaderName='내 활동' />

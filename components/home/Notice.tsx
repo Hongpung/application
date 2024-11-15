@@ -1,0 +1,72 @@
+import { ActivityIndicator, TouchableOpacity, Text, View, Pressable } from 'react-native'
+import React from 'react'
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
+import { Color } from '@hongpung/ColorSet'
+import { Icons } from '../Icon'
+import { CompositeNavigationProp, StackActions, useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { MainStackParamList, NoticeStackParamList } from '@hongpung/nav/HomeStacks'
+
+
+interface BriefNotice {
+    infoId: number
+    title: string
+    date: string//dateString
+}
+
+type CombinedNavigationProp = CompositeNavigationProp<
+    NativeStackNavigationProp<MainStackParamList, 'NoticeStack'>,
+    NativeStackNavigationProp<NoticeStackParamList, 'NoticeDetail'>
+>;
+
+const NoticePartition: React.FC = () => {
+
+    const navigation = useNavigation<CombinedNavigationProp>();
+
+    const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.BASE_URL}/info`)
+
+    if (loading)
+        return (<>
+            <ActivityIndicator color={'white'} size={'large'} />
+        </>)
+
+    return (
+        <View style={{ display: 'flex', gap: 14, width: '100%', flexDirection: 'column' }}>
+            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Icons name='megaphone' size={16} color={Color['grey400']} />
+                <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Bold', height: 20 }}>공지사항</Text>
+            </View>
+            <View style={{ display: 'flex', gap: 16, width: '100%', flexDirection: 'column' }}>
+                {data && data?.length > 0 ?
+                    data.slice(0, 4).map((notice) => (
+                        <TouchableOpacity key={notice.infoId} style={{ display: 'flex', alignItems: 'center', marginHorizontal: 12, flexDirection: 'row', gap: 2 }}
+                            onPress={() => {
+                                navigation.navigate('NoticeStack');
+                                navigation.navigate('NoticeStack', { screen: 'NoticeDetail', params: { infoId: notice.infoId } })
+
+                            }}>
+                            <Text numberOfLines={1} ellipsizeMode='tail' style={{ flex: 1, fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>
+                                [공지사항] {notice.title}
+                            </Text>
+                            <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{notice.date.split('T')[0]}</Text>
+                        </TouchableOpacity>
+                    )) :
+                    <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>공지 사항이 없습니다.</Text>
+                }
+                {true
+                    // data && data?.length > 4 
+                    &&
+                    <Pressable style={{ alignItems: 'center', display: 'flex', flexDirection: 'row', gap: 4, alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 50, borderWidth: 1, borderColor: Color['grey400'] }}
+                        onPress={() => { navigation.navigate('NoticeStack') }}>
+                        <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>
+                            더 보기
+                        </Text>
+                        <Icons name='chevron-forward' size={18} color={Color['grey400']} />
+                    </Pressable>
+                }
+            </View>
+        </View >
+    )
+}
+
+export default NoticePartition

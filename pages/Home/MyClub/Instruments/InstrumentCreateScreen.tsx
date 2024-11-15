@@ -9,17 +9,11 @@ import { Icons } from '@hongpung/components/Icon';
 import { getToken } from '@hongpung/utils/TokenHandler';
 import Toast from 'react-native-toast-message';
 import uploadImages from '@hongpung/utils/uploadImage';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ClubInstrumentStackParamList } from '@hongpung/nav/InstrumentStack';
 
 
-const showDeleteCompleteToast = () => {
-    Toast.show({
-        type: 'success',
-        text1: '악기 삭제를 완료했어요!',
-        position: 'bottom',
-        bottomOffset: 60,
-        visibilityTime: 2000
-    });
-};
 const showCreateCompleteToast = () => {
     Toast.show({
         type: 'success',
@@ -29,23 +23,15 @@ const showCreateCompleteToast = () => {
         visibilityTime: 2000
     });
 };
-const showEditCompleteToast = () => {
-    Toast.show({
-        type: 'success',
-        text1: '악기 수정을 완료했어요!',
-        position: 'bottom',
-        bottomOffset: 60,
-        visibilityTime: 2000
-    });
-};
 
+type InstrumentCreateNav = NativeStackNavigationProp<ClubInstrumentStackParamList, 'InstrumentCreate'>
 
-const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+const InstrumentEditScreen: React.FC = () => {
 
-    const { instrumentInform } = route.params ?? { instrumentInform: null };
 
     const loginUser = useRecoilValue(loginUserState);
 
+    const navigation = useNavigation<InstrumentCreateNav>();
 
     const [instrumentsEngType] = useState(['KKWANGGWARI', 'JANGGU', 'BUK', 'SOGO', 'JING', 'ETC'])
     const [aspectRatio, setAspectRatio] = useState<number | null>(null);
@@ -56,9 +42,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
     const [onSelectType, setSelectTypeVisible] = useState(false);
     const [modalVisible2, setModalVisible2] = useState(false);
 
-
-    const [instrument, setInstrument] = useState<Instrument>(instrumentInform ? JSON.parse(instrumentInform) :
-        { available: true, club: loginUser?.club, borrowHistory: [], name: '', instrumentId: -1, type: '쇠' })
+    const [instrument, setInstrument] = useState<Instrument>({ available: true, club: loginUser?.club == '기타' ? '들녘' : loginUser?.club!, borrowHistory: [], name: '', instrumentId: -1, type: '꽹과리' })
 
 
     const uploadImageToInstrumentImage = useCallback(async (imageFile: File) => {
@@ -80,87 +64,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
         setInstrument({ ...instrument, name: e })
     };
 
-    const DeleteHandler = () => {
-        const deleteInstrument = async () => {
-            const controller = new AbortController();
-            const signal = controller.signal;
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-            try {
-
-                const token = await getToken('token');
-
-                if (!token) throw Error('invalid Token');
-
-                const response = await fetch(`${process.env.BASE_URL}/instrument/${instrument.instrumentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
-                    },
-                    signal,
-                })
-
-                if (!response.ok) throw Error('Server Error' + response.status)
-
-                showDeleteCompleteToast();
-                navigation.navigate('InstrumentsHome');
-
-            } catch (err: any) {
-                if (err.name === 'AbortError') {
-                    console.error('Request was canceled' + err.status);
-                } else {
-                    console.error(err.message + ' ' + err.status);
-                }
-            } finally {
-                clearTimeout(timeoutId);
-            }
-        }
-        deleteInstrument()
-    }
-
     const SubmitHandler = () => {
-
-        const editInstrument = async () => {
-            console.log(instrument.instrumentId + `수정`)
-            const controller = new AbortController();
-            const signal = controller.signal;
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-            try {
-                const token = await getToken('token');
-
-                if (!token) throw Error('invalid Token');
-
-                const submitForm: InstrumentEditDTO = { name: instrument.name, type: parseInstrument(instrument.type), available: instrument.available }
-
-                if (seletedImage) {
-                    const imageUrl = await uploadImageToInstrumentImage(seletedImage);
-                    if (imageUrl) submitForm.imageUrl = imageUrl;
-                }
-
-                console.log(submitForm);
-                const response = await fetch(`${process.env.BASE_URL}/instrument/${instrument.instrumentId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(submitForm),
-                    signal,
-                })
-
-                if (!response.ok) throw Error('Server Error' + response.status)
-
-                showEditCompleteToast();
-                navigation.goBack();
-            } catch (err: any) {
-                if (err.name === 'AbortError') {
-                    console.error('Request was canceled' + err.status);
-                } else {
-                    console.error(err.message + ' ' + err.status);
-                }
-            } finally {
-                clearTimeout(timeoutId);
-            }
-        }
 
         const createInstrument = async () => {
             console.log(`신규 생성`)
@@ -186,8 +90,11 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
 
                 if (!response.ok) throw Error('Server Error' + response.status)
 
+                const { instrumentId } = await response.json();
+
                 showCreateCompleteToast();
-                navigation.goBack();
+
+                navigation.replace('InstrumentSpecific', { instrumentId });
 
             } catch (err: any) {
                 if (err.name === 'AbortError') {
@@ -201,11 +108,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
 
         }
 
-
-        if (instrument.instrumentId != -1)
-            editInstrument()
-        else
-            createInstrument()
+        createInstrument();
     }
 
     useLayoutEffect(() => {
@@ -230,26 +133,19 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
                             onPress={() => {
                                 setModalVisible2(true);
                             }}>
-
-                            {instrument?.imgURL ?
-                                <Image
-                                    source={{ uri: instrument?.imgURL }}
-                                    style={styles.image}
-                                />
-                                :
-                                <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />
-                            }
-
+                            {instrument?.imgURL ? <Image
+                                source={{ uri: instrument?.imgURL }}
+                                style={styles.image}
+                            /> :
+                                <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />}
                             <Modal visible={modalVisible2} transparent={true}>
                                 <Pressable onPress={() => setModalVisible2(false)} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
                                     {instrument?.imgURL ?
                                         <Image
                                             source={{ uri: instrument?.imgURL }}
                                             style={[styles.image, { width: modalImgWidth, height: modalImgWidth / aspectRatio!, borderRadius: 15 }]}
-                                        />
-                                        :
-                                        <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />
-                                    }
+                                        /> :
+                                        <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />}
                                 </Pressable>
                             </Modal>
                         </Pressable>
@@ -268,8 +164,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
                                 onPress={() => { Keyboard.dismiss(); setSelectTypeVisible(true); }}>
                                 <Text style={styles.RowRight}>{instrument.type}</Text>
                                 {
-                                    onSelectType && 
-                                    <View style={{
+                                    onSelectType && <View style={{
                                         position: 'absolute', top: 0, right: 0, zIndex: 2, width: 120, backgroundColor: '#FFF', alignItems: 'flex-start', paddingHorizontal: 16, borderRadius: 5, shadowColor: Color['grey700'],
                                         shadowOffset: { width: -2, height: 2 }, // 그림자 오프셋 (x, y)
                                         shadowOpacity: 0.1,         // 그림자 투명도 (0에서 1)
@@ -347,7 +242,7 @@ const styles = StyleSheet.create({
         color: Color['grey400']
     },
     RowRight: {
-        width: 120,
+        width: 80,
         textAlign: 'right',
         fontFamily: "NanumSquareNeo-Regular",
         fontSize: 16,

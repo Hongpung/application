@@ -1,25 +1,30 @@
-import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useLayoutEffect, useMemo, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
-import { HomeStackParamList } from '@hongpung/pageTypes';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import ProfileBoxCard from "@hongpung/components/cards/PrifileBoxCard";
 import { useRecoilCallback } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState'
 import { User } from '@hongpung/UserType';
-import { StackActions } from '@react-navigation/native';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import { Icons } from '@hongpung/components/Icon';
+import { MyPageParamList } from '@hongpung/nav/MyPageStack';
 
 
-type MyPageProps = NativeStackScreenProps<HomeStackParamList, 'MyPageHome'>;
+type MyPageProps = NativeStackNavigationProp<MyPageParamList, 'MyPageHome'>;
 
-const MyPageScreen: React.FC<MyPageProps> = ({ navigation }) => {
+const MyPageScreen: React.FC = () => {
+
+    const navigation = useNavigation<MyPageProps>();
+
     type subMenu = {
         name: string,
-        link: string
+        link: keyof MyPageParamList
     }
     const myActivities: subMenu[] = useMemo(() => [{ name: '내 일정', link: 'MySchedules' }, { name: '내 활동', link: 'MyPractices' },], [])
-    const Settings: subMenu[] = useMemo(() => [{ name: '알림 설정', link: 'NotificationSetting' }, { name: '로그인 설정', link: 'LoginSetting' }, { name: '암호 잠금', link: '' }, { name: '앱 설정', link: '' },], [])
+    const Settings: subMenu[] = useMemo(() => [{ name: '알림 설정', link: 'NotificationSetting' }, { name: '로그인 설정', link: 'LoginSetting' }, 
+        // { name: '암호 잠금', link: '' }, { name: '앱 설정', link: '' }, //추후 설정
+    ], [])
     const [loginUser, setUser] = useState<User | null>(null);
     const [isloading, setLoading] = useState(true);
 

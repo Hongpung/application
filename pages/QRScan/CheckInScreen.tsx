@@ -3,8 +3,14 @@ import React, { useEffect, useState } from 'react'
 import { Color } from '../../ColorSet'
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg'
 import LongButton from '../../components/buttons/LongButton'
+import { useNavigation } from '@react-navigation/native'
+import { MainStackParamList } from '@hongpung/nav/HomeStacks'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
-const CheckInScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const CheckInScreen: React.FC = () => {
+
+    const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+    
     const [isCheckin, CheckIn] = useState(false);
     const [isLoading, setLoading] = useState(false);
     const [isLate, setLate] = useState(false);
@@ -141,7 +147,7 @@ const CheckInScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         </View>}
 
                     <View style={{ position: 'absolute', width: '100%', bottom: 16 }}>
-                        <LongButton color='blue' innerText={isCheckin ? '확인' : '맞아요'} isAble={true} onPress={() => { console.log(navigation); CheckIn(!isCheckin); if(isCheckin)navigation.navigate('Home') }} />
+                        <LongButton color='blue' innerText={isCheckin ? '확인' : '맞아요'} isAble={true} onPress={() => { console.log(navigation); CheckIn(!isCheckin); if (isCheckin) navigation.navigate('Home') }} />
                     </View>
                 </View>}
         </View>

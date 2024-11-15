@@ -6,6 +6,9 @@ import { useReservation } from '@hongpung/pages/Reserve/context/ReservationConte
 import ShortButton from '@hongpung/components/buttons/ShortButton';
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import { Icons } from '@hongpung/components/Icon';
+import { InReservationStackParamList } from '@hongpung/nav/ReservationStack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get(`window`)
 
@@ -21,7 +24,13 @@ interface briefReservation {
     lastmodified: string;               // 마지막 수정 시간 (ISO 8601 형식)
 }
 
-const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+
+type TimeSelcectNavProps = NativeStackNavigationProp<InReservationStackParamList, 'TimeSelect'>
+
+const TimeSelectScreen: React.FC = () => {
+
+    const navigation = useNavigation<TimeSelcectNavProps>();
+
     const { reservation, setDate, setTime, setHasWait } = useReservation();
     const TimesRef = useRef<any>(null);
     const { date, Time } = reservation;
@@ -340,7 +349,7 @@ const TimeSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                             <ShortButton color='red' innerText='취소' isFilled={true} onPress={() => { setAlertVisible(false) }} />
                             <ShortButton color='blue' innerText='대기 진행' isFilled={true} onPress={() => {
                                 setTime((selectedTimeBlocks![0]), (times[times.indexOf(selectedTimeBlocks![selectedTimeBlocks!.length - 1]) + 1]))
-                                navigation.navigate('Reservation');
+                                navigation.navigate('inReservation');
                                 setHasWait(true)
                             }} />
                         </View>

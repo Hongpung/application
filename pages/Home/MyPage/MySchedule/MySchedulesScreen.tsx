@@ -1,20 +1,25 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
-import { HomeStackParamList } from '../../../../pageTypes';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Color } from '../../../../ColorSet';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
-import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import { Icons } from '@hongpung/components/Icon';
 import { loginUserState, todayReservation } from '@hongpung/recoil/authState';
 import { useRecoilValue } from 'recoil';
+import { CompositeNavigationProp, useNavigation } from '@react-navigation/native';
+import { MyPageParamList } from '@hongpung/nav/MyPageStack';
+import { MainStackParamList } from '@hongpung/nav/HomeStacks';
 
 
 
-type MySchedulesProps = NativeStackScreenProps<HomeStackParamList, 'MySchedules'>;
+type MySchedulesProps = CompositeNavigationProp<
+    NativeStackNavigationProp<MyPageParamList, 'MySchedules'>,
+    NativeStackNavigationProp<MainStackParamList, 'Reservation'>
+>;
 
-const MySchedulesScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const MySchedulesScreen: React.FC = () => {
 
+    const navigation = useNavigation<MySchedulesProps>();
     const userReservations = useRecoilValue(todayReservation);
 
     const [selectedDate, setSelectedDate] = useState(new Date());

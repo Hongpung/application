@@ -1,11 +1,18 @@
-import { FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View, Image, Modal, Button, Alert, PermissionsAndroid, Dimensions, ActivityIndicator } from 'react-native'
+import { FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View, Image, Modal, Alert, PermissionsAndroid, Dimensions, ActivityIndicator, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Color } from '../../ColorSet'
+
 import * as MediaLibrary from 'expo-media-library';
-import LongButton from '../../components/buttons/LongButton';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system';
+
+import { StackActions } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+import { Color } from '@hongpung/ColorSet'
+import LongButton from '@hongpung/components/buttons/LongButton';
 import { Icons } from '@hongpung/components/Icon';
+import { getToken } from '@hongpung/utils/TokenHandler';
+import { ChatStackParamList } from '@hongpung/nav/HomeStacks';
 
 
 //채팅 스크린
@@ -36,9 +43,12 @@ const ChatMessage = React.memo(({ message, timestamp, isUser }: { message: strin
 });
 
 
+type ChatProps = NativeStackScreenProps<ChatStackParamList, 'ChatRoom'>
 
-const ChatScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
-    const { roomId, roomName } = route?.params
+
+const ChatScreen: React.FC<ChatProps> = ({ navigation, route }) => {
+
+    const { roomId, roomName } = route.params
 
     const [isTyped, setType] = useState(false);
     const [typedMessage, setMessage] = useState<string>("");
@@ -48,6 +58,7 @@ const ChatScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
     const [ModalVisible, setModalVisible] = useState<boolean>(false)
     const [isLoading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
+    const [onHamburgerOpen, setHamburgerOpen] = useState(false)
 
     const flatListRef = useRef<FlatList>(null);
     const messageRef = useRef<TextInput>(null)
@@ -72,6 +83,47 @@ const ChatScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
         }
     };
 
+    const leaveChatRoom = useCallback(() => {
+        const tryLeave = async () => {
+            try {
+                const token = await getToken('token');
+                if (!token) throw Error('invalid Token')
+                const response = await fetch(`${process.env.BASE_URL}/chat/${roomId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
+                        }
+                    }
+                )
+                if (!response.ok) throw Error()
+
+                navigation.goBack();
+            } catch (err) {
+                if (err instanceof Error) {
+                    // `invalid Token` 메시지일 경우 처리
+                    if (err.message === 'invalid Token') {
+                        console.error(err + 'Invalid Token - Please login again.');
+                        navigation.dispatch(StackActions.replace('Login'))
+                        return;
+                    }
+                    // `AbortError`일 경우 처리
+                    if (err.name === 'AbortError') {
+                        const status = (err as any).status ?? ''; // status가 있으면 사용, 없으면 빈 문자열
+                        console.error(err + 'Invalid Token - Please login again.', status);
+                    } else {
+                        // `status` 속성이 있는지 검사 후 처리
+                        const status = (err as any).status ?? ''; // status가 있으면 사용, 없으면 빈 문자열
+                        console.error(err + ' ', status);
+                    }
+                } else {
+                    console.error('An unknown error occurred');
+                }
+            }
+        }
+        tryLeave();
+
+    }, [])
     //대화 내용 불러오기
     const loadChatLogFromFile = async () => {
         try {
@@ -155,6 +207,10 @@ const ChatScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
 
     }, []);
 
+    const dropdownCloseHandler = () => {
+        if (onHamburgerOpen)
+            setHamburgerOpen(false)
+    }
     //앨범 목록 받아오기
     const getAlbums = async () => {
         try {
@@ -415,27 +471,26 @@ const ChatScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
     }
 
     return (
-        <KeyboardAvoidingView
-            style={{ backgroundColor: '#FFF', flex: 1 }}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={inputHeight + 80}
-        >
-            <View style={{
-                height: 50,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: '#FFF',
-                paddingHorizontal: 24
-            }}>
-                <Pressable
-                    style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28 }}
-                    onPress={() => navigation.goBack()}
-                >
-                    <Icons size={24} name={'arrow-back'} color={Color['blue500']} />
-                </Pressable>
-                <View style={{}}>
-
+        <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); dropdownCloseHandler(); }} >
+            <KeyboardAvoidingView
+                style={{ backgroundColor: '#FFF', flex: 1 }}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={inputHeight + 80}
+            >
+                <View style={{
+                    height: 50,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#FFF',
+                    paddingHorizontal: 24
+                }}>
+                    <Pressable
+                        style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28 }}
+                        onPress={() => navigation.goBack()}
+                    >
+                        <Icons size={24} name={'arrow-back'} color={Color['blue500']} />
+                    </Pressable>
                     <Text style={{
                         fontFamily: "NanumSquareNeo-Bold",
                         color: Color['grey800'],
@@ -443,150 +498,172 @@ const ChatScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, rou
                     }}>
                         {roomName}
                     </Text>
-
-                </View>
-                {<Pressable onPress={() => {
-                    navigation.navigate('Reservation', {
-
-                    });
-                }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}>
-                    <Text style={{
-                        fontFamily: "NanumSquareNeo-Bold", color: Color['blue500'],
-                        fontSize: 18,
-                        textAlign: 'right',
-                        textAlignVertical: 'center'
-                    }}>{'추가'}</Text>
-                </Pressable>}
-            </View>
-            <FlatList
-                ref={flatListRef}
-                data={chatLog}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={rederLogItem}
-                ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-                onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
-            />
-            <View style={{ justifyContent: 'center', height: inputHeight + 40, backgroundColor: `#FFF` }}>
-                <View style={{ marginHorizontal: 12, paddingHorizontal: 2, paddingVertical: 2, borderWidth: 1, borderRadius: 20, borderColor: Color['grey200'], flexDirection: 'row', height: inputHeight, maxHeight: 78, minHeight: 48, backgroundColor: '#FFF' }}>
-                    {typedMessage == "" && !isTyped &&
-                        <Pressable
-                            style={{ backgroundColor: Color['blue500'], marginVertical: 2, marginHorizontal: 2, width: 50, height: 40, borderRadius: 16, alignSelf: 'center', alignItems: 'center', justifyContent: 'center' }}
-                            onPress={() => { setMenuOpen(!isMenuOpen); }}>
-                            <Icons name={isMenuOpen ? 'close' : 'add'} color={'#FFF'} size={24} />
-                        </Pressable>
-                    }
-                    {isMenuOpen && <View style={{ position: 'absolute', top: -48, height: 40, flexDirection: 'row', }}>
-                        <Pressable
-                            style={{ height: 40, width: 50, borderRadius: 16, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderColor: Color['grey200'], borderWidth: 1, marginHorizontal: 4, backgroundColor: `#FFF` }}
-                            onPress={() => { setModalVisible(true) }}>
-                            <Icons name='albums' color={Color['grey400']} size={24} />
-                        </Pressable>
-                        <Pressable
-                            style={{ height: 40, width: 50, borderRadius: 16, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderColor: Color['grey200'], borderWidth: 1, backgroundColor: `#FFF` }}
-                            onPress={async () => await clearChatLogFile()}>
-                            <Icons name='camera' color={Color['grey400']} size={24} />
-                        </Pressable>
-                    </View>}
-                    <TextInput
-                        ref={messageRef}
-                        onChangeText={(text) => setMessage(text)}
-                        value={typedMessage}
-                        multiline={true}
-                        numberOfLines={3}
-                        textAlign='right'
-                        style={{ paddingHorizontal: 8, paddingVertical: 12, fontSize: 16, flex: 1, minHeight: 16 }}
-                        onFocus={() => setType(true)}
-                        onBlur={() => setType(false)}
-                        onContentSizeChange={(event) => {
-                            setInputHeight(event.nativeEvent.contentSize.height);  // +16은 패딩이나 마진을 고려한 값
-                        }} />
-                    {(typedMessage != "" || isTyped) && <Pressable
-                        style={{ backgroundColor: Color['blue500'], marginVertical: 2, marginHorizontal: 2, width: 50, height: 40, alignSelf: 'center', borderRadius: 16, alignItems: 'center', justifyContent: 'center' }}
-                        onPress={handleSend}>
-                        <Icons name='arrow-up' color={'#FFF'} size={20} />
-                    </Pressable>
-                    }
-                </View>
-            </View>
-
-
-
-            <Modal visible={ModalVisible}
-                transparent
-                animationType="slide"
-            >
-                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
-                    <Pressable style={{ flex: 1 }}
+                    {<Pressable
                         onPress={() => {
-                            setModalVisible(false);
-                            setSelectedImages([]);
-                        }} />
-                    <View style={{ height: 420, padding: 12, backgroundColor: "#FFF", paddingBottom: 0, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
-                        <Pressable style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 120, alignSelf: 'center', marginVertical: 12, paddingBottom: 8 }}
-                            onPress={() => setSelctingState(true)}>
-                            <Text style={{ alignSelf: 'center', fontSize: 20, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey800'] }}>{selectedAlbum?.title ?? '전체'}</Text>
-                            <View style={{ width: 24, height: 24, backgroundColor: Color['blue200'] }} />
-                        </Pressable>
-                        {isSelectingAlbum && <View style={{
-                            display: 'flex', position: 'absolute', right: width / 2 - 72, top: 20, zIndex: 10, backgroundColor: '#FFF', alignItems: 'flex-end', paddingHorizontal: 14, borderRadius: 5, shadowColor: Color['grey700'],
-                            shadowOffset: { width: -2, height: 2 }, // 그림자 오프셋 (x, y)
-                            shadowOpacity: 0.1,         // 그림자 투명도 (0에서 1)
-                            shadowRadius: 5,          // 그림자 반경
-                            elevation: 5,
-                            maxHeight: 160,
-                        }}>
-                            <FlatList
-                                contentContainerStyle={{ flex: 1 }}
-                                data={[null, ...albums]}
-                                renderItem={({ item }) => {
-                                    return (
-                                        <Pressable style={{ flexDirection: 'row-reverse', width: 120, paddingVertical: 8, marginVertical: 4, alignItems: 'center', justifyContent: 'space-between' }}
-                                            onPress={() => { item ? selectAlbum(item) : selectAlbum(null); }}>
-                                            <Text style={{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, textAlign: 'right', color: selectedAlbum == item ? Color['blue500'] : Color['grey400'] }}>{item?.title ?? '전체'}</Text>
-                                        </Pressable>
-                                    )
-                                }}
-                            />
-                        </View>}
-                        {isSelectingAlbum && <Pressable style={{ position: 'absolute', flex: 1, width: width, height: '120%', zIndex: 1 }} onPress={() => setSelctingState(false)} />}
-                        {photos?.length > 0 ? <FlatList
-                            data={photos}
-                            renderItem={AlbumItem}
-                            keyExtractor={(item, index) => item.id + index}
-                            numColumns={3}  // 3열로 이미지 배치
-                            initialNumToRender={12} // 처음 렌더링할 아이템 수
-                            windowSize={21} // 메모리 최적화를 위한 window size
-                            removeClippedSubviews={true} // 화면 밖 아이템 제거
+                            Keyboard.dismiss(); setHamburgerOpen(true);
+                        }}
+                        style={{ zIndex: 0, alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}
+                    >
+                        <Icons name='reorder-three-outline' color={Color['blue500']} />
+                    </Pressable>}
+                </View>
+                {
+                    onHamburgerOpen &&
+                    <View style={{
+                        position: 'absolute', top: 40, right: 12, zIndex: 3, width: 148, backgroundColor: '#FFF', alignItems: 'flex-start', paddingHorizontal: 16, borderRadius: 5, shadowColor: Color['grey700'],
+                        shadowOffset: { width: -2, height: 2 }, // 그림자 오프셋 (x, y)
+                        shadowOpacity: 0.1,         // 그림자 투명도 (0에서 1)
+                        shadowRadius: 5,          // 그림자 반경
+                        elevation: 5,
+                    }}
+                    >
+                        <ScrollView
+                            contentContainerStyle={{ alignItems: 'flex-start', paddingVertical: 4 }}
                             showsVerticalScrollIndicator={false}
-                            onEndReached={() => {
-                                if (!isLoading && hasMore) {
-                                    fetchPhotos();
-                                }
-                            }}
-                            onEndReachedThreshold={0.85} // 여전히 이 값을 유지하여 기본 동작을 추가
-                            ListFooterComponent={isLoading ? <View style={{ height: 120, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator size="large" color="#0000ff" /></View> : null}
-                        /> : isLoading ?
-                            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                                <ActivityIndicator size="large" color="#0000ff" />
-                            </View> :
-                            <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 24, color: Color['grey400'], paddingVertical: 8 }}>이 앨범엔 사진이 없어요</Text>
-                                <Pressable onPress={() => setAlbum(null)}>
-                                    <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 16, color: Color['grey300'], paddingVertical: 6 }}>다른앨범 보러가기</Text>
+                        >{['앨범 확인하기', '방 나가기'].map((item) => {
+                            return (
+                                <Pressable
+                                    key={item + 'seletor'}
+                                    style={{ paddingHorizontal: 4, paddingVertical: 12, width: 148 - 32, alignItems: 'center', }}
+                                    onPress={() => { console.log(item); if (item == '방 나가기') { console.log('방 나감'); leaveChatRoom(); }; dropdownCloseHandler() }}>
+                                    <Text style={[{ fontFamily: "NanumSquareNeo-Regular", fontSize: 14 }]}>
+                                        {item}
+                                    </Text>
                                 </Pressable>
-                            </View>}
+                            )
+                        })}</ScrollView>
                     </View>
-                    <View style={{ backgroundColor: "#FFF" }}>
-
-                        <View style={{ height: 8 }} />
-
-                        <LongButton color='blue' isAble={selectedImages.length > 0} innerText={selectedImages.length > 0 ? `사진 전송 (${selectedImages.length})` : '사진 선택'} onPress={handleSendImage} />
-
-                        <View style={{ height: 24 }} />
+                }
+                <FlatList
+                    ref={flatListRef}
+                    data={chatLog}
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={rederLogItem}
+                    ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+                    onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+                />
+                <View style={{ justifyContent: 'center', height: inputHeight + 40, backgroundColor: `#FFF` }}>
+                    <View style={{ marginHorizontal: 12, paddingHorizontal: 2, paddingVertical: 2, borderWidth: 1, borderRadius: 20, borderColor: Color['grey200'], flexDirection: 'row', height: inputHeight, maxHeight: 78, minHeight: 48, backgroundColor: '#FFF' }}>
+                        {typedMessage == "" && !isTyped &&
+                            <Pressable
+                                style={{ backgroundColor: Color['blue500'], marginVertical: 2, marginHorizontal: 2, width: 50, height: 40, borderRadius: 16, alignSelf: 'center', alignItems: 'center', justifyContent: 'center' }}
+                                onPress={() => { setMenuOpen(!isMenuOpen); }}>
+                                <Icons name={isMenuOpen ? 'close' : 'add'} color={'#FFF'} size={24} />
+                            </Pressable>
+                        }
+                        {isMenuOpen && <View style={{ position: 'absolute', top: -48, height: 40, flexDirection: 'row', }}>
+                            <Pressable
+                                style={{ height: 40, width: 50, borderRadius: 16, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderColor: Color['grey200'], borderWidth: 1, marginHorizontal: 4, backgroundColor: `#FFF` }}
+                                onPress={() => { setModalVisible(true) }}>
+                                <Icons name='albums' color={Color['grey400']} size={24} />
+                            </Pressable>
+                            <Pressable
+                                style={{ height: 40, width: 50, borderRadius: 16, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', borderColor: Color['grey200'], borderWidth: 1, backgroundColor: `#FFF` }}
+                                onPress={async () => await clearChatLogFile()}>
+                                <Icons name='camera' color={Color['grey400']} size={24} />
+                            </Pressable>
+                        </View>}
+                        <TextInput
+                            ref={messageRef}
+                            onChangeText={(text) => setMessage(text)}
+                            value={typedMessage}
+                            multiline={true}
+                            numberOfLines={3}
+                            textAlign='right'
+                            style={{ paddingHorizontal: 8, paddingVertical: 12, fontSize: 16, flex: 1, minHeight: 16 }}
+                            onFocus={() => setType(true)}
+                            onBlur={() => setType(false)}
+                            onContentSizeChange={(event) => {
+                                setInputHeight(event.nativeEvent.contentSize.height);  // +16은 패딩이나 마진을 고려한 값
+                            }} />
+                        {(typedMessage != "" || isTyped) && <Pressable
+                            style={{ backgroundColor: Color['blue500'], marginVertical: 2, marginHorizontal: 2, width: 50, height: 40, alignSelf: 'center', borderRadius: 16, alignItems: 'center', justifyContent: 'center' }}
+                            onPress={handleSend}>
+                            <Icons name='arrow-up' color={'#FFF'} size={20} />
+                        </Pressable>
+                        }
                     </View>
                 </View>
-            </Modal>
-        </KeyboardAvoidingView>
+
+
+
+                <Modal visible={ModalVisible}
+                    transparent
+                    animationType="slide"
+                >
+                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}>
+                        <Pressable style={{ flex: 1 }}
+                            onPress={() => {
+                                setModalVisible(false);
+                                setSelectedImages([]);
+                            }} />
+                        <View style={{ height: 420, padding: 12, backgroundColor: "#FFF", paddingBottom: 0, borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
+                            <Pressable style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: 120, alignSelf: 'center', marginVertical: 12, paddingBottom: 8 }}
+                                onPress={() => setSelctingState(true)}>
+                                <Text style={{ alignSelf: 'center', fontSize: 20, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey800'] }}>{selectedAlbum?.title ?? '전체'}</Text>
+                                <View style={{ width: 24, height: 24, backgroundColor: Color['blue200'] }} />
+                            </Pressable>
+                            {isSelectingAlbum && <View style={{
+                                display: 'flex', position: 'absolute', right: width / 2 - 72, top: 20, zIndex: 10, backgroundColor: '#FFF', alignItems: 'flex-end', paddingHorizontal: 14, borderRadius: 5, shadowColor: Color['grey700'],
+                                shadowOffset: { width: -2, height: 2 }, // 그림자 오프셋 (x, y)
+                                shadowOpacity: 0.1,         // 그림자 투명도 (0에서 1)
+                                shadowRadius: 5,          // 그림자 반경
+                                elevation: 5,
+                                maxHeight: 160,
+                            }}>
+                                <FlatList
+                                    contentContainerStyle={{ flex: 1 }}
+                                    data={[null, ...albums]}
+                                    renderItem={({ item }) => {
+                                        return (
+                                            <Pressable style={{ flexDirection: 'row-reverse', width: 120, paddingVertical: 8, marginVertical: 4, alignItems: 'center', justifyContent: 'space-between' }}
+                                                onPress={() => { item ? selectAlbum(item) : selectAlbum(null); }}>
+                                                <Text style={{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, textAlign: 'right', color: selectedAlbum == item ? Color['blue500'] : Color['grey400'] }}>{item?.title ?? '전체'}</Text>
+                                            </Pressable>
+                                        )
+                                    }}
+                                />
+                            </View>}
+                            {isSelectingAlbum && <Pressable style={{ position: 'absolute', flex: 1, width: width, height: '120%', zIndex: 1 }} onPress={() => setSelctingState(false)} />}
+                            {photos?.length > 0 ? <FlatList
+                                data={photos}
+                                renderItem={AlbumItem}
+                                keyExtractor={(item, index) => item.id + index}
+                                numColumns={3}  // 3열로 이미지 배치
+                                initialNumToRender={12} // 처음 렌더링할 아이템 수
+                                windowSize={21} // 메모리 최적화를 위한 window size
+                                removeClippedSubviews={true} // 화면 밖 아이템 제거
+                                showsVerticalScrollIndicator={false}
+                                onEndReached={() => {
+                                    if (!isLoading && hasMore) {
+                                        fetchPhotos();
+                                    }
+                                }}
+                                onEndReachedThreshold={0.85} // 여전히 이 값을 유지하여 기본 동작을 추가
+                                ListFooterComponent={isLoading ? <View style={{ height: 120, alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator size="large" color="#0000ff" /></View> : null}
+                            /> : isLoading ?
+                                <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                    <ActivityIndicator size="large" color="#0000ff" />
+                                </View> :
+                                <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1 }}>
+                                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 24, color: Color['grey400'], paddingVertical: 8 }}>이 앨범엔 사진이 없어요</Text>
+                                    <Pressable onPress={() => setAlbum(null)}>
+                                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 16, color: Color['grey300'], paddingVertical: 6 }}>다른앨범 보러가기</Text>
+                                    </Pressable>
+                                </View>}
+                        </View>
+                        <View style={{ backgroundColor: "#FFF" }}>
+
+                            <View style={{ height: 8 }} />
+
+                            <LongButton color='blue' isAble={selectedImages.length > 0} innerText={selectedImages.length > 0 ? `사진 전송 (${selectedImages.length})` : '사진 선택'} onPress={handleSendImage} />
+
+                            <View style={{ height: 24 }} />
+                        </View>
+                    </View>
+                </Modal>
+            </KeyboardAvoidingView>
+        </TouchableWithoutFeedback>
     )
 }
 

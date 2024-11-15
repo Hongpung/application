@@ -8,10 +8,15 @@ import { getToken } from '@hongpung/utils/TokenHandler'
 import { Reservation, parseToReservation } from '../ReserveInterface'
 import { Icons } from '@hongpung/components/Icon'
 import Toast from 'react-native-toast-message'
+import { ReservationStackParamList } from '@hongpung/nav/ReservationStack'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
 const { width } = Dimensions.get('window')
 
-const ReservationDetailScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+
+type ReservationDetailProps = NativeStackScreenProps<ReservationStackParamList, 'ReservationDetail'>
+
+const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation, route }) => {
     const { reservationId } = route.params
 
     const loginUser = useRecoilValue(loginUserState)
@@ -215,7 +220,7 @@ const ReservationDetailScreen: React.FC<{ navigation: any, route: any }> = ({ na
                     <View style={{ height: 16 }} />
 
                     <Pressable style={{ marginHorizontal: 16 }}
-                        onPress={() => reservation.participants.length > 0 && navigation.push('ParticipantsSelect')}>
+                        onPress={() => reservation.participants.length > 0 && navigation.push('ReservationStack', { screen: 'ParticipantsSelect'})}>
                         {reservation.participants.length > 0 ?
                             <View style={{ alignItems: 'center', justifyContent: 'flex-end', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>

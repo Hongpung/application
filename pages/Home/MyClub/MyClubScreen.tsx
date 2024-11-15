@@ -1,16 +1,16 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useMemo } from 'react'
 import { Color } from '../../../ColorSet'
-import { HomeStackParamList } from '../../../pageTypes';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ProfileMiniCard from '../../../components/cards/ProfileMiniCard'
 import { UserProvider } from '../../../context/UserContext';
 import { UserModal } from './ClubMember/ClubMemeberScreen';
 import { throttle } from 'lodash';
 import { Icons } from '@hongpung/components/Icon';
+import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack';
 
 
-type MyClubProps = NativeStackScreenProps<HomeStackParamList, 'MyClubHome'>;
+type MyClubProps = NativeStackScreenProps<MyClubStackStackParamList, 'MyClubHome'>;
 
 const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
 
@@ -67,14 +67,17 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                             <View style={{ height: 12 }} />
                             <ProfileMiniCard
                                 user={{
-                                    name: '홍길동',
+                                    email: 'dwq',
+                                    instrument: '기타',
+                                    memberId: 1,
+                                    name: '임꺽정',
                                     nickname: '길동색시',
-                                    role: '상장구',
+                                    role: '상쇠',
                                     club: '기타',
-                                    enrollmentNumber: 20,
-                                    instrument: '장구'
+                                    enrollmentNumber: 14,
                                 }}
                                 isPicked={false}
+                                onPick={()=>{}}
                                 view='inClubView'
                             />
                         </View>
@@ -86,15 +89,17 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                             <View style={{ height: 12 }} />
                             <ProfileMiniCard
                                 user={{
+                                    email: 'dwq',
+                                    instrument: '기타',
+                                    memberId: 1,
                                     name: '임꺽정',
-                                    isCapt: true,
                                     nickname: '길동색시',
                                     role: '상쇠',
                                     club: '기타',
                                     enrollmentNumber: 14,
-                                    instrument: '새납'
                                 }}
                                 isPicked={false}
+                                onPick={()=>{}}
                                 view='inClubView'
                             />
                         </View>

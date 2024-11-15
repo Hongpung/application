@@ -4,12 +4,17 @@ import { Color } from '../../ColorSet'
 import InstrumentCard from '../../components/cards/InstrumentCard'
 import { InstrumentProvider } from '@hongpung/context/InstrumentContext'
 import LongButton from '../../components/buttons/LongButton'
-import { Reserve } from '../Home/MyClub/ClubCalendar/ClubCalendar'
+import { SerializedReserve } from '../Home/MyClub/ClubCalendar/ClubCalendar'
 import { Icons } from '@hongpung/components/Icon'
+import { RouteProp, useRoute } from '@react-navigation/native'
 
-const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+type PracticeInfoRoute = RouteProp<{ param: { reserveInfo: SerializedReserve } }>
 
-    const { reserveInfo }: { reserveInfo: Reserve } = route.params;
+const PracticeInfoScreen: React.FC = () => {
+
+    const route = useRoute<PracticeInfoRoute>();
+
+    const { reserveInfo }: { reserveInfo: SerializedReserve } = route.params;
 
     const reserveData = {
         ...reserveInfo,
@@ -50,7 +55,7 @@ const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                                 position: 'absolute', right: 12, top: -4, width: 48, height: 48
                             }} >
                                 <Icons name="bookmark-sharp" size={40} color={Color['blue500']} />
-                            </View> 
+                            </View>
                             :
                             <View style={{
                                 position: 'absolute', right: 20, top: 12,
@@ -222,12 +227,11 @@ const PracticeInfoScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                                         <InstrumentCard
                                             onSelectInstrument={() => { }}
                                             instrument={{
-                                                imgURL: null,
                                                 club: '들녘',
-                                                type: '쇠',
+                                                type: '꽹과리',
                                                 name: 'www',
-                                                state: '대여가능',
-                                                nickname: 'ss'
+                                                available: true,
+                                                instrumentId: 1
                                             }} view={'inBorrow'} />
                                     </View>
                                 )

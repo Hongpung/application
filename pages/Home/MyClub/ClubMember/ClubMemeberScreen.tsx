@@ -4,15 +4,15 @@ import ProfileMiniCard from "../../../../components/cards/ProfileMiniCard";
 import { Color } from "../../../../ColorSet";
 import ProfileBoxCard from "../../../../components/cards/PrifileBoxCard";
 import { instrumentOrder, User } from "../../../../UserType";
-import { HomeStackParamList } from "../../../../pageTypes";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { UserProvider, useUser } from "../../../../context/UserContext";
 import useFetchUsingToken from "@hongpung/hoc/useFetchUsingToken";
 import { useRecoilValue } from "recoil";
 import { loginUserState } from "@hongpung/recoil/authState";
 import { Icons } from "@hongpung/components/Icon";
+import { MyClubStackStackParamList } from "@hongpung/nav/MyClubStack";
 
-type ClubMembersProps = NativeStackScreenProps<HomeStackParamList, 'ClubMembersHome'>
+type ClubMembersProps = NativeStackScreenProps<MyClubStackStackParamList, 'ClubMembers'>
 
 
 

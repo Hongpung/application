@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { Color } from '../../ColorSet';
+import { Icons } from '@hongpung/components/Icon';
 
 const { width, height } = Dimensions.get('window');
 
@@ -27,9 +28,9 @@ const ChatMediaViewerScreen: React.FC<{ navigation: any, route: any }> = ({ navi
                 <Pressable onPress={() => {
                     navigation.goBack();
                 }}
-                    style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 18, left: 22, width: 28, height: 28, backgroundColor: Color['grey300'] }}
+                    style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 18, left: 22, width: 28, height: 28}}
                 >
-                    <Text style={styles.Text}>{'<-'}</Text>
+                    <Icons name='arrow-back' color={'#FFF'}/>
                 </Pressable>
                 <View>
                     <Text style={styles.sendUser}>{images[selectedIndex]?.user}</Text>
