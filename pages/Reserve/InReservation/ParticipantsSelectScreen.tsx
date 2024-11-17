@@ -7,6 +7,7 @@ import { useReservation } from '../context/ReservationContext'
 import LongButton from '../../../components/buttons/LongButton'
 import Header from '../../../components/Header'
 import { getToken } from '@hongpung/utils/TokenHandler'
+import { Icons } from '@hongpung/components/Icon'
 
 
 const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -116,10 +117,10 @@ const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation })
                             <View />
                         </Pressable>
                     )}
-                    <Pressable style={[fiterBar.box, { flexDirection: 'row', alignItems: 'center' }]}
+                    <Pressable style={[fiterBar.box, { flexDirection: 'row', alignItems: 'center', gap:2 }]}
                         onPress={() => { setDescendingOrder(!descendingOrder); }}>
                         <Text style={fiterBar.text}>학번순</Text>
-                        <View style={{ width: 24, height: 24, backgroundColor: descendingOrder ? Color['blue300'] : Color['grey300'], alignSelf: 'center' }} />
+                        <Icons size={20} name={descendingOrder ? 'arrow-down' : 'arrow-up'} color={Color['blue400']} />
                     </Pressable>
                     <Pressable style={[fiterBar.box, club && { backgroundColor: Color['blue100'], borderColor: Color['blue500'] }]}
                         onPress={() => { setSelctFilter('club') }}>

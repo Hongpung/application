@@ -7,11 +7,13 @@ export const loginUserState = atom<User | null>({
   default: null,
 });
 
+// 사용자의 당일 예약 정보
 export const todayReservation = atom<any[]>({
   key:'todayReservation',
   default:[]
 })
 
+// 사용자의 현재 연습실 사용 정보
 export const isOnReserve = atom<boolean>({
   key:'userOnReserve',
   default:false

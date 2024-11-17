@@ -2,6 +2,9 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { Color } from '@hongpung/ColorSet'
+import { NoticeStackParamList } from '@hongpung/nav/HomeStacks'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useNavigation } from '@react-navigation/native'
 
 interface BriefNotice {
     infoId: number
@@ -9,9 +12,10 @@ interface BriefNotice {
     date: string//dateString
 }
 
+type NoticeDetailNav = NativeStackNavigationProp<NoticeStackParamList, 'Notices'>
+const NoticesPage: React.FC = () => {
 
-const NoticesPage: React.FC<{ navigation: any }> = ({ navigation }) => {
-
+    const navigation = useNavigation<NoticeDetailNav>();
     const today = new Date().toISOString().split('T')[0]
     const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.BASE_URL}/info`)
 
@@ -23,7 +27,7 @@ const NoticesPage: React.FC<{ navigation: any }> = ({ navigation }) => {
                     :
                     data && data?.length > 0 ?
                         data.slice(0, 10).map((notice) => (
-                            <TouchableOpacity style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', gap: 2 }}
+                            <TouchableOpacity key={notice.infoId} style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', gap: 2 }}
                                 onPress={() => { navigation.navigate('NoticeDetail', { infoId: notice.infoId }) }}>
                                 {today == notice.date.split('T')[0] &&
                                     <View style={{ paddingHorizontal: 4, paddingVertical: 2, backgroundColor: Color['red100'], borderRadius: 4 }}>

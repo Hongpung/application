@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Modal, FlatList, Animated, NativeSyntheticEvent } from 'react-native';
 import { Color } from '@hongpung/ColorSet'
-import PagerView from 'react-native-pager-view';
+
 import { debounce } from 'lodash';
 import { useAuth } from '@hongpung/hoc/useAuth';
 import { Icons } from '@hongpung/components/Icon';
-import { useUserReserve } from '@hongpung/hoc/useUserReserve';
+
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';
 import NoticePartition from '@hongpung/components/home/Notice';
@@ -16,7 +16,7 @@ import { MainStackParamList } from '@hongpung/nav/HomeStacks';
 import { useNavigation } from '@react-navigation/native';
 
 
-type HomeNavProps = NativeStackNavigationProp<MainStackParamList,'Home'>
+type HomeNavProps = NativeStackNavigationProp<MainStackParamList, 'Home'>
 
 const HomeScreen: React.FC = () => {
 
@@ -48,16 +48,12 @@ const HomeScreen: React.FC = () => {
         }
     };
 
-
     useEffect(() => {
         const loadUserinfo = async () => {
             await getUserInfo();
         }
 
-
-
         setUsed(false)
-
         if (!loginUser) {
             loadUserinfo();
         }
@@ -77,7 +73,7 @@ const HomeScreen: React.FC = () => {
                         </Pressable>
                         <Pressable
                             style={styles.icons}
-                            onPress={() => { navigation.navigate('MyPage'); }}>
+                            onPress={() => { navigation.navigate('MyPage', { screen: 'MyPageHome' }); }}>
                             <Icons size={32} name={'person'} color={Color['blue500']} />
                         </Pressable>
                     </View>
@@ -111,7 +107,7 @@ const HomeScreen: React.FC = () => {
                         우리 동아리
                     </Text>
                     <TouchableOpacity activeOpacity={0.85}
-                        onPress={() => navigation.navigate('MyClub')}>
+                        onPress={() => navigation.navigate('MyClub', { screen: 'MyClubHome' })}>
                         <View style={{ height: 120, backgroundColor: Color['grey300'], borderRadius: 10 }} />
                     </TouchableOpacity>
                 </View>

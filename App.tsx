@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, View, SafeAreaView as SafeView, ViewStyle, StyleProp, Text, Pressable, ActivityIndicator, Image, ImageBackground } from 'react-native';
+import { Platform, View, SafeAreaView as SafeView, ViewStyle, StyleProp, Text, Pressable, ActivityIndicator, Image, ImageBackground, Modal, AppState } from 'react-native';
 import Tutorial from './pages/FirstInstall/Tutorial/Tutorial';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -15,8 +15,9 @@ import Toast, { BaseToastProps } from 'react-native-toast-message';
 import { Color } from '@hongpung/ColorSet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SignUpProvider } from '@hongpung/pages/Auth/SignUp/context/SignUpContext';
-import { RecoilRoot } from 'recoil';
+import { RecoilRoot, useRecoilState } from 'recoil';
 import { deleteToken, getToken } from './utils/TokenHandler';
+import { bannersState } from './recoil/bannerState';
 
 
 const RootStack = createNativeStackNavigator();
@@ -105,7 +106,7 @@ const toastConfig = {
         }}
         {...rest}
       >
-        <Text style={{ color: '#FFF', fontSize: 14, fontFamily: "NanumSquareNeo-Bold", textAlign: 'center', lineHeight:20 }}>
+        <Text style={{ color: '#FFF', fontSize: 14, fontFamily: "NanumSquareNeo-Bold", textAlign: 'center', lineHeight: 20 }}>
           {text1}
         </Text>
       </View>
@@ -143,9 +144,43 @@ const RootStacks: React.FC<{ startDomain: string }> = ({ startDomain }) => {
   )
 }
 
+const SafeZone: React.FC<{ children: any, style: StyleProp<ViewStyle> }> = ({ children, style }) => {
+
+  if (Platform.OS == 'android')
+    return (
+      <SafeAreaView style={[style]} >
+        {children}
+      </SafeAreaView>
+    )
+
+  return (
+    <SafeView style={style}>
+      {children}
+    </SafeView>
+  )
+}
+
 const App: React.FC = () => {
+  return (
+    <RecoilRoot>
+      <AppLoader />
+    </RecoilRoot>
+  )
+}
+
+interface BannerFetchData {
+  id: string
+  owner: string
+  startDate: string //ISOTimeString
+  endDate: string //ISOTimeString
+  bannerImgUrl: string
+  href?: string
+}
+
+const AppLoader: React.FC = () => {
   const [fontLoaded, setFontLoaded] = useState(false);
   const [firstScreen, setFirstScreen] = useState<"Tutorial" | "Login" | "HomeStack" | null>(null);
+  const [banners, setBanners] = useRecoilState<{ state: 'BEFORE' | 'PENDING' | 'LOADED' | 'FAILED', value: BannerFetchData[] | null }>(bannersState)
 
   const loadFonts = async () => {
     await fetchFonts();
@@ -171,7 +206,7 @@ const App: React.FC = () => {
             visibilityTime: 3000
           });
         }
-        
+
         else {
           setFirstScreen('Login')
           Toast.show({
@@ -202,6 +237,56 @@ const App: React.FC = () => {
 
     loadResources();
 
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    const fetchBanner = async () => {
+      setBanners(prev => ({ state: 'PENDING', value: prev.value }))
+      const cachedData = await AsyncStorage.getItem('BANNER_CACHED_DATA');
+      const cachedBanners = cachedData ? JSON.parse(cachedData) as BannerFetchData[] : null;
+
+      const cachedVersion = await AsyncStorage.getItem('BANNER_VERSION');// 캐시된 배너의 버전
+      
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      try {
+        const versionData = await fetch(`${process.env.WEB_API}/banners/version`, {
+          signal
+        })
+
+        if (!versionData.ok) throw Error();
+        const { version } = await versionData.json();
+        
+        if (!cachedBanners || cachedVersion !== version) {
+
+          const bannerData = await fetch(`${process.env.WEB_API}/banners/public`, {
+            signal
+          })
+
+          if (!bannerData.ok) throw Error();
+
+          const serverData = await bannerData.json() as BannerFetchData[];
+
+          //신규 다운로드한 배너의 버전 캐싱
+          await AsyncStorage.setItem('BANNER_VERSION', JSON.stringify({version}));
+
+          //신규 다운로드한 배너 캐싱
+          await AsyncStorage.setItem('BANNER_CACHED_DATA', JSON.stringify(serverData));
+
+          setBanners({ state: 'LOADED', value: serverData })
+        }
+        else {
+          setBanners({ state: 'LOADED', value: cachedBanners })
+        }
+      } catch (e) {
+        console.error(e);
+        setBanners(prev => ({ state: 'FAILED', value: prev.value }))
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    };
+
+    fetchBanner();
+
     return () => {
       const Logout = async () => {
         try {
@@ -221,23 +306,7 @@ const App: React.FC = () => {
 
 
 
-  const SafeZone: React.FC<{ children: any, style: StyleProp<ViewStyle> }> = ({ children, style }) => {
-
-    if (Platform.OS == 'android')
-      return (
-        <SafeAreaView style={[style]} >
-          {children}
-        </SafeAreaView>
-      )
-
-    return (
-      <SafeView style={style}>
-        {children}
-      </SafeView>
-    )
-  }
-
-  if (!fontLoaded || !firstScreen) {
+  if (!fontLoaded || !firstScreen || banners.state != 'LOADED') {
     return (
       <View style={{ flex: 1 }}>
         <ImageBackground source={require('./assets/splash.png')}
@@ -246,19 +315,42 @@ const App: React.FC = () => {
           onLoadEnd={SplashScreen.hideAsync} />
         <View style={{ position: 'absolute', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <ActivityIndicator size="large" color={'#FFF'} />
-          <Text style={{ position: 'absolute', bottom: 20, right: 20, color: '#FFF', fontFamily: 'NanumSquareNeo-Bold' }}>{fontLoaded ? firstScreen ? '' : '기본 정보 로딩중' : `폰트 로딩중`}</Text>
+          <Text style={{ position: 'absolute', bottom: 20, right: 20, color: '#FFF', fontFamily: 'NanumSquareNeo-Bold' }}>{fontLoaded ? firstScreen ? banners.state == 'FAILED' ? '' : '배너 로딩중' : '기본 정보 로딩중' : `폰트 로딩중`}</Text>
         </View>
+        <Modal visible={banners.state == 'FAILED'} transparent>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <View style={{
+              borderRadius: 20,
+              minHeight: 200,
+              paddingVertical: 24,
+              marginHorizontal: 24,
+              display: 'flex',
+              gap: 12,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: '#fff',
+            }}>
+              <Text style={{
+                fontSize: 18,
+                fontWeight: 'bold',
+                color: 'red',
+              }}>데이터를 불러오는 데 실패했습니다.</Text>
+              <Text style={{
+                fontSize: 16,
+                color: '#333',
+              }}>인터넷 연결을 확인 후 앱을 다시 시작해주세요.</Text>
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   }
 
   return (
-    <RecoilRoot>
-      <SafeZone style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-        <ContentsContainer startDomain={firstScreen} />
-        <Toast config={toastConfig} />
-      </SafeZone>
-    </RecoilRoot>
+    <SafeZone style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+      <ContentsContainer startDomain={firstScreen} />
+      <Toast config={toastConfig} />
+    </SafeZone>
   );
 }
 

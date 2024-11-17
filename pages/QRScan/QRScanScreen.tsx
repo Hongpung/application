@@ -1,18 +1,17 @@
-import React, { useState,  useEffect } from 'react';
-import { StyleSheet, Text, View, Button, Pressable, Linking, Dimensions } from 'react-native';
-import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
-import { Color } from '../../ColorSet';
-import { debounce } from 'lodash';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View, Button, Pressable, Linking, Dimensions, Modal } from 'react-native';
 
-const QRScanScreen: React.FC<{navigation:any}> = ({navigation}) => {
+import { CameraType, CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
+
+import { Color } from '@hongpung/ColorSet';
+import LongButton from '@hongpung/components/buttons/LongButton';
+
+const { width, height } = Dimensions.get('window');
+
+const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [facing, setFacing] = useState<CameraType>('back');
     const [permission, requestPermission] = useCameraPermissions();
-    let isScanned: boolean = false
-
-
-    useEffect(() => {
-        isScanned = false;
-    }, [])
+    const [scanStatus, setScanStatus] = useState<'IDLE' | 'PROCESSING' | 'COMPLETE' | 'FAILED'>('IDLE');
 
     if (!permission) {
         return <View />;
@@ -31,40 +30,54 @@ const QRScanScreen: React.FC<{navigation:any}> = ({navigation}) => {
         setFacing(current => (current === 'back' ? 'front' : 'back'));
     }
 
-    const openUrl = (url: string) => {
-        if (!isScanned) return
-        Linking.openURL(url)
-            .catch((err) => { console.error('Failed to open URL:', err); })
-            .finally(debounce(() => isScanned = false, 500))
+    const handleOpen = (url: string) => {
+        if (scanStatus != 'IDLE') return
+        const openUrl = async () => {
+            try {
+                if (url != `${process.env.BASE_URL}`) throw Error('invalid Url')
+                await Linking.openURL(url)
+                setScanStatus('COMPLETE')
+            }
+            catch (err) {
+                setScanStatus('FAILED')
+            }
+        }
+        openUrl();
     };
 
     const isInCenter = (x: number, y: number) => {
-        const { width, height } = Dimensions.get('window');
         const centerWidth = 360;
-        const centerHeight = centerWidth;
+        const centerHeight = 360;
         const centerX = width / 2;
         const centerY = height / 2;
 
-        return x > centerX - centerWidth / 2 && x < centerX + centerWidth / 2 && y > centerY - centerHeight / 2 && y < centerY + centerHeight / 2;
+        return (
+              x > centerX - centerWidth / 2 //범위 지정
+            && x < centerX + centerWidth / 2
+            && y > centerY - centerHeight / 2
+            && y < centerY + centerHeight / 2
+        );
     };
 
-    const handleScanned = ({ type, data, bounds }: { type: string; data: string, bounds: { origin: { x: number, y: number }, size: { width: number, height: number } } }) => {
+    const handleScanned = ({ type, data, bounds }: BarcodeScanningResult) => {
 
-        if (isScanned) return;
+        if (scanStatus != 'IDLE' || type != 'qr') return;
 
         const { origin, size } = bounds;
+
         const centerX = origin.x + size.width / 2;
         const centerY = origin.y + size.height / 2;
 
         if (isInCenter(centerX, centerY)) {
-            isScanned = true;
-            openUrl(data)
+            setScanStatus('PROCESSING')
+            handleOpen(data)
         }
     }
 
     return (
         <View style={styles.container}>
             <CameraView
+                active={scanStatus == 'IDLE'}
                 style={styles.camera}
                 facing={facing}
                 barcodeScannerSettings={{
@@ -82,14 +95,41 @@ const QRScanScreen: React.FC<{navigation:any}> = ({navigation}) => {
                     <View style={styles.bottomOverlay} />
                 </View>
                 <View style={styles.buttonContainer}>
-                    <Pressable style={styles.button} 
-                    onPress={
-                        // toggleCameraFacing
-                        ()=> navigation.push('CheckIn')
+                    <Pressable style={styles.button}
+                        onPress={
+                            () => navigation.push('CheckIn')
                         } />
                     <Text style={styles.descript}>QR코드를 스캔해주세요</Text>
                 </View>
             </CameraView>
+            <Modal visible={scanStatus == 'FAILED'} transparent>
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <View style={{
+                        borderRadius: 20,
+                        minHeight: 200,
+                        paddingVertical: 24,
+                        marginHorizontal: 24,
+                        display: 'flex',
+                        gap: 12,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        backgroundColor: '#fff',
+                    }}>
+                        <Text style={{
+                            fontSize: 18,
+                            fontWeight: 'bold',
+                            color: 'red',
+                        }}>유효하지 않은 QR코드 입니다.</Text>
+                        <Text style={{
+                            fontSize: 16,
+                            color: '#333',
+                        }}>확인 후 다시 촬영해주세요.</Text>
+                        <View style={{ width: '100%', marginTop: 16 }}>
+                            <LongButton color='blue' innerText='확인' isAble={true} onPress={() => setScanStatus('IDLE')} />
+                        </View>
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };

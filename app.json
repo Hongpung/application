@@ -16,7 +16,10 @@
       "infoPlist": {
         "NSCameraUsageDescription": "This app needs access to your camera to take photos.",
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select photos.",
-        "UIBackgroundModes": ["fetch", "remote-notification"]
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification"
+        ]
       }
     },
     "android": {
@@ -24,7 +27,9 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions":[""]
+      "permissions": [
+        ""
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -37,7 +42,19 @@
       "NanumSquareNeo-Heavy": "./assets/fonts/NanumSquareNeoOTF-Hv.otf"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "newArchEnabled": true
+          },
+          "ios": {
+            "newArchEnabled": true
+          }
+        }
+      ],
+      "expo-secure-store"
     ]
   }
 }

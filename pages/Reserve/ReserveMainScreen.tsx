@@ -66,9 +66,8 @@ const ReserveMainScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <View style={{ height: 12 }} />
                 {data?.length == 0 ?
                     <Pressable style={{ alignSelf: 'center', height: 200, borderWidth: 1, borderColor: Color['grey200'], borderRadius: 10, marginHorizontal: 6, width: width - 48, gap: 8, justifyContent: 'center' }}>
-                        <Text style={{ textAlign: 'center', fontFamily: 'NanumSquareNeo-ExtraBold', fontSize: 38 }}>무주공산</Text>
                         <Text style={{ fontFamily: 'NanumSquareNeo-Bold', marginHorizontal: 64, color: Color['grey700'], textAlign: 'center', fontSize: 16 }}>
-                            {`일정이 없어요`}
+                            {`오늘 예정된 예약이 없어요`}
                         </Text>
                         <Text style={{ fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'], textAlign: 'center' }}>
                             {`지금 연습실에 가면 바로 이용이 가능해요!`}</Text>
