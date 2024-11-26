@@ -1,7 +1,7 @@
-import { StyleSheet, TextInput, Text, View, ScrollView, Image, Modal, Pressable, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Keyboard, TextInputChangeEventData, NativeSyntheticEvent } from 'react-native'
-import React, { useCallback, useLayoutEffect, useState } from 'react'
+import { StyleSheet, TextInput, Text, View, ScrollView, Image, Modal, Pressable, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Keyboard, TextInputChangeEventData, NativeSyntheticEvent, FlatList, Alert, ActivityIndicator } from 'react-native'
+import React, { useState } from 'react'
 import { Color } from '../../../../ColorSet';
-import { Instrument, InstrumentCreateDTO, InstrumentEditDTO, InstrumentType, InstrumentTypes } from '../../../../UserType';
+import { Instrument, InstrumentCreateDTO,  InstrumentType, InstrumentTypes } from '../../../../UserType';
 import LongButton from '../../../../components/buttons/LongButton';
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';
@@ -12,7 +12,7 @@ import uploadImages from '@hongpung/utils/uploadImage';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ClubInstrumentStackParamList } from '@hongpung/nav/InstrumentStack';
-
+import * as ImagePicker from 'expo-image-picker';
 
 const showCreateCompleteToast = () => {
     Toast.show({
@@ -34,21 +34,48 @@ const InstrumentEditScreen: React.FC = () => {
     const navigation = useNavigation<InstrumentCreateNav>();
 
     const [instrumentsEngType] = useState(['KKWANGGWARI', 'JANGGU', 'BUK', 'SOGO', 'JING', 'ETC'])
-    const [aspectRatio, setAspectRatio] = useState<number | null>(null);
-    const [modalImgWidth, setModalImgWidth] = useState(332);
 
-    const [seletedImage, setImageFile] = useState<File | null>(null);
+    const [selectedImage, setImageFile] = useState<File | null>(null);
+    const [selectedImageUri, setImageUri] = useState<string | null>(null);
 
     const [onSelectType, setSelectTypeVisible] = useState(false);
-    const [modalVisible2, setModalVisible2] = useState(false);
+    const [isLoading, setLoading] = useState(false);
 
     const [instrument, setInstrument] = useState<Instrument>({ available: true, club: loginUser?.club == '기타' ? '들녘' : loginUser?.club!, borrowHistory: [], name: '', instrumentId: -1, type: '꽹과리' })
 
 
-    const uploadImageToInstrumentImage = useCallback(async (imageFile: File) => {
-        const imageUrl = await uploadImages(imageFile, 'instrumentsImage')
-        return imageUrl
-    }, [])
+    const pickImageFromAlbum = async () => {
+        // 권한 요청
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('권한 필요', '앨범 접근 권한이 필요합니다.');
+            return;
+        }
+
+        // 앨범에서 이미지 선택
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true, // 선택 후 편집 가능
+            aspect: [300, 200], // 편집 비율 설정 (4:3)
+            quality: 0.5, // 이미지 품질 설정 (0 ~ 1)
+        });
+
+        if (!result.canceled) {
+            const imageUri = result.assets[0].uri;
+            const imageName = imageUri.split('/').pop();
+            const imageType = `image/${imageName?.split('.').pop()}`; // MIME 타입 추정
+
+            const imageFile = {
+                uri: imageUri,
+                name: imageName,
+                type: imageType,
+            } as unknown as File;
+
+            console.log(imageFile)
+            setImageUri(imageUri);
+            setImageFile(imageFile); // 선택된 이미지의 URI 저장
+        }
+    };
 
     const parseInstrument = (type: InstrumentType): string => {
         const instrumentEnumNo = InstrumentTypes.indexOf(type)
@@ -60,24 +87,40 @@ const InstrumentEditScreen: React.FC = () => {
             setSelectTypeVisible(false)
     }
 
+
     const chageName = (e: string) => {
         setInstrument({ ...instrument, name: e })
     };
 
-    const SubmitHandler = () => {
 
+    const SubmitHandler = () => {
         const createInstrument = async () => {
+            
             console.log(`신규 생성`)
             const controller = new AbortController();
             const signal = controller.signal;
             const timeoutId = setTimeout(() => controller.abort(), 5000);
             try {
+                setLoading(true)
                 const token = await getToken('token');
 
                 if (!token) throw Error('invalid Token');
 
                 const submitForm: InstrumentCreateDTO = { name: instrument.name, type: parseInstrument(instrument.type) }
 
+                if (!!selectedImage) {
+                    console.log('이미지 업로드 수행중')
+                    const uploadRespone = await uploadImages(selectedImage, 'instruments')
+
+                    if (!uploadRespone) throw Error('업로드 실패')
+
+                    console.log('이미지 업로드 수행완료')
+                    const { imageUrl } = uploadRespone;
+                    submitForm.imageUrl = imageUrl;
+                }
+
+
+                console.log('신규 악기 생성 수행중', submitForm)
                 const response = await fetch(`${process.env.BASE_URL}/instrument`, {
                     method: 'POST',
                     headers: {
@@ -88,13 +131,10 @@ const InstrumentEditScreen: React.FC = () => {
                     signal
                 })
 
+                console.log('신규 악기 생성 수행')
                 if (!response.ok) throw Error('Server Error' + response.status)
 
-                const { instrumentId } = await response.json();
-
-                showCreateCompleteToast();
-
-                navigation.replace('InstrumentSpecific', { instrumentId });
+                navigation.replace('InstrumentsHome');
 
             } catch (err: any) {
                 if (err.name === 'AbortError') {
@@ -103,7 +143,9 @@ const InstrumentEditScreen: React.FC = () => {
                     console.error(err.message + ' ' + err.status);
                 }
             } finally {
+                showCreateCompleteToast();
                 clearTimeout(timeoutId);
+                setLoading(false)
             }
 
         }
@@ -111,43 +153,28 @@ const InstrumentEditScreen: React.FC = () => {
         createInstrument();
     }
 
-    useLayoutEffect(() => {
-
-        if (instrument?.imgURL!)
-            Image.getSize(instrument?.imgURL!, (width, height) => {
-                setAspectRatio(width / height);
-            }, (error) => {
-                console.error(`Couldn't get the image size: ${error.message}`);
-            });
-        setModalImgWidth(340);
-
-    }, [instrument]);
 
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); dropdownCloseHandler() }} >
             <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#FFF" }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}>
                 <View style={{ flex: 1, backgroundColor: `#FFF`, }}>
+                    <Modal visible={isLoading} transparent>
+                        <View style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <ActivityIndicator size={'large'} color={'white'}></ActivityIndicator>
+                        </View>
+                    </Modal>
                     <ScrollView contentContainerStyle={{ alignItems: 'center', flex: 1 }}>
                         <View style={{ height: 12 }} />
                         <Pressable style={styles.imageContainer}
                             onPress={() => {
-                                setModalVisible2(true);
+                                pickImageFromAlbum();
                             }}>
-                            {instrument?.imgURL ? <Image
-                                source={{ uri: instrument?.imgURL }}
+                            {selectedImageUri ? <Image
+                                source={{ uri: selectedImageUri }}
                                 style={styles.image}
                             /> :
-                                <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />}
-                            <Modal visible={modalVisible2} transparent={true}>
-                                <Pressable onPress={() => setModalVisible2(false)} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
-                                    {instrument?.imgURL ?
-                                        <Image
-                                            source={{ uri: instrument?.imgURL }}
-                                            style={[styles.image, { width: modalImgWidth, height: modalImgWidth / aspectRatio!, borderRadius: 15 }]}
-                                        /> :
-                                        <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />}
-                                </Pressable>
-                            </Modal>
+                                <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />
+                            }
                         </Pressable>
                         <View style={{ height: 28 }} />
                         <View style={styles.Row}>
@@ -194,18 +221,15 @@ const InstrumentEditScreen: React.FC = () => {
 
                     </ScrollView >
 
-                    {instrument.instrumentId != -1 && <>
-                        <View style={{ height: 8 }} />
-                        <LongButton color='red' innerText='삭제하기' isAble={true} onPress={() => DeleteHandler()} />
-                    </>}
                     <View style={{ height: 8 }} />
-                    <LongButton color='blue' innerText='저장하기' isAble={true} onPress={() => SubmitHandler()} />
+                    <LongButton color='blue' innerText='생성하기' isAble={true} onPress={() => SubmitHandler()} />
                     <View style={{ height: 8 }} />
                 </View >
             </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
     )
 }
+
 
 export default InstrumentEditScreen
 

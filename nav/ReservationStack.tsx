@@ -12,16 +12,18 @@ import ReservationDetailScreen from "@hongpung/pages/Reserve/ViewDetailReservati
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Header from '@hongpung/components/Header';
 import { ScreenParams } from "./HomeStacks";
+import ReservationParticipatorsViewScreen from "@hongpung/pages/Reserve/ViewDetailReservation/ReservationParticipatorsViewScreen";
 
 
 
 export type InReservationStackParamList = {
     inReservation?: { reservationId?: number, date?: string };
+
     ResrvationDateSelect: undefined;
     TimeSelect: undefined;
     BorrowInstrumentSelect: undefined;
 
-    ParticipantsSelect: never;
+    ParticipantsSelect: undefined;
     ReservationConfirm: undefined;
     ReservationEditConfirm: undefined;
 };
@@ -97,11 +99,12 @@ const InReservationStacks = () => {
 
 export type ReservationStackParamList = {
     ReserveCalendar?: { date?: string };
-    DailyReserveList?: { date: string }
+    DailyReserveList: { date: string }
     ReservationDetail: { reservationId: number }
 
     ReservationStack?: ScreenParams<InReservationStackParamList>;
-
+    ReservationParticipatorsView: { participators: string }//User[]
+    ReservationInstrumentsView: { instruments: string }//User[]
 };
 
 const ReservationStack = createNativeStackNavigator<ReservationStackParamList>();
@@ -128,7 +131,19 @@ const ReservationStacks = () => {
                 options={{
                     animation: 'none',
                 }}
+
             />
+
+            <ReservationStack.Screen
+                name='ReservationParticipatorsView'
+                component={ReservationParticipatorsViewScreen}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='close' HeaderName='참여 인원' />
+                }}
+
+            />
+
 
             <ReservationStack.Screen
                 name='ReservationDetail'

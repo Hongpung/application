@@ -68,7 +68,7 @@ const sendVerificationCode = async (email: string) => {
     let result = 500;
 
     try {
-        const response = await fetch(`${process.env.WEB_API}/verificationCode/send`, {
+        const response = await fetch(`${process.env.SUB_API}/verification/send/id`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

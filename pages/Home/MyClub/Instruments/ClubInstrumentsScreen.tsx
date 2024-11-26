@@ -9,12 +9,12 @@ import useFetchUsingToken from "@hongpung/hoc/useFetchUsingToken"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { ClubInstrumentStackParamList } from "@hongpung/nav/InstrumentStack"
 
-type InstrumentNavParams = NativeStackNavigationProp<ClubInstrumentStackParamList,'InstrumentsHome'>
+type InstrumentNavParams = NativeStackNavigationProp<ClubInstrumentStackParamList, 'InstrumentsHome'>
 
 const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ instrumentsList }) => {
 
     const navigation = useNavigation<InstrumentNavParams>();
-    
+
     const renderInstruments = () => {
         const rows = [];
         let cnt = instrumentOrder(instrumentsList[0]?.type) - 1;
@@ -24,7 +24,7 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ ins
             const group = instrumentsList.slice(i, i + sliceCnt);
             if (cnt < instrumentOrder(group[0].type)) {
                 rows.push(
-                    <View key={group[0].type + 'header'} style={{ marginTop: 16, marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
+                    <View key={group[0].type + 'header' + i} style={{ marginTop: 16, marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
                         <View style={{ width: 24, height: 24, backgroundColor: Color['grey400'] }} />
                         <Text style={{ fontSize: 18, color: Color['grey400'], marginLeft: 8 }}>
                             {group[0].type}

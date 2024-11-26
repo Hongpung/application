@@ -1,17 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, Button, Pressable, Linking, Dimensions, Modal } from 'react-native';
 
 import { CameraType, CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 
 import { Color } from '@hongpung/ColorSet';
 import LongButton from '@hongpung/components/buttons/LongButton';
+import { useIsFocused } from '@react-navigation/native';
+import { BlurView } from 'expo-blur';
 
 const { width, height } = Dimensions.get('window');
 
 const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-    const [facing, setFacing] = useState<CameraType>('back');
+    const isFocusing = useIsFocused()
     const [permission, requestPermission] = useCameraPermissions();
     const [scanStatus, setScanStatus] = useState<'IDLE' | 'PROCESSING' | 'COMPLETE' | 'FAILED'>('IDLE');
+
+    useEffect(() => {
+        setScanStatus('IDLE')
+    }, [isFocusing])
 
     if (!permission) {
         return <View />;
@@ -26,9 +32,7 @@ const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         );
     }
 
-    function toggleCameraFacing() {
-        setFacing(current => (current === 'back' ? 'front' : 'back'));
-    }
+
 
     const handleOpen = (url: string) => {
         if (scanStatus != 'IDLE') return
@@ -52,7 +56,7 @@ const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         const centerY = height / 2;
 
         return (
-              x > centerX - centerWidth / 2 //범위 지정
+            x > centerX - centerWidth / 2 //범위 지정
             && x < centerX + centerWidth / 2
             && y > centerY - centerHeight / 2
             && y < centerY + centerHeight / 2
@@ -76,32 +80,33 @@ const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <CameraView
-                active={scanStatus == 'IDLE'}
-                style={styles.camera}
-                facing={facing}
-                barcodeScannerSettings={{
-                    barcodeTypes: ["qr"],
-                }}
-                onBarcodeScanned={handleScanned}
-            >
-                <View style={styles.overlay}>
-                    <View style={styles.topOverlay} />
-                    <View style={styles.centerOverlay}>
-                        <View style={styles.leftOverlay} />
-                        <View style={styles.focused} />
-                        <View style={styles.rightOverlay} />
+            {isFocusing && permission.granted && (
+                <CameraView
+                    style={styles.camera}
+                    facing={'back'}
+                    barcodeScannerSettings={{
+                        barcodeTypes: ["qr"],
+                    }}
+                    onBarcodeScanned={handleScanned}
+                >
+                    <View style={styles.overlay}>
+                        <BlurView tint='dark' intensity={80} style={styles.topOverlay} />
+                        <View style={styles.centerOverlay}>
+                            <BlurView tint='dark' intensity={80} style={styles.leftOverlay} />
+                            <View style={styles.focused} />
+                            <BlurView tint='dark' intensity={80} style={styles.rightOverlay} />
+                        </View>
+                        <BlurView tint='dark' intensity={80} style={styles.bottomOverlay} />
                     </View>
-                    <View style={styles.bottomOverlay} />
-                </View>
-                <View style={styles.buttonContainer}>
-                    <Pressable style={styles.button}
-                        onPress={
-                            () => navigation.push('CheckIn')
-                        } />
-                    <Text style={styles.descript}>QR코드를 스캔해주세요</Text>
-                </View>
-            </CameraView>
+                    <View style={styles.buttonContainer}>
+                        <Pressable style={styles.button}
+                            onPress={
+                                () => navigation.push('CheckIn')
+                            } />
+                        <Text style={styles.descript}>QR코드를 스캔해주세요</Text>
+                    </View>
+                </CameraView>
+            )}
             <Modal visible={scanStatus == 'FAILED'} transparent>
                 <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <View style={{
@@ -179,9 +184,8 @@ const styles = StyleSheet.create({
     },
     topOverlay: {
         width: '100%',
-        backgroundColor: Color['grey700'],
         height: 144,
-        opacity: 0.3
+        
     },
     centerOverlay: {
         flexDirection: 'row',
@@ -189,8 +193,6 @@ const styles = StyleSheet.create({
     leftOverlay: {
         flex: 1,
         height: 240,
-        backgroundColor: Color['grey700'],
-        opacity: 0.3
     },
     focused: {
         width: 240,
@@ -199,13 +201,10 @@ const styles = StyleSheet.create({
     rightOverlay: {
         flex: 1,
         height: 240,
-        backgroundColor: Color['grey700'],
-        opacity: 0.3,
     },
     bottomOverlay: {
         flex: 1,
         width: '100%',
-        backgroundColor: Color['grey700'],
-        opacity: 0.3,
+        
     },
 });

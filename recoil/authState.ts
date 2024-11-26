@@ -1,5 +1,7 @@
-import { atom } from 'recoil';
+import { atom, selector } from 'recoil';
 import { User } from '@hongpung/UserType';
+import { getToken } from '@hongpung/utils/TokenHandler';
+import { Socket } from 'socket.io-client';
 
 // 로그인된 사용자 정보 관리 Atom
 export const loginUserState = atom<User | null>({
@@ -14,7 +16,7 @@ export const todayReservation = atom<any[]>({
 })
 
 // 사용자의 현재 연습실 사용 정보
-export const isOnReserve = atom<boolean>({
+export const useOnReserve = atom<boolean>({
   key:'userOnReserve',
   default:false
 })

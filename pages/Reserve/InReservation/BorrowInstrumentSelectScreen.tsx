@@ -12,9 +12,8 @@ import { Icons } from '@hongpung/components/Icon'
 const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     const { data, loading, error } = useFetchUsingToken<briefInstrument[]>(
-        `${process.env.BASE_URL}/instrument/list`, {}, 5000, []
+        `${process.env.BASE_URL}/instrument`, {}, 5000, []
     )
-
     const { reservation, setBorrowInstruments } = useReservation();
 
     const [originList, setOrigin] = useState<briefInstrument[]>([])
@@ -27,19 +26,26 @@ const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigatio
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <Header leftButton='close' HeaderName='대여 악기 선택' addLeftAction={() => setBorrowInstruments(originList)} />
             <ScrollView contentContainerStyle={{ flex: 1, backgroundColor: '#FFF' }}>
-                <View style={{ flex: 1, marginHorizontal: 24 }}>
-                    <InstrumentsList instrumentsList={data ?? []} />
+                {data && data?.length == 0 ?
+                    <View >
+                        <Text style={{ marginHorizontal:'auto', marginTop:300, fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, color:Color['grey400'] }}>대여 할 수 있는 악기가 없습니다.</Text>
+                    </View>
+                    :
+                    <View style={{ flex: 1, marginHorizontal: 24 }}>
+                        <InstrumentsList instrumentsList={data ?? []} />
+                    </View>}
+            </ScrollView >
+            {
+                reservation.borrowInstruments.length > 0 && <View style={{ paddingTop: 12, width: '100%' }}>
+                    <LongButton
+                        color='blue'
+                        isAble={true}
+                        innerText={`선택완료 (${reservation.borrowInstruments.length})`}
+                        onPress={() => navigation.pop()}
+                    />
                 </View>
-            </ScrollView>
-            {reservation.borrowInstruments.length > 0 && <View style={{ paddingTop: 12, width: '100%' }}>
-                <LongButton
-                    color='blue'
-                    isAble={true}
-                    innerText={`선택완료 (${reservation.borrowInstruments.length})`}
-                    onPress={() => navigation.pop()}
-                />
-            </View>}
-        </View>
+            }
+        </View >
     )
 }
 
@@ -170,7 +176,7 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ ins
                                 {group[0].type} {selectedCount > 0 && `(` + selectedCount + `)`}
                             </Text>
                         </View>
-                        <Icons name={isOpen(instrumentsList[i].type)?'chevron-up':'chevron-down'} size={24} color={Color['grey300']} />
+                        <Icons name={isOpen(instrumentsList[i].type) ? 'chevron-up' : 'chevron-down'} size={24} color={Color['grey300']} />
                     </Pressable>
                 )
                 cnt++;
@@ -180,7 +186,7 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ ins
                     {isOpen(instrumentsList[i].type) && <View key={i} style={{ height: 168, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 4, marginHorizontal: 12 }}>
                         {group.map((instrument, index) => (
                             <InstrumentCard
-                                key={instrument.name + instrument.imgURL?.slice(-10, -5) + index}
+                                key={instrument.name + instrument.imageUrl?.slice(-10, -5) + index}
                                 instrument={instrument}
                                 view="inBorrow"
                                 isPicked={haveSameInstrument(reservation.borrowInstruments, instrument)}

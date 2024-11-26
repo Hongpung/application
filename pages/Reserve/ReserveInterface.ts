@@ -85,12 +85,13 @@ export function findReservationDifferences(preReservation: Reservation, newReser
 }
 
 
-export interface ReservationDTO extends Omit<ReservationSubmitForm, 'participaterIds'> {
+export interface ReservationDTO extends Omit<ReservationSubmitForm, 'participaterIds' | 'borrowInstrumentIds'> {
     reservationId?: number;            // 예약 ID
     creatorName: string;              // 생성자 이름
     email: string;                    // 생성자 이메일
     lastmodified: string;             // 마지막 수정 날짜 (ISO 형식)
     participators: User[]
+    borrowInstruments: briefInstrument[]
     [key: string]: any
 }
 
@@ -118,6 +119,7 @@ export const parseToReservationDetail = (reservation: Reservation, user: User): 
         participationAvailable: reservation.isParticipatible,
         lastmodified: new Date().toISOString(),  // 현재 시각을 ISO 형식으로 설정
         participators: reservation.participants,
+        borrowInstruments: reservation.borrowInstruments
     };
 }
 
@@ -127,10 +129,10 @@ export const parseToReservationForm = (reservation: Reservation): ReservationSub
         type: reservation.isRegular ? "REGULAR" : "COMMON",  // 예약 유형 변환
         startTime: reservation.Time.startTime,  // Enum -> HH:MM:SS 변환
         endTime: reservation.Time.endTime,      // Enum -> HH:MM:SS 변환
-        participaterIds: reservation.participants.map(user => user.memberId),
         message: reservation.reservationName,  // 필요시 채워야 함
         participationAvailable: reservation.isParticipatible,
-        borrowInstrumentIds:[]
+        participaterIds: reservation.participants.map(user => user.memberId),
+        borrowInstrumentIds: reservation.borrowInstruments.map(instrument => instrument.instrumentId)
     };
 }
 // ReservationDetail -> Reservation 변환 함수
@@ -148,7 +150,7 @@ export function parseToReservation(reservationDTO: ReservationDTO): Reservation 
             endTime: `TIME_${endHour}${endMinnute}`,
         },
         reservationName: reservationDTO.message,  // 생성자 이름을 예약 이름으로 사용
-        isRegular: reservationDTO.type === "정기연습",  // `type`에 따라 정기 예약 여부 판단
+        isRegular: reservationDTO.type === "정규연습",  // `type`에 따라 정기 예약 여부 판단
         isParticipatible: reservationDTO.participationAvailable,  // 참여 가능 여부 매핑
         participants: reservationDTO.participators?.filter(user => user.email != reservationDTO.email) ?? [],  // 참여자 목록 그대로 매핑
         borrowInstruments: [],  // 사용 중인 악기 정보는 기본적으로 빈 배열로 설정 (필요시 추가)

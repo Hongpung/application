@@ -9,7 +9,14 @@ import { Icons } from '@hongpung/components/Icon';
 import { Text, View } from 'react-native';
 import ChatListScreen from '@hongpung/pages/Chat/ChatListScreen';
 
-const Tab = createBottomTabNavigator();
+
+export type BottomTabParamList = {
+    Home: undefined;
+    Reserve: undefined;
+    QRScan:undefined;
+};
+
+const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 const BottomTab = () => {
     return (
@@ -53,7 +60,7 @@ const BottomTab = () => {
                 }} />
 
 
-            <Tab.Screen name="Chat"
+            {/* <Tab.Screen name="Chat"
                 component={ChatListScreen}
                 options={{
                     tabBarIcon: ({ color, focused }) => <Icons name={focused ? 'chatbox-ellipses' : 'chatbox-ellipses-outline'} color={color} />,
@@ -73,7 +80,7 @@ const BottomTab = () => {
                         }}>채팅</Text>
                     </View>,
                     tabBarLabel: '채팅',
-                }} />
+                }} /> */}
         </Tab.Navigator>
     );
 }

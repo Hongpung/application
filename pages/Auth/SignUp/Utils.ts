@@ -15,7 +15,7 @@ export const verifyingEmail = async (email: string, code: string) => {
 
     try {
 
-        const response = await fetch(`${process.env.WEB_API}/verificationCode/verifying`, {
+        const response = await fetch(`${process.env.SUB_API}/verification/verify/id`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

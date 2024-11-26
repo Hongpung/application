@@ -9,8 +9,19 @@ import { loginUserState } from '@hongpung/recoil/authState'
 import { getToken } from '@hongpung/utils/TokenHandler'
 import { parseToReservationDetail, parseToReservationForm, ReservationDTO, ReservationSubmitForm } from '../ReserveInterface'
 import { Icons } from '@hongpung/components/Icon'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { InReservationStackParamList, ReservationStackParamList } from '@hongpung/nav/ReservationStack'
+import { CompositeNavigationProp, useNavigation } from '@react-navigation/native'
+import Toast from 'react-native-toast-message'
 
-const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+type ReservationConfirmNavProp = CompositeNavigationProp<
+    NativeStackNavigationProp<InReservationStackParamList, 'ReservationConfirm'>,
+    NativeStackNavigationProp<ReservationStackParamList, 'ReservationStack'>
+>
+
+const ReservationConfirmScreen: React.FC = () => {
+
+    const navigation = useNavigation<ReservationConfirmNavProp>();
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
     const [isAgree, setAgree] = useState(false);
@@ -26,7 +37,7 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
     const ConfirmHandler = () => {
         const createReservation = async () => {
 
-            const data = parseToReservationForm(reservation) as any
+            const data = parseToReservationForm(reservation) as ReservationSubmitForm
 
             if (data.message.length == 0) {
                 data.message = `${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`
@@ -41,7 +52,7 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
             try {
                 const token = await getToken('token');
 
-                console.log(sendFormat,`${process.env.BASE_URL}/reservation`)
+                console.log(sendFormat, `${process.env.BASE_URL}/reservation`)
                 const response = await fetch(
                     `${process.env.BASE_URL}/reservation`
                     , {
@@ -59,6 +70,29 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
                     throw new Error('Network response was not ok');
                 }
                 const result: any = await response.json();
+
+
+                const notificationResponse = await fetch(`${process.env.SUB_API}/notification/send`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(
+                        {
+                            to: [...data.participaterIds.map(id => id != loginUser?.memberId)],
+                            title: '예약에 포함되었습니다',
+                            text: `예약명: ${data.message}\n일시: ${data.date}/${data.startTime.slice(-4, -2)}~${data.endTime.slice(-2)}`
+                        }
+                    )
+                })
+
+                if (!notificationResponse.ok) {
+                    Toast.show({
+                        type: 'success',
+                        text1: '알림 전송에는 실패했어요',
+                        position: 'bottom',
+                        bottomOffset: 60,
+                        visibilityTime: 3000
+                    });
+                }
 
                 if (result != null)
                     navigation.navigate('DailyReserveList', { date: reservation.date!.toISOString() })
@@ -117,31 +151,36 @@ const ReservationConfirmScreen: React.FC<{ navigation: any, route: any }> = ({ n
                     <Text style={styles.leftText}>예약 유형</Text>
                     <Text style={styles.rightText}>{reservation.isRegular ? '정기 연습' : '개인 연습'} ({reservation.isParticipatible ? '참여 가능' : '참여 불가'})</Text>
                 </View>
+
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
                     <Text style={styles.leftText}>참여자</Text>
-                    <Text style={styles.rightText}>
-                        {reservation.participants.length > 0 ? `${reservation.participants.slice(0, reservation.participants.length > 3 ? 3 : reservation.participants.length).map(user => `${user.name} `)}${reservation.participants.length >= 3 ? `외 ${reservation.participants?.length} 명` : ''}` : '없음'}
-                    </Text>
-                    {reservation.participants.length > 0 && <Pressable style={{ position: 'absolute', right: -16 }}><Text style={{
-                        fontFamily: 'NanumSquareNeo-ExtarBold',
-                        fontSize: 16,
-                        color: Color['grey400']
-                    }}>{'>'}</Text></Pressable>}
+                    <View style={[{ display: 'flex', flexDirection: 'row', }, reservation.participants.length > 0 && { marginRight: 12 }]}>
+                        <Text style={[styles.rightText, { maxWidth: 156 }]} numberOfLines={1}>
+                            {reservation.participants.length > 0 ? `${reservation.participants.slice(0, reservation.participants.length > 3 ? 3 : reservation.participants.length).map(user => `${user.name} `)}` : '없음'}
+                        </Text>
+                        {reservation.participants.length >= 3 && <Text style={styles.rightText}>{`외 ${reservation.participants?.length} 명`}</Text>}
+                    </View>
+                    {reservation.participants.length > 0 &&
+                        <Pressable style={{ position: 'absolute', right: -12 }}>
+                            <Icons size={16} color={Color['grey300']} name={'chevron-forward'}></Icons>
+                        </Pressable>}
                 </View>
+
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
-                    <Text style={styles.leftText}>대여악기</Text>
-                    <Text style={styles.rightText}>
-                        {reservation.borrowInstruments.length > 0 ? ['쇠', '장구', '북', '소고', '새납'].map((type) => {
+                    <Text style={styles.leftText}>대여 악기</Text>
+                    {reservation.borrowInstruments.length > 0 ?
+                        <Text style={[styles.rightText, { marginRight: 12 }]}>{['쇠', '장구', '북', '소고', '새납'].map((type) => {
                             const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
                             if (instCount > 0)
                                 return `${type} ${instCount}`
-                        }) : '없음'}
-                    </Text>
-                    {reservation.borrowInstruments.length > 0 && <Pressable style={{ position: 'absolute', right: -16 }}><Text style={{
-                        fontFamily: 'NanumSquareNeo-ExtarBold',
-                        fontSize: 16,
-                        color: Color['grey400']
-                    }}>{'>'}</Text></Pressable>}
+                        }).filter(Boolean).join(', ')}
+                        </Text>
+                        : <Text style={[styles.rightText, { color: Color['grey300'] }]}>{'없음'}</Text>}
+
+                    {reservation.borrowInstruments.length > 0 &&
+                        <Pressable style={{ position: 'absolute', right: -12 }}>
+                            <Icons size={16} color={Color['grey300']} name={'chevron-forward'}></Icons>
+                        </Pressable>}
                 </View>
             </View>
 

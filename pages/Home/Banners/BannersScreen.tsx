@@ -7,7 +7,7 @@ import { useRecoilValue } from 'recoil'
 import { bannersState } from '@hongpung/recoil/bannerState'
 
 interface BannerFetchData {
-    id: string
+    bannerId: string
     owner: string
     startDate: string //ISOTimeString
     endDate: string //ISOTimeString
@@ -56,7 +56,7 @@ const BannersScreen: React.FC = () => {
                     data={banners.value}
                     renderItem={({ item }) => (
                         <BannerWithPlaceholder
-                            key={item.id} bannerItem={item} />
+                            key={item.bannerId} bannerItem={item} />
                     )}
                     ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
                     initialNumToRender={3} // 초기 렌더링할 아이템 개수
@@ -69,19 +69,11 @@ const BannersScreen: React.FC = () => {
 
 export const BannerWithPlaceholder = ({ bannerItem }: { bannerItem: BannerFetchData }) => {
 
-    const [isLoading, setLoading] = useState(true);
 
     return (
         <Pressable style={{ height: 120, borderRadius: 10, overflow: 'hidden' }}
-            onPress={() => { !isLoading && bannerItem.href && Linking.openURL(bannerItem.href) }}>
-            {isLoading ?
-                <View style={{ flex: 1 }}>
-                    <ActivityIndicator size="large" color="#888" />
-                </View>
-                :
-                <Image src={bannerItem.bannerImgUrl} style={{ height: 120, width: '100%', alignItems: 'center' }} resizeMode="cover"
-                    onLoad={() => setLoading(false)} />
-            }
+            onPress={() => { bannerItem.href && Linking.openURL(bannerItem.href) }}>
+            <Image src={bannerItem.bannerImgUrl} style={{ height: 120, width: '100%', alignItems: 'center' }} resizeMode="cover" />
         </Pressable>
     );
 };

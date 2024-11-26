@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { Color } from '@hongpung/ColorSet';
 import CustomSwitch from '@hongpung/components/CustomSwitch';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NotificationSettingScreen: React.FC = () => {
 
@@ -31,8 +32,10 @@ const NotificationSettingScreen: React.FC = () => {
 
 
     const toggleNotification = async () => {
-        if (isEnabled) {
-            const { status } = await Notifications.requestPermissionsAsync();
+        const { status } = await Notifications.requestPermissionsAsync();
+        if (isEnabled) { // false로 변환
+            await AsyncStorage.setItem('receive-push', 'false');
+            console.log(status)
             if (status === 'granted') {
                 setIsEnabled(false);
             } else {
@@ -42,9 +45,10 @@ const NotificationSettingScreen: React.FC = () => {
                     [{ text: '확인', onPress: () => { Linking.openSettings(); } }]
                 );
             }
-        } else {
-            const { status } = await Notifications.requestPermissionsAsync();
+        } else { // true로 변환
+            console.log(status)
             if (status === 'granted') {
+                await AsyncStorage.setItem('receive-push', 'true');
                 setIsEnabled(true);
             } else {
                 Alert.alert(
@@ -61,7 +65,7 @@ const NotificationSettingScreen: React.FC = () => {
             <View>
                 <View style={{ height: 24 }} />
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 36, justifyContent: 'space-between' }}>
-                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'], fontSize: 16 }}>알림 설정</Text>
+                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'], fontSize: 16 }}>푸시 알림</Text>
                     <CustomSwitch
                         onChange={toggleNotification}
                         value={isEnabled}
@@ -73,5 +77,3 @@ const NotificationSettingScreen: React.FC = () => {
 }
 
 export default NotificationSettingScreen
-
-const styles = StyleSheet.create({})

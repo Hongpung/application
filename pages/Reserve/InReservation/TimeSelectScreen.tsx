@@ -93,18 +93,18 @@ const TimeSelectScreen: React.FC = () => {
         return `${period}${formattedHourStr}`;
     }, [])
 
-    const parseTime = useCallback((time: string): number => {
-        const period = time.slice(0, 2);
-        let hour = Number(time.slice(2));
+    // const parseTime = useCallback((time: string): number => {
+    //     const period = time.slice(0, 2);
+    //     let hour = Number(time.slice(2));
 
-        if (period === "PM" && hour !== 12) {
-            hour += 12;
-        } else if (period === "AM" && hour === 12) {
-            hour = 0;
-        }
+    //     if (period === "PM" && hour !== 12) {
+    //         hour += 12;
+    //     } else if (period === "AM" && hour === 12) {
+    //         hour = 0;
+    //     }
 
-        return hour;
-    }, [])
+    //     return hour;
+    // }, [])
 
     useEffect(() => {
         const { startTime, endTime } = Time;
@@ -119,7 +119,7 @@ const TimeSelectScreen: React.FC = () => {
         }
     }, [])
 
-    const confirmButtonText = useMemo(() => {
+    const confirmButtonText = useCallback(() => {
         if (selectedTimeBlocks && selectedTimeBlocks.length > 0) {
             const startTimeText = selectedTimeBlocks[0].toString();
             const endTimeText = times[times.indexOf(selectedTimeBlocks[selectedTimeBlocks.length - 1]) + 1];
@@ -130,10 +130,11 @@ const TimeSelectScreen: React.FC = () => {
 
 
     const { data, loading, error } = useFetchUsingToken<briefReservation[]>(
-        `${process.env.BASE_URL}/reservation/day?date=${date!.getFullYear()}-${(date!.getMonth() + 1).toString().padStart(2, '0')}-${(date!.getDate()).toString().padStart(2, '0')}`,
+        date ? `${process.env.BASE_URL}/reservation/day?date=${date?.toISOString().split('T')[0]}` : null,
         {
         }, 2000, [date]
     )
+
 
     const parsedTimeRange = (reservation: briefReservation) => {
         const [startHour, startMinnute] = reservation.startTime.split(':')
@@ -141,6 +142,7 @@ const TimeSelectScreen: React.FC = () => {
 
         return [`TIME_${startHour}${startMinnute}`, `TIME_${endHour}${endMinnute}`]
     }
+
     useEffect(() => {
         const occupied: string[] = [];
 
@@ -214,10 +216,6 @@ const TimeSelectScreen: React.FC = () => {
         setDate(nextDay);
     }
 
-    useEffect(() => {
-        // fetch 함수 구현
-    }, [date])
-
     return (
         <View style={{ backgroundColor: '#FFF', flex: 1 }}>
             <View style={{
@@ -238,7 +236,7 @@ const TimeSelectScreen: React.FC = () => {
                     </Pressable>
                     <Pressable
                         onPress={() => {
-                            navigation.navigate('ResrvationDateSelect');
+                            // navigation.navigate('ResrvationDateSelect');
                         }}>
                         <Text style={styles.MonthNumber}>
                             {`${date!.getMonth() + 1}월`}
@@ -325,7 +323,7 @@ const TimeSelectScreen: React.FC = () => {
 
             <View style={{ height: 20 }} />
             {selectedTimeBlocks && selectedTimeBlocks?.length != 0 && <View>
-                <LongButton color='blue' innerText={confirmButtonText}
+                <LongButton color='blue' innerText={confirmButtonText()}
                     isAble={true}
                     onPress={() => {
                         const overlappingTimes = occupiedTimes.filter(time => selectedTimeBlocks.includes(time));

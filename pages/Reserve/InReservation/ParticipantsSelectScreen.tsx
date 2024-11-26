@@ -8,22 +8,33 @@ import LongButton from '../../../components/buttons/LongButton'
 import Header from '../../../components/Header'
 import { getToken } from '@hongpung/utils/TokenHandler'
 import { Icons } from '@hongpung/components/Icon'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { InReservationStackParamList } from '@hongpung/nav/ReservationStack'
+import { useNavigation } from '@react-navigation/native'
 
 
-const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type ParticipantsSelectNavProps = NativeStackNavigationProp<InReservationStackParamList, 'ParticipantsSelect'>
 
+const ParticipantsSelectScreen: React.FC = () => {
+
+    const navigation = useNavigation<ParticipantsSelectNavProps>();
     const { reservation, setParticipants } = useReservation();
 
     const [prevUserPicked, setPrevUserPick] = useState<User[]>([])
     const [originList, setOrigin] = useState<User[]>([])
     const [fiteredUsers, fiterUser] = useState<User[]>([])
+
     const [descendingOrder, setDescendingOrder] = useState(true)
     const [club, setClub] = useState<club | null>(null)
+
     const [userInstrumentType, setUserInstermentType] = useState<InstrumentType | null>(null)
+
     const [onSelect, setSelctFilter] = useState<`club` | 'instruement' | 'enrollmentNumber' | null>(null)
+
     const [isLoading, setLoading] = useState(false)
+
     useEffect(() => {
-        setPrevUserPick(reservation.participants)
+        // setPrevUserPick(reservation.participants);
         const load = async () => {
             const controller = new AbortController();
             const signal = controller.signal;
@@ -43,9 +54,10 @@ const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation })
                     }
                 )
                 const loadedUsers = await response.json() as User[];
-                console.log('is on Load')
 
-                setOrigin(loadedUsers.map((user: any) => { if (user.club == '화랑') return { ...user, club: '신명화랑' }; return user }));
+                console.log(loadedUsers)
+                setOrigin(loadedUsers);
+                fiterUser(loadedUsers)
             } catch (e) {
                 console.error(e);
                 navigation.goBack();
@@ -56,9 +68,7 @@ const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation })
 
         }
 
-
         load();
-
     }, [])
 
 
@@ -117,7 +127,7 @@ const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation })
                             <View />
                         </Pressable>
                     )}
-                    <Pressable style={[fiterBar.box, { flexDirection: 'row', alignItems: 'center', gap:2 }]}
+                    <Pressable style={[fiterBar.box, { flexDirection: 'row', alignItems: 'center', gap: 2 }]}
                         onPress={() => { setDescendingOrder(!descendingOrder); }}>
                         <Text style={fiterBar.text}>학번순</Text>
                         <Icons size={20} name={descendingOrder ? 'arrow-down' : 'arrow-up'} color={Color['blue400']} />
@@ -146,8 +156,11 @@ const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation })
                                     )
                                 }}
                             />
-                        </View>}</Pressable>
-                    <Pressable style={fiterBar.box}><Text style={fiterBar.text}>학번</Text></Pressable>
+                        </View>}
+                    </Pressable>
+                    {/* <Pressable style={fiterBar.box}>
+                        <Text style={fiterBar.text}>학번</Text>
+                    </Pressable> */}
                     <Pressable style={[fiterBar.box, userInstrumentType && { backgroundColor: Color['blue100'], borderColor: Color['blue500'] }]}
                         onPress={() => { setSelctFilter('instruement') }}
                     >
@@ -178,22 +191,25 @@ const ParticipantsSelectScreen: React.FC<{ navigation: any }> = ({ navigation })
                 </ScrollView>
             </View>
 
-            <View style={{ flex: 1, marginHorizontal: 24, zIndex: -1, marginTop: onSelect ? -(200 - 12) : 12, position: 'relative' }}>
+            <View style={{ flex: 1, zIndex: 1, marginTop: onSelect ? -(200 - 12) : 12, position: 'relative' }}>
                 <FlatList
-                    contentContainerStyle={{ top: 0, backgroundColor: '#FFF', zIndex: -1 }}
-                    data={fiteredUsers}
+                    contentContainerStyle={{ marginHorizontal: 24, backgroundColor: '#FFF', zIndex: 1 }}
+                    data={originList}
                     renderItem={({ item }: { item: User }) => {
                         const isPicked = reservation.participants.some(participant =>
                             JSON.stringify(participant) === JSON.stringify(item)
                         )
-                        return (<ProfileMiniCard user={item} view={'inReserveView'}
-                            isPicked={isPicked}
-                            onPick={() => {
-                                if (!isPicked) setParticipants([...reservation.participants, item])
-                                else setParticipants(reservation.participants.filter((participant) => JSON.stringify(participant) != JSON.stringify(item)))
-                            }}
+                        return (
+                            <ProfileMiniCard
+                                key={item.memberId}
+                                user={item} view={'inReserveView'}
+                                isPicked={isPicked}
+                                onPick={() => {
+                                    if (!isPicked) setParticipants([...reservation.participants, item])
+                                    else setParticipants(reservation.participants.filter((participant) => JSON.stringify(participant) != JSON.stringify(item)))
+                                }}
 
-                        ></ProfileMiniCard>)
+                            ></ProfileMiniCard>)
                     }}
                     ItemSeparatorComponent={() => (<View style={{ height: 12 }} />)}
                 />

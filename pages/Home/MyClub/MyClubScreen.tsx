@@ -40,69 +40,24 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                     <View style={{ flex: 1 }}>
                         <View style={{ height: 10 }} />
                         <View style={styles.info}>
-                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>상쇠</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>홍길동(길동색시)</Text>
+                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>상쇠</Text>
+                            <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>홍길동(길동색시)</Text>
                         </View>
                         <View style={styles.info}>
-                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>패짱</Text><Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>임꺽정</Text>
+                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>패짱</Text>
+                            <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>임꺽정</Text>
                         </View>
                         <View style={{ marginHorizontal: 24, flexDirection: 'row', height: 20, alignSelf: 'flex-start', alignItems: 'flex-end', justifyContent: 'flex-start', marginTop: 20, marginBottom: 16 }}>
                             <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>동아리 관리</Text>
                         </View>
+
                         {manageClubMenu.map((subMenu: subMenu, index: number) => {
                             return (<Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => { throttledNavigation(subMenu.link) }}>
                                 <Text style={styles.subMenuTitle}>{subMenu.name}</Text>
                                 <Icons size={20} name='chevron-forward' color={Color['grey400']} />
                             </Pressable>)
                         })}
-                        <View style={{ height: 24, alignSelf: 'flex-start', justifyContent: 'space-between', marginHorizontal: 24, marginTop: 20, marginBottom: 16 }}>
-                            <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>활동 우수자</Text>
-                            <View style={{ height: 4 }} />
-                            <Text style={{ fontSize: 12, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>최근 30일의 기록으로 선정해요.</Text>
-                        </View>
-                        <View style={{ marginHorizontal: 32, marginVertical: 12 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                                <Text style={{ fontSize: 18, color: Color['grey500'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>출석 1위</Text>
-                                <Text style={{ fontSize: 14, color: Color['grey400'], fontFamily: "NanumSquareNeo-Light", textAlign: 'left', marginLeft: 8 }}>{`자세히 보기 >`}</Text>
-                            </View>
-                            <View style={{ height: 12 }} />
-                            <ProfileMiniCard
-                                user={{
-                                    email: 'dwq',
-                                    instrument: '기타',
-                                    memberId: 1,
-                                    name: '임꺽정',
-                                    nickname: '길동색시',
-                                    role: '상쇠',
-                                    club: '기타',
-                                    enrollmentNumber: 14,
-                                }}
-                                isPicked={false}
-                                onPick={()=>{}}
-                                view='inClubView'
-                            />
-                        </View>
-                        <View style={{ marginHorizontal: 32, marginVertical: 12 }}>
-                            <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                                <Text style={{ fontSize: 18, color: Color['grey500'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>예약 1위</Text>
-                                <Text style={{ fontSize: 14, color: Color['grey400'], fontFamily: "NanumSquareNeo-Light", textAlign: 'left', marginLeft: 8 }}>{`자세히 보기 >`}</Text>
-                            </View>
-                            <View style={{ height: 12 }} />
-                            <ProfileMiniCard
-                                user={{
-                                    email: 'dwq',
-                                    instrument: '기타',
-                                    memberId: 1,
-                                    name: '임꺽정',
-                                    nickname: '길동색시',
-                                    role: '상쇠',
-                                    club: '기타',
-                                    enrollmentNumber: 14,
-                                }}
-                                isPicked={false}
-                                onPick={()=>{}}
-                                view='inClubView'
-                            />
-                        </View>
+                        
                     </View>
 
                 </View>
@@ -111,7 +66,6 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                         <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'], textAlign: 'center' }}>동아리 정보 변경을 원하시나요?</Text>
                     </Pressable>
                 </View>
-                <UserModal />
             </ScrollView>
         </UserProvider>
     )

@@ -1,181 +1,77 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useLayoutEffect, useState } from 'react'
-import { Color } from '../../../../ColorSet'
-import PracticeCard from '../../../../components/cards/PracticeCard'
-import { club } from '../../../../UserType'
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { Color } from '@hongpung/ColorSet'
+import PracticeCard from '@hongpung/components/cards/PracticeCard'
+import { club, clubToEng } from '@hongpung/UserType'
 import { Icons } from '@hongpung/components/Icon'
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
+import { useRecoilValue } from 'recoil'
+import { loginUserState } from '@hongpung/recoil/authState'
+import { ReservationDTO } from '@hongpung/pages/Reserve/ReserveInterface'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack'
+import { useNavigation } from '@react-navigation/native'
 
 export type ReserveType = 'regular' | 'personal' | 'none';
 
-export interface Reserve{
-    date: Date;
-    title: string;
-    type: ReserveType;
-    name: string;
-    nickname?: string;
-    club?: club;
-    startTime: 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21;
-    endTime: 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22;
-    personnel: number
-}
 
-export interface SerializedReserve{
-    date: string;
-    title: string;
-    type: ReserveType;
-    name: string;
-    nickname?: string;
-    club?: club;
-    startTime: 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21;
-    endTime: 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 | 21 | 22;
-    personnel: number
-}
-
-const ClubCalendar: React.FC<{ navigation: any }> = ({ navigation }) => {
+const ClubPracticeCalendarScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     const [selectedDate, setDate] = useState<Date | null>(null)
-    const [reserveList, setReserveList] = useState<Reserve[] | null>(null)
-    const [calendarMonth, setMonth] = useState(new Date)
-    const [reservedDate, calcDates] = useState<number[] | null>(null)
-    const PrevPractices: Reserve[] = [
-        {
-            date: new Date('2024-08-11'),
-            title: '그냥 연습',
-            type: 'regular',
-            name: '홍길동',
-            nickname: '길동색시',
-            startTime: 17,
-            endTime: 19,
-            personnel: 10
-        },
-        {
-            date: new Date('2024-08-12'),
-            title: '개인 연습',
-            type: 'personal',
-            name: '이순신',
-            nickname: '이장군',
-            startTime: 10,
-            endTime: 12,
-            personnel: 10
-        },
-        {
-            date: new Date('2024-08-14'),
-            title: '정기 연습',
-            type: 'regular',
-            name: '김유신',
-            nickname: '김장군',
-            startTime: 15,
-            endTime: 18,
-            personnel: 12
-        },
-        {
-            date: new Date('2024-08-14'),
-            title: '개인 연습',
-            type: 'personal',
-            name: '유관순',
-            startTime: 18,
-            endTime: 21,
-            personnel: 9
-        },
-        {
-            date: new Date('2024-08-15'),
-            title: '정기 연습',
-            type: 'regular',
-            name: '안중근',
-            startTime: 14,
-            endTime: 17,
-            personnel: 10
-        },
-        {
-            date: new Date('2024-08-16'),
-            title: '개인 연습',
-            type: 'personal',
-            name: '윤봉길',
-            startTime: 12,
-            endTime: 14,
-            personnel: 12
-        },
-        {
-            date: new Date('2024-08-17'),
-            title: '정기 연습',
-            type: 'regular',
-            name: '장보고',
-            nickname: '장해적',
-            startTime: 16,
-            endTime: 19,
-            personnel: 82
-        },
-        {
-            date: new Date('2024-08-13'),
-            title: '개인 연습',
-            type: 'personal',
-            name: '이성계',
-            nickname: '태조',
-            startTime: 11,
-            endTime: 14,
-            personnel: 10
-        },
-        {
-            date: new Date('2024-08-19'),
-            title: '정기 연습',
-            type: 'regular',
-            name: '세종대왕',
-            nickname: '세종',
-            startTime: 13,
-            endTime: 16,
-            personnel: 11
-        },
-        {
-            date: new Date('2024-08-20'),
-            title: '개인 연습',
-            type: 'personal',
-            name: '광개토대왕',
-            nickname: '광개토',
-            startTime: 19,
-            endTime: 21,
-            personnel: 1
-        }
-    ];
+    const [reserveList, setReserveList] = useState<ReservationDTO[] | null>(null)
+    const [calendarMonth, setMonth] = useState(new Date())
+    const [reservedDate, setReservedDates] = useState<{ [key: number]: { regularType: string, isParticipable: boolean }[] }>([]);
+    const userInfo = useRecoilValue(loginUserState);
 
+    const { data, loading, error } = useFetchUsingToken<ReservationDTO[]>(
+        `${process.env.BASE_URL}/reservation/year-month-member?year=${calendarMonth.getFullYear()}&month=${Number(calendarMonth.getMonth()) + 1}&memberId=${userInfo?.memberId!}`,
+        {},
+        5000,
+        [userInfo, calendarMonth]
+    )
+    
     useEffect(() => {
         //fetchMothlyReserves
-        setDate(null);
-        const dates = PrevPractices.map(reserve => reserve.date.getDate());
-        calcDates(dates);
+        if (!!data) {
+            const reservedDates: { [key: number]: any[] } = [];
+            data.map((reserve) => {
+                const reserveDate = new Date(reserve.date).getDate();
+                if (!reservedDates[reserveDate]) reservedDates[reserveDate] = [{ regularType: reserve.type, isParticipable: reserve.participationAvailable }];
+                else reservedDates[reserveDate] = [...reservedDates[reserveDate], { regularType: reserve.type, isParticipable: reserve.participationAvailable }];
+            })
+            setReservedDates(reservedDates);
+        }
 
-    }, [calendarMonth])
+    }, [calendarMonth, data])
 
     useEffect(() => {
-        if (!selectedDate) setReserveList(PrevPractices)
-        else {
-            setReserveList(PrevPractices.filter((reserve) => reserve.date.getDate() == selectedDate.getDate()))
+        if (!!data) {
+            if (!selectedDate) setReserveList(data)
+            else {
+                setReserveList(data.filter((reserve) => new Date(reserve.date).getDate() == selectedDate.getDate()))
+            }
+            console.log(data);
         }
-    }, [selectedDate])
+    }, [selectedDate, data])
 
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+            <MiniCalendar
+                onSelect={(date) => setDate(date)}
+                selectedDate={selectedDate}
+                setMonth={setMonth}
+                calendarMonth={calendarMonth}
+                reservedDates={reservedDate} />
             <ScrollView contentContainerStyle={{ backgroundColor: '#FFF' }}>
-                <MiniCalendar
-                    onSelect={(date) => setDate(date)}
-                    selectedDate={selectedDate}
-                    setMonth={setMonth}
-                    calendarMonth={calendarMonth}
-                    reservedDates={reservedDate} />
                 <PrevPracticeList
                     prevPractice={reserveList}
-                    onPress={(reserve: Reserve) => {
-                        const serializedReserve = {
-                            ...reserve,
-                            date: reserve.date.toISOString(),
-                        };
-                        navigation.push('PracticeInfo', { reserveInfo: serializedReserve });
-                    }} />
+                />
             </ScrollView>
         </View>
     )
 }
 
-const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDate: Date | null, calendarMonth: Date, setMonth: (date: Date) => void, reservedDates: number[] | null }> = ({ onSelect, selectedDate, setMonth, calendarMonth, reservedDates }) => {
+const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDate: Date | null, calendarMonth: Date, setMonth: (date: Date) => void, reservedDates: { [key: number]: { regularType: string, isParticipable: boolean }[] } }> = ({ onSelect, selectedDate, setMonth, calendarMonth, reservedDates }) => {
 
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
 
@@ -234,19 +130,21 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
         daysInMonth.forEach((day, index) => {
             if (day == 0) days.push(<View style={{ width: 32, height: 32 }} />)
             else {
-                const isReserved = reservedDates?.includes(day);
+                const dateReservaData = reservedDates[day];
                 days.push(
                     <Pressable key={`date-${day}`}
                         style={{ height: 32, width: 32, alignItems: 'center', justifyContent: 'flex-start', backgroundColor: day == selectedDate?.getDate() ? Color['blue100'] : 'transparent', borderRadius: 5 }}
                         onPress={() => {
                             if (selectedDate?.getDate() == day) onSelect(null);
-                            else isReserved && filterLogforDate(day);
+                            else !!dateReservaData && filterLogforDate(day);
                         }}
                     >
-                        <Text style={[styles.CalendarText, isReserved && { color: Color['grey600'] }, day == selectedDate?.getDate() && { color: Color['blue600'] }]}>{day}</Text>
-                        {isReserved && <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 2 }}>
-                            <View style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: Color['blue500'] }} />
-                        </View>}
+                        <Text style={[styles.CalendarText, !!dateReservaData && { color: Color['grey600'] }, day == selectedDate?.getDate() && { color: Color['blue600'] }]}>{day}</Text>
+                        {!!dateReservaData &&
+                            dateReservaData?.map(reserve => (<View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 2 }}>
+                                <View style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: reserve.regularType == '정규연습' ? Color['blue500'] : reserve.isParticipable ? Color['green500'] : Color['red500'] }} />
+                            </View>))
+                        }
                     </Pressable>
                 );
             }
@@ -266,8 +164,7 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
     };
 
     return (
-        <View>
-            <View style={{ height: 16 }} />
+        <View style={{ display: 'flex', flexDirection: 'column' }}>
             <Text style={{ marginLeft: 32, marginBottom: 8, fontSize: 16, color: Color['grey400'], fontFamily: 'NanumSquareNeo-Bold' }}>
                 {calendarMonth.getFullYear()}년
             </Text>
@@ -303,11 +200,14 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
     );
 }
 
+type ClubPracticeNavProp = NativeStackNavigationProp<MyClubStackStackParamList, 'ClubCalendar'>
 
-const PrevPracticeList: React.FC<{ prevPractice: Reserve[] | null, onPress: (reserve: Reserve) => void }> = ({ prevPractice, onPress }) => {
+const PrevPracticeList: React.FC<{ prevPractice: ReservationDTO[] | null }> = ({ prevPractice }) => {
 
+    const navigation = useNavigation<ClubPracticeNavProp>();
+    const today = useMemo(() => new Date(), [])
     const mapedList = prevPractice?.reduce((acc, reserve) => {
-        const dateKey: string = reserve.date.toDateString(); // 날짜를 키로 사용 (YYYY-MM-DD 포맷)
+        const dateKey: string = reserve.date; // 날짜를 키로 사용 (YYYY-MM-DD 포맷)
 
         if (!acc[dateKey]) {
             acc[dateKey] = []; // 해당 날짜에 대한 배열이 없으면 초기화
@@ -315,26 +215,27 @@ const PrevPracticeList: React.FC<{ prevPractice: Reserve[] | null, onPress: (res
 
         acc[dateKey].push(reserve); // 해당 날짜에 예약 추가
         return acc;
-    }, {} as Record<string, Reserve[]>);
+    }, {} as Record<string, ReservationDTO[]>);
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
             {mapedList && Object.entries(mapedList).map(([dateKey, reserves]) => {
                 const date = new Date(dateKey);
 
                 return (
-                    <View key={dateKey}>
+                    <View key={dateKey} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                         {/* 날짜 출력 */}
-                        <Text style={{ marginVertical: 4, marginHorizontal: 28, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey500'], fontSize: 14 }}>
+                        <Text style={{ marginHorizontal: 28, fontFamily: 'NanumSquareNeo-Bold', color: date < today ? Color['grey300'] : Color['grey500'], fontSize: 14 }}>
                             {date.getFullYear()}.{date.getMonth() + 1}.{date.getDate()}({daysOfWeek[date.getDay()]})
                         </Text>
 
-                        {/* 해당 날짜의 모든 예약을 출력 */}
                         {reserves.map((reserve, index) => (
                             <View key={dateKey + '-' + index} style={{ marginVertical: 6 }}>
-                                <PracticeCard reserve={reserve} onPress={onPress} />
+                                <PracticeCard
+                                    reserve={reserve}
+                                    onPress={(reserve) => { navigation.push('MyClubPracticeInfo', { reservationId: reserve.reservationId! }) }} />
                             </View>
                         ))}
                     </View>
@@ -344,13 +245,12 @@ const PrevPracticeList: React.FC<{ prevPractice: Reserve[] | null, onPress: (res
     )
 }
 
-export default ClubCalendar
+export default ClubPracticeCalendarScreen
 
 const styles = StyleSheet.create({
     MonthRow: {
         height: 24,
         marginHorizontal: 32,
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start'

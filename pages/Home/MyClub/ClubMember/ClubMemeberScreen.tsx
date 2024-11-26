@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, ScrollView, Modal, Pressable, Image, Text } from "react-native";
 import ProfileMiniCard from "../../../../components/cards/ProfileMiniCard";
 import { Color } from "../../../../ColorSet";
@@ -16,25 +16,14 @@ type ClubMembersProps = NativeStackScreenProps<MyClubStackStackParamList, 'ClubM
 
 
 
-const MemeberList: React.FC<{ memberList: User[] }> = ({ memberList }) => {
 
-    const { setModalVisible, setSelectedUser } = useUser();
-
-    return (
-        <View style={{ flex: 1 }}>
-            {memberList.map((member) => (
-                <View key={member.name} style={{ marginVertical: 8, marginHorizontal: 24 }}>
-                    <ProfileMiniCard user={member} isPicked={false} onPick={user => { setSelectedUser(user); setModalVisible(true) }} view={'inClubView'} />
-                </View>
-            ))}
-        </View>
-    )
-}
 
 const ClubMemeberScreen: React.FC<ClubMembersProps> = ({ navigation }) => {
 
-    const [users, setUsers] = useState<User[]>([])
-    const loginUser = useRecoilValue(loginUserState)
+    const [users, setUsers] = useState<User[]>([]);
+
+    const loginUser = useRecoilValue(loginUserState);
+    const [selectedUser, selectUser] = useState<User | null>(null);
 
     const { data, loading, error } = useFetchUsingToken<User[]>(
         `${process.env.BASE_URL}/member`,
@@ -55,38 +44,37 @@ const ClubMemeberScreen: React.FC<ClubMembersProps> = ({ navigation }) => {
 
 
     return (
-        <UserProvider>
-            <View style={{
-                flexGrow: 1,
+        <View style={{
+            flexGrow: 1,
+            backgroundColor: '#fff',
+        }}>
+            <ScrollView contentContainerStyle={{
                 backgroundColor: '#fff',
             }}>
-                <ScrollView contentContainerStyle={{
-                    backgroundColor: '#fff',
-                }}>
-                    {users && <MemeberList memberList={users} />}
-                </ScrollView>
-                <UserModal />
-            </View>
-        </UserProvider>
+                {users && <View style={{ flex: 1 }}>
+                    {users.map((member) => (
+                        <View key={member.name} style={{ marginVertical: 8, marginHorizontal: 24 }}>
+                            <ProfileMiniCard user={member} isPicked={false} onPick={user => { selectUser(user); }} view={'inClubView'} />
+                        </View>
+                    ))}
+                </View>}
+            </ScrollView>
+            <UserModal selectedUser={selectedUser} selectUser={selectUser} />
+        </View>
     )
 }
 
-export const UserModal: React.FC = () => {
-    const { setModalVisible, modalVisible, selectedUser, setSelectedUser } = useUser();
+export const UserModal: React.FC<{ selectUser: (user: User | null) => void, selectedUser: User | null }> = ({ selectUser, selectedUser }) => {
 
-    const CloseHandler = () => {
-        setSelectedUser(null);
-        setModalVisible(false)
-    }
 
     return (
-        <Modal transparent={true} visible={modalVisible}>
+        <Modal transparent visible={!!selectedUser}>
             <Pressable style={{
                 height: '100%',
                 justifyContent: 'center',
                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
             }}
-                onPress={CloseHandler}
+                onPress={() => selectUser(null)}
             >
                 <Pressable
                     style={{
@@ -107,7 +95,7 @@ export const UserModal: React.FC = () => {
                             position: 'absolute',
                             top: 12, right: 16, width: 36, height: 36, justifyContent: 'center', alignItems: 'center'
                         }}
-                        onPress={CloseHandler}
+                        onPress={() => selectUser(null)}
                     >
                         <Icons name="close" color={'#000'} size={32} />
                     </Pressable>

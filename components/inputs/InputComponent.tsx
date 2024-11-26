@@ -29,7 +29,7 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
     const labelAnimation = useRef(new Animated.Value(0)).current; // 애니메이션 초기 값
     const inputRef = useRef<TextInput>(null); // 내부적으로 TextInput 참조
 
-    const [isVisible, setIsVisible] = useState(isEncryption);
+    const [isVisible, setIsVisible] = useState(!isEncryption);
 
     const underlineColor = color ? Color[color + "500"] : Color[`blue500`];
 

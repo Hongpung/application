@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardAvoidingView, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, KeyboardAvoidingView, Pressable, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { StackActions } from '@react-navigation/native'
 import Toast from 'react-native-toast-message'
@@ -12,8 +12,6 @@ import InputComponent from '@hongpung/components/inputs/InputComponent'
 import { Color } from '@hongpung/ColorSet'
 import LongButton from '@hongpung/components/buttons/LongButton'
 import CheckboxComponent from '@hongpung/components/checkboxs/CheckboxComponent'
-
-
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, "Login">;
 
@@ -34,7 +32,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
         const loadLoginSetting = async () => {
             try {
                 const loadedAutoLogin = await AsyncStorage.getItem('autoLogin')//오토 로그인 로두
-                setAutoLogin(loadedAutoLogin != null); 
+                setAutoLogin(loadedAutoLogin != null);
 
                 if (loadedAutoLogin == null) {
                     const loadedSaveID = await AsyncStorage.getItem('saveID')//아이디 세이브인지 확인
@@ -82,7 +80,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                 AsyncStorage.setItem('autoLogin', 'true');
                 await AsyncStorage.setItem('saveID', 'true')
                 await AsyncStorage.setItem('Email', Email)
-                
+
                 Toast.show({
                     type: 'success',
                     text1: '앞으로 앱 실행시 자동으로 로그인 돼요',
@@ -227,6 +225,16 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                             onPress={debounce(LoginBtnHandler, 500, { leading: true, trailing: false })}
                         />
                     </View>
+                    <View style={{ display: 'flex', flexDirection: 'row', marginTop: 16, width: 300, height: 26, marginHorizontal: 48 }}>
+                        <Pressable style={{ flex: 1, alignItems:'center' }}>
+                            <Text style={{ fontSize: 16, lineHeight: 22, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey600'] }}>ID 찾기</Text>
+                        </Pressable>
+                        <Pressable style={{ flex: 1, alignItems:'center' }}
+                        onPress={()=>{navigation.push('PWReset')}}>
+                            <Text style={{ fontSize: 16, lineHeight: 22, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey600'] }}>비밀번호 변경</Text>
+                        </Pressable>
+                    </View>
+
                     <View style={{ marginTop: 16, width: 300, height: 26, justifyContent: 'center', marginHorizontal: 48 }}>
                         <Text style={{ fontSize: 16, lineHeight: 22, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey600'] }}>홍풍 앱이 처음이시라면?</Text>
                     </View>

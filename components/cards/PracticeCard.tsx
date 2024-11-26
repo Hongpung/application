@@ -1,33 +1,26 @@
 import { View, Text, Pressable } from "react-native"
-import { Color } from "../../ColorSet"
-import { Reserve } from "../../pages/Home/MyClub/ClubCalendar/ClubCalendar"
-import { Icons } from "../Icon"
+import { Color } from "@hongpung/ColorSet"
+import { ReservationDTO } from "@hongpung/pages/Reserve/ReserveInterface"
+import { Icons } from "@hongpung/components/Icon"
+import { useMemo } from "react"
 
-const PracticeCard: React.FC<{ reserve: Reserve, onPress: (reserve: Reserve) => void }> = ({ reserve, onPress }) => {
+const PracticeCard: React.FC<{ reserve: ReservationDTO, onPress: (reserve: ReservationDTO) => void }> = ({ reserve, onPress }) => {
+    const isBefore = useMemo(() => new Date(reserve.date) < new Date(), []);
     return (
-        <View style={{ marginHorizontal: 24, height: 120, borderRadius: 10, borderWidth: 1, borderColor: reserve.type == 'regular' ? Color['blue200'] : Color['red200'] }}>
+        <View style={{ marginHorizontal: 24, height: 120, borderRadius: 10, borderWidth: 1.5, borderColor: reserve.type == '정규연습' ? isBefore ? Color['blue200'] : Color['blue500'] : reserve.participationAvailable ? isBefore ? Color['green200'] : Color['green500'] : isBefore ? Color['red200'] : Color['red500'] }}>
             <Text style={{
                 position: 'absolute', left: 18, top: 20,
                 fontFamily: 'NanumSquareNeo-Bold',
                 fontSize: 18,
-                color: Color['grey700']
-            }}>{reserve.title}</Text>
+                color: isBefore ?Color['grey400']:Color['grey700']
+            }}>{reserve.message}</Text>
             <Text style={{
-                position: 'absolute', left: 18, top: 52,
+                position: 'absolute', left: 18, bottom: 12,
                 fontFamily: 'NanumSquareNeo-Light',
                 fontSize: 14,
                 color: Color['grey400']
-            }}>{reserve.startTime}:00~{reserve.endTime}:00</Text>
-            <View style={{ position: 'absolute', left: 18, bottom: 16, flexDirection: 'row', alignItems: 'center' }}>
-                {/* 인원 아이콘 */}
-                <Icons size={24} name="people" color={Color['grey400']} />
-                <Text style={{
-                    marginLeft: 8,
-                    fontFamily: 'NanumSquareNeo-Light',
-                    fontSize: 14,
-                    color: Color['grey400']
-                }}>{reserve.personnel}</Text>
-            </View>
+            }}>{reserve.startTime.slice(0, -3)}~{reserve.endTime.slice(0, -3)}
+            </Text>
             <Pressable style={{ position: 'absolute', right: 16, bottom: 12 }} onPress={() => onPress(reserve)}>
                 <Text style={{
                     textAlign: 'right',
@@ -36,15 +29,13 @@ const PracticeCard: React.FC<{ reserve: Reserve, onPress: (reserve: Reserve) => 
                     color: Color['grey400']
                 }}>{`자세히 보기 >`}</Text>
             </Pressable>
-
             {/* 동아리 개별 연습 유형 */
-                reserve.type == 'regular' ?
+                reserve.type == '정규연습' ?
                     <View style={{
                         position: 'absolute', right: 12, top: -4, width: 48, height: 48
                     }} >
                         <Icons name="bookmark-sharp" size={48} color={Color['blue500']} />
                     </View>
-
                     : <View style={{
                         position: 'absolute', right: 20, top: 20,
                     }}>

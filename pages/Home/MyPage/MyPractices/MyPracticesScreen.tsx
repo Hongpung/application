@@ -3,85 +3,77 @@ import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
 import PracticeCard from '@hongpung/components/cards/PracticeCard'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
-import { Reserve } from '@hongpung/pages/Home/MyClub/ClubCalendar/ClubCalendar'
 import { Icons } from '@hongpung/components/Icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { MyPageParamList } from '@hongpung/nav/MyPageStack'
 import { useNavigation } from '@react-navigation/native'
+import { ReservationDTO } from '@hongpung/pages/Reserve/ReserveInterface'
+import { useRecoilValue } from 'recoil'
+import { loginUserState } from '@hongpung/recoil/authState'
 
 
-type MyPracticesProps = NativeStackNavigationProp<MyPageParamList, 'MyPractices'>;
 
+type MyPracticesNavProps = NativeStackNavigationProp<MyPageParamList, 'MyPractices'>;
 
 const MyPracticesScreen: React.FC = () => {
 
-    const navigation = useNavigation<MyPracticesProps>();
+    const navigation = useNavigation<MyPracticesNavProps>()
     const [selectedDate, setDate] = useState<Date | null>(null)
-    const [reserveList, setReserveList] = useState<Reserve[] | null>(null)
-    const [calendarMonth, setMonth] = useState(new Date)
-    const [reservedDates, setReservedDates] = useState<{ [key: number]: boolean[] }>([]);
+    const [reserveList, setReserveList] = useState<ReservationDTO[] | null>(null)
+    const [calendarMonth, setMonth] = useState(new Date())
+    const [reservedDate, setReservedDates] = useState<{ [key: number]: { regularType: string, isParticipable: boolean }[] }>([]);
+    const userInfo = useRecoilValue(loginUserState);
 
-
-
-    const { data, loading, error } = useFetchUsingToken<Reserve[]>(
-        `${process.env.BASE_URL}/reservation/search`,
-        {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ date: new Date().toISOString() })
-
-        }, 2000, [calendarMonth]
-    );
+    const { data, loading, error } = useFetchUsingToken<ReservationDTO[]>(
+        `${process.env.BASE_URL}/reservation/year-month-member?year=${calendarMonth.getFullYear()}&month=${Number(calendarMonth.getMonth()) + 1}&memberId=${userInfo?.memberId!}`,
+        {},
+        5000,
+        [userInfo, calendarMonth]
+    )
 
     useEffect(() => {
         //fetchMothlyReserves
-        if (data) {
-            const reservedDates: { [key: number]: boolean[] } = [];
+        if (!!data) {
+            const reservedDates: { [key: number]: any[] } = [];
             data.map((reserve) => {
-                const reserveDate = reserve.date.getDate();
-                if (!reservedDates[reserveDate]) reservedDates[reserveDate] = [reserve.name == '홍길동'];
-                else reservedDates[reserveDate] = [...reservedDates[reserveDate], reserve.name == '홍길동'];
+                const reserveDate = new Date(reserve.date).getDate();
+                if (!reservedDates[reserveDate]) reservedDates[reserveDate] = [{ regularType: reserve.type, isParticipable: reserve.participationAvailable }];
+                else reservedDates[reserveDate] = [...reservedDates[reserveDate], { regularType: reserve.type, isParticipable: reserve.participationAvailable }];
             })
             setReservedDates(reservedDates);
         }
 
-    }, [data]);
-
+    }, [calendarMonth, data])
 
     useEffect(() => {
-        if (!selectedDate) setReserveList(data)
-        else {
-            if (data)
-                setReserveList(data.filter((reserve) => reserve.date.getDate() == selectedDate.getDate()))
+        if (!!data) {
+            if (!selectedDate) setReserveList(data)
+            else {
+                setReserveList(data.filter((reserve) => new Date(reserve.date).getDate() == selectedDate.getDate()))
+            }
+            console.log(data);
         }
-    }, [selectedDate])
+    }, [selectedDate, data])
 
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+            <MiniCalendar
+                onSelect={(date) => setDate(date)}
+                selectedDate={selectedDate}
+                setMonth={setMonth}
+                calendarMonth={calendarMonth}
+                reservedDates={reservedDate} />
             <ScrollView contentContainerStyle={{ backgroundColor: '#FFF' }}>
-                <MiniCalendar
-                    onSelect={(date) => setDate(date)}
-                    selectedDate={selectedDate}
-                    setMonth={setMonth}
-                    calendarMonth={calendarMonth}
-                    reservedDates={reservedDates} />
                 <PrevPracticeList
                     prevPractice={reserveList}
-                    onPress={(reserve: Reserve) => {
-                        const serializedReserve = {
-                            ...reserve,
-                            date: reserve.date.toISOString(),
-                        };
-                        navigation.push('MyPracticeInfo', { reserveInfo: serializedReserve });
-                    }} />
+                    onPress={(reserve) => navigation.push('MyPracticeInfo', { reservationId: reserve.reservationId! })}
+                />
             </ScrollView>
         </View>
     )
 }
 
-const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDate: Date | null, calendarMonth: Date, setMonth: (date: Date) => void, reservedDates: { [key: number]: boolean[] } }> = ({ onSelect, selectedDate, setMonth, calendarMonth, reservedDates }) => {
+const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDate: Date | null, calendarMonth: Date, setMonth: (date: Date) => void, reservedDates: { [key: number]: { regularType: string, isParticipable: boolean }[] } }> = ({ onSelect, selectedDate, setMonth, calendarMonth, reservedDates }) => {
 
     const [daysInMonth, setDaysInMonth] = useState<number[]>([]);
 
@@ -140,20 +132,20 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
         daysInMonth.forEach((day, index) => {
             if (day == 0) days.push(<View style={{ width: 32, height: 32 }} />)
             else {
-                const reserveOfDate = reservedDates[day];
+                const dateReservaData = reservedDates[day];
                 days.push(
                     <Pressable key={`date-${day}`}
                         style={{ height: 32, width: 32, alignItems: 'center', justifyContent: 'flex-start', backgroundColor: day == selectedDate?.getDate() ? Color['blue100'] : 'transparent', borderRadius: 5 }}
                         onPress={() => {
                             if (selectedDate?.getDate() == day) onSelect(null);
-                            else reserveOfDate && filterLogforDate(day);
+                            else !!dateReservaData && filterLogforDate(day);
                         }}
                     >
-                        <Text style={[styles.CalendarText, reserveOfDate && { color: Color['grey600'] }, day == selectedDate?.getDate() && { color: Color['blue600'] }]}>{day}</Text>
-                        {reserveOfDate &&
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 2 }}>
-                                {reserveOfDate.map(isReserver => (<View style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: isReserver ? Color['blue500'] : Color['green500'] }} />))}
-                            </View>
+                        <Text style={[styles.CalendarText, !!dateReservaData && { color: Color['grey600'] }, day == selectedDate?.getDate() && { color: Color['blue600'] }]}>{day}</Text>
+                        {!!dateReservaData &&
+                            dateReservaData?.map(reserve => (<View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 2 }}>
+                                <View style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: reserve.regularType == '정규연습' ? Color['blue500'] : reserve.isParticipable ? Color['green500'] : Color['red500'] }} />
+                            </View>))
                         }
                     </Pressable>
                 );
@@ -174,8 +166,7 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
     };
 
     return (
-        <View>
-            <View style={{ height: 16 }} />
+        <View style={{ display: 'flex', flexDirection: 'column' }}>
             <Text style={{ marginLeft: 32, marginBottom: 8, fontSize: 16, color: Color['grey400'], fontFamily: 'NanumSquareNeo-Bold' }}>
                 {calendarMonth.getFullYear()}년
             </Text>
@@ -212,10 +203,11 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
 }
 
 
-const PrevPracticeList: React.FC<{ prevPractice: Reserve[] | null, onPress: (reserve: Reserve) => void }> = ({ prevPractice, onPress }) => {
+
+const PrevPracticeList: React.FC<{ prevPractice: ReservationDTO[] | null, onPress: (reserve: ReservationDTO) => void }> = ({ prevPractice, onPress }) => {
 
     const mapedList = prevPractice?.reduce((acc, reserve) => {
-        const dateKey: string = reserve.date.toDateString(); // 날짜를 키로 사용 (YYYY-MM-DD 포맷)
+        const dateKey: string = reserve.date; // 날짜를 키로 사용 (YYYY-MM-DD 포맷)
 
         if (!acc[dateKey]) {
             acc[dateKey] = []; // 해당 날짜에 대한 배열이 없으면 초기화
@@ -223,7 +215,7 @@ const PrevPracticeList: React.FC<{ prevPractice: Reserve[] | null, onPress: (res
 
         acc[dateKey].push(reserve); // 해당 날짜에 예약 추가
         return acc;
-    }, {} as Record<string, Reserve[]>);
+    }, {} as Record<string, ReservationDTO[]>);
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -258,7 +250,6 @@ const styles = StyleSheet.create({
     MonthRow: {
         height: 24,
         marginHorizontal: 32,
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start'

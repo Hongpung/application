@@ -13,8 +13,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useRecoilValue } from 'recoil';
 import { bannersState } from '@hongpung/recoil/bannerState';
 
-interface BannerFetchData {
-    id: string
+export interface BannerFetchData {
+    bannerId: string
     owner: string
     startDate: string //ISOTimeString
     endDate: string //ISOTimeString
@@ -31,8 +31,6 @@ const Banner: React.FC<{ withIndicator?: boolean }> = ({ withIndicator = true })
     const banners = useRecoilValue<{ state: 'BEFORE' | 'PENDING' | 'LOADED' | 'FAILED', value: BannerFetchData[] | null }>(bannersState);
     const [bannerNum, setBannerNum] = useState<number>(0);
     const pagerRef = useRef<PagerView>(null);//러페런스 추가
-
-    console.log(banners)
 
     const bannerMass = banners.value?.length;// 배너 수
 

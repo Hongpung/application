@@ -1,5 +1,5 @@
-import { StyleSheet, TextInput, Text, View, ScrollView, Image, Modal, Pressable, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Keyboard, TextInputChangeEventData, NativeSyntheticEvent } from 'react-native'
-import React, { useCallback, useLayoutEffect, useState } from 'react'
+import { StyleSheet, TextInput, Text, View, ScrollView, Image, Modal, Pressable, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Keyboard, TextInputChangeEventData, NativeSyntheticEvent, Alert, ActivityIndicator } from 'react-native'
+import React, { useState } from 'react'
 import { Color } from '../../../../ColorSet';
 import { Instrument, InstrumentCreateDTO, InstrumentEditDTO, InstrumentType, InstrumentTypes } from '../../../../UserType';
 import LongButton from '../../../../components/buttons/LongButton';
@@ -8,22 +8,14 @@ import { loginUserState } from '@hongpung/recoil/authState';
 import { Icons } from '@hongpung/components/Icon';
 import { getToken } from '@hongpung/utils/TokenHandler';
 import Toast from 'react-native-toast-message';
-import uploadImages from '@hongpung/utils/uploadImage';
+import uploadImage from '@hongpung/utils/uploadImage';
+import * as ImagePicker from 'expo-image-picker';
 
 
 const showDeleteCompleteToast = () => {
     Toast.show({
         type: 'success',
         text1: '악기 삭제를 완료했어요!',
-        position: 'bottom',
-        bottomOffset: 60,
-        visibilityTime: 2000
-    });
-};
-const showCreateCompleteToast = () => {
-    Toast.show({
-        type: 'success',
-        text1: '악기 등록을 완료했어요!',
         position: 'bottom',
         bottomOffset: 60,
         visibilityTime: 2000
@@ -48,23 +40,16 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
 
 
     const [instrumentsEngType] = useState(['KKWANGGWARI', 'JANGGU', 'BUK', 'SOGO', 'JING', 'ETC'])
-    const [aspectRatio, setAspectRatio] = useState<number | null>(null);
-    const [modalImgWidth, setModalImgWidth] = useState(332);
 
-    const [seletedImage, setImageFile] = useState<File | null>(null);
+    const [selectedImage, setImageFile] = useState<File | null>(null);
+    const [selectedImageUri, setImageUri] = useState<string | null>(null);
 
     const [onSelectType, setSelectTypeVisible] = useState(false);
-    const [modalVisible2, setModalVisible2] = useState(false);
+    const [isLoading, setLoading] = useState(false);
 
 
     const [instrument, setInstrument] = useState<Instrument>(instrumentInform ? JSON.parse(instrumentInform) :
         { available: true, club: loginUser?.club, borrowHistory: [], name: '', instrumentId: -1, type: '쇠' })
-
-
-    const uploadImageToInstrumentImage = useCallback(async (imageFile: File) => {
-        const imageUrl = await uploadImages(imageFile, 'instrumentsImage')
-        return imageUrl
-    }, [])
 
     const parseInstrument = (type: InstrumentType): string => {
         const instrumentEnumNo = InstrumentTypes.indexOf(type)
@@ -79,6 +64,38 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
     const chageName = (e: string) => {
         setInstrument({ ...instrument, name: e })
     };
+    const pickImageFromAlbum = async () => {
+        // 권한 요청
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('권한 필요', '앨범 접근 권한이 필요합니다.');
+            return;
+        }
+
+        // 앨범에서 이미지 선택
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true, // 선택 후 편집 가능
+            aspect: [300, 200], // 편집 비율 설정 (4:3)
+            quality: 0.5, // 이미지 품질 설정 (0 ~ 1)
+        });
+
+        if (!result.canceled) {
+            const imageUri = result.assets[0].uri;
+            const imageName = imageUri.split('/').pop();
+            const imageType = `image/${imageName?.split('.').pop()}`; // MIME 타입 추정
+
+            const imageFile = {
+                uri: imageUri,
+                name: imageName,
+                type: imageType,
+            } as unknown as File;
+
+            console.log(imageFile)
+            setImageUri(imageUri);
+            setImageFile(imageFile); // 선택된 이미지의 URI 저장
+        }
+    };
 
     const DeleteHandler = () => {
         const deleteInstrument = async () => {
@@ -86,7 +103,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
             const signal = controller.signal;
             const timeoutId = setTimeout(() => controller.abort(), 5000);
             try {
-
+                setLoading(true)
                 const token = await getToken('token');
 
                 if (!token) throw Error('invalid Token');
@@ -112,6 +129,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
                 }
             } finally {
                 clearTimeout(timeoutId);
+                setLoading(false)
             }
         }
         deleteInstrument()
@@ -125,15 +143,22 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
             const signal = controller.signal;
             const timeoutId = setTimeout(() => controller.abort(), 5000);
             try {
+                setLoading(true)
                 const token = await getToken('token');
 
                 if (!token) throw Error('invalid Token');
 
-                const submitForm: InstrumentEditDTO = { name: instrument.name, type: parseInstrument(instrument.type), available: instrument.available }
+                const submitForm: InstrumentEditDTO = { available: true, name: instrument.name, type: parseInstrument(instrument.type) }
 
-                if (seletedImage) {
-                    const imageUrl = await uploadImageToInstrumentImage(seletedImage);
-                    if (imageUrl) submitForm.imageUrl = imageUrl;
+                if (!!selectedImage) {
+                    console.log('이미지 업로드 수행중')
+                    const uploadRespone = await uploadImage(selectedImage, 'instruments')
+
+                    if (!uploadRespone) throw Error('업로드 실패')
+
+                    console.log('이미지 업로드 수행완료')
+                    const { imageUrl } = uploadRespone;
+                    submitForm.imageUrl = imageUrl;
                 }
 
                 console.log(submitForm);
@@ -158,100 +183,40 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
                     console.error(err.message + ' ' + err.status);
                 }
             } finally {
+                setLoading(false)
                 clearTimeout(timeoutId);
             }
         }
-
-        const createInstrument = async () => {
-            console.log(`신규 생성`)
-            const controller = new AbortController();
-            const signal = controller.signal;
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-            try {
-                const token = await getToken('token');
-
-                if (!token) throw Error('invalid Token');
-
-                const submitForm: InstrumentCreateDTO = { name: instrument.name, type: parseInstrument(instrument.type) }
-
-                const response = await fetch(`${process.env.BASE_URL}/instrument`, {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(submitForm),
-                    signal
-                })
-
-                if (!response.ok) throw Error('Server Error' + response.status)
-
-                showCreateCompleteToast();
-                navigation.goBack();
-
-            } catch (err: any) {
-                if (err.name === 'AbortError') {
-                    console.error('Request was canceled' + err.status);
-                } else {
-                    console.error(err.message + ' ' + err.status);
-                }
-            } finally {
-                clearTimeout(timeoutId);
-            }
-
-        }
-
-
-        if (instrument.instrumentId != -1)
-            editInstrument()
-        else
-            createInstrument()
+        
+        editInstrument()
     }
-
-    useLayoutEffect(() => {
-
-        if (instrument?.imgURL!)
-            Image.getSize(instrument?.imgURL!, (width, height) => {
-                setAspectRatio(width / height);
-            }, (error) => {
-                console.error(`Couldn't get the image size: ${error.message}`);
-            });
-        setModalImgWidth(340);
-
-    }, [instrument]);
 
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); dropdownCloseHandler() }} >
             <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#FFF" }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}>
                 <View style={{ flex: 1, backgroundColor: `#FFF`, }}>
+                    <Modal visible={isLoading} transparent>
+                        <View style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <ActivityIndicator size={'large'} color={'white'}></ActivityIndicator>
+                        </View>
+                    </Modal>
                     <ScrollView contentContainerStyle={{ alignItems: 'center', flex: 1 }}>
                         <View style={{ height: 12 }} />
                         <Pressable style={styles.imageContainer}
                             onPress={() => {
-                                setModalVisible2(true);
+                                pickImageFromAlbum();
                             }}>
 
-                            {instrument?.imgURL ?
+                            {instrument?.imageUrl || selectedImageUri ?
                                 <Image
-                                    source={{ uri: instrument?.imgURL }}
+                                    source={{ uri: selectedImageUri || instrument?.imageUrl }}
                                     style={styles.image}
                                 />
                                 :
                                 <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />
                             }
 
-                            <Modal visible={modalVisible2} transparent={true}>
-                                <Pressable onPress={() => setModalVisible2(false)} style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
-                                    {instrument?.imgURL ?
-                                        <Image
-                                            source={{ uri: instrument?.imgURL }}
-                                            style={[styles.image, { width: modalImgWidth, height: modalImgWidth / aspectRatio!, borderRadius: 15 }]}
-                                        />
-                                        :
-                                        <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />
-                                    }
-                                </Pressable>
-                            </Modal>
+
                         </Pressable>
                         <View style={{ height: 28 }} />
                         <View style={styles.Row}>
@@ -268,7 +233,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
                                 onPress={() => { Keyboard.dismiss(); setSelectTypeVisible(true); }}>
                                 <Text style={styles.RowRight}>{instrument.type}</Text>
                                 {
-                                    onSelectType && 
+                                    onSelectType &&
                                     <View style={{
                                         position: 'absolute', top: 0, right: 0, zIndex: 2, width: 120, backgroundColor: '#FFF', alignItems: 'flex-start', paddingHorizontal: 16, borderRadius: 5, shadowColor: Color['grey700'],
                                         shadowOffset: { width: -2, height: 2 }, // 그림자 오프셋 (x, y)

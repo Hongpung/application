@@ -128,7 +128,7 @@ const MainStacks = () => {
                 component={UsingManageScreen}
                 options={{
                     headerShown: true,
-                    animation: 'none',
+                    animation: 'slide_from_bottom',
                     header: () => <Header leftButton='close' HeaderName='현재 정보' />,
                     presentation: 'modal'
                 }}

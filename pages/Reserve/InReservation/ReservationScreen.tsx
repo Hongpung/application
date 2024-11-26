@@ -17,7 +17,7 @@ const { width } = Dimensions.get('window')
 
 type inReservationProps = NativeStackScreenProps<InReservationStackParamList, 'inReservation'>
 
-const ReservationScreen: React.FC<inReservationProps>= ({ navigation, route }) => {
+const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) => {
 
     const {
         reservation,
@@ -116,8 +116,7 @@ const ReservationScreen: React.FC<inReservationProps>= ({ navigation, route }) =
                 <View style={{ height: 16 }} />
                 <Pressable style={{ height: 100, marginHorizontal: 40, backgroundColor: Color['grey100'], borderRadius: 10 }}
                     onPress={() => {
-                        if (reservation?.date)
-                            navigation.push('TimeSelect')
+                        if (reservation?.date) navigation.push('TimeSelect')
                         else navigation.push('ResrvationDateSelect')
                     }}>
                     <View style={{ flexDirection: 'row', marginTop: 8, marginLeft: 8, alignItems: 'center' }}>
@@ -163,7 +162,7 @@ const ReservationScreen: React.FC<inReservationProps>= ({ navigation, route }) =
                 <View style={{ height: 24 }} />
 
                 <View style={{ marginHorizontal: 44, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>정기 연습</Text>
+                    <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>정규 연습</Text>
                     <View style={{ width: 218, height: 36, borderRadius: 5, flexDirection: 'row', alignItems: 'center' }}>
                         <Pressable style={[{ width: 108, alignItems: 'center', borderBottomLeftRadius: 5, borderTopLeftRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderRightWidth: 0.5, borderColor: reservation.isRegular ? Color['blue500'] : Color['red500'] }, reservation.isRegular && { backgroundColor: Color['blue100'] }]}
                             onPress={() => { setIsRegular(true); setIsParticipatible(false); }}>
@@ -220,20 +219,21 @@ const ReservationScreen: React.FC<inReservationProps>= ({ navigation, route }) =
                     <View style={{ height: 16 }} />
 
                     <Pressable style={{ marginHorizontal: 16 }}
-                        onPress={() => navigation.push('ParticipantsSelect')}>
+                        onPress={() => navigation.navigate('ParticipantsSelect')}>
                         {reservation.participants.length > 0 ?
-                            <View style={{ alignItems: 'center', justifyContent: 'flex-end', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                                    <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', width: 120, marginLeft: 24, bottom: 8 }}>
+                            <View style={{ justifyContent: 'flex-end', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center' }}>
+                                    <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', flex: 1, marginLeft: 24, bottom: 8 }}>
                                         {reservation.participants.slice(0, 4).map(user => (user.profileImageUrl ? <Image
-                                            source={{ uri: user.profileImageUrl }} style={{ width: 42, height: 56, }} /> : <View style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -4 * reservation.participants.length, borderRadius: 5 }} />))}
+                                            source={{ uri: user.profileImageUrl }} style={{ width: 42, height: 56, }} /> : <View style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -6 * Math.min(reservation.participants.length,4), borderRadius: 5 }} />))}
                                     </View>
-                                    <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', width: 152, bottom: 12 }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end', flex: 1, bottom: 12, gap: 8, paddingHorizontal:12 }}>
 
-                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Bold', marginRight: 24, color: Color['grey400'] }} numberOfLines={1}>
-                                            {reservation.participants.slice(0, 2).map(user => `${user.name} `)}{reservation.participants.length >= 3 && `등`}
+                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'] }} numberOfLines={1}>
+                                            {reservation.participants.slice(0, 2).map(user => `${user.name}`).filter(Boolean).join(', ')}{reservation.participants.length >= 3 && `등`}
                                         </Text>
-                                        <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginRight: 24 }}>
+
+                                        <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                                             <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Bold', color: Color['blue500'] }}>
                                                 {reservation.participants.length}
                                             </Text>

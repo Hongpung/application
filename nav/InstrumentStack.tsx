@@ -5,11 +5,15 @@ import InstrumentSpecificScreen from "@hongpung/pages/Home/MyClub/Instruments/In
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Header from '@hongpung/components/Header';
 
+import { useRecoilValue } from 'recoil';
+import { loginUserState } from '@hongpung/recoil/authState';
+import InstrumentCreateScreen from "@hongpung/pages/Home/MyClub/Instruments/InstrumentCreateScreen";
+
 
 export type ClubInstrumentStackParamList = {
     InstrumentsHome:undefined;
     InstrumentSpecific:{ instrumentId: number };
-    InstrumentCreate: { instrumentInform: string };
+    InstrumentCreate: undefined;
     InstrumentEdit: { instrumentInform: string };
 };
 
@@ -17,6 +21,7 @@ export type ClubInstrumentStackParamList = {
 const InstrumentStack = createNativeStackNavigator<ClubInstrumentStackParamList>();
 
 const InstrumentStacks = () => {
+    const userInfo = useRecoilValue(loginUserState)
     return (
         <InstrumentStack.Navigator initialRouteName="InstrumentsHome" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
             <InstrumentStack.Screen
@@ -25,7 +30,7 @@ const InstrumentStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: ({ navigation }) => <Header leftButton='arrow-back' HeaderName='악기 관리' RightButton='추가' RightAction={() => navigation.navigate('InstrumentEdit')} />
+                    header: ({ navigation }) => <Header leftButton='arrow-back' HeaderName='악기 관리' RightButton='추가' RightAction={() => navigation.navigate('InstrumentCreate')} />
                 }}
             />
             <InstrumentStack.Screen
@@ -46,6 +51,20 @@ const InstrumentStacks = () => {
                         <Header
                             leftButton='arrow-back'
                             HeaderName='악기 수정'
+                        />
+                    )
+                }}
+            />
+            <InstrumentStack.Screen
+                name="InstrumentCreate"
+                component={InstrumentCreateScreen}
+                options={{
+                    headerShown: true,
+                    animation: 'none',
+                    header: () => (
+                        <Header
+                            leftButton='arrow-back'
+                            HeaderName='악기 생성'
                         />
                     )
                 }}

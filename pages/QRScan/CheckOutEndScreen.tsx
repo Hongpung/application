@@ -5,7 +5,6 @@ import LongButton from '../../components/buttons/LongButton'
 
 const CheckOutEndScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [isLoading, setLoading] = useState(false);
-    const [isAgree, setAgree] = useState(true);
 
     useEffect(() => { navigation.setOptions({ animation: 'none' }); }, [])
 
@@ -37,7 +36,7 @@ const CheckOutEndScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     </View>
 
                     <View style={{ position: 'absolute', width: '100%', bottom: 16 }}>
-                        <LongButton color='blue' innerText={`종료하기`} isAble={isAgree} onPress={() => { navigation.navigate('Home') }} />
+                        <LongButton color='blue' innerText={`종료하기`} isAble={true} onPress={() => { navigation.navigate('Home') }} />
                     </View>
                 </View>}
         </View>

@@ -1,8 +1,8 @@
-import { Platform, View, SafeAreaView as SafeView, ViewStyle, StyleProp, Text, Pressable, ActivityIndicator, Image, ImageBackground, Modal, AppState } from 'react-native';
+import { Platform, View, SafeAreaView as SafeView, ViewStyle, StyleProp, Text, Pressable, ActivityIndicator, Image, ImageBackground, Modal, AppState, TouchableOpacity } from 'react-native';
 import Tutorial from './pages/FirstInstall/Tutorial/Tutorial';
 import * as Font from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Permission from './pages/FirstInstall/Permission/Permission';
@@ -18,9 +18,24 @@ import { SignUpProvider } from '@hongpung/pages/Auth/SignUp/context/SignUpContex
 import { RecoilRoot, useRecoilState } from 'recoil';
 import { deleteToken, getToken } from './utils/TokenHandler';
 import { bannersState } from './recoil/bannerState';
+import * as Notifications from 'expo-notifications';
+import { Icons } from './components/Icon';
+import PWResetScreen from './pages/Auth/PWReset/PWReset';
+import { PasswordResetProvider } from './pages/Auth/PWReset/context/PWResetContext';
+import { RootStackParamList } from './pageTypes';
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => {
+    const appState = AppState.currentState;
+    const receive = await AsyncStorage.getItem('receive-push')
+    return {
+      shouldShowAlert: appState !== 'active' && receive == 'true',
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }
+  },
+});
 
-const RootStack = createNativeStackNavigator();
 
 const fetchFonts = async () => {
   await Font.loadAsync({
@@ -33,6 +48,43 @@ const fetchFonts = async () => {
 }
 
 const toastConfig = {
+  notification: ({ text1, text2, ...rest }: BaseToastProps) => (//success시 알림 모양
+    <TouchableOpacity style={{ width: '100%', }}>
+      <View
+        style={{
+          backgroundColor: '#FFF',
+          paddingVertical: 16,
+          borderRadius: 12,
+          paddingHorizontal: 12,
+          marginHorizontal: 24,
+          minHeight: 56,
+          gap: 12,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.1,
+          shadowRadius: 24,
+          elevation: 1,
+          display: 'flex',
+          flexDirection: 'row',
+          alignItems: 'center'
+        }}
+        {...rest}
+      >
+        <Icons name='notifications' size={36} color={Color['blue500']} />
+        <View style={{
+          flexDirection: 'column',
+          gap: 4
+        }}>
+          <Text style={{ color: '#000', fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>
+            {text1}
+          </Text>
+          <Text style={{ color: Color['grey400'], lineHeight: 18, fontSize: 14, fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>
+            {text2}
+          </Text>
+        </View>
+
+      </View>
+    </TouchableOpacity>
+  ),
   successHasReturn: ({ text1, text2, ...rest }: BaseToastProps) => (//success 및 되돌리기 버튼 포함
     <View style={{ width: '100%' }}>
       <View
@@ -115,7 +167,7 @@ const toastConfig = {
 };
 
 
-const ContentsContainer: React.FC<{ startDomain: string }> = ({ startDomain }) => {
+const ContentsContainer: React.FC<{ startDomain: "Login" | "Tutorial" | "HomeStack" }> = ({ startDomain }) => {
   return (
     <NavigationContainer>
       <RootStacks startDomain={startDomain} />
@@ -123,7 +175,7 @@ const ContentsContainer: React.FC<{ startDomain: string }> = ({ startDomain }) =
   )
 }
 
-const SignUp: React.FC<{ navigation: any, route: any }> = () => {
+const SignUp: React.FC = () => {
   return (
     <SignUpProvider>
       <SignUpScreen />
@@ -131,13 +183,25 @@ const SignUp: React.FC<{ navigation: any, route: any }> = () => {
   )
 
 }
-
-const RootStacks: React.FC<{ startDomain: string }> = ({ startDomain }) => {
+const PasswordReset: React.FC = () => {
   return (
-    <RootStack.Navigator initialRouteName={"HomeStack"} screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
+    <PasswordResetProvider>
+      <PWResetScreen />
+    </PasswordResetProvider>
+  )
+
+}
+
+
+const RootStack = createNativeStackNavigator<RootStackParamList>();
+
+const RootStacks: React.FC<{ startDomain: "Login" | "Tutorial" | "HomeStack" }> = ({ startDomain }) => {
+  return (
+    <RootStack.Navigator initialRouteName={startDomain} screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
       <RootStack.Screen name="Tutorial" component={Tutorial} />
       <RootStack.Screen name="Permission" component={Permission} />
       <RootStack.Screen name="Login" component={LoginScreen} options={{ animation: 'none' }} />
+      <RootStack.Screen name="PWReset" component={PasswordReset} options={{ headerShown: true, header: () => <Header leftButton='close' /> }} />
       <RootStack.Screen name="SignUp" component={SignUp} options={{ headerShown: true, header: () => <Header leftButton='close' /> }} />
       <RootStack.Screen name="HomeStack" component={MainStacks} options={{ animation: 'none' }} />
     </RootStack.Navigator>
@@ -161,6 +225,34 @@ const SafeZone: React.FC<{ children: any, style: StyleProp<ViewStyle> }> = ({ ch
 }
 
 const App: React.FC = () => {
+
+  const notificationListener = useRef<Notifications.EventSubscription>();
+  const responseListener = useRef<Notifications.EventSubscription>();
+
+  useEffect(() => {
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      Toast.show({
+        type: 'notification',
+        text1: notification.request.content.title || 'fail',
+        text2: notification.request.content.body || 'fail',
+        position: 'top',
+        topOffset: 56,
+        visibilityTime: 2000
+      });
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+
+    return () => {
+      notificationListener.current &&
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      responseListener.current &&
+        Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, [])
   return (
     <RecoilRoot>
       <AppLoader />
@@ -169,7 +261,7 @@ const App: React.FC = () => {
 }
 
 interface BannerFetchData {
-  id: string
+  bannerId: string
   owner: string
   startDate: string //ISOTimeString
   endDate: string //ISOTimeString
@@ -242,41 +334,19 @@ const AppLoader: React.FC = () => {
 
     const fetchBanner = async () => {
       setBanners(prev => ({ state: 'PENDING', value: prev.value }))
-      const cachedData = await AsyncStorage.getItem('BANNER_CACHED_DATA');
-      const cachedBanners = cachedData ? JSON.parse(cachedData) as BannerFetchData[] : null;
-
-      const cachedVersion = await AsyncStorage.getItem('BANNER_VERSION');// 캐시된 배너의 버전
-      
       const timeoutId = setTimeout(() => controller.abort(), 6000);
       try {
-        const versionData = await fetch(`${process.env.WEB_API}/banners/version`, {
+
+        const bannerData = await fetch(`${process.env.SUB_API}/banners/on-post`, {
           signal
         })
 
-        if (!versionData.ok) throw Error();
-        const { version } = await versionData.json();
-        
-        if (!cachedBanners || cachedVersion !== version) {
+        if (!bannerData.ok) throw Error();
 
-          const bannerData = await fetch(`${process.env.WEB_API}/banners/public`, {
-            signal
-          })
+        const serverData = await bannerData.json() as BannerFetchData[];
 
-          if (!bannerData.ok) throw Error();
+        setBanners({ state: 'LOADED', value: serverData })
 
-          const serverData = await bannerData.json() as BannerFetchData[];
-
-          //신규 다운로드한 배너의 버전 캐싱
-          await AsyncStorage.setItem('BANNER_VERSION', JSON.stringify({version}));
-
-          //신규 다운로드한 배너 캐싱
-          await AsyncStorage.setItem('BANNER_CACHED_DATA', JSON.stringify(serverData));
-
-          setBanners({ state: 'LOADED', value: serverData })
-        }
-        else {
-          setBanners({ state: 'LOADED', value: cachedBanners })
-        }
       } catch (e) {
         console.error(e);
         setBanners(prev => ({ state: 'FAILED', value: prev.value }))

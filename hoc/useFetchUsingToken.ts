@@ -5,9 +5,11 @@ import { UseFetchOptions, UseFetchResult } from '@hongpung/hoc/types/FetchTypes'
 
 
 const useFetchUsingToken = <T>(url: string | null, options: UseFetchOptions = {}, timeout: number = 5000, dependencies: any[] = []): UseFetchResult<T> => {
+
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -17,7 +19,6 @@ const useFetchUsingToken = <T>(url: string | null, options: UseFetchOptions = {}
     const fetching = async () => {
       setLoading(true); // 요청 시작 시 loading을 true로 설정
       const timeoutId = setTimeout(() => controller.abort(), timeout);
-
       try {
 
         if (!url) throw Error('invalid url');;
@@ -40,10 +41,9 @@ const useFetchUsingToken = <T>(url: string | null, options: UseFetchOptions = {}
           console.log(response.status + response.statusText)
           throw new Error('Network response was not ok');
         }
-        const result: T = await response.json();
+        const result: T = await response.json() as T;
 
         setData(result);
-
       } catch (err: unknown) {
         if (err instanceof Error) {
           // `invalid Token` 메시지일 경우 처리
@@ -65,17 +65,18 @@ const useFetchUsingToken = <T>(url: string | null, options: UseFetchOptions = {}
           setError('An unknown error occurred');
         }
       } finally {
-        clearTimeout(timeoutId);
         setLoading(false);
+        console.log(loading)
+        clearTimeout(timeoutId);
       }
-
     }
+
     fetching();
 
     return () => {
       controller.abort();
     };
-  }, [...dependencies]);
+  }, [url, ...dependencies]);
 
   return { data, error, loading };
 };

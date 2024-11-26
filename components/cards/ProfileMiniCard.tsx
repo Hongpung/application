@@ -52,9 +52,9 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick 
                         borderColor: Color['grey300'],
                         backgroundColor: Color['grey200'],
                     }]} />}
-                <View style={{ height: 44, justifyContent: 'space-evenly' }}>
+                <View style={{ height: 44, display:'flex', gap:2 }}>
                     <View style={[{ flexDirection: 'row', flex: 1, alignItems: 'center', }, user.nickname ? { marginTop: 3 } : null]}>
-                        <View style={styles.instrumnetMark} />
+                        {/* <View style={styles.instrumnetMark} /> */}
                         <Text style={styles.UserName}>{user.name}</Text>
                     </View>
                     {user.nickname && <Text style={styles.UserNickName}>{user.nickname}</Text>}

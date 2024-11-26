@@ -17,6 +17,7 @@ const { width } = Dimensions.get('window')
 type ReservationDetailProps = NativeStackScreenProps<ReservationStackParamList, 'ReservationDetail'>
 
 const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation, route }) => {
+
     const { reservationId } = route.params
 
     const loginUser = useRecoilValue(loginUserState)
@@ -24,7 +25,15 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
     const daysOfWeek = useMemo(() => ['일', '월', '화', '수', '목', '금', '토'], [])
     const [reservation, setReservation] = useState<Reservation | null>(null)
     const [isLoading, setLoading] = useState(false);
-
+    const isEditible = () => {
+        if (reservation) {
+            const utcTime = new Date();
+            const koreaTime = new Date(utcTime.getTime() + 9 * 60 * 60 * 1000);
+            const limitTime = new Date(new Date(reservation?.date!).getTime() - 2 * 60 * 60 * 1000)
+            return koreaTime <= limitTime
+        }
+        return false;
+    }
     useEffect(() => {
         const load = async () => {
             const controller = new AbortController();
@@ -172,7 +181,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                 <View style={{ height: 24 }} />
 
                 <View style={{ marginHorizontal: 44, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>정기 연습</Text>
+                    <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>정규 연습</Text>
                     <View style={{ width: 218, height: 36, borderRadius: 5, flexDirection: 'row', alignItems: 'center' }}>
                         <View style={[{ width: 108, alignItems: 'center', borderBottomLeftRadius: 5, borderTopLeftRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderRightWidth: 0.5, borderColor: reservation.isRegular ? Color['blue500'] : Color['red500'] }, reservation.isRegular && { backgroundColor: Color['blue100'] }]}>
                             <Text style={[{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14 }, reservation.isRegular ? { color: Color['blue600'] } : { color: Color['red300'] }]}>
@@ -220,20 +229,21 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                     <View style={{ height: 16 }} />
 
                     <Pressable style={{ marginHorizontal: 16 }}
-                        onPress={() => reservation.participants.length > 0 && navigation.push('ReservationStack', { screen: 'ParticipantsSelect'})}>
+                        onPress={() => reservation.participants.length > 0 && navigation.push('ReservationParticipatorsView', { participators: JSON.stringify(reservation.participants) })}>
                         {reservation.participants.length > 0 ?
-                            <View style={{ alignItems: 'center', justifyContent: 'flex-end', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
-                                <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
-                                    <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', width: 120, marginLeft: 24, bottom: 8 }}>
+                            <View style={{ justifyContent: 'flex-end', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center' }}>
+                                    <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', flex: 1, marginLeft: 24, bottom: 8 }}>
                                         {reservation.participants.slice(0, 4).map(user => (user.profileImageUrl ? <Image
-                                            source={{ uri: user.profileImageUrl }} style={{ width: 42, height: 56, }} /> : <View style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -4 * reservation.participants.length, borderRadius: 5 }} />))}
+                                            source={{ uri: user.profileImageUrl }} style={{ width: 42, height: 56, }} /> : <View style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -6 * Math.min(reservation.participants.length, 4), borderRadius: 5 }} />))}
                                     </View>
-                                    <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', width: 152, bottom: 12 }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end', flex: 1, bottom: 12, gap: 8, paddingHorizontal: 12 }}>
 
-                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Bold', marginRight: 24, color: Color['grey400'] }} numberOfLines={1}>
-                                            {reservation.participants.slice(0, 2).map(user => `${user.name} `)}{reservation.participants.length >= 3 && `등`}
+                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'] }} numberOfLines={1}>
+                                            {reservation.participants.slice(0, 2).map(user => `${user.name}`).filter(Boolean).join(', ')}{reservation.participants.length >= 3 && `등`}
                                         </Text>
-                                        <View style={{ flexDirection: 'row', alignItems: 'flex-end', marginRight: 24 }}>
+
+                                        <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                                             <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Bold', color: Color['blue500'] }}>
                                                 {reservation.participants.length}
                                             </Text>
@@ -280,21 +290,25 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                 </View>
 
                 <View style={{ height: 24 }} />
-                {loginUser?.email == reservation.userEmail && reservation.date! > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
+                {isEditible() && loginUser?.email == reservation.userEmail && reservation.date! > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
                     <LongButton
                         color={'red'}
                         innerText={'취소하기'}
                         isAble={true}
-                        onPress={onDelete}
+                        onPress={() => {
+                            if (!isEditible()) { alert('변경 가능 시간이 종료되었습니다.'); return }
+                            onDelete()
+                        }}
                     />
                 </View>}
             </ScrollView>
-            {loginUser?.email == reservation.userEmail && reservation.date! > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
+            {isEditible() && loginUser?.email == reservation.userEmail && reservation.date! > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
                 <LongButton
                     color={'green'}
                     innerText={'수정하기'}
                     isAble={true}
                     onPress={() => {
+                        if (!isEditible()) { alert('변경 가능 시간이 종료되었습니다.'); return }
                         navigation.push('ReservationStack', { screen: 'inReservation', params: { reservationId } })
                     }}
                 />

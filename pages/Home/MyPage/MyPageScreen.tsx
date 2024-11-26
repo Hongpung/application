@@ -1,65 +1,67 @@
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useLayoutEffect, useMemo, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import ProfileBoxCard from "@hongpung/components/cards/PrifileBoxCard";
-import { useRecoilCallback } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState'
 import { User } from '@hongpung/UserType';
-import { StackActions, useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Icons } from '@hongpung/components/Icon';
 import { MyPageParamList } from '@hongpung/nav/MyPageStack';
+import { useAuth } from '@hongpung/hoc/useAuth';
 
 
 type MyPageProps = NativeStackNavigationProp<MyPageParamList, 'MyPageHome'>;
 
 const MyPageScreen: React.FC = () => {
 
+    const isFocusing = useIsFocused()
     const navigation = useNavigation<MyPageProps>();
 
+    const { loadUserState, loginUser } = useAuth()
     type subMenu = {
         name: string,
         link: keyof MyPageParamList
     }
     const myActivities: subMenu[] = useMemo(() => [{ name: '내 일정', link: 'MySchedules' }, { name: '내 활동', link: 'MyPractices' },], [])
-    const Settings: subMenu[] = useMemo(() => [{ name: '알림 설정', link: 'NotificationSetting' }, { name: '로그인 설정', link: 'LoginSetting' }, 
+    const Settings: subMenu[] = useMemo(() => [
+        { name: '알림 설정', link: 'NotificationSetting' }, 
+        { name: '로그인 설정', link: 'LoginSetting' },
         // { name: '암호 잠금', link: '' }, { name: '앱 설정', link: '' }, //추후 설정
     ], [])
-    const [loginUser, setUser] = useState<User | null>(null);
-    const [isloading, setLoading] = useState(true);
 
-    const loadUser = useRecoilCallback(({ snapshot }) => async () => {
-        const user = await snapshot.getPromise(loginUserState); // Recoil 상태 읽기
-        return user;
-    }, []);
+    const [isLoading, setLoading] = useState(true);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
+        loadUserState()
         const checkUser = async () => {
-            const loadedUser = await loadUser(); // Recoil 상태 값 가져오기
-            if (!loadedUser) {
-                navigation.dispatch(StackActions.replace('Login')); // 로그인 페이지로 이동
-            } else {
-                setUser(loadedUser);
+            try {
+                setLoading(false)
+                console.log(loginUser, 'fetch', isLoading)
+                
             }
-            setLoading(false)
+            catch (e) {
+                console.error(e)
+            }
         }
-        
         checkUser();
-    }, [])
+    }, [isFocusing])
 
 
-    if (isloading)
-        return (
-            <View style={styles.container}>
-                <ActivityIndicator size={'large'} color={'#fff'} />
-            </View>
-        )
+    // if (isLoading)
+    //     return (
+    //         <View style={styles.container}>
+    //             <ActivityIndicator size={'large'} color={'#fff'} />
+    //         </View>
+    //     )
+    if(!loginUser) return(<View></View>)
 
     return (
         <ScrollView style={styles.container}>
             <ProfileBoxCard
-                isCard={false}
                 user={{
+                    profileImageUrl: loginUser?.profileImageUrl,
                     email: loginUser!.email,
                     memberId: loginUser!.memberId,
                     club: loginUser!.club,
@@ -89,7 +91,8 @@ const MyPageScreen: React.FC = () => {
                 </Pressable>)
             })}
             <View style={styles.footer}>
-                <Pressable style={{ paddingBottom: 1, borderBottomWidth: 1, borderBottomColor: Color['grey300'], marginVertical: 14, alignItems: 'center' }}>
+                <Pressable style={{ paddingBottom: 1, borderBottomWidth: 1, borderBottomColor: Color['grey300'], marginVertical: 14, alignItems: 'center' }}
+                    onPress={() => { navigation.push('ChangeMyInfo') }}>
                     <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'], textAlign: 'center' }}>개인 정보 수정</Text>
                 </Pressable>
                 <Pressable style={{ paddingBottom: 1, borderBottomWidth: 1, borderBottomColor: Color['grey300'], alignItems: 'center' }}>

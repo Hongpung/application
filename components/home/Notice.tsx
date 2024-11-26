@@ -41,9 +41,14 @@ const NoticePartition: React.FC = () => {
                     data.slice(0, 4).map((notice) => (
                         <TouchableOpacity key={notice.infoId} style={{ display: 'flex', alignItems: 'center', marginHorizontal: 12, flexDirection: 'row', gap: 2 }}
                             onPress={() => {
-                                navigation.navigate('NoticeStack');
-                                navigation.navigate('NoticeStack', { screen: 'NoticeDetail', params: { infoId: notice.infoId } })
-
+                                navigation.setOptions({
+                                    animation: 'none', // 애니메이션 끄기
+                                  });
+                                navigation.push('NoticeStack');
+                                navigation.setOptions({
+                                    animation: 'slide_from_right', // 애니메이션 끄기
+                                  });
+                                navigation.push('NoticeStack', { screen: 'NoticeDetail', params: { infoId: notice.infoId } })
                             }}>
                             <Text numberOfLines={1} ellipsizeMode='tail' style={{ flex: 1, fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>
                                 [공지사항] {notice.title}

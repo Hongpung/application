@@ -29,7 +29,8 @@
       },
       "permissions": [
         ""
-      ]
+      ],
+      "package": "com.widepants.HongPung"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -55,6 +56,11 @@
         }
       ],
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "1de88024-4522-477b-99c9-b458d373a286"
+      }
+    }
   }
 }

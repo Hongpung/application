@@ -10,8 +10,8 @@ const InstrumentTag: React.FC<{ state: boolean }> = ({ state }) => {
         <View style={[styles.tag, {
             backgroundColor: state ? Color['blue100'] : Color['red100']
         }]}>
-            <Text style={[styles.tagText, { color: state? Color['blue500'] : Color['red500'] }]}>
-                {state? '대여 가능' : '분실'}
+            <Text style={[styles.tagText, { color: state ? Color['blue500'] : Color['red500'] }]}>
+                {state ? '대여 가능' : '분실'}
             </Text>
         </View>
     )
@@ -31,10 +31,12 @@ const InstrumentCard: React.FC<instrumentCardProps> = ({ instrument, view, onSel
             style={[styles.card, { height: 156 }, isPicked && { borderColor: Color['blue500'], backgroundColor: Color['blue100'], borderWidth: 1, }]}>
             <View>
                 <View style={styles.imageContainer}>
-                    {instrument.imgURL ? <Image
-                        source={{ uri: instrument.imgURL }}
-                        style={styles.image}
-                    /> :
+                    {instrument.imageUrl ?
+                        <Image
+                            source={{ uri: instrument.imageUrl }}
+                            style={styles.image}
+                            resizeMode="cover"
+                        /> :
                         <View style={{ backgroundColor: Color['grey100'], flex: 1, height: 200, width: 300 }}>
                         </View>}
                 </View>

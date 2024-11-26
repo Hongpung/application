@@ -97,7 +97,7 @@ const CheckOutDescriptScreen: React.FC<{ navigation: any }> = ({ navigation }) =
                     </View>
                 </View>
                 <View style={styles.CTA}>
-                    <LongButton color='blue' isAble={true} innerText={pageNum < 2 ? '다음' : '촬영하기'} onPress={() => { if (pageNum == 2) navigation.navigate('CheckOutCamera'); else goToPage(); }} />
+                    <LongButton color='blue' isAble={true} innerText={pageNum < 2 ? '다음' : '촬영하기'} onPress={() => { if (pageNum == 2) navigation.navigate('PictureCheck'); else goToPage(); }} />
                 </View>
             </View>
 

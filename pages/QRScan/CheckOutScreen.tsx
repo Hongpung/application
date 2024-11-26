@@ -5,6 +5,8 @@ import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg'
 import LongButton from '../../components/buttons/LongButton'
 import CheckboxComponent from '../../components/checkboxs/CheckboxComponent'
 import { debounce } from 'lodash'
+import { loginUserState, useOnReserve } from '@hongpung/recoil/authState'
+import { useRecoilState, useRecoilValue } from 'recoil'
 
 const CheckOutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     const [isCheckin, CheckIn] = useState(false);
@@ -20,6 +22,7 @@ const CheckOutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
     }, [isCheckin])
 
+    
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <View style={{ height: '20%' }}></View>
@@ -82,11 +85,14 @@ const CheckOutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         <View style={{ marginHorizontal: 28, marginBottom: 12 }}>
                             <CheckboxComponent
                                 isChecked={isAgree}
-                                innerText='남은시간을 반납하여, 연습을 종료합니다.' 
+                                innerText='남은시간을 반납하여, 연습을 종료합니다.'
                                 onCheck={() => isAgree ? setAgree(false) : setAgree(true)}
                             ></CheckboxComponent>
                         </View>
-                        <LongButton color='red' innerText={`네, 종료할래요`} isAble={isAgree} onPress={() => { debounce(navigation.push('CheckOutDescript'), 500, { leading: true, trailing: false }) }} />
+                        <LongButton color='red' innerText={`네, 종료할래요`} isAble={isAgree} onPress={() => {
+                            // endSession()
+                            navigation.push('CheckOutDescript')
+                        }} />
                     </View>
                 </View>}
         </View>

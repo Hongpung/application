@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useState } from 'react'
 import LongButton from '@hongpung/components/buttons/LongButton'
 import { Color } from '@hongpung/ColorSet'
@@ -9,9 +9,19 @@ import { loginUserState } from '@hongpung/recoil/authState'
 import { getToken } from '@hongpung/utils/TokenHandler'
 import { findReservationDifferences, parseToReservationForm } from '../ReserveInterface'
 import { Icons } from '@hongpung/components/Icon'
+import { InReservationStackParamList, ReservationStackParamList } from '@hongpung/nav/ReservationStack'
+import { CompositeNavigationProp, useNavigation } from '@react-navigation/native'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 
-const ReservationEditConfirmScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
+type ReservationEditConfirmNavProp = CompositeNavigationProp<
+    NativeStackNavigationProp<InReservationStackParamList, 'ReservationEditConfirm'>,
+    NativeStackNavigationProp<ReservationStackParamList, 'ReservationStack'>
+>
+
+const ReservationEditConfirmScreen: React.FC = () => {
+
+    const navigation = useNavigation<ReservationEditConfirmNavProp>();
     const { reservation, preReservation } = useReservation();
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
@@ -66,7 +76,7 @@ const ReservationEditConfirmScreen: React.FC<{ navigation: any }> = ({ navigatio
                 const result: any = await response.json();
 
                 if (result != null)
-                    navigation.navigate('DailyReserveList', { date: reservation.date?.toISOString() })
+                    navigation.navigate('DailyReserveList', { date: reservation.date!.toISOString() })
             }
             catch (e) {
                 console.error(e)
@@ -98,23 +108,136 @@ const ReservationEditConfirmScreen: React.FC<{ navigation: any }> = ({ navigatio
             <View style={{ height: 88 }} />
             <Text style={{ textAlign: 'center', fontFamily: 'NanumSquareNeo-Bold', fontSize: 20, marginBottom: 34 }}>예약 정보 변경 확인</Text>
             <View style={{ paddingHorizontal: 18, marginHorizontal: 24, borderRadius: 15, paddingVertical: 8, backgroundColor: '#FFF' }}>
-                {Object.keys(difference)?.map((key: string) => {
-                    return (
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
-                            <Text style={styles.leftText}>{key}</Text>
-                            <Text style={[styles.rightText, { color: Color['grey300'] }]}>{preReservationDTO[key]}</Text>
-                        </View>)
-                })}
+                {Object.keys(difference)
+                    .filter(
+                        (key: string) =>
+                            !['addedBorrowInstrumentIds', 'reomvedBorrowInstrumentIds', 'addedParticipatorIds', 'removedParticipatorIds'].includes(key)
+                    )?.map((key: string) => {
+                        if (key == 'startTime'||key == 'endTime') {
+                            const time = preReservationDTO[key].slice(-4);
+                            return (
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                                    <Text style={styles.leftText}>{key == 'startTime'?'시작시간':'종료시간'}</Text>
+                                    <Text style={[styles.rightText, { color: Color['grey300'] }]}>{time.slice(0,2)}시 {time.slice(-2)}분</Text>
+                                </View>)
+                        }
+                        return (
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                                <Text style={styles.leftText}>{key == 'startTime' ? '시작시간' : key}</Text>
+                                <Text style={[styles.rightText, { color: Color['grey300'] }]}>{preReservationDTO[key]}</Text>
+                            </View>)
+                    })}
+
+
+                {(difference.addedBorrowInstrumentIds || difference.removedBorrowInstrumentIds) && (
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14, }}                    >
+                        <Text style={styles.leftText}>대여 악기</Text>
+                        {preReservation.borrowInstruments.length > 0 ?
+                            <Text style={[styles.rightText, { color: Color['grey300'] }]}>{['쇠', '장구', '북', '소고', '새납'].map((type) => {
+                                const instCount = preReservation.borrowInstruments.filter((instrument) => instrument.type == type).length
+                                if (instCount > 0)
+                                    return `${type} ${instCount}`
+                            })}
+                            </Text>
+                            :
+                            <Text style={[styles.rightText, { color: Color['grey300'] }]}>{'없음'}</Text>}
+
+                    </View>
+                )}
+
+
+                {(difference.addedParticipatorIds || difference.removedParticipatorIds) && (
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                        <Text style={styles.leftText}>참여 인원</Text>
+                        {preReservation.participants.length > 0 ?
+                            <View style={{ display: 'flex', flexDirection: 'row', gap: 8, }}>
+                                <Text style={[styles.rightText, { color: Color['grey300'], maxWidth: 156 }]} numberOfLines={1}>
+                                    {`${preReservation.participants.slice(0, 3).map(user => `${user.name}`).filter(Boolean).join(', ')}`}
+                                </Text>
+                                {preReservation.participants.length >= 3 && <Text style={[styles.rightText, { color: Color['grey400'] }]}>{`외 ${reservation.participants?.length} 명`}</Text>}
+                            </View>
+
+                            :
+                            <Text style={[styles.rightText, { color: Color['grey300'] }]}>
+                                없음
+                            </Text>}
+                    </View>
+                )}
             </View>
+
+
+
             <View style={{ alignSelf: 'center', paddingVertical: 16 }}>
                 <Icons name='arrow-down' color={Color['red500']} />
             </View>
+
+
+
             <View style={{ paddingHorizontal: 18, marginHorizontal: 24, borderRadius: 15, paddingVertical: 8, backgroundColor: '#FFF' }}>
-                {Object.keys(difference)?.map((key: string) =>
+
+
+                {Object.keys(difference)
+                    .filter((key: string) => !['addedBorrowInstrumentIds', 'reomvedBorrowInstrumentIds', 'addedParticipatorIds', 'removedParticipatorIds'].includes(key))
+                    ?.map((key: string) => {
+                        if (key == 'startTime'||key == 'endTime') {
+                            const time = newReservationDTO[key].slice(-4);
+                            return (
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                                    <Text style={styles.leftText}>{key == 'startTime'?'시작시간':'종료시간'}</Text>
+                                    <Text style={[styles.rightText, { color: Color['blue500'] }]}>{time.slice(0,2)}시 {time.slice(-2)}분</Text>
+                                </View>)
+                        }
+                        return (
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                                <Text style={styles.leftText}>{key}</Text>
+                                <Text style={[styles.rightText, { color: Color['blue500'] }]}>{newReservationDTO[key]}</Text>
+                            </View>)
+                    })}
+
+
+                {(difference.addedBorrowInstrumentIds || difference.removedBorrowInstrumentIds) && (
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
-                        <Text style={styles.leftText}>{key}</Text>
-                        <Text style={[styles.rightText, { color: Color['blue500'] }]}>{newReservationDTO[key]}</Text>
-                    </View>)}
+                        <Text style={styles.leftText}>대여 악기</Text>
+                        {reservation.borrowInstruments.length > 0 ?
+                            <Text style={[styles.rightText, { marginRight: 12, color: Color['blue500'] }]}>{['쇠', '장구', '북', '소고', '새납'].map((type) => {
+                                const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
+                                if (instCount > 0)
+                                    return `${type} ${instCount}`
+                            })}
+                            </Text>
+                            : <Text style={[styles.rightText, { color: Color['blue500'] }]}>{'없음'}</Text>}
+
+                        {reservation.borrowInstruments.length > 0 &&
+                            <Pressable style={{ position: 'absolute', right: -12 }}
+                                onPress={() => reservation.borrowInstruments.length > 0 && navigation.navigate('ReservationInstrumentsView', { instruments: JSON.stringify(reservation.borrowInstruments) })}>
+                                <Icons size={16} color={Color['grey300']} name={'chevron-forward'}></Icons>
+                            </Pressable>}
+                    </View>
+                )}
+
+
+                {(difference.addedParticipatorIds || difference.removedParticipatorIds) && (
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
+                        <Text style={styles.leftText}>참여 인원</Text>
+                        {reservation.participants.length > 0 ?
+                            <View style={{ display: 'flex', flexDirection: 'row', gap: 8, marginRight: 12, }}><Text style={[styles.rightText, { color: Color['blue500'], maxWidth: 156 }]} numberOfLines={1}>
+                                {`${reservation.participants.slice(0, 3).map(user => `${user.name}`).join(', ')}` + `${reservation.participants.length >= 3 ? `외 ${reservation.participants?.length} 명` : ''}`}
+                            </Text>
+                                {reservation.participants.length >= 3 && <Text style={[styles.rightText, { color: Color['grey400'] }]}>{`외 ${reservation.participants?.length} 명`}</Text>}
+                            </View>
+                            :
+                            <Text style={[styles.rightText, { color: Color['blue500'] }]}>
+                                없음
+                            </Text>}
+
+                        {reservation.participants.length > 0 &&
+                            <Pressable style={{ position: 'absolute', right: -12 }}
+                                onPress={() => reservation.participants.length > 0 && navigation.navigate('ReservationParticipatorsView', { participators: JSON.stringify(reservation.participants) })}>
+                                <Icons size={16} color={Color['grey300']} name={'chevron-forward'} />
+                            </Pressable>}
+                    </View>
+                )}
+
             </View>
             {/*<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 36, marginVertical: 14 }}>
                 <Text style={styles.leftText}>예약 일자</Text>
@@ -164,7 +287,7 @@ const ReservationEditConfirmScreen: React.FC<{ navigation: any }> = ({ navigatio
                 }}>{'>'}</Text></Pressable>}
             </View> */}
             <View style={{ position: 'absolute', bottom: 0, backgroundColor: '#FFF', borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingVertical: 8, width: '100%' }}>
-                <View style={{ marginHorizontal: 28, marginBottom: 12, marginTop:8 }}>
+                <View style={{ marginHorizontal: 28, marginBottom: 12, marginTop: 8 }}>
 
                     <CheckboxComponent
                         isChecked={isAgree}
@@ -174,7 +297,7 @@ const ReservationEditConfirmScreen: React.FC<{ navigation: any }> = ({ navigatio
                 </View>
                 <LongButton color='blue' innerText='확정하기' isAble={isAgree} onPress={ConfirmHandler} />
             </View>
-        </View>
+        </View >
     )
 }
 

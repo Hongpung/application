@@ -1,141 +1,210 @@
-import { StyleSheet, Text, View, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import { StyleSheet, Text, View, ScrollView, Modal } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Color } from '../../ColorSet'
 import ProfileMiniCard from '../../components/cards/ProfileMiniCard'
 import { UserProvider } from '../../context/UserContext'
 import { User } from '../../UserType'
 import LongButton from '../../components/buttons/LongButton'
 import { debounce } from 'lodash'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { MainStackParamList } from '@hongpung/nav/HomeStacks'
+import { useNavigation } from '@react-navigation/native'
+import { loginUserState } from '@hongpung/recoil/authState'
+import { useRecoilValue } from 'recoil'
+import { onUseSession } from '@hongpung/recoil/sessionState'
+import { Icons } from '@hongpung/components/Icon'
 
-const UsingManageScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type UsingManageNavProp = NativeStackNavigationProp<MainStackParamList, 'UsingManage'>
 
-    const users: User[] = [
-        {
-            name: "홍길동",
-            nickname: "길동이",
-            club: "들녘",
-            instrument: "쇠",
-            enrollmentNumber: 3,
-            isCapt: true,
-            role: "상쇠",
-            badge: "https://example.com/badge1.png"
-        },
-        {
-            name: "이영희",
-            club: "산틀",
-            instrument: "장구",
-            enrollmentNumber: 2,
-        },
-        {
-            name: "김철수",
-            nickname: "철이",
-            club: "신명화랑",
-            instrument: "북",
-            enrollmentNumber: 13,
-            isCapt: false,
-            badge: "https://example.com/badge2.png"
-        },
-        {
-            name: "박민수",
-            club: "악반",
-            instrument: "소고",
-            enrollmentNumber: 1,
-            role: "수법고",
-            badge: "https://example.com/badge3.png"
-        },
-        {
-            name: "최지우",
-            nickname: "지우",
-            club: "들녘",
-            instrument: "새납",
-            enrollmentNumber: 5,
-        },
-        {
-            name: "한가영",
-            club: "산틀",
-            instrument: "쇠",
-            enrollmentNumber: 14,
-            isCapt: true,
-            role: "상쇠",
-        },
-        {
-            name: "이정수",
-            nickname: "정수",
-            club: "신명화랑",
-            instrument: "장구",
-            enrollmentNumber: 9,
-            isCapt: false,
-        },
-        {
-            name: "김민호",
-            nickname: "민호",
-            club: "악반",
-            instrument: "북",
-            enrollmentNumber: 12,
-            role: "수북",
-            badge: "https://example.com/badge4.png"
-        },
-        {
-            name: "박수현",
-            club: "들녘",
-            instrument: "소고",
-            enrollmentNumber: 7,
-        },
-        {
-            name: "이하나",
-            nickname: "하나",
-            club: "산틀",
-            instrument: "새납",
-            enrollmentNumber: 15,
-            isCapt: true,
-            role: "상장구",
-        }
-    ];
+const UsingManageScreen: React.FC = () => {
 
+    const navigation = useNavigation<UsingManageNavProp>()
+    const sessionData = useRecoilValue(onUseSession)
     const [canExtand, setExtendPossible] = useState(true);
-    const [canReturn, setcanReturnPossible] = useState(false);
+    const [canReturn, setcanReturnPossible] = useState(true);
 
+
+    const [attendUsers, setAttendUsers] = useState<User[]>([])
+    const [lateUsers, setLateUsers] = useState<User[]>([])
+    const [absentUsers, setAbsentUsers] = useState<User[]>([])
+    const loginUser = useRecoilValue(loginUserState)
+
+    const seperateUser = useCallback((sessionAttendanceList: { user: User, attendance: '참가' | '출석' | '결석' | '지각' }[]) => {
+        const attendanceList = sessionAttendanceList
+        const attends: User[] = []
+        const lates: User[] = []
+        const absences: User[] = []
+
+        if (sessionData?.sessionType == 'Reservation') {
+            attendanceList?.map(({ user, attendance }) => {
+                if (attendance == '참가' || attendance == '출석')
+                    attends.push(user)
+                else if (attendance == '지각')
+                    lates.push(user)
+                else if (attendance == '결석')
+                    absences.push(user)
+
+            })
+
+            setAttendUsers(attends)
+            setLateUsers(lates)
+            setAbsentUsers(absences)
+        } else {
+            attendanceList?.map(({ user, attendance }) => {
+                if (attendance == '참가')
+                    attends.push(user)
+            })
+            setAttendUsers(attends)
+        }
+
+    }, [])
+
+    useEffect(() => {
+        if (!!sessionData)
+            seperateUser(sessionData?.attendanceList)
+    }, [sessionData?.attendanceList])
+
+    const extendSession = () => {
+        const endfetch = async () => {
+            try {
+                const response = await fetch(`${process.env.SUB_API}/room-session/extend/${loginUser?.memberId}`, {
+                    method: 'POST'
+                })
+
+                if (!response.ok) throw Error('Failed')
+                const { message } = await response.json();
+                console.log(message)
+                if (message != 'Fail')
+                    navigation.goBack()
+                else 
+                 alert('연습 시간 연장에 실패했어요.')
+            } catch (e) {
+                console.log(e)
+                alert(e)
+            }
+        }
+        endfetch()
+    }
+    const calculateTimeDifference = () => {
+        if (sessionData) {
+            const now = new Date();
+
+            // 목표 시각 생성
+            const [hours, minutes, seconds] = sessionData?.endTime.split(':').map(Number);
+            const endDate = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                hours,
+                minutes,
+                seconds
+            );
+
+            // 시간 차이 계산
+            const diff = endDate.getTime() - now.getTime();
+            if (diff <= 15 * 60 * 1000) {
+                setExtendPossible(false)
+            }
+            const [shours, sminutes, sseconds] = sessionData?.startTime.split(':').map(Number);
+            const startDate = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                shours,
+                sminutes,
+                sseconds
+            );
+            const diff2 = now.getTime() - startDate.getTime()
+            if (diff2 >= 20 * 60 * 1000) {
+                setcanReturnPossible(true)
+            }
+
+        }
+    };
+
+
+    useEffect(() => {
+        // 초기 시간 계산
+        calculateTimeDifference();
+
+        // 1초마다 시간 업데이트
+        const interval = setInterval(calculateTimeDifference, 1000);
+
+        return () => clearInterval(interval); // 컴포넌트 언마운트 시 타이머 정리
+    }, [sessionData?.endTime]);
+
+
+    if (!sessionData) return (
+        <View>
+            <Modal visible={true} transparent>
+                <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'center' }}>
+                    <View style={{ marginHorizontal: 24, paddingVertical: 24, backgroundColor: '#FFF', display: 'flex', gap: 16, borderRadius: 15 }}>
+                        <Text style={{
+                            paddingHorizontal: 24,
+                            fontFamily: 'NanumSquareNeo-Regular',
+                            fontSize: 16,
+                        }}>세션 정보가 없어요</Text>
+                        <LongButton color='blue' innerText={'확인'} isAble={true} onPress={() => {
+                            navigation.goBack()
+                        }} />
+                    </View>
+                </View>
+            </Modal>
+        </View>
+    )
 
     return (
         <UserProvider>
             <View style={{ flex: 1, backgroundColor: '#FFF' }}>
                 <ScrollView style={{ flex: 1, backgroundColor: '#FFF' }} showsVerticalScrollIndicator={false}>
                     <View style={{ height: 16 }} />
-                    <Text style={{ marginHorizontal: 28, fontFamily: 'NanumSquareNeo-Bold', fontSize: 18 }}>
+                    <Text style={{ marginHorizontal: 32, fontFamily: 'NanumSquareNeo-Bold', fontSize: 18 }}>
                         연습 예정 시간
                     </Text>
                     <View style={{ height: 20 }} />
-                    <View style={{ flexDirection: 'row', width: 176, alignSelf: 'center', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <View style={{ width: 36, height: 36, justifyContent: 'center', alignItems: 'center' }}>
-                            <View style={{ width: 32, height: 32, borderRadius: 100, borderWidth: 1, borderColor: Color['grey400'] }} />
-                        </View>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 20 }}>17:00~19:00</Text>
+                    <View style={{ flexDirection: 'row', width: 176, alignSelf: 'center', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                        <Icons name='time-outline' color={Color['grey400']} />
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 20 }}>{sessionData.startTime.slice(0, -3)} ~ {sessionData.endTime.slice(0, -3)}</Text>
                     </View>
 
-                    <View style={{ height: 24 }} />
-                    <Text style={{ marginHorizontal: 28, fontFamily: 'NanumSquareNeo-Bold', fontSize: 18 }}>
-                        아직 안 온 사람
-                    </Text>
 
                     <View style={{ height: 16 }} />
 
-                    <View style={{ marginHorizontal: 24 }}>
-                        {users.map((member) => (
-                            <View key={member.name + 'container'} style={{ marginVertical: 4 }}>
-                                <ProfileMiniCard key={member.name} user={member} isPicked={false} view={'inReserveView'} onPick={() => { }} />
+                    <View style={{ marginHorizontal: 24, display: 'flex', gap: 8 }}>
+                        <Text style={{ marginHorizontal: 8, fontFamily: 'NanumSquareNeo-Bold', fontSize: 18 }}>{sessionData?.sessionType == 'Reservation' ? '출석한 사람' : '참가한 사람'}</Text>
+                        {attendUsers.map((user) => (
+                            <View key={user.memberId + 'container'} style={{ marginVertical: 4 }}>
+                                <ProfileMiniCard key={user.name} user={user} isPicked={false} view={'inReserveView'} onPick={() => { }} />
                             </View>
                         ))}
+                        {sessionData.sessionType == 'Reservation' && <>
+                            {lateUsers.length != 0 &&
+                                <>
+                                    <Text style={{ marginHorizontal: 8, fontFamily: 'NanumSquareNeo-Bold', fontSize: 18 }}>지각한 사람</Text>
+                                    {lateUsers.map((user) => (
+                                        <View key={user.memberId + 'container'} style={{ marginVertical: 4 }}>
+                                            <ProfileMiniCard key={user.name} user={user} isPicked={false} view={'inReserveView'} onPick={() => { }} />
+                                        </View>
+                                    ))}
+                                </>}
+                            {absentUsers.length != 0 &&
+                                <><Text style={{ marginHorizontal: 8, fontFamily: 'NanumSquareNeo-Bold', fontSize: 18 }}>아직 안 온 사람</Text>
+                                    {absentUsers.map((user) => (
+                                        <View key={user.memberId + 'container'} style={{ marginVertical: 4 }}>
+                                            <ProfileMiniCard key={user.name} user={user} isPicked={false} view={'inReserveView'} onPick={() => { }} />
+                                        </View>
+                                    ))}
+                                </>}
+                        </>}
+                        <View style={{ height: 24 }} />
                     </View>
-                </ScrollView>
-                <View>
 
-                    <View style={{ height: 8 }} />
-                    {(!canExtand) && <Text style={{ alignSelf: 'center', color: Color['red700'], fontSize: 14, fontFamily: 'NanumSquareNeo-Bold' }}>연장은 종료 30분 이전까지만 가능해요</Text>}
-                    {(!canReturn) && <Text style={{ alignSelf: 'center', color: Color['red700'], fontSize: 14, fontFamily: 'NanumSquareNeo-Bold' }}>종료는 30분 이상 이용 후 가능해요</Text>}
-                    <View style={{ height: 8 }} />
-                    <LongButton color='green' innerText='연장하기' isAble={canExtand} onPress={() => { debounce(navigation.goBack(), 1000, { leading: true, trailing: false }) }} />
-                    <View style={{ height: 8 }} />
-                    <LongButton color='red' innerText='종료하기' isAble={canReturn} onPress={() => { debounce(navigation.goBack(), 1000, { leading: true, trailing: false }) }} />
+                </ScrollView>
+                <View style={{ bottom: 0, display: 'flex', gap: 12, paddingBottom: 28 }}>
+                    {(!canExtand) && <Text style={{ alignSelf: 'center', color: Color['red700'], fontSize: 14, fontFamily: 'NanumSquareNeo-Bold' }}>연장은 종료 15분 이전까지만 가능해요</Text>}
+                    {(!canReturn) && <Text style={{ alignSelf: 'center', color: Color['red700'], fontSize: 14, fontFamily: 'NanumSquareNeo-Bold' }}>종료는 20분 이상 이용 후 가능해요</Text>}
+                    <LongButton color='green' innerText='연장하기' isAble={canExtand} onPress={() => { extendSession() }} />
+                    <LongButton color='red' innerText='종료하기' isAble={canReturn} onPress={() => { navigation.replace('CheckOut') }} />
                 </View>
             </View>
         </UserProvider>

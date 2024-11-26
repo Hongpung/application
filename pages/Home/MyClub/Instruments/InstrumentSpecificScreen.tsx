@@ -1,72 +1,42 @@
-import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator } from 'react-native'
-import React, { useMemo } from 'react'
-import { useIsFocused, useRoute } from '@react-navigation/native';
-import { Color } from '../../../../ColorSet';
-import { Instrument } from '../../../../UserType';
-import { useInstrument } from '@hongpung/context/InstrumentContext';
+import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator, Modal, Pressable, Dimensions } from 'react-native'
+import React, { useEffect, useMemo, useState } from 'react'
+import { useIsFocused } from '@react-navigation/native';
+
+import { Color } from '@hongpung/ColorSet';
+import { Instrument } from '@hongpung/UserType';
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import Header from '@hongpung/components/Header';
 
 
+const { width } = Dimensions.get('window');
 
 const InstrumentSpecificScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
     const { instrumentId } = route?.params;
 
     const daysOfWeek = useMemo(() => ['일', '월', '화', '수', '목', '금', '토'], [])
 
+    const [imageModalVsible, setImageModalVsible] = useState(false);
+    const [aspectRatio, setAspectRatio] = useState<number | null>(null);
     const isFocusing = useIsFocused();
     const { data, loading, error } = useFetchUsingToken<Instrument>(
         `${process.env.BASE_URL}/instrument/${instrumentId}`
-        , {}, 5000, [instrumentId,isFocusing]
+        , {}, 5000, [instrumentId, isFocusing]
     )
 
-    
-
-    const reservesList = () => {
-        const Cards = []
-        data?.borrowHistory.sort((a, b) => new Date(a.borrowDate).getTime() - new Date(b.borrowDate).getTime())
-        for (const reserve of data!.borrowHistory) {
-            const borrowDate = new Date(reserve.borrowDate);
-            Cards.push(
-                <View key={reserve.borrowerName + reserve.borrowDate} style={{ width: 320, height: 76, borderRadius: 5, borderWidth: 1, borderColor: Color['grey200'], marginVertical: 6 }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'flex-end', position: 'absolute', left: 14, top: 12 }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontFamily: "NanumSquareNeo-Regular",
-                            color: Color['grey700'],
-                            marginRight: 2
-                        }}>{reserve.borrowerName}</Text>
-                        {reserve?.borrowerNickname && <Text style={{
-                            fontSize: 14,
-                            fontFamily: "NanumSquareNeo-Regular",
-                            color: Color['grey400']
-                        }}>{reserve.borrowerNickname}</Text>}
-                    </View>
-                    <View style={{ position: 'absolute', left: 14, bottom: 12 }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontFamily: "NanumSquareNeo-Regular",
-                            color: Color['grey400']
-                        }}>{reserve.borrowerName}</Text>
-                    </View>
-                    <View style={{ position: 'absolute', right: 12, bottom: 12 }}>
-                        <Text style={{
-                            textAlign: 'right',
-                            fontSize: 14,
-                            fontFamily: "NanumSquareNeo-Regular",
-                            color: Color['grey400']
-                        }}>{borrowDate.getFullYear() + '.' + (borrowDate.getMonth() + 1 < 9 ? '0' : '') + (borrowDate.getMonth() + 1) + '.' + (borrowDate.getDate() < 9 ? '0' : '') + '(' + (daysOfWeek[borrowDate.getDay()]) + ')'}</Text>
-                    </View>
-                </View>
-            )
-        }
-        return Cards;
-    }
+    useEffect(() => {
+            if (!!data?.imageUrl) {
+                Image.getSize(data.imageUrl!, (width, height) => {
+                    setAspectRatio(width / height);
+                }, (error) => {
+                    console.error(`Couldn't get the image size: ${error.message}`);
+                });
+            }
+    }, [data])
 
     if (loading)
         return (<View style={{ flex: 1, backgroundColor: `#FFF` }}>
-            <ActivityIndicator size={'large'} color={Color['blue500']}/>
-            </View>)
+            <ActivityIndicator size={'large'} color={Color['blue500']} />
+        </View>)
 
     if (!data)
         return (<View><Text>Error:Can't find the instrument</Text></View>)
@@ -76,28 +46,45 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any, route: any }> = ({ n
                 leftButton='close'
                 HeaderName='악기 상세'
                 RightButton='수정'
-                RightAction={() => navigation.push('InstrumentEdit',{instrumentInform:JSON.stringify(data)})}
+                RightAction={() => navigation.push('InstrumentEdit', { instrumentInform: JSON.stringify(data) })}
             />
             <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
                 <View style={{ height: 12 }} />
-                <View style={styles.imageContainer}>
-                    {data.imgURL ? <Image
-                        source={{ uri: data?.imgURL }}
-                        style={styles.image}
-                    /> :
+                <Pressable style={styles.imageContainer}
+                    onPress={() => {
+                        data.imageUrl && setImageModalVsible(true)
+                    }}>
+                    {data.imageUrl ?
+                        <Image
+                            source={{ uri: data.imageUrl }}
+                            style={styles.image}
+                        />
+                        :
                         <View
                             style={[styles.image, { backgroundColor: Color['grey200'] }]}
                         />
                     }
-                </View>
+                </Pressable>
                 <View style={{ height: 28 }} />
+                <Modal visible={imageModalVsible} transparent={true}>
+                    <Pressable onPress={() => setImageModalVsible(false)}
+                        style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
+                        {data.imageUrl ?
+                            <Image
+                                source={{ uri:data.imageUrl }}
+                                style={[styles.image, { width: width - 36, height: (width - 36) / aspectRatio!, borderRadius: 15 }]}
+                            />
+                            :
+                            <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />
+                        }
+                    </Pressable>
+                </Modal>
                 <View style={styles.Row}>
 
                     <Text style={styles.RowLeft}>{`악기 이름`}</Text>
                     <Text style={styles.RowRight}>{data.name}</Text>
 
                 </View>
-
                 <View style={{ height: 14 }} />
 
                 <View style={styles.Row}>
@@ -107,19 +94,6 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any, route: any }> = ({ n
 
                 </View>
 
-                {/* <View style={styles.Row}>
-
-                    <Text style={styles.RowLeft}>{`할당 치배`}</Text>
-                    <Text style={styles.RowRight}>{data.owner ?? '-'}</Text>
-
-                </View>
-                {data.nickname && <View style={styles.Row}>
-
-                    <Text style={styles.RowLeft}>{`별명`}</Text>
-                    <Text style={styles.RowRight}>{data.nickname}</Text>
-
-                </View>} */}
-
                 <View style={{ height: 20 }} />
                 <View style={{ alignSelf: 'flex-start', paddingHorizontal: 28 }}>
                     <View>
@@ -127,7 +101,37 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any, route: any }> = ({ n
                     </View>
                 </View>
                 <View style={{ paddingVertical: 6 }}>
-                    {data.borrowHistory.length > 0 && reservesList()}
+                    {data!.borrowHistory.map(borrowHistory =>
+                    (<View key={borrowHistory.borrowerName + borrowHistory.borrowDate} style={{ width: 320, height: 76, borderRadius: 5, borderWidth: 1, borderColor: Color['grey200'], marginVertical: 6 }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'flex-end', position: 'absolute', left: 14, top: 12 }}>
+                            <Text style={{
+                                fontSize: 16,
+                                fontFamily: "NanumSquareNeo-Regular",
+                                color: Color['grey700'],
+                                marginRight: 2
+                            }}>{borrowHistory.borrowerName}</Text>
+                            {borrowHistory?.borrowerNickname && <Text style={{
+                                fontSize: 14,
+                                fontFamily: "NanumSquareNeo-Regular",
+                                color: Color['grey400']
+                            }}>{borrowHistory.borrowerNickname}</Text>}
+                        </View>
+                        <View style={{ position: 'absolute', left: 14, bottom: 12 }}>
+                            <Text style={{
+                                fontSize: 16,
+                                fontFamily: "NanumSquareNeo-Regular",
+                                color: Color['grey400']
+                            }}>{borrowHistory.borrowerName}</Text>
+                        </View>
+                        <View style={{ position: 'absolute', right: 12, bottom: 12 }}>
+                            <Text style={{
+                                textAlign: 'right',
+                                fontSize: 14,
+                                fontFamily: "NanumSquareNeo-Regular",
+                                color: Color['grey400']
+                            }}>{borrowHistory.borrowDate}</Text>
+                        </View>
+                    </View>))}
                 </View>
                 <View style={{ height: 18 }} />
             </ScrollView>

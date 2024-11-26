@@ -1,25 +1,35 @@
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { Color } from '../../ColorSet'
-import InstrumentCard from '../../components/cards/InstrumentCard'
+import { Color } from '@hongpung/ColorSet'
+import InstrumentCard from '@hongpung/components/cards/InstrumentCard'
 import { InstrumentProvider } from '@hongpung/context/InstrumentContext'
-import LongButton from '../../components/buttons/LongButton'
-import { SerializedReserve } from '../Home/MyClub/ClubCalendar/ClubCalendar'
+import LongButton from '@hongpung/components/buttons/LongButton'
 import { Icons } from '@hongpung/components/Icon'
-import { RouteProp, useRoute } from '@react-navigation/native'
+import { CompositeScreenProps } from '@react-navigation/native'
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
+import { ReservationDTO } from '../Reserve/ReserveInterface'
+import { User } from '@hongpung/UserType'
+import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack'
+import { MyPageParamList } from '@hongpung/nav/MyPageStack'
 
-type PracticeInfoRoute = RouteProp<{ param: { reserveInfo: SerializedReserve } }>
+interface AttendanceDTO {
+    member: User
+    attendance: string
+}
 
-const PracticeInfoScreen: React.FC = () => {
+type PracticeProps =
+    CompositeScreenProps<
+        NativeStackScreenProps<MyClubStackStackParamList, 'MyClubPracticeInfo'>,
+        NativeStackScreenProps<MyPageParamList, 'MyPracticeInfo'>
+    >
 
-    const route = useRoute<PracticeInfoRoute>();
+const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
 
-    const { reserveInfo }: { reserveInfo: SerializedReserve } = route.params;
+    const { reservationId } = route.params;
 
-    const reserveData = {
-        ...reserveInfo,
-        date: new Date(reserveInfo.date),
-    };
+    const { data: reservationData, loading, error } = useFetchUsingToken<ReservationDTO>(`${process.env.BASE_URL}/reservation/${reservationId}`)
+    const { data: attendanceData } = useFetchUsingToken<AttendanceDTO[]>(`${process.env.BASE_URL}/attendance/${reservationId}`)
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -34,13 +44,13 @@ const PracticeInfoScreen: React.FC = () => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 18,
                             color: Color['grey700']
-                        }}>{reserveData.title}</Text>
+                        }}>{reservationData?.message}</Text>
                         <Text style={{
                             position: 'absolute', left: 18, bottom: 12,
                             fontFamily: 'NanumSquareNeo-Light',
                             fontSize: 14,
                             color: Color['grey400']
-                        }}>{reserveData.date.getFullYear()}-{reserveData.date.getMonth() + 1}-{reserveData.date.getDate()}-{daysOfWeek[reserveData.date.getDay()]}</Text>
+                        }}>{reservationData?.date} ({daysOfWeek[new Date(reservationData?.date).getDay()]})</Text>
 
                         <Text style={{
                             position: 'absolute', right: 16, bottom: 12,
@@ -48,9 +58,9 @@ const PracticeInfoScreen: React.FC = () => {
                             fontFamily: 'NanumSquareNeo-Light',
                             fontSize: 14,
                             color: Color['grey400']
-                        }}>{reserveData.startTime}:00~{reserveData.endTime}:00</Text>
+                        }}>{reservationData?.startTime.slice(0, -3)}~{reservationData?.endTime.slice(0, -3)}</Text>
 
-                        {reserveData.type == 'regular' ?
+                        {reservationData?.type == '정규연습' ?
                             <View style={{
                                 position: 'absolute', right: 12, top: -4, width: 48, height: 48
                             }} >
@@ -65,14 +75,14 @@ const PracticeInfoScreen: React.FC = () => {
                                     fontFamily: 'NanumSquareNeo-Regular',
                                     fontSize: 14,
                                     color: Color['grey600']
-                                }}>{reserveData.name}</Text>
+                                }}>{reservationData?.name}</Text>
                                 <View style={{ height: 4 }} />
-                                {reserveData.nickname && <Text style={{
+                                {reservationData?.nickname && <Text style={{
                                     textAlign: 'right',
                                     fontFamily: 'NanumSquareNeo-Regular',
                                     fontSize: 12,
                                     color: Color['grey400']
-                                }}>{reserveData.nickname}</Text>}
+                                }}>{reservationData?.nickname}</Text>}
                             </View>
                         }
                     </View>
@@ -101,7 +111,7 @@ const PracticeInfoScreen: React.FC = () => {
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey700']
-                    }}>{reserveData.startTime}:00</Text>
+                    }}>{reservationData?.startTime.slice(0, -3)}</Text>
                 </View>
 
                 <View style={{ height: 12 }} />
@@ -118,7 +128,7 @@ const PracticeInfoScreen: React.FC = () => {
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey700']
-                    }}>{reserveData.endTime}:00</Text>
+                    }}>{reservationData?.endTime.slice(0, -3)}</Text>
                 </View>
 
                 <View style={{ height: 12 }} />
@@ -168,7 +178,7 @@ const PracticeInfoScreen: React.FC = () => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 24,
                             color: Color['blue500']
-                        }}>26</Text>
+                        }}>{attendanceData?.filter(attendannceData => attendannceData.attendance == '출석').length}</Text>
                     </View>
 
                     <View style={{ alignItems: 'center', justifyContent: 'space-between', height: 56, width: 64 }}>
@@ -181,7 +191,7 @@ const PracticeInfoScreen: React.FC = () => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 24,
                             color: Color['red500']
-                        }}>2</Text>
+                        }}>{attendanceData?.filter(attendannceData => attendannceData.attendance == '지각').length}</Text>
                     </View>
 
                     <View style={{ alignItems: 'center', justifyContent: 'space-between', height: 56, width: 64 }}>
@@ -189,12 +199,12 @@ const PracticeInfoScreen: React.FC = () => {
                             fontFamily: 'NanumSquareNeo-Regular',
                             fontSize: 14,
                             color: Color['grey700']
-                        }}>출석</Text>
+                        }}>결석</Text>
                         <Text style={{
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 24,
                             color: Color['grey400']
-                        }}>-</Text>
+                        }}>{attendanceData?.filter(attendannceData => attendannceData.attendance == '미출석').length}</Text>
                     </View>
                 </View>
 
@@ -207,82 +217,43 @@ const PracticeInfoScreen: React.FC = () => {
                         fontSize: 18,
                         color: Color['grey700']
                     }}>대여 악기</Text>
-                    <Text style={{
+                    {reservationData?.borrowInstruments && <Text style={{
                         textAlign: 'right',
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey300']
-                    }}>{'펼쳐서 보기 >'}</Text>
+                    }}>{'펼쳐서 보기 >'}</Text>}
                 </View>
 
                 <View style={{ height: 20 }} />
                 <View>
-                    <InstrumentProvider>
+                    {reservationData?.borrowInstruments ?
                         <FlatList
                             showsHorizontalScrollIndicator={false}
-                            data={[`data1`, `data2`, `data3`]}
+                            data={reservationData?.borrowInstruments}
                             renderItem={({ item }) => {
                                 return (
                                     <View style={{ marginHorizontal: 6 }}>
                                         <InstrumentCard
                                             onSelectInstrument={() => { }}
-                                            instrument={{
-                                                club: '들녘',
-                                                type: '꽹과리',
-                                                name: 'www',
-                                                available: true,
-                                                instrumentId: 1
-                                            }} view={'inBorrow'} />
+                                            instrument={item} view={'inBorrow'} />
                                     </View>
                                 )
                             }}
-                            keyExtractor={item => item + 'kk'}
+                            keyExtractor={item => item.instrumentId + '-key'}
                             horizontal={true}
                             ListHeaderComponent={<View style={{ width: 18 }} />}
                             ListFooterComponent={<View style={{ width: 18 }} />}
-                        />
-                    </InstrumentProvider>
+                        /> :
+                        <View style={{ paddingVertical: 28 }}>
+                            <Text style={{
+                                textAlign: 'center',
+                                fontFamily: 'NanumSquareNeo-Regular',
+                                fontSize: 18,
+                                color: Color['grey400']
+                            }}> 대여한 악기가 없습니다.</Text>
+                        </View>}
                 </View>
-                <View style={{ height: 32 }} />
-
-                <View style={{ marginHorizontal: 28, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', height: 22 }}>
-                    <Text style={{
-                        textAlign: 'left',
-                        fontFamily: 'NanumSquareNeo-Bold',
-                        fontSize: 18,
-                        color: Color['grey700']
-                    }}
-                    >연습 정리 사진</Text>
-                    <Text style={{
-                        textAlign: 'right',
-                        fontFamily: 'NanumSquareNeo-Regular',
-                        fontSize: 14,
-                        color: Color['grey300']
-                    }}>{'펼쳐서 보기 >'}</Text>
-                </View>
-
-                <View style={{ height: 20 }} />
-
-                <View>
-                    <InstrumentProvider>
-                        <FlatList
-                            showsHorizontalScrollIndicator={false}
-                            data={[`data1`, `data2`, `data3`]}
-                            renderItem={({ item }) => {
-                                return (
-                                    <View style={{ marginHorizontal: 6 }}>
-                                        <View style={{ height: 124, width: 156, backgroundColor: Color['grey200'], borderRadius: 10 }} />
-                                    </View>
-                                )
-                            }}
-                            keyExtractor={item => item + 'kk'}
-                            horizontal={true}
-                            ListHeaderComponent={<View style={{ width: 18 }} />}
-                            ListFooterComponent={<View style={{ width: 18 }} />}
-                        />
-                    </InstrumentProvider>
-                </View>
-
                 <View style={{ height: 8 }} />
 
             </ScrollView>

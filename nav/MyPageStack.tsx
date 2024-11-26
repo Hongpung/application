@@ -7,7 +7,7 @@ import NotificationSettingScreen from "@hongpung/pages/Setting/NotificationSetti
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Header from '@hongpung/components/Header';
 import PracticeInfoScreen from "@hongpung/pages/share/PracticeInfoScreen";
-import { SerializedReserve } from "@hongpung/pages/Home/MyClub/ClubCalendar/ClubCalendar";
+import ChangeMyInfoScreen from "@hongpung/pages/Home/MyPage/ChangeMyInfoScreen";
 
 
 export type MyPageParamList = {
@@ -16,7 +16,8 @@ export type MyPageParamList = {
     MyPractices: undefined
     NotificationSetting: undefined
     LoginSetting: undefined
-    MyPracticeInfo: { reserveInfo: SerializedReserve }
+    MyPracticeInfo: { reservationId: number }
+    ChangeMyInfo: undefined
 }
 
 const MyPageStack = createNativeStackNavigator<MyPageParamList>();
@@ -63,6 +64,15 @@ const MyPageStacks = () => {
             <MyPageStack.Screen
                 name='MyPracticeInfo'
                 component={PracticeInfoScreen}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='arrow-back' HeaderName='내 활동' />
+                }}
+            />
+
+            <MyPageStack.Screen
+                name='ChangeMyInfo'
+                component={ChangeMyInfoScreen}
                 options={{
                     headerShown: true,
                     header: () => <Header leftButton='arrow-back' HeaderName='내 활동' />

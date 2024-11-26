@@ -4,18 +4,19 @@ import { View, Text, Image, StyleSheet, Pressable, Linking } from "react-native"
 import { Color } from "../../ColorSet"
 import { User } from "../../UserType"
 import { Icons } from "../Icon"
+import useFetch from "@hongpung/hoc/useFetch"
 
 
 interface ProfileBoxProps {
-    isCard: boolean,
     user: User
 }
 
-const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
-    const [loading, setLoading] = useState(true);
+const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ user }) => {
+
+    const { data: snsData, loading, error } = useFetch<{ instagramUrl: string, blogUrl: string }>(user?`${process.env.SUB_API}/member/sns/${user?.memberId}`:null, {}, 5000, [user])
 
     const RoleTextRender = () => {
-        if (user.role) { return user.role }
+        if (user?.role) { return user.role }
         return "동아리원"
     }
 
@@ -28,25 +29,28 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ isCard, user }) => {
                     <Image source={{ uri: user.profileImageUrl }} style={styles.ProfilePhoto} /> :
                     <View style={[styles.ProfilePhoto, { backgroundColor: Color['grey200'], borderWidth: 1, borderColor: Color['grey300'] }]} />}
 
-                <View style={{ flexDirection: 'column', flex:1, height: 120, justifyContent: 'space-between', paddingVertical: 12 }}>
+                <View style={{ flexDirection: 'column', flex: 1, height: 120, justifyContent: 'space-between', paddingVertical: 12 }}>
                     <View style={{ display: 'flex', gap: 4 }}>
                         <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>{user.name}</Text>
                         {user?.nickname && <Text style={{ fontSize: 14, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>{user?.nickname}</Text>}
                     </View>
                     <View style={{ flexDirection: 'row', width: 64, justifyContent: 'flex-start', gap: 4 }}>
-                        <Pressable style={styles.icons}
-                            onPress={() => {
-                                Linking.openURL('https://www.instagram.com/younho10.3/')
-                                    .catch((err) => { console.error('Failed to open URL:', err); })
-                            }}>
-                            <Icons name="logo-instagram" size={24} color={Color['grey400']} />
-                        </Pressable>
+                        {snsData && Object.entries(snsData)?.map(([key, value]) => !!value && (
+                            <Pressable style={styles.icons}
+                                onPress={() => {
+                                    Linking.openURL(value)
+                                        .catch((err) => { console.error('Failed to open URL:', err); })
+                                }}>
+                                <Icons name={key == 'instagramUrl' ? "logo-instagram" : 'chatbox-outline'} size={24} color={key == 'instagramUrl' ? Color['grey400'] : Color['green500']} />
+                            </Pressable>
+                        ))
+                        }
                     </View>
                 </View>
             </View>
             <View style={styles.info}>
                 <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text>
-                <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{`${user.club == '화랑' ? '신명화랑' : user.club}` + `(${user.enrollmentNumber})`}</Text>
+                <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{`${user.club == '신명화랑' ? '신명화랑' : user.club}` + `(${user.enrollmentNumber})`}</Text>
             </View>
             <View style={styles.info}>
                 <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>역할</Text>

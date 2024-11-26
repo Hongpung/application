@@ -1,7 +1,7 @@
 import { atom } from 'recoil';
 
 interface BannerFetchData {
-    id: string
+    bannerId: string
     owner: string
     startDate: string //ISOTimeString
     endDate: string //ISOTimeString

@@ -3,8 +3,11 @@ import { Pressable, View, Text, StyleSheet, Dimensions, ActivityIndicator, Modal
 import { Color } from "../../ColorSet";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+
 import useFetchUsingToken from "../../hoc/useFetchUsingToken";
 import { Icons } from "@hongpung/components/Icon";
+import { ReservationStackParamList } from "@hongpung/nav/ReservationStack";
 
 const { width } = Dimensions.get(`window`);
 
@@ -38,8 +41,8 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
             const reservedDates: { [key: number]: any[] } = [];
             data.map((reserve) => {
                 const reserveDate = new Date(reserve.date).getDate();
-                if (!reservedDates[reserveDate]) reservedDates[reserveDate] = [{ isRegular: reserve.type, isParticipable: reserve.participationAvailable }];
-                else reservedDates[reserveDate] = [...reservedDates[reserveDate], { isRegular: reserve.type, isParticipable: reserve.participationAvailable }];
+                if (!reservedDates[reserveDate]) reservedDates[reserveDate] = [{ regularType: reserve.type, isParticipable: reserve.participationAvailable }];
+                else reservedDates[reserveDate] = [...reservedDates[reserveDate], { regularType: reserve.type, isParticipable: reserve.participationAvailable }];
             })
             setReservedDates(reservedDates);
         }
@@ -100,7 +103,7 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
                         <Text style={[styles.CalendarText, (day == today.getDate()) && (calendarMonth.getMonth() == today.getMonth()) ? { color: Color['blue600'] } : null]}>{day}</Text>
                         <View style={{ marginHorizontal: 2, height: 16, flexDirection: 'column-reverse', marginTop: 4 }}>
                             {reservedDates[day] && reservedDates[day].slice(0, 3).map((obj, index) => {
-                                const color = obj.isRegular == '정기연습' ? Color['blue500'] : obj.isParticipable ? Color['green500'] : Color['red500']
+                                const color = obj.regularType == '정규연습' ? Color['blue500'] : obj.isParticipable ? Color['green500'] : Color['red500']
                                 return (
                                     <View key={calendarMonth.getMonth() + day + index} style={{ height: 4, backgroundColor: color, width: 28, borderRadius: 5, marginTop: 2 }} />
                                 )
@@ -169,7 +172,10 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
     );
 }
 
-const ReserveCalendarScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+
+type ReserveCalendarProps = NativeStackScreenProps<ReservationStackParamList, 'ReserveCalendar'>
+
+const ReserveCalendarScreen: React.FC<ReserveCalendarProps> = ({ navigation, route }) => {
 
     const [calendarDate, setCalendarDate] = useState(new Date())
 
@@ -212,7 +218,7 @@ const ReserveCalendarScreen: React.FC<{ navigation: any, route: any }> = ({ navi
             <View style={{ position: 'absolute', width: width, bottom: 12 }}>
                 <Pressable style={{ marginHorizontal: 24, height: 88, backgroundColor: Color['grey200'], borderRadius: 10 }}
                     onPress={() => {
-                        navigation.replace('ExtaraActivities', { animation: 'none' });
+                        // navigation.replace('ExtaraActivities', { animation: 'none' });
                     }}>
                     <View style={{ width: 56, height: 56, backgroundColor: Color['grey700'], borderRadius: 200, top: 16, left: 12 }} />
                     <Text style={{ position: 'absolute', top: 16, right: 12, fontSize: 18, fontFamily: 'NanumSquareNeo-ExtraBold', color: Color['grey700'] }}>다른 활동을 찾고 계셨나요?</Text>
