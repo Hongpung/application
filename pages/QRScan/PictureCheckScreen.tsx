@@ -5,79 +5,71 @@ import ImageViewer from 'react-native-image-zoom-viewer';
 import { Color } from '../../ColorSet';
 import Header from '@hongpung/components/Header';
 import { loginUserState, useOnReserve } from '@hongpung/recoil/authState';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import * as ImagePicker from 'expo-image-picker';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { onUseSession } from '@hongpung/recoil/sessionState';
+import { StackActions } from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CheckOutStackParamList } from '@hongpung/nav/HomeStacks';
+import { getToken } from '@hongpung/utils/TokenHandler';
 
 const { width } = Dimensions.get('window');
 
-const PictureCheckScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+type PictureCheckProps = NativeStackScreenProps<CheckOutStackParamList, 'PictureCheck'>
 
+const PictureCheckScreen: React.FC<PictureCheckProps> = ({ navigation, route }) => {
+
+    const { photos } = route.params
     const [selectedIndex, setSelectIndex] = useState(0);
     const [indicatorVisible, setIndicatorVisible] = useState(true)
 
     const [loading, setLoading] = useState(false)
 
-    const [useRoomSocket, setRoomSocket] = useRecoilState(useOnReserve)
+    const sessionData = useRecoilValue(onUseSession)
+    const setRoomSocket = useSetRecoilState(useOnReserve)
     const loginUser = useRecoilValue(loginUserState)
 
     const applyIndex = async (index: number) => {
         setSelectIndex(index);
     }
-    const [photos, setPhotos] = useState<File[]>([]);
-
-    const [photoUris, setPhotoUris] = useState<string[]>([])
-
-    const takePictureHandler = async () => {
-        // 카메라 권한 요청
-        const permission = await ImagePicker.requestCameraPermissionsAsync();
-        if (!permission.granted) {
-            Alert.alert('Permission required', 'Camera access is needed to take pictures.');
-            return;
-        }
-
-        // 카메라 실행
-        for (const _ of Array(2)) { // 2번 반복
-            const result = await ImagePicker.launchCameraAsync({
-
-                allowsEditing: true,
-                aspect: [4, 3],
-                quality: 0.5,
-            });
-
-            if (!result.canceled) {
-                const imageUri = result.assets[0].uri;
-                const imageName = imageUri.split('/').pop();
-                const imageType = `image/${imageName?.split('.').pop()}`;
-
-                const imageFile = {
-                    uri: imageUri,
-                    name: imageName,
-                    type: imageType,
-                } as unknown as File;
-
-                console.log(imageUri);
-                setPhotoUris((prevUris) => [...prevUris, imageUri]);
-                setPhotos((prevPhotos) => [...prevPhotos, imageFile]);
-            }
-        }
-    };
+    // const [photos, setPhotos] = useState<File[]>([]);
 
     const endSession = () => {
         const endfetch = async () => {
             try {
+                if (!sessionData) throw Error('진행 중인 세션 정보가 없습니다.')
+
+                const token = await getToken('utilToken')
 
                 setLoading(true)
 
                 const formData = new FormData();
 
-                photos.forEach((photo, index) => {
-                    formData.append('images', photo, `${photo.name}-${(new Date).toISOString()}`); // React Native에서 FormData 파일 처리 방식
+                const photoFiles = photos.map(photo => {
+
+                    const imageUri = photo.uri;
+                    const imageName = imageUri.split('/').pop();
+                    const imageType = `image/${imageName?.split('.').pop()}`;
+
+                    const imageFile = {
+                        uri: imageUri,
+                        name: imageName,
+                        type: imageType,
+                    } as unknown as File;
+
+                    return imageFile
+                })
+
+                photoFiles.forEach((photo, index) => {
+                    formData.append('images', photo, `${photo.name}-${sessionData!.date}-${index}-${(new Date).toISOString()}`); // React Native에서 FormData 파일 처리 방식
                 });
 
                 formData.append('path', 'end-session'); // 업로드 경로
 
                 const pictureUpload = await fetch(`${process.env.SUB_API}/upload-s3/images`, {
                     method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
+                    },
                     body: formData,
                 });
 
@@ -90,22 +82,26 @@ const PictureCheckScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                         headers: {
                             'Content-Type': 'image/jpeg', // MIME 타입 지정
                         },
-                        body: photos[i],
+                        body: photoFiles[i],
                     });
                 }
 
                 const imageUrls = uploadUrls.map(url => (url.imageUrl))
                 console.log(imageUrls)
 
-                const response = await fetch(`${process.env.SUB_API}/room-session/end/${loginUser?.memberId}`, {
+                const response = await fetch(`${process.env.SUB_API}/room-session/end`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({ returnImageUrls: imageUrls })
                 })
 
                 if (!response.ok) throw Error('Failed')
                 const { message } = await response.json();
                 console.log(message)
+
                 if (message != 'Fail') {
                     setRoomSocket(false)
                     navigation.navigate('CheckOutEnd')
@@ -113,7 +109,15 @@ const PictureCheckScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
 
             } catch (e) {
                 console.log(e)
-                alert(e)
+                if (e instanceof Error) {
+                    if (e.message == '진행 중인 세션 정보가 없습니다.') {
+                        {
+                            alert(e.message)
+                            navigation.dispatch(StackActions.replace('HomeStack'))
+                        }
+                    }
+                }
+                alert('종료 중 오류가 발생했어요.\n다시 시도해주세요.')
             }
             finally {
                 setLoading(false)
@@ -122,14 +126,11 @@ const PictureCheckScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
         endfetch()
     }
 
-    useEffect(() => {
-        takePictureHandler()
-    }, [])
 
     return (
         <>
             <Modal visible={loading}>
-                <View style={{ backgroundColor: '#FFF', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <View style={{ flex: 1, backgroundColor: '#FFF', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <ActivityIndicator color={Color['blue500']} size={'large'} />
                 </View>
             </Modal>
@@ -137,10 +138,10 @@ const PictureCheckScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                 {indicatorVisible &&
                     <Header leftButton='close' HeaderName={'종료어쩌구'} RightButton='보내기' RightAction={() => { endSession() }}></Header>
                 }
-                {photoUris.length > 0 && <View style={[styles.container, { zIndex: 0 }]}
+                {photos.length > 0 && <View style={[styles.container, { zIndex: 0 }]}
                 >
                     <ImageViewer
-                        key={photoUris.length}
+                        key={photos.length}
                         onChange={(index) => setSelectIndex(index!)}
                         index={selectedIndex}
                         renderIndicator={() => <View />}
@@ -149,7 +150,7 @@ const PictureCheckScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                         enableSwipeDown
                         swipeDownThreshold={10}
                         onSwipeDown={() => navigation.goBack()}
-                        imageUrls={photoUris.map(image => ({ url: image }))}
+                        imageUrls={photos.map(image => ({ url: image.uri }))}
                         style={{
                             flex: 1,
                             justifyContent: 'center',
@@ -163,20 +164,20 @@ const PictureCheckScreen: React.FC<{ navigation: any, route: any }> = ({ navigat
                 >
                     <FlatList
                         horizontal
-                        data={photoUris}
+                        data={photos}
                         renderItem={({ item, index }) => {
                             return (
                                 <Pressable
-                                    key={item.slice(-11, -5) + index * 11}
+                                    key={item.uri.slice(-11, -5) + index * 11}
                                     onPress={() => {
                                         applyIndex(index);
                                     }}>
                                     <Image
-                                        source={{ uri: item }}
+                                        source={{ uri: item.uri }}
                                         style={[{
                                             width: 75, // 화면의 너비에 맞춤
                                             height: 75, // 비율에 따라 높이 조정
-                                        }, item == photoUris[selectedIndex] && { borderWidth: 4, borderColor: Color['blue400'] }]}></Image>
+                                        }, index == selectedIndex && { borderWidth: 4, borderColor: Color['blue400'] }]}></Image>
                                 </Pressable>)
                         }}
                         ItemSeparatorComponent={() => <View style={{ width: 4 }} />}

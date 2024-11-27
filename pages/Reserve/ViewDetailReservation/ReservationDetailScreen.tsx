@@ -235,7 +235,8 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                                 <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center' }}>
                                     <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', flex: 1, marginLeft: 24, bottom: 8 }}>
                                         {reservation.participants.slice(0, 4).map(user => (user.profileImageUrl ? <Image
-                                            source={{ uri: user.profileImageUrl }} style={{ width: 42, height: 56, }} /> : <View style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -6 * Math.min(reservation.participants.length, 4), borderRadius: 5 }} />))}
+                                            key={user.memberId}
+                                            source={{ uri: user.profileImageUrl }} style={{ width: 42, height: 56, }} /> : <View key={user.memberId} style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -6 * Math.min(reservation.participants.length, 4), borderRadius: 5 }} />))}
                                     </View>
                                     <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end', flex: 1, bottom: 12, gap: 8, paddingHorizontal: 12 }}>
 
@@ -275,7 +276,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                                 <View style={{ flexDirection: 'row' }}>
                                     {['쇠', '장구', '북', '소고', '새납'].map((type) => {
                                         const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
-                                        return (<View style={{ width: (width - 96) / 5, alignItems: 'center' }}>
+                                        return (<View key={type} style={{ width: (width - 96) / 5, alignItems: 'center' }}>
                                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14 }}>{type}</Text>
                                             <View style={{ height: 8 }} />
                                             <Text style={instCount > 0 ? { fontFamily: 'NanumSquareNeo-Bold', fontSize: 20, color: Color['blue500'] } : { fontFamily: 'NanumSquareNeo-Bold', fontSize: 20, color: Color['grey300'] }}>{instCount > 0 ? instCount : '-'}</Text>

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { UseFetchOptions, UseFetchResult } from '@hongpung/hoc/types/FetchTypes';
 
 
-const useFetchUsingToken = <T>(url: string | null, options: UseFetchOptions = {}, timeout: number = 5000, dependencies: any[] = []): UseFetchResult<T> => {
+const useFetchUsingUtilToken = <T>(url: string | null, options: UseFetchOptions = {}, timeout: number = 5000, dependencies: any[] = []): UseFetchResult<T> => {
 
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ const useFetchUsingToken = <T>(url: string | null, options: UseFetchOptions = {}
 
         if (!url) throw Error('invalid url');;
 
-        const token = await getToken('token');
+        const token = await getToken('utilToken');
 
         if (!token) { throw Error('invalid Token'); }
 
@@ -80,4 +80,4 @@ const useFetchUsingToken = <T>(url: string | null, options: UseFetchOptions = {}
   return { data, error, loading };
 };
 
-export default useFetchUsingToken;
+export default useFetchUsingUtilToken;

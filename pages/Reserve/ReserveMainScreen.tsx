@@ -5,7 +5,6 @@ import { BlurView } from 'expo-blur';
 import { Color } from '@hongpung//ColorSet'
 import { Icons } from '@hongpung/components/Icon';
 
-import { ReservationDTO } from './ReserveInterface';
 import { CompositeNavigationProp, useIsFocused, useNavigation } from '@react-navigation/native';
 import { io } from 'socket.io-client';
 import Toast from 'react-native-toast-message';
@@ -14,7 +13,7 @@ import { BottomTabParamList } from '@hongpung/nav/BottomNav';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '@hongpung/nav/HomeStacks';
 import { RealtimeSession, ReservationSession } from './SessionTypes';
-import { josa } from 'es-hangul';
+import { getToken } from '@hongpung/utils/TokenHandler';
 
 const { width } = Dimensions.get('window');
 
@@ -132,14 +131,15 @@ const ReserveMainScreen: React.FC = () => {
     const socketRef = useRef<any>(null); // 소켓 참조를 저장할 useRef
 
     useEffect(() => {
-        const connectSocket = () => {
+        const connectSocket = async () => {
             if (socketRef.current) {
                 socketRef.current.disconnect(); // 기존 소켓 연결 해제
             }
-
+            const token = await getToken('utilToken')
             const socket = io(`${process.env.SUB_API}/reservation`, {
                 transports: ['websocket'],
                 reconnection: true,
+                auth: { token }
             });
 
             socket.on('connect', () => {
@@ -303,7 +303,7 @@ const ReserveMainScreen: React.FC = () => {
                         renderItem={({ item, index }) => {
 
                             const isPlayed = item?.onAir || false;
-                            const color = 'blue'
+                            const color = item?.reservationType == '정규연습' ? 'blue' : item.participationAvailable ? 'green' : 'red';
 
                             if (!!item?.nextReservationTime) {
                                 if (isOnAir) return null
@@ -336,7 +336,8 @@ const ReserveMainScreen: React.FC = () => {
                                             <View style={{ position: 'absolute', borderRadius: 10, height: '100%', width: width - 32, overflow: 'hidden', backgroundColor: Color[`${color}100`] }} />
                                             <View style={{ position: 'absolute', left: 6, top: 6, borderRadius: 10, height: 204, width: width - 44, overflow: 'hidden', backgroundColor: Color[`${color}500`] }} />
                                             <BlurView intensity={10} tint='default' style={{ borderRadius: 10, height: '100%', width: width - 32, overflow: 'hidden', }} />
-                                        </View>}
+                                        </View>
+                                    }
 
                                     {item.sessionType == 'Reservation' ?
                                         <Pressable key={item.sessionId + index} style={[{ marginVertical: 8, height: 200, borderWidth: 1, backgroundColor: '#FFF', borderColor: Color['grey200'], borderRadius: 10, marginHorizontal: 8 }, { width: width - 48 }]}
@@ -372,7 +373,7 @@ const ReserveMainScreen: React.FC = () => {
                                                     {item.creatorNickname && <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 12, color: Color['grey400'] }}>{item.creatorNickname}</Text>}
                                                 </View>
                                             }
-                                            <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontFamily: 'NanumSquareNeo-Bold', marginHorizontal: 64, top: 72, textAlign: 'center', fontSize: 20 }}>{josa(item.creatorName, '이/가')} 만든 예약</Text>
+                                            <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontFamily: 'NanumSquareNeo-Bold', marginHorizontal: 64, top: 72, textAlign: 'center', fontSize: 20 }}>{item.message}</Text>
                                             <View style={{ position: 'absolute', right: 24, bottom: 12, alignItems: 'flex-end', gap: 4 }}>
                                                 <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>{`${item.startTime.slice(0, -3)} ~ ${item.endTime.slice(0, -3)}`}</Text>
                                                 <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>

@@ -1,13 +1,18 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useRef, useState } from 'react'
-import ShortButton from '../../components/buttons/ShortButton';
 import LongButton from '../../components/buttons/LongButton';
 import { Color } from '../../ColorSet';
-import { TutorialEx } from '../../ExplainSet';
 import PagerView from 'react-native-pager-view';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { CheckOutStackParamList } from '@hongpung/nav/HomeStacks';
+import { useNavigation } from '@react-navigation/native';
 
 
-const CheckOutDescriptScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type PictureCheckNavProp = NativeStackNavigationProp<CheckOutStackParamList, 'PictureCheck'>
+
+const CheckOutDescriptScreen: React.FC = () => {
+
+    const navigation = useNavigation<PictureCheckNavProp>();
     const [pageNum, setPageNum] = useState(0);
     const Pages = ["0", "1", "2"]
     const photo = 'phptoUrl'//나중에 추가할것
@@ -97,7 +102,7 @@ const CheckOutDescriptScreen: React.FC<{ navigation: any }> = ({ navigation }) =
                     </View>
                 </View>
                 <View style={styles.CTA}>
-                    <LongButton color='blue' isAble={true} innerText={pageNum < 2 ? '다음' : '촬영하기'} onPress={() => { if (pageNum == 2) navigation.navigate('PictureCheck'); else goToPage(); }} />
+                    <LongButton color='blue' isAble={true} innerText={pageNum < 2 ? '다음' : '촬영하기'} onPress={() => { if (pageNum == 2) navigation.navigate('CheckOutCamera'); else goToPage(); }} />
                 </View>
             </View>
 

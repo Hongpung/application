@@ -71,15 +71,18 @@ const ReservationConfirmScreen: React.FC = () => {
                 }
                 const result: any = await response.json();
 
-
+                const utilToken = await getToken('utilToken');
                 const notificationResponse = await fetch(`${process.env.SUB_API}/notification/send`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${utilToken}`,
+                    },
                     body: JSON.stringify(
                         {
-                            to: [...data.participaterIds.map(id => id != loginUser?.memberId)],
+                            to: [...data.participaterIds.map(id => { if (id != loginUser?.memberId) return id })],
                             title: '예약에 포함되었습니다',
-                            text: `예약명: ${data.message}\n일시: ${data.date}/${data.startTime.slice(-4, -2)}~${data.endTime.slice(-2)}`
+                            text: `예약명: ${result.message}\n일시: ${data.date}/${data.startTime.slice(-4, -2)}~${data.endTime.slice(-2)}`
                         }
                     )
                 })

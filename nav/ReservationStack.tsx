@@ -17,7 +17,7 @@ import ReservationParticipatorsViewScreen from "@hongpung/pages/Reserve/ViewDeta
 
 
 export type InReservationStackParamList = {
-    inReservation?: { reservationId?: number, date?: string };
+    inReservation?: { reservationId: number, date: string };
 
     ResrvationDateSelect: undefined;
     TimeSelect: undefined;

@@ -223,7 +223,15 @@ const ChatStacks = () => {
 }
 
 
-const CheckOutStack = createNativeStackNavigator();
+export type CheckOutStackParamList = {
+    CheckOutStart: undefined;
+    CheckOutDescript: undefined;
+    CheckOutCamera: undefined;
+    PictureCheck: { photos: { uri: string, originHeight: number, originWidth: number }[] };
+    CheckOutEnd: undefined;
+};
+
+const CheckOutStack = createNativeStackNavigator<CheckOutStackParamList>();
 
 const CheckOutStacks = () => {
     return (

@@ -215,7 +215,7 @@ const ReserveCalendarScreen: React.FC<ReserveCalendarProps> = ({ navigation, rou
                         navigation.push(`DailyReserveList`, { date: date.toISOString() })
                     }} />
             </View>
-            <View style={{ position: 'absolute', width: width, bottom: 12 }}>
+            {/* <View style={{ position: 'absolute', width: width, bottom: 12 }}>
                 <Pressable style={{ marginHorizontal: 24, height: 88, backgroundColor: Color['grey200'], borderRadius: 10 }}
                     onPress={() => {
                         // navigation.replace('ExtaraActivities', { animation: 'none' });
@@ -224,7 +224,7 @@ const ReserveCalendarScreen: React.FC<ReserveCalendarProps> = ({ navigation, rou
                     <Text style={{ position: 'absolute', top: 16, right: 12, fontSize: 18, fontFamily: 'NanumSquareNeo-ExtraBold', color: Color['grey700'] }}>다른 활동을 찾고 계셨나요?</Text>
                     <Text style={{ position: 'absolute', bottom: 12, right: 12, fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{`활동 둘러보러 가기 >`}</Text>
                 </Pressable>
-            </View>
+            </View> */}
         </View>
     )
 }

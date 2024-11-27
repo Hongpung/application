@@ -12,6 +12,8 @@ import useFetch from '@hongpung/hoc/useFetch'
 import { RealtimeSession, ReservationSession } from '../Reserve/SessionTypes'
 import { io } from 'socket.io-client'
 import { Icons } from '@hongpung/components/Icon'
+import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken'
+import { getToken } from '@hongpung/utils/TokenHandler'
 
 const CheckInScreen: React.FC = () => {
 
@@ -22,17 +24,25 @@ const CheckInScreen: React.FC = () => {
     const [isCheckin, CheckIn] = useState(false);
     const [checkinStatus, setStatus] = useState<'create' | 'attend' | 'start' | 'late' | null>(null);
 
-    const { data: sessionData, loading, error } = useFetch<{ session: ReservationSession | RealtimeSession | null, nextReservation: ReservationSession | null, creatPossible: boolean, isPariticipant: boolean | undefined, message: string | null, participationAvailable: boolean | undefined }>(`${process.env.SUB_API}/room-session/check-possible/${loginUser?.memberId}`,)
+    const { data: sessionData, loading, error } = useFetchUsingUtilToken<{ session: ReservationSession | RealtimeSession | null, nextReservation: ReservationSession | null, timeLimit: boolean | undefined, creatPossible: boolean, isPariticipant: boolean | undefined, message: string | null, participationAvailable: boolean | undefined }>(`${process.env.SUB_API}/room-session/check-possible`,)
 
     useEffect(() => { navigation.setOptions({ animation: 'none' }); }, [])
-    console.log(sessionData)
+
     const startSession = () => {
         const start = async () => {
             try {
+                if (!loginUser) throw Error('유저 정보가 없습니다.')
+
+                const token = await getToken('utilToken')
+                if (!token) throw Error('Invalid Token')
+
                 const response = await fetch(`${process.env.SUB_API}/room-session/start`,
                     {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify(loginUser)
                     }
                 )
@@ -64,10 +74,16 @@ const CheckInScreen: React.FC = () => {
     const attendSession = () => {
         const attend = async () => {
             try {
+                if (!loginUser) throw Error('유저 정보가 없습니다.')
+                const token = await getToken('utilToken')
+                if (!token) throw Error('Invalid Token')
                 const response = await fetch(`${process.env.SUB_API}/room-session/attend`,
                     {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify(loginUser)
                     }
                 )
@@ -115,12 +131,43 @@ const CheckInScreen: React.FC = () => {
                 <ActivityIndicator style={{ alignSelf: 'center', marginVertical: 24, width: 180, height: 180 }} color={Color['blue500']} size={100} />
             </View>
         )
+
+    if (!!sessionData?.timeLimit)
+        return (
+            <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+                <Modal visible={true} transparent>
+                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'center' }}>
+                        <View style={{ marginHorizontal: 24, paddingVertical: 24, backgroundColor: '#FFF', display: 'flex', gap: 16, borderRadius: 15 }}>
+                            <Text style={{
+                                paddingHorizontal: 24,
+                                fontFamily: 'NanumSquareNeo-Bold',
+                                fontSize: 20,
+                            }}>사용불가</Text>
+                            <Text style={{
+                                paddingHorizontal: 24,
+                                fontFamily: 'NanumSquareNeo-Regular',
+                                fontSize: 16,
+                            }}>연습실 사용시간: 10:00 ~ 22:00</Text>
+                            <LongButton color='blue' innerText={'확인'} isAble={true} onPress={() => {
+                                navigation.goBack()
+                                navigation.goBack()
+                            }} />
+                        </View>
+                    </View>
+                </Modal>
+            </View>
+        )
     if (!!sessionData?.message)
         return (
             <View style={{ flex: 1, backgroundColor: '#FFF' }}>
                 <Modal visible={true} transparent>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'center' }}>
                         <View style={{ marginHorizontal: 24, paddingVertical: 24, backgroundColor: '#FFF', display: 'flex', gap: 16, borderRadius: 15 }}>
+                            <Text style={{
+                                paddingHorizontal: 24,
+                                fontFamily: 'NanumSquareNeo-Bold',
+                                fontSize: 20,
+                            }}>참여 불가</Text>
                             <Text style={{
                                 paddingHorizontal: 24,
                                 fontFamily: 'NanumSquareNeo-Regular',
@@ -141,6 +188,11 @@ const CheckInScreen: React.FC = () => {
                 <Modal visible={true} transparent>
                     <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'center' }}>
                         <View style={{ marginHorizontal: 24, paddingVertical: 24, backgroundColor: '#FFF', display: 'flex', gap: 16, borderRadius: 15 }}>
+                            <Text style={{
+                                paddingHorizontal: 24,
+                                fontFamily: 'NanumSquareNeo-Bold',
+                                fontSize: 20,
+                            }}>참여 불가</Text>
                             <Text style={{
                                 paddingHorizontal: 24,
                                 fontFamily: 'NanumSquareNeo-Regular',
@@ -210,7 +262,10 @@ const CheckInScreen: React.FC = () => {
                                         <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{sessionData.session.startTime.slice(0, -3)}~{sessionData.session.endTime.slice(0, -3)}</Text>
                                     </View>
                                     <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 20, height: 24, alignItems: 'center' }}>
-                                        <Icons name='people' color={Color['grey400']} size={24} /><Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{sessionData.session.participatorIds?.length}</Text>
+                                        <Icons name='people' color={Color['grey400']} size={24} />
+                                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>
+                                            {sessionData.session.participatorIds!.length}
+                                        </Text>
                                     </View>
                                 </View>
                                 :
@@ -260,18 +315,20 @@ const CheckInScreen: React.FC = () => {
                             </View>}
                 {isCheckin ?
                     signRender()
-                    : !!sessionData?.session ? <View>
-                        <Text style={{
-                            fontFamily: 'NanumSquareNeo-Bold',
-                            fontSize: 22,
-                            color: Color['green500'], textAlign: 'center', marginBottom: 4
-                        }}>{`참가하는 일정 최대 12자`}</Text>
-                        <Text style={{
-                            fontFamily: 'NanumSquareNeo-Bold',
-                            fontSize: 22,
-                            color: Color['grey700'], textAlign: 'center'
-                        }}>{sessionData?.isPariticipant ? `연습에 출석하시나요?` : `연습에 참가하시나요?`}</Text>
-                    </View> :
+                    : !!sessionData?.session ?
+                        <View>
+                            <Text style={{
+                                fontFamily: 'NanumSquareNeo-Bold',
+                                fontSize: 22,
+                                color: Color['green500'], textAlign: 'center', marginBottom: 4
+                            }}>{`참가하는 일정 최대 12자`}</Text>
+                            <Text style={{
+                                fontFamily: 'NanumSquareNeo-Bold',
+                                fontSize: 22,
+                                color: Color['grey700'], textAlign: 'center'
+                            }}>{sessionData?.isPariticipant ? `연습에 출석하시나요?` : `연습에 참가하시나요?`}</Text>
+                        </View>
+                        :
                         <View>
                             <Text style={{
                                 fontFamily: 'NanumSquareNeo-Bold',

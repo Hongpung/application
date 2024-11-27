@@ -10,7 +10,7 @@ import MyClubScreen from "@hongpung/pages/Home/MyClub/MyClubScreen";
 import ClubMemeberScreen from "@hongpung/pages/Home/MyClub/ClubMember/ClubMemeberScreen";
 import ClubPracticeCalendarScreen from "@hongpung/pages/Home/MyClub/ClubCalendar/ClubPracticeCalendarScreen";
 
-import PracticeInfoScreen from "@hongpung/pages/share/PracticeInfoScreen";
+import PracticeInfoScreen from "@hongpung/pages/share/ClubPracticeInfoScreen";
 
 
 export type MyClubStackStackParamList = {

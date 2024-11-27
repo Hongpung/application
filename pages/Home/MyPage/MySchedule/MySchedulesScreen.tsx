@@ -19,11 +19,10 @@ type MySchedulesProps = CompositeNavigationProp<
 
 const MySchedulesScreen: React.FC = () => {
 
-    const navigation = useNavigation<MySchedulesProps>();
     const userReservations = useRecoilValue(todayReservation);
 
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const loginUser = useRecoilValue(loginUserState);
+    
     const subtractDate = () => {
         const previousDay = new Date(selectedDate);
         previousDay.setDate(selectedDate.getDate() - 1);
@@ -38,88 +37,6 @@ const MySchedulesScreen: React.FC = () => {
         return `${selectedDate.getUTCFullYear() + '.' + (selectedDate.getMonth() + 1) + '.' + selectedDate.getDate()}`
     }
 
-    const RenderDailySchedules: React.FC = (ScheduleData: any) => {
-        if (ScheduleData.creatorName != loginUser?.name)
-            return (
-                <Pressable style={{
-                    width: 320, height: 180, borderRadius: 5, borderWidth: 1, borderColor: Color['grey100'], marginVertical: 6, overflow: 'hidden'
-                }}
-                    onPress={() => navigation.navigate('Reservation', { screen: 'ReservationDetail', params: { reservationId: ScheduleData.reservationId } })}>
-                    <Svg height="420" width="400" style={[StyleSheet.absoluteFill, { opacity: 0.3 }]}>
-                        <Defs>
-                            <RadialGradient
-                                id="grad"
-                                cx="30%"
-                                cy="56%"
-                                rx="34%"
-                                ry="32%"
-                                fx="32%"
-                                fy="58%"
-                                gradientUnits="userSpaceOnUse"
-                            >
-                                <Stop offset="0%" stopColor="#5BBF88" />
-                                <Stop offset="60%" stopColor="#B2CF82" />
-                                <Stop offset="100%" stopColor="#FFFFFF" />
-                            </RadialGradient>
-                        </Defs>
-                        <Rect width="100%" height="100%" fill="url(#grad)" />
-                    </Svg>
-                    <View style={{ position: 'absolute', flexDirection: 'row', left: 18, top: 18 }}>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['green500'] }}>참가하는 일정</Text>
-                    </View>
-                    <View style={{ position: 'absolute', width: 208, top: 62, left: 56 }}>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, textAlign: 'center', }} numberOfLines={1} ellipsizeMode='tail' >{ScheduleData.message}</Text>
-                    </View>
-                    <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 50 }}>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{ScheduleData.startTime.slice(0, -3)}~{ScheduleData.endTime.slice(0, -3)}</Text>
-                    </View>
-                    <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 20, height: 24, alignItems: 'center' }}>
-                        <View style={{ backgroundColor: Color['grey400'], height: 20, width: 20 }} /><Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>99</Text>
-                    </View>
-                </Pressable >)
-        else return (
-            <Pressable style={{
-                width: 320, height: 180, borderRadius: 5, borderWidth: 1, borderColor: Color['grey100'],
-                overflow: 'hidden', marginVertical: 6
-            }}
-                onPress={() => navigation.navigate('Reservation', { screen: 'ReservationDetail', params: { reservationId: ScheduleData.reservationId } })}>
-                <Svg height="420" width="400" style={[StyleSheet.absoluteFill, { opacity: 0.2 }]}>
-                    <Defs>
-                        <RadialGradient
-                            id="grad"
-                            cx="30%"
-                            cy="56%"
-                            rx="34%"
-                            ry="32%"
-                            fx="32%"
-                            fy="58%"
-                            gradientUnits="userSpaceOnUse"
-                        >
-                            <Stop offset="0%" stopColor="#8048F5" />
-                            <Stop offset="60%" stopColor="#64C2F7" />
-                            <Stop offset="100%" stopColor="#FFFFFF" />
-                        </RadialGradient>
-                    </Defs>
-                    <Rect width="100%" height="100%" fill="url(#grad)" />
-                </Svg>
-                <View style={{ position: 'absolute', flexDirection: 'row', left: 18, top: 18 }}>
-                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['blue500'] }}>내가 만든 일정</Text>
-                </View>
-                <View style={{ position: 'absolute', width: 208, top: 62, left: 56 }}>
-                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, textAlign: 'center', }} numberOfLines={1} ellipsizeMode='tail' >
-                        {ScheduleData.message}
-                    </Text>
-                </View>
-                <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 50 }}>
-                    <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{ScheduleData.startTime.slice(0, -3)}~{ScheduleData.endTime.slice(0, -3)}</Text>
-                </View>
-                <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 20, height: 24, alignItems: 'center' }}>
-                    <Icons size={24} name={'people'} color={Color['grey300']} />
-                    <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>99</Text>
-                </View>
-            </Pressable>
-        )
-    }
 
     const renderBlankDay = () => {
         return (
@@ -161,8 +78,7 @@ const MySchedulesScreen: React.FC = () => {
                 </View>
             </View>
             {userReservations?.length > 0 ? <ScrollView contentContainerStyle={styles.Container}>
-                {userReservations.map((reserve: any) => (RenderDailySchedules(reserve)))}
-
+                {userReservations.map((reserve: any) => <RenderDailySchedules key={reserve.reservationId} ScheduleData={reserve}/>)}
             </ScrollView> :
                 renderBlankDay()}
         </View>
@@ -171,6 +87,93 @@ const MySchedulesScreen: React.FC = () => {
 }
 
 export default MySchedulesScreen
+
+const RenderDailySchedules: React.FC<{ ScheduleData: any }> = ({ ScheduleData }) => {
+
+    const navigation = useNavigation<MySchedulesProps>();
+    const loginUser = useRecoilValue(loginUserState);
+
+    if (ScheduleData.creatorName != loginUser?.name)
+        return (
+            <Pressable style={{
+                width: 320, height: 180, borderRadius: 5, borderWidth: 1, borderColor: Color['grey100'], marginVertical: 6, overflow: 'hidden'
+            }}
+                onPress={() => navigation.navigate('Reservation', { screen: 'ReservationDetail', params: { reservationId: ScheduleData.reservationId } })}>
+                <Svg height="420" width="400" style={[StyleSheet.absoluteFill, { opacity: 0.3 }]}>
+                    <Defs>
+                        <RadialGradient
+                            id="grad"
+                            cx="30%"
+                            cy="56%"
+                            rx="34%"
+                            ry="32%"
+                            fx="32%"
+                            fy="58%"
+                            gradientUnits="userSpaceOnUse"
+                        >
+                            <Stop offset="0%" stopColor="#5BBF88" />
+                            <Stop offset="60%" stopColor="#B2CF82" />
+                            <Stop offset="100%" stopColor="#FFFFFF" />
+                        </RadialGradient>
+                    </Defs>
+                    <Rect width="100%" height="100%" fill="url(#grad)" />
+                </Svg>
+                <View style={{ position: 'absolute', flexDirection: 'row', left: 18, top: 18 }}>
+                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['green500'] }}>참가하는 일정</Text>
+                </View>
+                <View style={{ position: 'absolute', width: 208, top: 62, left: 56 }}>
+                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, textAlign: 'center', }} numberOfLines={1} ellipsizeMode='tail' >{ScheduleData.message}</Text>
+                </View>
+                <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 50 }}>
+                    <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{ScheduleData.startTime.slice(0, -3)}~{ScheduleData.endTime.slice(0, -3)}</Text>
+                </View>
+                <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 20, height: 24, alignItems: 'center' }}>
+                    <View style={{ backgroundColor: Color['grey400'], height: 20, width: 20 }} /><Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>99</Text>
+                </View>
+            </Pressable >)
+    else return (
+        <Pressable style={{
+            width: 320, height: 180, borderRadius: 5, borderWidth: 1, borderColor: Color['grey100'],
+            overflow: 'hidden', marginVertical: 6
+        }}
+            onPress={() => navigation.navigate('Reservation', { screen: 'ReservationDetail', params: { reservationId: ScheduleData.reservationId } })}>
+            <Svg height="420" width="400" style={[StyleSheet.absoluteFill, { opacity: 0.2 }]}>
+                <Defs>
+                    <RadialGradient
+                        id="grad"
+                        cx="30%"
+                        cy="56%"
+                        rx="34%"
+                        ry="32%"
+                        fx="32%"
+                        fy="58%"
+                        gradientUnits="userSpaceOnUse"
+                    >
+                        <Stop offset="0%" stopColor="#8048F5" />
+                        <Stop offset="60%" stopColor="#64C2F7" />
+                        <Stop offset="100%" stopColor="#FFFFFF" />
+                    </RadialGradient>
+                </Defs>
+                <Rect width="100%" height="100%" fill="url(#grad)" />
+            </Svg>
+            <View style={{ position: 'absolute', flexDirection: 'row', left: 18, top: 18 }}>
+                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['blue500'] }}>내가 만든 일정</Text>
+            </View>
+            <View style={{ position: 'absolute', width: 208, top: 62, left: 56 }}>
+                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, textAlign: 'center', }} numberOfLines={1} ellipsizeMode='tail' >
+                    {ScheduleData.message}
+                </Text>
+            </View>
+            <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 50 }}>
+                <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{ScheduleData.startTime.slice(0, -3)}~{ScheduleData.endTime.slice(0, -3)}</Text>
+            </View>
+            <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 20, height: 24, alignItems: 'center' }}>
+                <Icons size={24} name={'people'} color={Color['grey300']} />
+                <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>99</Text>
+            </View>
+        </Pressable>
+    )
+}
 
 const styles = StyleSheet.create({
     Container: {

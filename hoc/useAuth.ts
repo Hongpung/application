@@ -31,19 +31,28 @@ export const useAuth = () => {
         if (!loadUser.ok) throw Error('유저 정보 로드 실패')
         const userStatus = await loadUser.json() as User;
 
-        const { memberId } = userStatus;
+        if (!userStatus) throw Error('유저 정보가 비어 있음')
+        const { memberId, email } = userStatus;
         const { status } = await Notifications.requestPermissionsAsync();
 
-        const sendFormat: { email: string, memberId: string, pushEnable: boolean, notificationToken: null | string } = { memberId, email: userStatus?.email, pushEnable: (status === 'granted'), notificationToken: null }
+        const sendFormat: { email: string, memberId: string, pushEnable: boolean, notificationToken: null | string } = { memberId, email, pushEnable: (status === 'granted'), notificationToken: null }
+
         if (status === 'granted') {
           const token = await registerForPushNotificationsAsync()
           sendFormat.notificationToken = token//
         }
+
+
+        setLoginUser(userStatus);
+
+        const utilToken = await getToken('utilToken');
+
         //token
         const fetchFCM = await fetch(`${process.env.SUB_API}/member/token`,
           {
             method: 'PUT',
             headers: {
+              'Authorization': `Bearer ${utilToken}`,
               'Content-Type': `application/json`,
             },
             body: JSON.stringify(sendFormat)
@@ -52,7 +61,21 @@ export const useAuth = () => {
 
         if (!fetchFCM.ok) throw Error('토큰 생성 실패')
 
-        setLoginUser(userStatus);
+        const useSession = await fetch(`${process.env.SUB_API}/room-session/isCheckin`, {
+          headers: {
+            'Authorization': `Bearer ${utilToken}`
+          },
+        })
+
+        if (!useSession.ok) throw Error('세션 불러오기 실패')
+
+        const { isCheckin } = await useSession.json()
+        console.log('isCheckin:', isCheckin)
+
+        if (isCheckin == true) {
+          console.log('세션 연겨룀')
+          setOnSession(true)
+        }
 
       }
     } catch (e) {
@@ -97,7 +120,7 @@ export const useAuth = () => {
     try {
       const loginData = { email, password };
 
-      const response = await fetch(`${process.env.BASE_URL}/auth/login`, {
+      const response = await fetch(`${process.env.SUB_API}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData),
@@ -110,10 +133,12 @@ export const useAuth = () => {
 
       const result = await response.json();
 
-      if (result.token) {
-        const { token } = result;
+      if (result.token && result.utilToken) {
+        const { token, utilToken } = result;
 
         await saveToken('token', token);
+        await saveToken('utilToken', utilToken);
+
         await initAppFetchUser();
         // Recoil 상태 업데이트
         return true;
@@ -126,12 +151,17 @@ export const useAuth = () => {
     return false;
   };
 
+
   const logout = async () => {
     try {
+      if (!loginUser) console.log('유저 정보가 없음')
+      const utilToken = await getToken('utilToken');
+    
       const fetchFCM = await fetch(`${process.env.SUB_API}/member/token/${loginUser?.memberId}`,
         {
           method: 'DELETE',
           headers: {
+            'Authorization': `Bearer ${utilToken}`,
             'Content-Type': `application/json`,
           }
         }
@@ -139,6 +169,7 @@ export const useAuth = () => {
       if (!fetchFCM.ok) throw Error('failed to delete Expo Token')
 
       await deleteToken('token');
+      await deleteToken('utilToken');
       setLoginUser(null);
     }
     catch (e) {

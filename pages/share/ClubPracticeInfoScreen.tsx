@@ -2,37 +2,34 @@ import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { Color } from '@hongpung/ColorSet'
 import InstrumentCard from '@hongpung/components/cards/InstrumentCard'
-import { InstrumentProvider } from '@hongpung/context/InstrumentContext'
 import LongButton from '@hongpung/components/buttons/LongButton'
 import { Icons } from '@hongpung/components/Icon'
-import { CompositeScreenProps } from '@react-navigation/native'
-import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { ReservationDTO } from '../Reserve/ReserveInterface'
 import { User } from '@hongpung/UserType'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack'
-import { MyPageParamList } from '@hongpung/nav/MyPageStack'
+import useFetch from '@hongpung/hoc/useFetch'
+import { Session } from '../Home/MyPage/MyPractices/MyPracticesScreen'
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
+import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken'
 
-interface AttendanceDTO {
-    member: User
-    attendance: string
-}
 
-type PracticeProps =
-    CompositeScreenProps<
-        NativeStackScreenProps<MyClubStackStackParamList, 'MyClubPracticeInfo'>,
-        NativeStackScreenProps<MyPageParamList, 'MyPracticeInfo'>
-    >
+type PracticeProps = NativeStackScreenProps<MyClubStackStackParamList, 'MyClubPracticeInfo'>
 
 const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
 
     const { reservationId } = route.params;
 
-    const { data: reservationData, loading, error } = useFetchUsingToken<ReservationDTO>(`${process.env.BASE_URL}/reservation/${reservationId}`)
-    const { data: attendanceData } = useFetchUsingToken<AttendanceDTO[]>(`${process.env.BASE_URL}/attendance/${reservationId}`)
+    console.log(reservationId)
+    const { data: reservationData } = useFetchUsingToken<ReservationDTO>(`${process.env.BASE_URL}/reservation/${reservationId}`)
+    const { data, loading, error } = useFetchUsingUtilToken<Session>(`${process.env.SUB_API}/room-session/log/specific/reservation/${reservationId}`)
 
+    console.log(data)
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
-
+    if (!data||!reservationData)
+        return (
+            <View></View>
+        )
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <ScrollView contentContainerStyle={{ backgroundColor: '#FFF' }}>
@@ -44,13 +41,13 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 18,
                             color: Color['grey700']
-                        }}>{reservationData?.message}</Text>
+                        }}>{data?.message}</Text>
                         <Text style={{
                             position: 'absolute', left: 18, bottom: 12,
                             fontFamily: 'NanumSquareNeo-Light',
                             fontSize: 14,
                             color: Color['grey400']
-                        }}>{reservationData?.date} ({daysOfWeek[new Date(reservationData?.date).getDay()]})</Text>
+                        }}>{data?.date} ({daysOfWeek[new Date(data?.date).getDay()]})</Text>
 
                         <Text style={{
                             position: 'absolute', right: 16, bottom: 12,
@@ -58,9 +55,9 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             fontFamily: 'NanumSquareNeo-Light',
                             fontSize: 14,
                             color: Color['grey400']
-                        }}>{reservationData?.startTime.slice(0, -3)}~{reservationData?.endTime.slice(0, -3)}</Text>
+                        }}>{data?.startTime.slice(0, -3)}~{data?.endTime.slice(0, -3)}</Text>
 
-                        {reservationData?.type == '정규연습' ?
+                        {data?.reservationType == '정규연습' ?
                             <View style={{
                                 position: 'absolute', right: 12, top: -4, width: 48, height: 48
                             }} >
@@ -75,14 +72,14 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                                     fontFamily: 'NanumSquareNeo-Regular',
                                     fontSize: 14,
                                     color: Color['grey600']
-                                }}>{reservationData?.name}</Text>
+                                }}>{data?.creatorName}</Text>
                                 <View style={{ height: 4 }} />
-                                {reservationData?.nickname && <Text style={{
+                                {data?.creatorNickname && <Text style={{
                                     textAlign: 'right',
                                     fontFamily: 'NanumSquareNeo-Regular',
                                     fontSize: 12,
                                     color: Color['grey400']
-                                }}>{reservationData?.nickname}</Text>}
+                                }}>{data?.creatorNickname}</Text>}
                             </View>
                         }
                     </View>
@@ -111,7 +108,7 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey700']
-                    }}>{reservationData?.startTime.slice(0, -3)}</Text>
+                    }}>{data?.startTime.slice(0, -3)}</Text>
                 </View>
 
                 <View style={{ height: 12 }} />
@@ -128,7 +125,7 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey700']
-                    }}>{reservationData?.endTime.slice(0, -3)}</Text>
+                    }}>{data?.endTime.slice(0, -3)}</Text>
                 </View>
 
                 <View style={{ height: 12 }} />
@@ -178,7 +175,7 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 24,
                             color: Color['blue500']
-                        }}>{attendanceData?.filter(attendannceData => attendannceData.attendance == '출석').length}</Text>
+                        }}>{data.attendanceList?.filter(attendannceData => attendannceData.status == '출석').length}</Text>
                     </View>
 
                     <View style={{ alignItems: 'center', justifyContent: 'space-between', height: 56, width: 64 }}>
@@ -191,7 +188,7 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 24,
                             color: Color['red500']
-                        }}>{attendanceData?.filter(attendannceData => attendannceData.attendance == '지각').length}</Text>
+                        }}>{data.attendanceList?.filter(attendannceData => attendannceData.status == '지각').length}</Text>
                     </View>
 
                     <View style={{ alignItems: 'center', justifyContent: 'space-between', height: 56, width: 64 }}>
@@ -204,7 +201,7 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 24,
                             color: Color['grey400']
-                        }}>{attendanceData?.filter(attendannceData => attendannceData.attendance == '미출석').length}</Text>
+                        }}>{data.attendanceList?.filter(attendannceData => attendannceData.status == '결석').length}</Text>
                     </View>
                 </View>
 

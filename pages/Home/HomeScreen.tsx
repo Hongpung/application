@@ -19,6 +19,8 @@ import { io } from 'socket.io-client';
 import { RealtimeSession, ReservationSession } from '../Reserve/SessionTypes';
 import LongButton from '@hongpung/components/buttons/LongButton';
 import { onUseSession } from '@hongpung/recoil/sessionState';
+import { getToken } from '@hongpung/utils/TokenHandler';
+import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken';
 
 
 type HomeNavProps = NativeStackNavigationProp<MainStackParamList, 'Home'>
@@ -30,7 +32,7 @@ const HomeScreen: React.FC = () => {
     const navigation = useNavigation<HomeNavProps>()
     const { initAppFetchUser } = useAuth();
     const loginUser = useRecoilValue(loginUserState);
-    const [isSession,setOnSession] = useRecoilState(useOnReserve);
+    const isSession = useRecoilValue(useOnReserve);
 
     const [isUsed, setUsed] = useState(true);
     const [isSlideUp, setSlide] = useState(false);
@@ -56,26 +58,6 @@ const HomeScreen: React.FC = () => {
         }
     };
 
-
-    useEffect(() => {
-        const loadOnsession = async () => {
-            try {
-                const useSession = await fetch(`${process.env.SUB_API}/room-session/isCheckin/${loginUser?.memberId}`)
-                if (!useSession.ok) throw Error('세션 불러오기 실패')
-                const { isCheckin } = await useSession.json()
-                console.log('isCheckin:', isCheckin)
-                if (isCheckin == true) {
-                    console.log('세션 연겨룀')
-                    setOnSession(true)
-                }
-            } catch {
-                alert('세션 연결 실패')
-            }
-        }
-        if (loginUser)
-            loadOnsession()
-    }, [loginUser])
-
     useEffect(() => {
 
         const loadUserinfo = async () => {
@@ -88,6 +70,9 @@ const HomeScreen: React.FC = () => {
         }
     }, [])
 
+    const {data:isNotRead} = useFetchUsingUtilToken<{status:boolean}>(`${process.env.SUB_API}/notification/notRead`,{},5000,[isFocusing])
+    console.log('isread:'+isNotRead?.status)
+
     return (
         <View style={{ flex: 1 }}>
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -96,12 +81,12 @@ const HomeScreen: React.FC = () => {
 
                 <View style={styles.iconsRow}>
                     <View style={styles.iconContainer}>
-                        {/* <Pressable
+                        <Pressable
                             style={styles.icons}
                             onPress={() => { navigation.navigate('Notification'); }}>
                             <Icons size={28} name={'notifications'} color={Color['blue500']} />
-                            {true && <View style={{ position: 'absolute', width: 8, height: 8, backgroundColor: 'orange', bottom: 4, right: 4, borderRadius: 100 }} />}
-                        </Pressable> */}
+                            {isNotRead?.status && <View style={{ position: 'absolute', width: 8, height: 8, backgroundColor: 'orange', bottom: 4, right: 4, borderRadius: 100 }} />}
+                        </Pressable>
                         <Pressable
                             style={styles.icons}
                             onPress={() => { navigation.navigate('MyPage', { screen: 'MyPageHome' }); }}>
@@ -364,10 +349,14 @@ const BottomOnUser: React.FC<{ toggleBottomSheet: () => void, isSlideUp: boolean
     const [useRoom, setUseRoom] = useRecoilState(useOnReserve);
     const [useSession, setUseSession] = useRecoilState(onUseSession);
     const [onEndModal, OnEnd] = useState(false);
+
     const socketRef = useRef<any>(null); // 소켓 참조를 저장할 useRef
+
     const [remainingHour, setRemainingHour] = useState('');
     const [remainingMinnute, setRemainingMinnute] = useState('');
+
     const loginUser = useRecoilValue(loginUserState);
+
     const calculateTimeDifference = () => {
         if (useSession) {
             const now = new Date();
@@ -401,14 +390,14 @@ const BottomOnUser: React.FC<{ toggleBottomSheet: () => void, isSlideUp: boolean
 
     useEffect(() => {
 
-        const connectSocket = () => {
+        const connectSocket = async () => {
             if (socketRef.current) {
                 socketRef.current.disconnect(); // 기존 소켓 연결 해제
             }
-
+            const token = await getToken('utilToken')
             const socket = io(`${process.env.SUB_API}/roomsession`, {
                 transports: ['websocket'],
-                auth: { memberId: loginUser?.memberId },
+                auth: { token },
                 reconnection: true,
             });
 
@@ -536,9 +525,8 @@ const BottomOnUser: React.FC<{ toggleBottomSheet: () => void, isSlideUp: boolean
                         <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>남은 예약 시간</Text>
                         <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'], fontSize: 12 }}>({useSession.startTime.slice(0, -3)}~{useSession.endTime.slice(0, -3)})</Text>
                     </View>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: 110 }}>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>{remainingHour}</Text>
-                        <View style={{ width: 8 }} />
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: 110, gap: 12 }}>
+                        {Number(remainingHour) != 0 && <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>{remainingHour}</Text>}
                         <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 14 }}>{remainingMinnute}</Text>
                     </View>
                     <Pressable style={{ justifyContent: 'center' }}

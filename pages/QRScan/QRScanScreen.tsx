@@ -38,7 +38,7 @@ const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         if (scanStatus != 'IDLE') return
         const openUrl = async () => {
             try {
-                if (url != `${process.env.BASE_URL}`) throw Error('invalid Url')
+                // if (url != `${process.env.BASE_URL}`) throw Error('invalid Url')
                 await Linking.openURL(url)
                 setScanStatus('COMPLETE')
             }
@@ -88,6 +88,7 @@ const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         barcodeTypes: ["qr"],
                     }}
                     onBarcodeScanned={handleScanned}
+
                 >
                     <View style={styles.overlay}>
                         <BlurView tint='dark' intensity={80} style={styles.topOverlay} />
@@ -185,7 +186,7 @@ const styles = StyleSheet.create({
     topOverlay: {
         width: '100%',
         height: 144,
-        
+
     },
     centerOverlay: {
         flexDirection: 'row',
@@ -205,6 +206,6 @@ const styles = StyleSheet.create({
     bottomOverlay: {
         flex: 1,
         width: '100%',
-        
+
     },
 });

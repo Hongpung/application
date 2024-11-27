@@ -11,6 +11,7 @@ import { ReservationDTO } from '@hongpung/pages/Reserve/ReserveInterface'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack'
 import { useNavigation } from '@react-navigation/native'
+import ReservationCard from '@hongpung/components/cards/ReservationCard'
 
 export type ReserveType = 'regular' | 'personal' | 'none';
 
@@ -29,7 +30,7 @@ const ClubPracticeCalendarScreen: React.FC<{ navigation: any }> = ({ navigation 
         5000,
         [userInfo, calendarMonth]
     )
-    
+
     useEffect(() => {
         //fetchMothlyReserves
         if (!!data) {
@@ -140,11 +141,13 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
                         }}
                     >
                         <Text style={[styles.CalendarText, !!dateReservaData && { color: Color['grey600'] }, day == selectedDate?.getDate() && { color: Color['blue600'] }]}>{day}</Text>
-                        {!!dateReservaData &&
-                            dateReservaData?.map(reserve => (<View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 2 }}>
-                                <View style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: reserve.regularType == '정규연습' ? Color['blue500'] : reserve.isParticipable ? Color['green500'] : Color['red500'] }} />
-                            </View>))
-                        }
+
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 2, gap: 2 }}>
+                            {!!dateReservaData &&
+                                dateReservaData?.map((reserve,index) => (
+                                    <View key={index+index} style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: reserve.regularType == '정규연습' ? Color['blue500'] : reserve.isParticipable ? Color['green500'] : Color['red500'] }} />
+                                ))
+                            }</View>
                     </Pressable>
                 );
             }
@@ -200,11 +203,10 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
     );
 }
 
-type ClubPracticeNavProp = NativeStackNavigationProp<MyClubStackStackParamList, 'ClubCalendar'>
 
 const PrevPracticeList: React.FC<{ prevPractice: ReservationDTO[] | null }> = ({ prevPractice }) => {
 
-    const navigation = useNavigation<ClubPracticeNavProp>();
+
     const today = useMemo(() => new Date(), [])
     const mapedList = prevPractice?.reduce((acc, reserve) => {
         const dateKey: string = reserve.date; // 날짜를 키로 사용 (YYYY-MM-DD 포맷)
@@ -233,9 +235,8 @@ const PrevPracticeList: React.FC<{ prevPractice: ReservationDTO[] | null }> = ({
 
                         {reserves.map((reserve, index) => (
                             <View key={dateKey + '-' + index} style={{ marginVertical: 6 }}>
-                                <PracticeCard
-                                    reserve={reserve}
-                                    onPress={(reserve) => { navigation.push('MyClubPracticeInfo', { reservationId: reserve.reservationId! }) }} />
+                                <ReservationCard
+                                    reservation={reserve} />
                             </View>
                         ))}
                     </View>

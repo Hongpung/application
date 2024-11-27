@@ -1,3 +1,5 @@
+import { getToken } from "./TokenHandler";
+
 export default async function uploadImage(imageFile: File, toUse: string): Promise<{ imageUrl: string } | null> {
     
     const controller = new AbortController();
@@ -5,6 +7,8 @@ export default async function uploadImage(imageFile: File, toUse: string): Promi
     const timeoutId = setTimeout(() => controller.abort(), 8000);
     try {
         console.log('진입')
+        const token = await getToken('utilToken')
+        if(!token) throw Error('Invalid Token')
         const formData = new FormData();
         formData.append('image', imageFile, `${imageFile.name}-${(new Date).toISOString()}`);
         formData.append('path', toUse);
@@ -15,6 +19,9 @@ export default async function uploadImage(imageFile: File, toUse: string): Promi
         const uploadConfirm = await fetch(`${process.env.SUB_API}/upload-s3/image`, 
             {
             method: 'POST',
+            headers: {
+              Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
+            },
             body: formData,
             signal
         })

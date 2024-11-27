@@ -116,8 +116,8 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
                 <View style={{ height: 16 }} />
                 <Pressable style={{ height: 100, marginHorizontal: 40, backgroundColor: Color['grey100'], borderRadius: 10 }}
                     onPress={() => {
-                        if (reservation?.date) navigation.push('TimeSelect')
-                        else navigation.push('ResrvationDateSelect')
+                        if (reservation?.date) navigation.navigate('TimeSelect')
+                        else navigation.navigate('ResrvationDateSelect')
                     }}>
                     <View style={{ flexDirection: 'row', marginTop: 8, marginLeft: 8, alignItems: 'center' }}>
                         {reservation?.date && <View style={{ height: 24, width: 24, marginRight: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }} >

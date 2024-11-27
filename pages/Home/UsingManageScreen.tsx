@@ -8,11 +8,12 @@ import LongButton from '../../components/buttons/LongButton'
 import { debounce } from 'lodash'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { MainStackParamList } from '@hongpung/nav/HomeStacks'
-import { useNavigation } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import { loginUserState } from '@hongpung/recoil/authState'
 import { useRecoilValue } from 'recoil'
 import { onUseSession } from '@hongpung/recoil/sessionState'
 import { Icons } from '@hongpung/components/Icon'
+import { getToken } from '@hongpung/utils/TokenHandler'
 
 type UsingManageNavProp = NativeStackNavigationProp<MainStackParamList, 'UsingManage'>
 
@@ -29,19 +30,19 @@ const UsingManageScreen: React.FC = () => {
     const [absentUsers, setAbsentUsers] = useState<User[]>([])
     const loginUser = useRecoilValue(loginUserState)
 
-    const seperateUser = useCallback((sessionAttendanceList: { user: User, attendance: '참가' | '출석' | '결석' | '지각' }[]) => {
+    const seperateUser = useCallback((sessionAttendanceList: { user: User, status: '참가' | '출석' | '결석' | '지각' }[]) => {
         const attendanceList = sessionAttendanceList
         const attends: User[] = []
         const lates: User[] = []
         const absences: User[] = []
 
         if (sessionData?.sessionType == 'Reservation') {
-            attendanceList?.map(({ user, attendance }) => {
-                if (attendance == '참가' || attendance == '출석')
+            attendanceList?.map(({ user, status }) => {
+                if (status == '참가' || status == '출석')
                     attends.push(user)
-                else if (attendance == '지각')
+                else if (status == '지각')
                     lates.push(user)
-                else if (attendance == '결석')
+                else if (status == '결석')
                     absences.push(user)
 
             })
@@ -50,8 +51,8 @@ const UsingManageScreen: React.FC = () => {
             setLateUsers(lates)
             setAbsentUsers(absences)
         } else {
-            attendanceList?.map(({ user, attendance }) => {
-                if (attendance == '참가')
+            attendanceList?.map(({ user, status }) => {
+                if (status == '참가')
                     attends.push(user)
             })
             setAttendUsers(attends)
@@ -67,8 +68,13 @@ const UsingManageScreen: React.FC = () => {
     const extendSession = () => {
         const endfetch = async () => {
             try {
-                const response = await fetch(`${process.env.SUB_API}/room-session/extend/${loginUser?.memberId}`, {
-                    method: 'POST'
+                const token = await getToken('utilToken')
+
+                const response = await fetch(`${process.env.SUB_API}/room-session/extend`, {
+                    method: 'POST', 
+                    headers: {
+                        Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
+                    },
                 })
 
                 if (!response.ok) throw Error('Failed')
@@ -76,11 +82,19 @@ const UsingManageScreen: React.FC = () => {
                 console.log(message)
                 if (message != 'Fail')
                     navigation.goBack()
-                else 
-                 alert('연습 시간 연장에 실패했어요.')
-            } catch (e) {
-                console.log(e)
-                alert(e)
+                else
+                    alert('연습 시간 연장에 실패했어요.')
+            } catch (err) {
+                if (err instanceof Error) {
+                    // `invalid Token` 메시지일 경우 처리
+                    if (err.message === 'invalid Token') {
+
+                        navigation.dispatch(StackActions.replace('Login'))
+                        return;
+                    }
+                }
+                console.log(err)
+                alert(err)
             }
         }
         endfetch()
@@ -203,7 +217,7 @@ const UsingManageScreen: React.FC = () => {
                 <View style={{ bottom: 0, display: 'flex', gap: 12, paddingBottom: 28 }}>
                     {(!canExtand) && <Text style={{ alignSelf: 'center', color: Color['red700'], fontSize: 14, fontFamily: 'NanumSquareNeo-Bold' }}>연장은 종료 15분 이전까지만 가능해요</Text>}
                     {(!canReturn) && <Text style={{ alignSelf: 'center', color: Color['red700'], fontSize: 14, fontFamily: 'NanumSquareNeo-Bold' }}>종료는 20분 이상 이용 후 가능해요</Text>}
-                    <LongButton color='green' innerText='연장하기' isAble={canExtand} onPress={() => { extendSession() }} />
+                    <LongButton color='green' innerText='30분 연장하기' isAble={canExtand} onPress={() => { extendSession() }} />
                     <LongButton color='red' innerText='종료하기' isAble={canReturn} onPress={() => { navigation.replace('CheckOut') }} />
                 </View>
             </View>

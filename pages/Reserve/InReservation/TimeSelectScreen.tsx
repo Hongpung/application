@@ -31,12 +31,14 @@ const TimeSelectScreen: React.FC = () => {
 
     const navigation = useNavigation<TimeSelcectNavProps>();
 
-    const { reservation, setDate, setTime, setHasWait } = useReservation();
-    const TimesRef = useRef<any>(null);
-    const { date, Time } = reservation;
+    const { reservation, setDate: reservationSetDate, setTime } = useReservation();
+
     const [selectedTimeBlocks, setTimeBlocks] = useState<string[]>([]);
     const [alertVisible, setAlertVisible] = useState(false);
-    const today = new Date()
+
+    const TimesRef = useRef<ScrollView>(null);
+
+    // console.log(reservation.date)
 
     const times = [
         'TIME_1000', 'TIME_1030', 'TIME_1100', 'TIME_1130',
@@ -46,31 +48,37 @@ const TimeSelectScreen: React.FC = () => {
         'TIME_1800', 'TIME_1830', 'TIME_1900', 'TIME_1930',
         'TIME_2000', 'TIME_2030', 'TIME_2100', 'TIME_2130',
         'TIME_2200'];
+
     const [occupiedTimes, setOccupiedTimes] = useState<string[]>([])
 
     const renderWeekOfDate = useCallback((selectedDate: Date) => {
         const day = selectedDate.getDay() == 0 ? 7 : selectedDate.getDay();
         const week = [];
         const startDate = new Date(selectedDate);
+        const today = new Date()
         startDate.setDate(selectedDate.getDate() - day + 1);
 
         for (let i = 0; i < 7; i++) {
             const currentDate = new Date(startDate);
             currentDate.setDate(startDate.getDate() + i);
             week.push(
-                <Pressable key={`${currentDate}`} onPress={() => { currentDate > today && setDate(currentDate) }} style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] }]}>
+                <Pressable key={`${currentDate}`} onPress={() => { currentDate > today && reservationSetDate(currentDate) }} style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] }]}>
                     <Text style={[styles.Date, (currentDate <= today) && { color: Color['grey300'] }]}>{currentDate.getDate()}</Text>
                 </Pressable>
             )
         }
-
-
-        TimesRef.current?.scrollTo({ y: 0, animated: false })
-
+        // TimesRef.current?.scrollTo({ y: 0, animated: false })
+        console.log(`renderWeekOfDate`)
         return week;
-    }, [date])
 
-    useEffect(() => setTimeBlocks([]), [date])
+    }, [reservation])
+
+    useEffect(() => {
+        if (reservation.date) {
+            setTimeBlocks([]);
+            console.log(`setTimeBlocks`);
+        }
+    }, [reservation.date])
     const formatTime = useCallback((hour: number): string => {
         let period = "AM";
         let formattedHour = hour;
@@ -107,14 +115,16 @@ const TimeSelectScreen: React.FC = () => {
     // }, [])
 
     useEffect(() => {
-        const { startTime, endTime } = Time;
-        if (startTime && endTime) {
-            const startIdx = times.indexOf(startTime);
-            const endIdx = times.indexOf(endTime);
+        {
+            const { startTime, endTime } = reservation.Time;
+            if (startTime.length > 0 && endTime.length > 0) {
+                const startIdx = times.indexOf(startTime);
+                const endIdx = times.indexOf(endTime);
 
-            if (startIdx != -1 && endIdx != -1) {
-                const loadedTimes = times.slice(startIdx, endIdx);
-                setTimeBlocks(loadedTimes);
+                if (startIdx != -1 && endIdx != -1) {
+                    const loadedTimes = times.slice(startIdx, endIdx);
+                    setTimeBlocks(loadedTimes);
+                }
             }
         }
     }, [])
@@ -130,36 +140,42 @@ const TimeSelectScreen: React.FC = () => {
 
 
     const { data, loading, error } = useFetchUsingToken<briefReservation[]>(
-        date ? `${process.env.BASE_URL}/reservation/day?date=${date?.toISOString().split('T')[0]}` : null,
+        reservation.date ? `${process.env.BASE_URL}/reservation/day?date=${reservation.date.toISOString().split('T')[0]}` : null,
         {
-        }, 2000, [date]
+        }, 2000, [reservation]
     )
 
+    console.log(data)
 
     const parsedTimeRange = (reservation: briefReservation) => {
         const [startHour, startMinnute] = reservation.startTime.split(':')
         const [endHour, endMinnute] = reservation.endTime.split(':')
-
+        console.log(`TIME_${startHour}${startMinnute}`, `TIME_${endHour}${endMinnute}`)
         return [`TIME_${startHour}${startMinnute}`, `TIME_${endHour}${endMinnute}`]
     }
 
     useEffect(() => {
-        const occupied: string[] = [];
+        if (data) {
+            const occupied: string[] = [];
+            data.forEach(reserve => {
+                if (reserve.reservationId == reservation.reservationId) return;
+                const [startTime, endTime] = parsedTimeRange(reserve);
+                for (let i = times.indexOf(startTime); i < times.indexOf(endTime); i++)
+                    occupied.push(times[i]);
+            });
 
-        data?.forEach(reserve => {
-            if (reserve.reservationId == reservation.reservationId) return;
-            const [startTime, endTime] = parsedTimeRange(reserve);
-            for (let i = times.indexOf(startTime); i < times.indexOf(endTime); i++)
-                occupied.push(times[i])
+            // 이전 값과 비교하여 업데이트
+            if (JSON.stringify(occupied) !== JSON.stringify(occupiedTimes)) {
+                setOccupiedTimes(occupied);
+                console.log(`setOccupiedTimes`);
+            }
         }
-        )
-        setOccupiedTimes(occupied);
-    }, [data])
+    }, [data, occupiedTimes]);
 
     const toggleTime = useCallback((time: string) => {
         // selectedTimes를 정렬된 상태로 유지
         //if (selectedTimeBlocks.length == 0) return;
-        const lastTimes = selectedTimeBlocks?.sort((a, b) => times.indexOf(a) - times.indexOf(b)) ?? [];
+        const lastTimes = selectedTimeBlocks.sort((a, b) => times.indexOf(a) - times.indexOf(b)) ?? [];
 
         const timeIndex = times.indexOf(time);
         const firstSelectedTimeIndex = times.indexOf(lastTimes[0]);
@@ -191,31 +207,43 @@ const TimeSelectScreen: React.FC = () => {
     }, [selectedTimeBlocks, times]);
 
     const incrementMonth = () => {
-        const nextMonth = new Date(date!);
-        nextMonth.setMonth(date!.getMonth() + 1);
-        setDate(nextMonth);
+        if (!reservation.date) return;
+        const nextMonth = new Date(reservation.date);
+        nextMonth.setMonth(reservation.date.getMonth() + 1);
+        reservationSetDate(nextMonth);
     };
 
     const decrementMonth = () => {
-        const prevMonth = new Date(date!);
-        prevMonth.setMonth(date!.getMonth() - 1);
-        setDate(prevMonth);
+
+        if (!reservation.date) return;
+        const prevMonth = new Date(reservation.date);
+        prevMonth.setMonth(reservation.date.getMonth() - 1);
+        reservationSetDate(prevMonth);
     };
 
     const prevWeek = () => {
-        const lastDay = new Date(date!)
-        lastDay.setDate(date!.getDate() - 7);
+        if (!reservation.date) return;
+        const lastDay = new Date(reservation.date)
+        lastDay.setDate(reservation.date.getDate() - 7);
+        const today = new Date()
         if (lastDay <= today)
             lastDay.setDate(today.getDate() + 1);
-        setDate(lastDay);
+        reservationSetDate(lastDay);
     }
 
     const nextWeek = () => {
-        const nextDay = new Date(date!)
-        nextDay.setDate(date!.getDate() + 7);
-        setDate(nextDay);
+        if (!reservation.date) return;
+        const nextDay = new Date(reservation.date)
+        nextDay.setDate(reservation.date.getDate() + 7);
+        reservationSetDate(nextDay);
     }
 
+    if (!reservation.date || !reservation.Time || !data)
+        return (
+            <View></View>
+        )
+
+    console.log(`reder 까지`)
     return (
         <View style={{ backgroundColor: '#FFF', flex: 1 }}>
             <View style={{
@@ -236,10 +264,10 @@ const TimeSelectScreen: React.FC = () => {
                     </Pressable>
                     <Pressable
                         onPress={() => {
-                            // navigation.navigate('ResrvationDateSelect');
+                            navigation.navigate('ResrvationDateSelect');
                         }}>
                         <Text style={styles.MonthNumber}>
-                            {`${date!.getMonth() + 1}월`}
+                            {`${reservation.date.getMonth() + 1}월`}
                         </Text>
                     </Pressable>
 
@@ -266,7 +294,7 @@ const TimeSelectScreen: React.FC = () => {
                         <Icons size={24} name={'chevron-back'} color={Color['blue500']} />
                     </Pressable>
                     <View style={{ height: 32, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 264, marginHorizontal: 8 }}>
-                        {renderWeekOfDate(date!)}
+                        {renderWeekOfDate(reservation.date)}
                     </View>
                     <Pressable style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, width: 32, }} onPress={nextWeek} >
                         <Icons size={24} name={'chevron-forward'} color={Color['blue500']} />
@@ -282,12 +310,12 @@ const TimeSelectScreen: React.FC = () => {
                         >
                             <View style={{ flexDirection: 'row', marginHorizontal: 24, alignItems: 'center', height: 24, justifyContent: 'center' }}>
                                 <View>
-                                    <View style={[{ position: 'absolute', height: 9.2, width: 56, top: 0, }, (selectedTimeBlocks?.includes(`TIME_${time - 1}30`)) ? { backgroundColor: Color['blue100'], zIndex: 2 } : { backgroundColor: '#FFF', zIndex: 0 },]} />
-                                    <View style={[{ position: 'absolute', height: 12, width: 56, top: 7.2, }, (selectedTimeBlocks?.includes(`TIME_${time}00`)) ? { backgroundColor: Color['blue100'], zIndex: 2 } : { backgroundColor: '#FFF', zIndex: 0 },]} />
+                                    <View style={[{ position: 'absolute', height: 9.2, width: 56, top: 0, }, (selectedTimeBlocks.includes(`TIME_${time - 1}30`)) ? { backgroundColor: Color['blue100'], zIndex: 2 } : { backgroundColor: '#FFF', zIndex: 0 },]} />
+                                    <View style={[{ position: 'absolute', height: 12, width: 56, top: 7.2, }, (selectedTimeBlocks.includes(`TIME_${time}00`)) ? { backgroundColor: Color['blue100'], zIndex: 2 } : { backgroundColor: '#FFF', zIndex: 0 },]} />
                                     <Text
                                         style={[
                                             { zIndex: 2, alignSelf: 'center', fontSize: 16, width: 56, textAlign: 'center', color: Color['grey300'], fontFamily: 'NanumSquareNeo-Regular' },
-                                            (selectedTimeBlocks?.includes(`TIME_${time}00`) || selectedTimeBlocks?.includes(`TIME_${time - 1}30`)) && { color: Color['blue500'] }
+                                            (selectedTimeBlocks.includes(`TIME_${time}00`) || selectedTimeBlocks.includes(`TIME_${time - 1}30`)) && { color: Color['blue500'] }
                                         ]}
                                     >
                                         {formatTime(time)}
@@ -310,7 +338,7 @@ const TimeSelectScreen: React.FC = () => {
                                     key={time + '_pressable'} // 고유한 key를 부여
                                     style={[
                                         { position: 'relative', display: 'flex', height: 42, borderWidth: 2, borderColor: Color['grey200'], marginHorizontal: 24, width: width - 48, borderStyle: 'dotted', backgroundColor: '#FFF', zIndex: index },
-                                        index != 0 && { top: -index * 2, height: 42 }, selectedTimeBlocks?.includes(time) && { borderColor: Color['blue500'], backgroundColor: Color['blue100'], zIndex: index + 2 }
+                                        index != 0 && { top: -index * 2, height: 42 }, selectedTimeBlocks.includes(time) && { borderColor: Color['blue500'], backgroundColor: Color['blue100'], zIndex: index + 2 }
                                     ]}
                                     onPress={() => toggleTime(time)}>
                                     {occupiedTimes.includes(time) && <View style={{ position: 'absolute', backgroundColor: Color['grey200'], height: 42, width: 100, left: 20, top: -2, }}></View>}
@@ -322,7 +350,7 @@ const TimeSelectScreen: React.FC = () => {
             </ScrollView>
 
             <View style={{ height: 20 }} />
-            {selectedTimeBlocks && selectedTimeBlocks?.length != 0 && <View>
+            {selectedTimeBlocks.length != 0 && <View>
                 <LongButton color='blue' innerText={confirmButtonText()}
                     isAble={true}
                     onPress={() => {
@@ -333,7 +361,7 @@ const TimeSelectScreen: React.FC = () => {
                         } else {
                             setTime((selectedTimeBlocks[0]), (times[times.indexOf(selectedTimeBlocks[selectedTimeBlocks.length - 1]) + 1]))
                             navigation.navigate('inReservation');
-                            setHasWait(false);
+                            // setHasWait(false);
                         }
 
                     }} />
@@ -346,9 +374,9 @@ const TimeSelectScreen: React.FC = () => {
                         <View style={{ position: 'absolute', flexDirection: 'row', justifyContent: 'space-around', marginHorizontal: 8, width: width - 56 - 16, bottom: 16 }}>
                             <ShortButton color='red' innerText='취소' isFilled={true} onPress={() => { setAlertVisible(false) }} />
                             <ShortButton color='blue' innerText='대기 진행' isFilled={true} onPress={() => {
-                                setTime((selectedTimeBlocks![0]), (times[times.indexOf(selectedTimeBlocks![selectedTimeBlocks!.length - 1]) + 1]))
+                                setTime((selectedTimeBlocks[0]), (times[times.indexOf(selectedTimeBlocks[selectedTimeBlocks.length - 1]) + 1]))
                                 navigation.navigate('inReservation');
-                                setHasWait(true)
+                                // setHasWait(true)
                             }} />
                         </View>
                     </Pressable>

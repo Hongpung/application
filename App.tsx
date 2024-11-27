@@ -212,7 +212,7 @@ const SafeZone: React.FC<{ children: any, style: StyleProp<ViewStyle> }> = ({ ch
 
   if (Platform.OS == 'android')
     return (
-      <SafeAreaView style={[style]} >
+      <SafeAreaView style={[style, {paddingBottom:12, backgroundColor:'#FFF', borderBottomLeftRadius:20, borderBottomRightRadius:20}]} >
         {children}
       </SafeAreaView>
     )
@@ -338,7 +338,8 @@ const AppLoader: React.FC = () => {
       try {
 
         const bannerData = await fetch(`${process.env.SUB_API}/banners/on-post`, {
-          signal
+          signal,
+          
         })
 
         if (!bannerData.ok) throw Error();

@@ -5,6 +5,9 @@ import { Color } from '../../../ColorSet';
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamList } from '../../../pageTypes';
+import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken';
+import { getToken } from '@hongpung/utils/TokenHandler';
+import { StackActions, useNavigation } from '@react-navigation/native';
 
 
 enum NotificationType {
@@ -17,13 +20,14 @@ enum NotificationType {
 
 type Notification = {
     id: any,
+    title: string;
     type: NotificationType,
     message: string
     time: Date;
 };
 
 type NotificationCard = {
-    notification: Notification,
+    notification: NotificationDTO,
     onDelete: () => void;
 }
 
@@ -131,16 +135,16 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
             <View style={[styles.NotificationCard]}>
                 <View style={{ margin: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        <View><Text style={{ fontSize: 16 }}>{getIcon(notification.type)}</Text></View>
-                        <Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'] }}>{notification.type}</Text>
+                        {/* <View><Text style={{ fontSize: 16 }}>{getIcon(notification.data)}</Text></View> */}
+                        <Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'] }}>{notification.data.title}</Text>
                     </View>
                     <Text style={{ fontSize: 12, height: 14, fontFamily: "NanumSquareNeo-Regular", color: Color['grey300'] }} >
-                        {calculateTimeDifference(notification.time)} 전
+                        {calculateTimeDifference(new Date(notification.timestamp))} 전
                     </Text>
                 </View>
                 <View style={{ marginHorizontal: 24, justifyContent: 'center', height: 60 }}>
                     <Text style={{ textAlignVertical: 'center', color: Color['grey600'], fontFamily: "NanumSquareNeo-Regular", fontSize: 14 }}>
-                        {notification.message}
+                        {notification.data.body}
                     </Text>
                 </View>
             </View>
@@ -150,7 +154,7 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
 
 
 type NotificationList = {
-    notifications: Notification[],
+    notifications: NotificationDTO[],
     onDelete: (any: any) => void
 }
 
@@ -161,14 +165,14 @@ const NotificationList: React.FC<NotificationList> = ({ notifications, onDelete 
         <View style={styles.container}>
             {notifications.map((notification) => {
 
-                const isOldNotification = notification.time.getTime() < new Date('2024-07-05').getTime();
+                const isOldNotification = new Date(notification.timestamp).getTime() < new Date('2024-07-05').getTime();
                 const shouldShowHeader = isOldNotification && !showOldNotificationHeader;
 
                 if (shouldShowHeader) {
                     showOldNotificationHeader = true;
                 }
                 return (
-                    <View key={notification.id}>
+                    <View key={notification.notificationId}>
                         {shouldShowHeader && (
                             <View style={{ backgroundColor: 'transparent', marginVertical: 4, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center' }}>
                                 <View style={{ height: 0, borderWidth: 0.6, flex: 1, marginRight: 8, borderColor: Color['grey200'] }} />
@@ -179,7 +183,7 @@ const NotificationList: React.FC<NotificationList> = ({ notifications, onDelete 
                         <GestureHandlerRootView>
                             <NotificationCard
                                 notification={notification}
-                                onDelete={() => { onDelete(notification.id) }}
+                                onDelete={() => { onDelete(notification.notificationId) }}
                             />
                         </GestureHandlerRootView>
                     </View>
@@ -189,45 +193,63 @@ const NotificationList: React.FC<NotificationList> = ({ notifications, onDelete 
     )
 }
 
-const NotificationScreen: React.FC= () => {
-    const [Notifications, setNotifications] = useState<Notification[]>([]);
-    const handleDelete = (id: any) => {
-        setNotifications(Notifications.filter(notification => notification.id !== id));
+interface NotificationDTO {
+    notificationId: number;
+    isRead: boolean,
+    data: { title: string, body: string, data?: Record<string, any> },
+    timestamp: string
+}
+
+const NotificationScreen: React.FC = () => {
+    const navigation = useNavigation();
+
+    const [Notifications, setNotifications] = useState<NotificationDTO[]>([]);
+    const handleDelete = (id: number) => {
+        const deleteFetch = async () => {
+            try {
+                const token = await getToken('utilToken');
+                if (!token) { throw Error('invalid Token'); }
+
+                const response = await fetch(`${process.env.SUB_API}/notification/delete/${id}`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}`, }
+                })
+
+                if (!response.ok) throw Error('Delete Fail')
+
+                setNotifications(Notifications.filter(notification => notification.notificationId !== id));
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                    // `invalid Token` 메시지일 경우 처리
+                    if (err.message === 'invalid Token') {
+
+                        navigation.dispatch(StackActions.replace('Login'))
+                        return;
+                    }
+                    // `AbortError`일 경우 처리
+                    if (err.name === 'AbortError') {
+                        const status = (err as any).status ?? ''; // status가 있으면 사용, 없으면 빈 문자열
+
+                    }
+                } else {
+                    console.error('An unknown error occurred');
+                }
+            }
+        }
+        deleteFetch()
+
     };
 
-
-    const notifications: Notification[] = [
-        {
-            id: 1,
-            type: NotificationType.Assignment,
-            time: new Date('2024-02-05'),
-            message: '내일(7.6(월)) 16:00~17:00에 예약한 일정이 있어요. 참고해주세요.',
-        },
-        {
-            id: 2,
-            type: NotificationType.Notification,
-            time: new Date('2024-02-05'),
-            message: '안전검사로 인한 연습실 사용 일시중단 안내',
-        },
-        {
-            id: 3,
-            type: NotificationType.Notification,
-            time: new Date('2024-03-05'),
-            message: '안전검사로 인한 연습실 사용 일시중단 안내',
-        },
-        {
-            id: 4,
-            type: NotificationType.Notification,
-            time: new Date('2024-08-01'),
-            message: '안전검사로 인한 연습실 사용 일시중단 안내',
-        },
-    ];
-
-    useLayoutEffect(() => {
-        const sorted = notifications.sort((a, b) => b.time.getTime() - a.time.getTime())
-        setNotifications(sorted);
-    }, [])
-
+    const { data: notifications, loading, error } = useFetchUsingUtilToken<NotificationDTO[]>(`${process.env.SUB_API}/notification/my`);
+    useFetchUsingUtilToken<NotificationDTO[]>(`${process.env.SUB_API}/notification/read`,{method:'PATCH'})
+    useEffect(() => {
+        if (notifications)
+            setNotifications(notifications)
+    }, [notifications])
+    if (!notifications || loading)
+        return (
+            <View style={{ flex: 1, backgroundColor: '#FFF' }} />
+        )
     return (
         <ScrollView style={styles.container} >
             <View style={{ marginTop: 6 }} />

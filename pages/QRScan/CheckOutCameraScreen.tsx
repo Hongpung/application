@@ -4,20 +4,21 @@ import React, { useEffect, useState } from 'react'
 import Header from '@hongpung/components/Header';
 import { useRecoilValue } from 'recoil';
 import { onUseSession } from '@hongpung/recoil/sessionState';
+import { useIsFocused } from '@react-navigation/native';
 
 const CheckOutCameraScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
-
+    const isFocusing = useIsFocused()
     const sessionData = useRecoilValue(onUseSession)
     const [permission, requestPermission] = useCameraPermissions();
-    const [photos, setPhotos] = useState<{ blob: Blob, uri: string, originHeight: number, originWidth: number }[]>([]);
+    const [photos, setPhotos] = useState<{ uri: string, originHeight: number, originWidth: number }[]>([]);
     const [cameraRef, setCameraRef] = useState<CameraView | null>(null);
     const shootingCount = (sessionData?.borrowInstruments?.length || 0) + 2;
 
     useEffect(() => {
         if (photos.length > 0)
             setPhotos([])
-    }, [])
+    }, [isFocusing])
 
     useEffect(() => {
         if (photos.length == shootingCount)
@@ -27,15 +28,14 @@ const CheckOutCameraScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
     const takePictureHandler = async () => {
         if (!cameraRef) return;
 
-        let photo = await cameraRef.takePictureAsync();
+        let photo = await cameraRef.takePictureAsync({ quality: 0.5, imageType: 'jpg'});
 
         if (photo) {
-            console.log(photo.uri+'ss')
+            console.log(photo.uri + 'ss')
             const response = await fetch(photo.uri);
             const blob = await response.blob();
             console.log('blobCreaterd', blob)
-            setPhotos([...photos, { blob, uri: photo.uri, originHeight: photo.height, originWidth: photo.width }]);
-            
+            setPhotos([...photos, { uri: photo.uri, originHeight: photo.height, originWidth: photo.width }]);
         }
     };
 

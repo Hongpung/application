@@ -10,22 +10,45 @@ import { useNavigation } from '@react-navigation/native'
 import { ReservationDTO } from '@hongpung/pages/Reserve/ReserveInterface'
 import { useRecoilValue } from 'recoil'
 import { loginUserState } from '@hongpung/recoil/authState'
+import useFetch from '@hongpung/hoc/useFetch'
+import { User } from '@hongpung/UserType'
+import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken'
 
 
 
 type MyPracticesNavProps = NativeStackNavigationProp<MyPageParamList, 'MyPractices'>;
 
+export interface Session {
+    sessionId: number;
+    date: string;
+    message: string;
+    startTime: string;
+    endTime: string;
+    creatorId: number;
+    extendCount: number;
+    creatorName: string;
+    creatorNickname: string | null;
+    sessionType: string;
+    reservationType?: string;
+    participationAvailable: boolean;
+    returnImageUrl: string[];
+    forceEnd: boolean;
+    attendanceList: { user: User, status: '참가' | '출석' | '결석' | '지각' }[];
+}
+
+export type breifSessionInfo = Omit<Session, 'returnImageUrl' | 'extendCount' | 'attendanceList'>;
+
 const MyPracticesScreen: React.FC = () => {
 
     const navigation = useNavigation<MyPracticesNavProps>()
     const [selectedDate, setDate] = useState<Date | null>(null)
-    const [reserveList, setReserveList] = useState<ReservationDTO[] | null>(null)
+    const [reserveList, setReserveList] = useState<breifSessionInfo[] | null>(null)
     const [calendarMonth, setMonth] = useState(new Date())
     const [reservedDate, setReservedDates] = useState<{ [key: number]: { regularType: string, isParticipable: boolean }[] }>([]);
     const userInfo = useRecoilValue(loginUserState);
 
-    const { data, loading, error } = useFetchUsingToken<ReservationDTO[]>(
-        `${process.env.BASE_URL}/reservation/year-month-member?year=${calendarMonth.getFullYear()}&month=${Number(calendarMonth.getMonth()) + 1}&memberId=${userInfo?.memberId!}`,
+
+    const { data: sessionDatas, loading, error } = useFetchUsingUtilToken<breifSessionInfo[]>(`${process.env.SUB_API}/room-session/log`,
         {},
         5000,
         [userInfo, calendarMonth]
@@ -33,27 +56,26 @@ const MyPracticesScreen: React.FC = () => {
 
     useEffect(() => {
         //fetchMothlyReserves
-        if (!!data) {
+        if (!!sessionDatas) {
             const reservedDates: { [key: number]: any[] } = [];
-            data.map((reserve) => {
+            sessionDatas.map((reserve) => {
                 const reserveDate = new Date(reserve.date).getDate();
-                if (!reservedDates[reserveDate]) reservedDates[reserveDate] = [{ regularType: reserve.type, isParticipable: reserve.participationAvailable }];
-                else reservedDates[reserveDate] = [...reservedDates[reserveDate], { regularType: reserve.type, isParticipable: reserve.participationAvailable }];
+                if (!reservedDates[reserveDate]) reservedDates[reserveDate] = [{ sessionType: reserve.sessionType, regularType: reserve.reservationType, isParticipable: reserve.participationAvailable }];
+                else reservedDates[reserveDate] = [...reservedDates[reserveDate], { sessionType: reserve.sessionType, regularType: reserve.reservationType, isParticipable: reserve.participationAvailable }];
             })
             setReservedDates(reservedDates);
         }
 
-    }, [calendarMonth, data])
+    }, [calendarMonth, sessionDatas])
 
     useEffect(() => {
-        if (!!data) {
-            if (!selectedDate) setReserveList(data)
+        if (!!sessionDatas) {
+            if (!selectedDate) setReserveList(sessionDatas)
             else {
-                setReserveList(data.filter((reserve) => new Date(reserve.date).getDate() == selectedDate.getDate()))
+                setReserveList(sessionDatas.filter((reserve) => new Date(reserve.date).getDate() == selectedDate.getDate()))
             }
-            console.log(data);
         }
-    }, [selectedDate, data])
+    }, [selectedDate, sessionDatas])
 
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
@@ -66,7 +88,7 @@ const MyPracticesScreen: React.FC = () => {
             <ScrollView contentContainerStyle={{ backgroundColor: '#FFF' }}>
                 <PrevPracticeList
                     prevPractice={reserveList}
-                    onPress={(reserve) => navigation.push('MyPracticeInfo', { reservationId: reserve.reservationId! })}
+                    onPress={(reserve) => navigation.push('MyPracticeInfo', { sessionId: reserve.sessionId! })}
                 />
             </ScrollView>
         </View>
@@ -135,18 +157,19 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
                 const dateReservaData = reservedDates[day];
                 days.push(
                     <Pressable key={`date-${day}`}
-                        style={{ height: 32, width: 32, alignItems: 'center', justifyContent: 'flex-start', backgroundColor: day == selectedDate?.getDate() ? Color['blue100'] : 'transparent', borderRadius: 5 }}
+                        style={{ display: 'flex', height: 32, width: 32, alignItems: 'center', justifyContent: 'flex-start', backgroundColor: day == selectedDate?.getDate() ? Color['blue100'] : 'transparent', borderRadius: 5 }}
                         onPress={() => {
                             if (selectedDate?.getDate() == day) onSelect(null);
                             else !!dateReservaData && filterLogforDate(day);
                         }}
                     >
                         <Text style={[styles.CalendarText, !!dateReservaData && { color: Color['grey600'] }, day == selectedDate?.getDate() && { color: Color['blue600'] }]}>{day}</Text>
-                        {!!dateReservaData &&
-                            dateReservaData?.map(reserve => (<View style={{ flexDirection: 'row', justifyContent: 'space-evenly', marginTop: 2 }}>
-                                <View style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: reserve.regularType == '정규연습' ? Color['blue500'] : reserve.isParticipable ? Color['green500'] : Color['red500'] }} />
-                            </View>))
-                        }
+                        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: 2, gap: 2 }}>
+                            {!!dateReservaData &&
+                                dateReservaData?.slice(0, 3).map(reserve => (
+                                    <View style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: reserve.regularType == '정규연습' ? Color['blue500'] : reserve.isParticipable ? Color['green500'] : Color['red500'] }} />))
+                            }
+                        </View>
                     </Pressable>
                 );
             }
@@ -204,24 +227,24 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
 
 
 
-const PrevPracticeList: React.FC<{ prevPractice: ReservationDTO[] | null, onPress: (reserve: ReservationDTO) => void }> = ({ prevPractice, onPress }) => {
+const PrevPracticeList: React.FC<{ prevPractice: breifSessionInfo[] | null, onPress: (session: breifSessionInfo) => void }> = ({ prevPractice, onPress }) => {
 
-    const mapedList = prevPractice?.reduce((acc, reserve) => {
-        const dateKey: string = reserve.date; // 날짜를 키로 사용 (YYYY-MM-DD 포맷)
+    const mapedList = prevPractice?.reduce((acc, session) => {
+        const dateKey: string = session.date; // 날짜를 키로 사용 (YYYY-MM-DD 포맷)
 
         if (!acc[dateKey]) {
             acc[dateKey] = []; // 해당 날짜에 대한 배열이 없으면 초기화
         }
 
-        acc[dateKey].push(reserve); // 해당 날짜에 예약 추가
+        acc[dateKey].push(session); // 해당 날짜에 예약 추가
         return acc;
-    }, {} as Record<string, ReservationDTO[]>);
+    }, {} as Record<string, breifSessionInfo[]>);
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
 
     return (
         <View style={{ flex: 1 }}>
-            {mapedList && Object.entries(mapedList).map(([dateKey, reserves]) => {
+            {mapedList && Object.entries(mapedList).map(([dateKey, session]) => {
                 const date = new Date(dateKey);
 
                 return (
@@ -232,9 +255,9 @@ const PrevPracticeList: React.FC<{ prevPractice: ReservationDTO[] | null, onPres
                         </Text>
 
                         {/* 해당 날짜의 모든 예약을 출력 */}
-                        {reserves.map((reserve, index) => (
+                        {session.map((session, index) => (
                             <View key={dateKey + '-' + index} style={{ marginVertical: 6 }}>
-                                <PracticeCard reserve={reserve} onPress={onPress} />
+                                <PracticeCard session={session} onPress={onPress} />
                             </View>
                         ))}
                     </View>

@@ -12,6 +12,7 @@ import { Icons } from '@hongpung/components/Icon'
 import { InReservationStackParamList, ReservationStackParamList } from '@hongpung/nav/ReservationStack'
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import Toast from 'react-native-toast-message'
 
 
 type ReservationEditConfirmNavProp = CompositeNavigationProp<
@@ -29,6 +30,7 @@ const ReservationEditConfirmScreen: React.FC = () => {
 
     const loginUser = useRecoilValue(loginUserState);
     const [difference, setDifference] = useState<{ [key: string]: any }>(findReservationDifferences(preReservation, reservation))
+
 
     const DateString = useCallback((selectedDate: Date) => {
         return `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}.${selectedDate.getDate().toString().padStart(2, '0')}(${daysOfWeek[selectedDate.getDay()]})`;
@@ -75,6 +77,33 @@ const ReservationEditConfirmScreen: React.FC = () => {
                 }
                 const result: any = await response.json();
 
+                const utilToken = await getToken('utilToken');
+                const notificationResponse = await fetch(`${process.env.SUB_API}/notification/send`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${utilToken}`,
+                    },
+                    body: JSON.stringify(
+                        {
+                            to: [...reservation.participants.map((user) => { if (user.memberId! != loginUser?.memberId) return user.memberId })],
+                            title: '예약이 변경되었습니다',
+                            text: `예약명: ${result.message}`
+                        }
+                    )
+                })
+
+                if (!notificationResponse.ok) {
+                    Toast.show({
+                        type: 'success',
+                        text1: '알림 전송에는 실패했어요',
+                        position: 'bottom',
+                        bottomOffset: 60,
+                        visibilityTime: 3000
+                    });
+                }
+
+
                 if (result != null)
                     navigation.navigate('DailyReserveList', { date: reservation.date!.toISOString() })
             }
@@ -113,12 +142,12 @@ const ReservationEditConfirmScreen: React.FC = () => {
                         (key: string) =>
                             !['addedBorrowInstrumentIds', 'reomvedBorrowInstrumentIds', 'addedParticipatorIds', 'removedParticipatorIds'].includes(key)
                     )?.map((key: string) => {
-                        if (key == 'startTime'||key == 'endTime') {
+                        if (key == 'startTime' || key == 'endTime') {
                             const time = preReservationDTO[key].slice(-4);
                             return (
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
-                                    <Text style={styles.leftText}>{key == 'startTime'?'시작시간':'종료시간'}</Text>
-                                    <Text style={[styles.rightText, { color: Color['grey300'] }]}>{time.slice(0,2)}시 {time.slice(-2)}분</Text>
+                                    <Text style={styles.leftText}>{key == 'startTime' ? '시작시간' : '종료시간'}</Text>
+                                    <Text style={[styles.rightText, { color: Color['grey300'] }]}>{time.slice(0, 2)}시 {time.slice(-2)}분</Text>
                                 </View>)
                         }
                         return (
@@ -179,12 +208,12 @@ const ReservationEditConfirmScreen: React.FC = () => {
                 {Object.keys(difference)
                     .filter((key: string) => !['addedBorrowInstrumentIds', 'reomvedBorrowInstrumentIds', 'addedParticipatorIds', 'removedParticipatorIds'].includes(key))
                     ?.map((key: string) => {
-                        if (key == 'startTime'||key == 'endTime') {
+                        if (key == 'startTime' || key == 'endTime') {
                             const time = newReservationDTO[key].slice(-4);
                             return (
                                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
-                                    <Text style={styles.leftText}>{key == 'startTime'?'시작시간':'종료시간'}</Text>
-                                    <Text style={[styles.rightText, { color: Color['blue500'] }]}>{time.slice(0,2)}시 {time.slice(-2)}분</Text>
+                                    <Text style={styles.leftText}>{key == 'startTime' ? '시작시간' : '종료시간'}</Text>
+                                    <Text style={[styles.rightText, { color: Color['blue500'] }]}>{time.slice(0, 2)}시 {time.slice(-2)}분</Text>
                                 </View>)
                         }
                         return (
