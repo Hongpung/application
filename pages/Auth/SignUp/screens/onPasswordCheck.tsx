@@ -52,7 +52,7 @@ export const PasswordCheck: React.FC = () => {
                                 }]}
                         />
                     </View>
-                    <View style={{ marginTop: 24 }}>
+                    <View style={{ alignSelf: 'center', marginTop: 24 }}>
                         <InputComponent
                             ref={confirmPasswordRef}
                             label='비밀번호 확인'

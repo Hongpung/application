@@ -164,7 +164,7 @@ const ReservationConfirmScreen: React.FC = () => {
                         {reservation.participants.length >= 3 && <Text style={styles.rightText}>{`외 ${reservation.participants?.length} 명`}</Text>}
                     </View>
                     {reservation.participants.length > 0 &&
-                        <Pressable style={{ position: 'absolute', right: -12 }}>
+                        <Pressable style={{ position: 'absolute', right: -12 }} onPress={() => { navigation.navigate('ReservationParticipatorsView', { participators: JSON.stringify(reservation.participants) }) }}>
                             <Icons size={16} color={Color['grey300']} name={'chevron-forward'}></Icons>
                         </Pressable>}
                 </View>
@@ -181,7 +181,7 @@ const ReservationConfirmScreen: React.FC = () => {
                         : <Text style={[styles.rightText, { color: Color['grey300'] }]}>{'없음'}</Text>}
 
                     {reservation.borrowInstruments.length > 0 &&
-                        <Pressable style={{ position: 'absolute', right: -12 }}>
+                        <Pressable style={{ position: 'absolute', right: -12 }} onPress={() => { navigation.navigate('ReservationInstrumentsView', { instruments: JSON.stringify(reservation.borrowInstruments) }) }}>
                             <Icons size={16} color={Color['grey300']} name={'chevron-forward'}></Icons>
                         </Pressable>}
                 </View>

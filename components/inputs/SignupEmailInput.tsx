@@ -6,7 +6,7 @@ import Toast from 'react-native-toast-message';
 
 type InputProps = {
     label: string,
-    checkValid?: (valid: boolean) => void,
+    setValid: () => void,
     color?: string
     isEditible?: boolean
     inputValue: string,
@@ -79,6 +79,7 @@ const sendVerificationCode = async (email: string) => {
 
         if (response.ok) {
             result = 200;
+            console.log('success')
         } else {
             console.error('서버에서 데이터 가져오기 실패: ', response.status);
             result = response.status;
@@ -102,7 +103,7 @@ const sendVerificationCode = async (email: string) => {
 }
 
 
-const SignUpEmailInput: React.FC<InputProps> = ({ label, checkValid, isEditible = true, inputValue, setInputValue }) => {
+const SignUpEmailInput: React.FC<InputProps> = ({ label, setValid, isEditible = true, inputValue, setInputValue }) => {
 
     const [isTyped, setIsTyped] = useState(false);
     const [isValid, setIsValid] = useState(true);
@@ -129,8 +130,8 @@ const SignUpEmailInput: React.FC<InputProps> = ({ label, checkValid, isEditible 
                     setLoading(true);
                     const sendResult = await sendVerificationCode(inputValue);
                     if (sendResult == 200) {
+                        setValid();
                         setIsSend(true);
-                        if (checkValid) checkValid(true);
                         showSendToast();
                     }
                     else if (sendResult == 403) {
@@ -169,16 +170,12 @@ const SignUpEmailInput: React.FC<InputProps> = ({ label, checkValid, isEditible 
             setIsTyped(false);
             setIsValid(false);
 
-            if (checkValid) checkValid(false);
-
             setErrorText(josa(label, '을/를') + ' 입력해야해요')
         } else {
             const regex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             const newCondition = regex.test(inputValue);
             setIsValid(newCondition);
             if (!newCondition) setErrorText("이메일 주소가 유효하지 않습니다")
-
-            if (checkValid) checkValid(false);
         }
     }
 

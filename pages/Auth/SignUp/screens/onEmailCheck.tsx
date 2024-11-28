@@ -7,9 +7,10 @@ import InputComponent from "@hongpung/components/inputs/InputComponent";
 import { Color } from "@hongpung/ColorSet";
 import { verifyingEmail } from "../Utils";
 import { showEmailVirificationCompleteToast, showExpiredCodeToast, showProblemToast, showUncorrectCodeToast } from "../toasts/sign-up-toast";
+import { debounce } from "lodash";
 
 export const EmailCheck: React.FC = () => {
-    
+
     const { signUpInfo, setEmail, setStep } = useSignUp();
     const [isVerifed, setVerified] = useState(false);
     const [isLoading, setLoading] = useState(false);
@@ -45,15 +46,15 @@ export const EmailCheck: React.FC = () => {
                     </Text>
                 </View>
 
-                <View style={{ alignSelf: 'center', marginTop:12 }}>
+                <View style={{ alignSelf: 'center', marginTop: 12 }}>
                     <SignUpEmailInput
                         label='이메일'
                         color={'green'}
                         inputValue={signUpInfo.email}
                         setInputValue={setEmail}
                         isEditible={!isVerifed}
-                        checkValid={(value: boolean) => {
-                            setVerified(value)
+                        setValid={() => {
+                            setVerified(true)
                         }}
                     />
                 </View>
@@ -76,13 +77,14 @@ export const EmailCheck: React.FC = () => {
                             }
                         />}
                 </View>
-                <View style={[{ paddingHorizontal: 12, marginTop: 24}]}>
+                <View style={[{ paddingHorizontal: 12, marginTop: 24 }]}>
                     <LongButton
+                        key={verificationCode}
                         color={'green'}
                         innerText='이메일 인증'
                         isAble={isVerifed}
-                        onPress={async () => {
-                            if (verificationCodeRef.current?.validate()) {
+                        onPress={debounce(async () => {
+                            if (verificationCodeRef.current?.validate() || !isLoading) {
                                 try {
                                     setLoading(true);
                                     const verified = await verifyingEmail(signUpInfo.email, verificationCode);
@@ -104,7 +106,7 @@ export const EmailCheck: React.FC = () => {
                                     setLoading(false);
                                 }
                             }
-                        }}
+                        }, 100)}
                     />
                 </View>
                 <Modal visible={isLoading} transparent>

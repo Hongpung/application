@@ -124,7 +124,7 @@ export const PersonalInformationCheck: React.FC = () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(
-                    { ...signUpInfo, enrollmentNumber: Number(signUpInfo.enrollmentNumber), club: clubsEng[clubs.indexOf(signUpInfo.club!)], nickname: '널 허용 왜 안 해' }
+                    { ...signUpInfo, enrollmentNumber: Number(signUpInfo.enrollmentNumber), club: clubsEng[clubs.indexOf(signUpInfo.club!)] }
                 ),
                 // 이거 넣어야함 {clubsEng[clubs.indexOf(signUpInfo.club??'기타')]}
                 signal

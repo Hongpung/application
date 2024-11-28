@@ -20,14 +20,11 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
     // 페이지 이동 함수
     const goToPage = () => {
         if (pagerRef.current) {
-            pagerRef.current.setPage(pageNum+1);
+            pagerRef.current.setPage(pageNum + 1);
         }
     };
     const SkipHandler = () => {
-        navigation.reset({
-            index: 0,
-            routes: [{ name: 'Permission' }],
-        })
+        navigation.replace('Permission')
     }
     return (
         // 배경용
@@ -117,13 +114,13 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
                             />
                         </>
                     ) : (
-                        <View style={{flexGrow:1}}>
-                        <LongButton
-                            innerText={'이해했어요'}
-                            isAble={true}
-                            color={'blue'}
-                            onPress={SkipHandler}
-                        />
+                        <View style={{ flexGrow: 1 }}>
+                            <LongButton
+                                innerText={'이해했어요'}
+                                isAble={true}
+                                color={'blue'}
+                                onPress={SkipHandler}
+                            />
                         </View>
                     )}
                 </View>
@@ -181,10 +178,10 @@ const styles = StyleSheet.create({
         position: 'absolute',
         flexDirection: 'row',
         bottom: 72,
-        paddingHorizontal:32,
-        width:'100%',
+        paddingHorizontal: 32,
+        width: '100%',
         justifyContent: 'space-around',
-        flex:1,
+        flex: 1,
     }
 })
 

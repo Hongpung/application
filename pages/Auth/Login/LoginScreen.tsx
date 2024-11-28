@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardAvoidingView, Pressable, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, KeyboardAvoidingView, Modal, Pressable, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { StackActions } from '@react-navigation/native'
 import Toast from 'react-native-toast-message'
@@ -17,6 +17,8 @@ type LoginProps = NativeStackScreenProps<RootStackParamList, "Login">;
 
 const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
+    const adminEmail = 'admin@gmail.com'
+    const [emailFoundModal, setVisibleEmailFoundModal] = useState(false)
     const { login } = useAuth();
     const [Email, setEmail] = useState('');
     const [password, setPassWord] = useState('')
@@ -154,10 +156,13 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                     <View style={{
                         height: 130,
                         width: 240,
-                        backgroundColor: Color['blue400'],
                         marginTop: 36,
-                        alignSelf: 'center'
+                        alignSelf: 'center',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }}>
+                        <Text style={{ fontSize: 42, fontFamily: 'NanumSquareNeo-ExtraBold', color: Color['blue400'], textAlign: 'center' }}>{`홍 풍`}</Text>
+                        <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['blue400'], textAlign: 'center' }}>({`임시로고`})</Text>
                     </View>
                     <View style={{
                         marginTop: 36,
@@ -226,11 +231,12 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                         />
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'row', marginTop: 16, width: 300, height: 26, marginHorizontal: 48 }}>
-                        <Pressable style={{ flex: 1, alignItems:'center' }}>
+                        <Pressable style={{ flex: 1, alignItems: 'center' }}
+                            onPress={() => setVisibleEmailFoundModal(true)}>
                             <Text style={{ fontSize: 16, lineHeight: 22, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey600'] }}>ID 찾기</Text>
                         </Pressable>
-                        <Pressable style={{ flex: 1, alignItems:'center' }}
-                        onPress={()=>{navigation.push('PWReset')}}>
+                        <Pressable style={{ flex: 1, alignItems: 'center' }}
+                            onPress={() => { navigation.push('PWReset') }}>
                             <Text style={{ fontSize: 16, lineHeight: 22, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey600'] }}>비밀번호 변경</Text>
                         </Pressable>
                     </View>
@@ -247,6 +253,27 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                         />
                     </View>
                 </View>
+                <Modal visible={emailFoundModal} transparent>
+                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.2)', display: 'flex', justifyContent: 'center' }}>
+                        <View style={{ marginHorizontal: 24, paddingVertical: 24, backgroundColor: '#FFF', display: 'flex', gap: 16, borderRadius: 15 }}>
+                            <Text style={{
+                                paddingHorizontal: 24,
+                                fontFamily: 'NanumSquareNeo-Bold',
+                                fontSize: 16,
+                            }}>이메일 찾기 안내</Text>
+                            <Text style={{
+                                paddingHorizontal: 24,
+                                fontFamily: 'NanumSquareNeo-Regular',
+                                fontSize: 14,
+                                lineHeight: 20
+                            }}>{`이메일은 관리자에게 문의하여 찾을 수 있어요.\n관리자 연락처: ${adminEmail}`}</Text>
+
+                            <LongButton color='blue' innerText={'확인'} isAble={true} onPress={() => {
+                                setVisibleEmailFoundModal(false)
+                            }} />
+                        </View>
+                    </View>
+                </Modal>
             </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
     )

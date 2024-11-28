@@ -57,19 +57,20 @@ const ReserveMainScreen: React.FC = () => {
             const utcTime = new Date();
             const koreaTime = new Date(utcTime.getTime() + 9 * 60 * 60 * 1000);
             const slideTo: { index: number | null } = { index: null }
-
-            let isOnAir = false;
-
+            let onAir = false;
             const fetchReservationCards: ReservationCard[] = []
             registeredSessions.map((session, index) => {
                 if (session.sessionType == 'Reservation') {
-                    if (session.onAir) isOnAir = true;
+                    console.log(session.onAir)
+                    if (session.onAir) {
+                        onAir=true
+                        setParticipatible(session.participationAvailable)
+                    }
                     const startTime = TimetoDate(session.startTime)
                     const endTime = TimetoDate(session.endTime)
                     if (endTime < koreaTime) console.log('종료 후') // 시간순에 따라 종료된 것이 먼저 출현
                     if (koreaTime < endTime && startTime < koreaTime) { //시간순에 따라 진행 중인 것이 그다음 출현
                         slideTo.index = index
-                        setOnAir(true)
                         setParticipatible(session.participationAvailable)
                     }
                     if (koreaTime < startTime) {                        //시간순에 따라 진행 전이 것이 그다음 출현
@@ -102,6 +103,12 @@ const ReserveMainScreen: React.FC = () => {
 
                     }
                 } if (session.sessionType == 'RealTime') {
+                    console.log(session.onAir)
+                    
+                    if (session.onAir) {
+                        onAir=true
+                        setParticipatible(session.participationAvailable)
+                    }
                     fetchReservationCards.push(session)
                 }
             })
@@ -109,9 +116,8 @@ const ReserveMainScreen: React.FC = () => {
             if (!slideTo.index && fetchReservationCards.length > 1) {
                 slideTo.index = fetchReservationCards.length - 1;
             }
-            setOnAir(isOnAir)
             setReservationCards(fetchReservationCards);
-
+            setOnAir(onAir)
             if (slideTo.index)
                 setSlideToIndex(slideTo.index);
             else

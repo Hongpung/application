@@ -12,19 +12,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Icons } from '@hongpung/components/Icon';
 
 type PermissionProps = NativeStackScreenProps<RootStackParamList, "Permission">;
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
 // 추후 보강
-
 const Permission: React.FC<PermissionProps> = ({ navigation }) => {
-
-
+  
   const PermissionHandler = async () => {
     await Notifications.requestPermissionsAsync();
     await Camera.requestCameraPermissionsAsync();

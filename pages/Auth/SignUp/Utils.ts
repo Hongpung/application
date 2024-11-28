@@ -25,12 +25,16 @@ export const verifyingEmail = async (email: string, code: string) => {
         });
 
 
-        if (response.ok) {
-            result = response.status;
-        } else {
+        if (!response.ok) {
+            const data = await response.json();
+            console.log(data)
             console.error('서버에서 데이터 가져오기 실패: ', response.status);
             result = response.status;
+            throw Error('서버에서 데이터 가져오기 실패')
         }
+
+        result = 200;
+
     } catch (error) {
         console.error(error)
     } finally {
