@@ -34,7 +34,9 @@ export const verifyingEmail = async (email: string, code: string) => {
             throw Error('Failed to Authorization')
         }
 
-        const { token } = await response.json();
+        const data = await response.json();
+        console.log(data)
+        const {token} = data;
         await saveToken('PWtoken', token)
     } catch (error) {
         console.error(error)
@@ -45,20 +47,21 @@ export const verifyingEmail = async (email: string, code: string) => {
     return result;
 }
 
-export const changePassword = async (password: string) => {
+export const changePassword = async (newPassword: string) => {
     const controller = new AbortController();
     const signal = controller.signal;
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 6초 타임아웃
 
+    
     try {
         const token = await getToken('PWtoken')
-
+        console.log(JSON.stringify({ token, newPassword }))
         const response = await fetch(`${process.env.BASE_URL}/member/password`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ token, password }),
+            body: JSON.stringify({ token, newPassword }),
             signal
         });
 

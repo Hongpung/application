@@ -13,6 +13,7 @@ import { InReservationStackParamList, ReservationStackParamList } from '@hongpun
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Toast from 'react-native-toast-message'
+import { InstrumentTypes } from '@hongpung/UserType'
 
 
 type ReservationEditConfirmNavProp = CompositeNavigationProp<
@@ -47,9 +48,7 @@ const ReservationEditConfirmScreen: React.FC = () => {
                 difference.message = `${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`
             }
 
-            const sendFormat = JSON.stringify(difference)
-
-            console.log(sendFormat, preReservation.reservationId);
+            const sendFormat = JSON.stringify(difference);
 
             const controller = new AbortController();
             const signal = controller.signal;
@@ -101,11 +100,19 @@ const ReservationEditConfirmScreen: React.FC = () => {
                         bottomOffset: 60,
                         visibilityTime: 3000
                     });
+                }else{
+                    Toast.show({
+                        type: 'success',
+                        text1: '예약을 변경하고 알림을 전송했어요',
+                        position: 'bottom',
+                        bottomOffset: 60,
+                        visibilityTime: 3000
+                    });
                 }
 
 
                 if (result != null)
-                    navigation.navigate('DailyReserveList', { date: reservation.date!.toISOString() })
+                    navigation.navigate('ReservationDetail', { reservationId: reservation.reservationId! })
             }
             catch (e) {
                 console.error(e)
@@ -140,7 +147,7 @@ const ReservationEditConfirmScreen: React.FC = () => {
                 {Object.keys(difference)
                     .filter(
                         (key: string) =>
-                            !['addedBorrowInstrumentIds', 'reomvedBorrowInstrumentIds', 'addedParticipatorIds', 'removedParticipatorIds'].includes(key)
+                            !['addedBorrowInstrumentIds', 'removedBorrowInstrumentIds', 'addedParticipatorIds', 'removedParticipatorIds'].includes(key)
                     )?.map((key: string) => {
                         if (key == 'startTime' || key == 'endTime') {
                             const time = preReservationDTO[key].slice(-4);
@@ -162,7 +169,7 @@ const ReservationEditConfirmScreen: React.FC = () => {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14, }}                    >
                         <Text style={styles.leftText}>대여 악기</Text>
                         {preReservation.borrowInstruments.length > 0 ?
-                            <Text style={[styles.rightText, { color: Color['grey300'] }]}>{['쇠', '장구', '북', '소고', '새납'].map((type) => {
+                            <Text style={[styles.rightText, { color: Color['grey300'] }]}>{InstrumentTypes.filter(type => type != '징').map((type) => {
                                 const instCount = preReservation.borrowInstruments.filter((instrument) => instrument.type == type).length
                                 if (instCount > 0)
                                     return `${type} ${instCount}`
@@ -206,7 +213,7 @@ const ReservationEditConfirmScreen: React.FC = () => {
 
 
                 {Object.keys(difference)
-                    .filter((key: string) => !['addedBorrowInstrumentIds', 'reomvedBorrowInstrumentIds', 'addedParticipatorIds', 'removedParticipatorIds'].includes(key))
+                    .filter((key: string) => !['addedBorrowInstrumentIds', 'removedBorrowInstrumentIds', 'addedParticipatorIds', 'removedParticipatorIds'].includes(key))
                     ?.map((key: string) => {
                         if (key == 'startTime' || key == 'endTime') {
                             const time = newReservationDTO[key].slice(-4);
@@ -228,7 +235,7 @@ const ReservationEditConfirmScreen: React.FC = () => {
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
                         <Text style={styles.leftText}>대여 악기</Text>
                         {reservation.borrowInstruments.length > 0 ?
-                            <Text style={[styles.rightText, { marginRight: 12, color: Color['blue500'] }]}>{['쇠', '장구', '북', '소고', '새납'].map((type) => {
+                            <Text style={[styles.rightText, { marginRight: 12, color: Color['blue500'] }]}>{InstrumentTypes.filter(type => type != '징').map((type) => {
                                 const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
                                 if (instCount > 0)
                                     return `${type} ${instCount}`

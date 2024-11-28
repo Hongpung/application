@@ -12,6 +12,7 @@ import { useFocusEffect } from '@react-navigation/native'
 import { Icons } from '@hongpung/components/Icon'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { InReservationStackParamList } from '@hongpung/nav/ReservationStack'
+import { InstrumentTypes } from '@hongpung/UserType'
 
 const { width } = Dimensions.get('window')
 
@@ -269,7 +270,7 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
                         {reservation.borrowInstruments.length > 0 ?
                             <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
                                 <View style={{ flexDirection: 'row' }}>
-                                    {['쇠', '장구', '북', '소고', '새납'].map((type) => {
+                                    {InstrumentTypes.filter(type=> type!='징').map((type) => {
                                         const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
                                         return (<View style={{ width: (width - 96) / 5, alignItems: 'center' }}>
                                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14 }}>{type}</Text>

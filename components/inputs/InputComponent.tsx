@@ -113,7 +113,7 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
                 key={label}
                 ref={inputRef}
                 style={[styles.InputBox, { width: length }]}
-                placeholder={`${josa(label, '을/를')} 입력하세요` + `${!isRequired ? ' (공백시 본명 적용)' : ``}`}
+                placeholder={`${josa(label, '을/를')} 입력하세요` + `${!isRequired ? ' (없으면 빈칸)' : ``}`}
                 value={inputValue}
                 onFocus={handleFocus}
                 onEndEditing={validateInput}

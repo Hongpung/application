@@ -1,9 +1,9 @@
 
 export type InstrumentType = '꽹과리' | '장구' | '북' | '소고' | '징' | '기타';
-export const InstrumentTypes: InstrumentType[] = ['꽹과리', '장구', '북', '소고', '징' , '기타']
+export const InstrumentTypes: InstrumentType[] = ['꽹과리', '장구', '북', '소고', '징', '기타']
 
 export const instrumentOrder = (instrument: InstrumentType) => {
-    const instruments = ['쇠', '장구', '북', '소고', '새납'];
+    const instruments = ['꽹과리', '장구', '북', '소고', '징', '기타'];
     return instruments.indexOf(instrument);
 }
 
@@ -15,7 +15,7 @@ export const clubToEng = (club: club) => {
     return clubsEng[clubIndex];
 }
 
-type Role = "상쇠" | "상장구" | "수북" | "수법고"
+type Role = "상쇠" | "상장구" | "수북" | "수법고" | '패원'
 
 interface borrowHistory {
     borrowerName: string
@@ -35,14 +35,14 @@ export interface Instrument {
     borrowHistory: borrowHistory[]
 }
 
-export interface InstrumentCreateDTO{
+export interface InstrumentCreateDTO {
     type: string
     name: string
     imageUrl?: string
 }
 
 
-export interface InstrumentEditDTO{
+export interface InstrumentEditDTO {
     type: string
     name: string
     available: boolean,

@@ -13,6 +13,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { InReservationStackParamList, ReservationStackParamList } from '@hongpung/nav/ReservationStack'
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native'
 import Toast from 'react-native-toast-message'
+import { InstrumentTypes } from '@hongpung/UserType'
 
 type ReservationConfirmNavProp = CompositeNavigationProp<
     NativeStackNavigationProp<InReservationStackParamList, 'ReservationConfirm'>,
@@ -95,6 +96,14 @@ const ReservationConfirmScreen: React.FC = () => {
                         bottomOffset: 60,
                         visibilityTime: 3000
                     });
+                }else{
+                    Toast.show({
+                        type: 'success',
+                        text1: '예약을 생성하고 알림을 전송했어요',
+                        position: 'bottom',
+                        bottomOffset: 60,
+                        visibilityTime: 3000
+                    });
                 }
 
                 if (result != null)
@@ -172,7 +181,7 @@ const ReservationConfirmScreen: React.FC = () => {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
                     <Text style={styles.leftText}>대여 악기</Text>
                     {reservation.borrowInstruments.length > 0 ?
-                        <Text style={[styles.rightText, { marginRight: 12 }]}>{['쇠', '장구', '북', '소고', '새납'].map((type) => {
+                        <Text style={[styles.rightText, { marginRight: 12 }]}>{InstrumentTypes.filter(type=> type!='징').map((type) => {
                             const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
                             if (instCount > 0)
                                 return `${type} ${instCount}`

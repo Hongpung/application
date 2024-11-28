@@ -101,7 +101,8 @@ const ChangeMyInfoScreen: React.FC = () => {
                 setLoading(true)
 
                 const token = await getToken('token');
-                if (!token) throw Error('invalid Token');
+                const utilToken = await getToken('utilToken')
+                if (!token || !utilToken) throw Error('invalid Token');
 
                 const submitForm: { [key: string]: string } = { password }
 
@@ -111,6 +112,7 @@ const ChangeMyInfoScreen: React.FC = () => {
                     const updateSns = await fetch(`${process.env.SUB_API}/member/sns/${userData?.memberId}`, {
                         method: 'PATCH',
                         headers: {
+                            Authorization: `Bearer ${utilToken}`,  // Authorization 헤더에 Bearer 토큰 추가
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify(snsDataForm),

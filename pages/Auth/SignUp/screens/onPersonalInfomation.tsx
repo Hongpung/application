@@ -8,6 +8,7 @@ import LongButton from "@hongpung/components/buttons/LongButton";
 import ShortButton from "@hongpung/components/buttons/ShortButton";
 import { showSignUpCompleteToast } from "../toasts/sign-up-toast";
 import { useNavigation } from "@react-navigation/native";
+import { Icons } from "@hongpung/components/Icon";
 
 const { width } = Dimensions.get('window');
 
@@ -52,7 +53,7 @@ const ClubSeletor: React.FC<ClubSeletorProps> = ({ club, setClub, isValidClub, s
 
                 <View style={[styles.InputBox, { flexDirection: 'row', justifyContent: 'space-between', width: 126, alignItems: 'center' }]}>
                     <Text style={[styles.InputText, club == null && { color: Color['grey300'] }]}>{club ?? '동아리 선택'}</Text>
-                    <View style={{ width: 24, height: 12, backgroundColor: Color["green500"] }} />
+                    <Icons name='caret-down' color={Color['green500']} size={20}/>
                 </View>
 
                 <View style={[styles.underline, { borderBottomColor: isValidClub ? Color["green500"] : Color["red500"], width: 142 }]} />
@@ -77,7 +78,7 @@ const ClubSeletor: React.FC<ClubSeletorProps> = ({ club, setClub, isValidClub, s
                                 style={{ paddingVertical: 8, marginVertical: 4, width: 142 - 32, alignItems: 'flex-start', justifyContent: 'space-between', flexDirection: 'row' }}
                                 onPress={() => { setClub(item); setSelectClubVisible(false); setClubisValid(true); }}>
                                 <Text style={[{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, color: club == item ? Color['green600'] : Color['grey400'] }]}>{item}</Text>
-                                {club == item && <View style={{ width: 16, height: 16, backgroundColor: Color['green500'] }} />}
+                                {club == item && <Icons name='checkmark' color={Color['green500']} size={20}/>}
                             </Pressable>
                         )
                     })}</ScrollView>
@@ -180,7 +181,7 @@ export const PersonalInformationCheck: React.FC = () => {
                             </Text>
                         </View>
                         <View style={{ marginTop: 20 }} />
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', zIndex: 1 }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', zIndex: 1,  width: 300, alignSelf: 'center'  }}>
                             <ClubSeletor
                                 club={club}
                                 setClub={setClub}
@@ -212,27 +213,31 @@ export const PersonalInformationCheck: React.FC = () => {
                                     }]}
                             />
                         </View>
-                        <View style={{ marginTop: 20 }} />
-                        <InputComponent
-                            ref={nameRef}
-                            label='이름(본명)'
-                            color={'green'}
-                            inputValue={name ?? ''}
-                            setInputValue={setName}
-                            isEditible={true}
-                            isRequiredMark={true}
-                            onFocus={dropdownCloseHandler}
-                        />
-                        <View style={{ marginTop: 20 }} />
-                        <InputComponent
-                            label='패명'
-                            color={'green'}
-                            inputValue={nickname ?? ''}
-                            setInputValue={setNickName}
-                            isEditible={true}
-                            isRequired={false}
-                            onFocus={dropdownCloseHandler}
-                        />
+                        <View style={{ marginTop: 24, width: 300, alignSelf: 'center' }}>
+                            <InputComponent
+                                ref={nameRef}
+                                label='이름(본명)'
+                                color={'green'}
+                                inputValue={name ?? ''}
+                                setInputValue={setName}
+                                isEditible={true}
+                                isRequiredMark={true}
+                                onFocus={dropdownCloseHandler}
+                            />
+                        </View>
+
+
+                        <View style={{ marginTop: 24,  width: 300, alignSelf: 'center' }}>
+                            <InputComponent
+                                label='패명'
+                                color={'green'}
+                                inputValue={nickname ?? ''}
+                                setInputValue={setNickName}
+                                isEditible={true}
+                                isRequired={false}
+                                onFocus={dropdownCloseHandler}
+                            />
+                        </View>
                     </View>
                     <View style={[{ paddingHorizontal: 12, marginTop: 24 }]}>
                         <LongButton

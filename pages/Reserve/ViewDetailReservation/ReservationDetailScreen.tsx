@@ -10,6 +10,7 @@ import { Icons } from '@hongpung/components/Icon'
 import Toast from 'react-native-toast-message'
 import { ReservationStackParamList } from '@hongpung/nav/ReservationStack'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { InstrumentTypes } from '@hongpung/UserType'
 
 const { width } = Dimensions.get('window')
 
@@ -56,7 +57,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                 const loadedReservation = await response.json();
 
                 const parsedReservation = parseToReservation(loadedReservation)
-
+                console.log(loadedReservation, parsedReservation)
                 setReservation(parsedReservation)
             } catch (e) {
                 console.error(e);
@@ -89,11 +90,11 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                     }
                 )
 
-                if (!response.ok) throw Error('삭제 실패' + response.status)
+                if (!response.ok) throw Error('취소 실패' + response.status)
 
                 Toast.show({
                     type: 'success',
-                    text1: '연습 삭제를 완료했어요!',
+                    text1: '연습 취소를 완료했어요!',
                     position: 'bottom',
                     bottomOffset: 60,
                     visibilityTime: 2000
@@ -272,9 +273,9 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
 
                     <View style={{ marginHorizontal: 16 }}>
                         {reservation.borrowInstruments.length > 0 ?
-                            <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
+                            <Pressable style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }} onPress={() => { navigation.navigate('ReservationInstrumentsView', { instruments: JSON.stringify(reservation.borrowInstruments) }) }}>
                                 <View style={{ flexDirection: 'row' }}>
-                                    {['쇠', '장구', '북', '소고', '새납'].map((type) => {
+                                    {InstrumentTypes.filter(type => type != '징').map((type) => {
                                         const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
                                         return (<View key={type} style={{ width: (width - 96) / 5, alignItems: 'center' }}>
                                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14 }}>{type}</Text>
@@ -283,7 +284,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                                         </View>)
                                     })}
                                 </View>
-                            </View> :
+                            </Pressable> :
                             <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 10, borderWidth: 4, height: 72, borderColor: Color['grey200'], borderStyle: 'dashed' }}>
                                 <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'] }}>대여 악기가 없습니다...</Text></View>
                         }
@@ -294,7 +295,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                 {isEditible() && loginUser?.email == reservation.userEmail && reservation.date! > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
                     <LongButton
                         color={'red'}
-                        innerText={'취소하기'}
+                        innerText={'예약 취소하기'}
                         isAble={true}
                         onPress={() => {
                             if (!isEditible()) { alert('변경 가능 시간이 종료되었습니다.'); return }
@@ -306,11 +307,11 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
             {isEditible() && loginUser?.email == reservation.userEmail && reservation.date! > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
                 <LongButton
                     color={'green'}
-                    innerText={'수정하기'}
+                    innerText={'예약 수정하기'}
                     isAble={true}
                     onPress={() => {
                         if (!isEditible()) { alert('변경 가능 시간이 종료되었습니다.'); return }
-                        navigation.push('ReservationStack', { screen: 'inReservation', params: { reservationId } })
+                        navigation.push('ReservationStack', { screen: 'inReservation', params: { reservationId, date: '' } })
                     }}
                 />
             </View>}

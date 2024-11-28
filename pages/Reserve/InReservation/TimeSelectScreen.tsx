@@ -38,7 +38,6 @@ const TimeSelectScreen: React.FC = () => {
 
     const TimesRef = useRef<ScrollView>(null);
 
-    // console.log(reservation.date)
 
     const times = [
         'TIME_1000', 'TIME_1030', 'TIME_1100', 'TIME_1130',
@@ -68,7 +67,6 @@ const TimeSelectScreen: React.FC = () => {
             )
         }
         // TimesRef.current?.scrollTo({ y: 0, animated: false })
-        console.log(`renderWeekOfDate`)
         return week;
 
     }, [reservation])
@@ -76,7 +74,6 @@ const TimeSelectScreen: React.FC = () => {
     useEffect(() => {
         if (reservation.date) {
             setTimeBlocks([]);
-            console.log(`setTimeBlocks`);
         }
     }, [reservation.date])
     const formatTime = useCallback((hour: number): string => {
@@ -145,12 +142,9 @@ const TimeSelectScreen: React.FC = () => {
         }, 2000, [reservation]
     )
 
-    console.log(data)
-
     const parsedTimeRange = (reservation: briefReservation) => {
         const [startHour, startMinnute] = reservation.startTime.split(':')
         const [endHour, endMinnute] = reservation.endTime.split(':')
-        console.log(`TIME_${startHour}${startMinnute}`, `TIME_${endHour}${endMinnute}`)
         return [`TIME_${startHour}${startMinnute}`, `TIME_${endHour}${endMinnute}`]
     }
 
@@ -167,7 +161,6 @@ const TimeSelectScreen: React.FC = () => {
             // 이전 값과 비교하여 업데이트
             if (JSON.stringify(occupied) !== JSON.stringify(occupiedTimes)) {
                 setOccupiedTimes(occupied);
-                console.log(`setOccupiedTimes`);
             }
         }
     }, [data, occupiedTimes]);
@@ -175,32 +168,46 @@ const TimeSelectScreen: React.FC = () => {
     const toggleTime = useCallback((time: string) => {
         // selectedTimes를 정렬된 상태로 유지
         //if (selectedTimeBlocks.length == 0) return;
-        const lastTimes = selectedTimeBlocks.sort((a, b) => times.indexOf(a) - times.indexOf(b)) ?? [];
+        const lateTimes = selectedTimeBlocks.sort((a, b) => times.indexOf(a) - times.indexOf(b)) ?? [];
 
         const timeIndex = times.indexOf(time);
-        const firstSelectedTimeIndex = times.indexOf(lastTimes[0]);
-        const lastSelectedTimeIndex = times.indexOf(lastTimes[lastTimes.length - 1]);
+        const firstSelectedTimeIndex = times.indexOf(lateTimes[0]);
+        const lastSelectedTimeIndex = times.indexOf(lateTimes[lateTimes.length - 1]);
 
-        if (!lastTimes.includes(time)) {
-            if (lastTimes.length === 0) {
-                lastTimes.push(time);
-                setTimeBlocks([...lastTimes]);
+        if (!lateTimes.includes(time)) {
+            if (lateTimes.length === 0) {
+                lateTimes.push(time);
+                setTimeBlocks([...lateTimes]);
             } else if (timeIndex === firstSelectedTimeIndex - 1 || timeIndex === lastSelectedTimeIndex + 1) {
-                lastTimes.push(time);
-                setTimeBlocks([...lastTimes]);
+                lateTimes.push(time);
+                setTimeBlocks([...lateTimes]);
             } else {
                 const startIndex = Math.min(timeIndex, firstSelectedTimeIndex);
                 const endIndex = Math.max(timeIndex, lastSelectedTimeIndex);
                 const newTimes = times.slice(startIndex, endIndex + 1);
-
-                setTimeBlocks([...newTimes]);
+                const contaionOccupies = newTimes.filter(newTime => occupiedTimes.includes(newTime))
+                if (contaionOccupies.length > 0 && contaionOccupies) {
+                    if (firstSelectedTimeIndex != startIndex) {
+                        //시작점을 바꿀 경우 이미 먹힌 시간은 못먹게 해야함
+                        //중첩되는 occupideTime을 가져와야듯
+                        const lastOccupiedIndex = times.indexOf(contaionOccupies[contaionOccupies.length - 1]) + 1;
+                        const newTimes = times.slice(lastOccupiedIndex, endIndex + 1);
+                        setTimeBlocks([...newTimes]);
+                    } else if (lastSelectedTimeIndex != endIndex) {
+                        const firstOccupiedIndex = times.indexOf(contaionOccupies[0]!) - 1;
+                        const newTimes = times.slice(startIndex, firstOccupiedIndex+1);
+                        setTimeBlocks([...newTimes]);
+                    }
+                }
+                else
+                    setTimeBlocks([...newTimes]);
             }
         } else {
-            const index = lastTimes.indexOf(time);
+            const index = lateTimes.indexOf(time);
             if (index > -1) {
-                if ((index === 0 && timeIndex === firstSelectedTimeIndex) || (index === lastTimes.length - 1 && timeIndex === lastSelectedTimeIndex)) {
-                    lastTimes.splice(index, 1);
-                    setTimeBlocks([...lastTimes]);
+                if ((index === 0 && timeIndex === firstSelectedTimeIndex) || (index === lateTimes.length - 1 && timeIndex === lastSelectedTimeIndex)) {
+                    lateTimes.splice(index, 1);
+                    setTimeBlocks([...lateTimes]);
                 }
             }
         }
@@ -243,7 +250,6 @@ const TimeSelectScreen: React.FC = () => {
             <View></View>
         )
 
-    console.log(`reder 까지`)
     return (
         <View style={{ backgroundColor: '#FFF', flex: 1 }}>
             <View style={{
@@ -310,8 +316,8 @@ const TimeSelectScreen: React.FC = () => {
                         >
                             <View style={{ flexDirection: 'row', marginHorizontal: 24, alignItems: 'center', height: 24, justifyContent: 'center' }}>
                                 <View>
-                                    <View style={[{ position: 'absolute', height: 9.2, width: 56, top: 0, }, (selectedTimeBlocks.includes(`TIME_${time - 1}30`)) ? { backgroundColor: Color['blue100'], zIndex: 2 } : { backgroundColor: '#FFF', zIndex: 0 },]} />
-                                    <View style={[{ position: 'absolute', height: 12, width: 56, top: 7.2, }, (selectedTimeBlocks.includes(`TIME_${time}00`)) ? { backgroundColor: Color['blue100'], zIndex: 2 } : { backgroundColor: '#FFF', zIndex: 0 },]} />
+                                    <View style={[{ position: 'absolute', height: 9.2, width: 56, top: 0, }, (selectedTimeBlocks.includes(`TIME_${time - 1}30`)) ? { backgroundColor: Color['blue100'], zIndex: 2 } : occupiedTimes.includes(`TIME_${time - 1}30`) ? { backgroundColor: Color['grey200'], zIndex: 2 } : { backgroundColor: '#FFF', zIndex: 0 },]} />
+                                    <View style={[{ position: 'absolute', height: 12, width: 56, top: 7.2, }, (selectedTimeBlocks.includes(`TIME_${time}00`)) ? { backgroundColor: Color['blue100'], zIndex: 2 } : occupiedTimes.includes(`TIME_${time}00`) ? { backgroundColor: Color['grey200'], zIndex: 2 } : { backgroundColor: '#FFF', zIndex: 0 },]} />
                                     <Text
                                         style={[
                                             { zIndex: 2, alignSelf: 'center', fontSize: 16, width: 56, textAlign: 'center', color: Color['grey300'], fontFamily: 'NanumSquareNeo-Regular' },
@@ -337,11 +343,11 @@ const TimeSelectScreen: React.FC = () => {
                                 <Pressable
                                     key={time + '_pressable'} // 고유한 key를 부여
                                     style={[
-                                        { position: 'relative', display: 'flex', height: 42, borderWidth: 2, borderColor: Color['grey200'], marginHorizontal: 24, width: width - 48, borderStyle: 'dotted', backgroundColor: '#FFF', zIndex: index },
+                                        { position: 'relative', display: 'flex', height: 42, borderWidth: 2, borderColor: Color['grey200'], marginHorizontal: 24, width: width - 48, borderStyle: 'dotted', backgroundColor: occupiedTimes.includes(time) ? Color['grey200'] : '#FFF', zIndex: index },
                                         index != 0 && { top: -index * 2, height: 42 }, selectedTimeBlocks.includes(time) && { borderColor: Color['blue500'], backgroundColor: Color['blue100'], zIndex: index + 2 }
                                     ]}
-                                    onPress={() => toggleTime(time)}>
-                                    {occupiedTimes.includes(time) && <View style={{ position: 'absolute', backgroundColor: Color['grey200'], height: 42, width: 100, left: 20, top: -2, }}></View>}
+                                    onPress={() => { if (!occupiedTimes.includes(time)) toggleTime(time) }}>
+                                    {/* { <View style={{ position: 'absolute', backgroundColor: Color['grey200'], height: 42, width: '100%', left: 20, top: -2, }}></View>} */}
                                 </Pressable>
                             );
                         })

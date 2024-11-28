@@ -5,6 +5,7 @@ import { Color } from "../../ColorSet"
 import { User } from "../../UserType"
 import { Icons } from "../Icon"
 import useFetch from "@hongpung/hoc/useFetch"
+import useFetchUsingUtilToken from "@hongpung/hoc/useFetchUsingutilToken"
 
 
 interface ProfileBoxProps {
@@ -13,8 +14,9 @@ interface ProfileBoxProps {
 
 const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ user }) => {
 
-    const { data: snsData, loading, error } = useFetch<{ instagramUrl: string, blogUrl: string }>(user?`${process.env.SUB_API}/member/sns/${user?.memberId}`:null, {}, 5000, [user])
+    const { data: snsData, loading, error } = useFetchUsingUtilToken<{ instagramUrl: string, blogUrl: string }>(user ? `${process.env.SUB_API}/member/sns/${user?.memberId}` : null, {}, 5000, [user])
 
+    console.log(snsData)
     const RoleTextRender = () => {
         if (user?.role) { return user.role }
         return "동아리원"
@@ -36,7 +38,7 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ user }) => {
                     </View>
                     <View style={{ flexDirection: 'row', width: 64, justifyContent: 'flex-start', gap: 4 }}>
                         {snsData && Object.entries(snsData)?.map(([key, value]) => !!value && (
-                            <Pressable style={styles.icons}
+                            <Pressable key={key} style={styles.icons}
                                 onPress={() => {
                                     Linking.openURL(value)
                                         .catch((err) => { console.error('Failed to open URL:', err); })

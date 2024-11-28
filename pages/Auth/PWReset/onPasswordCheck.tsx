@@ -8,6 +8,7 @@ import { Color } from "@hongpung/ColorSet";
 import { changePassword } from "./Utils";
 import { useNavigation } from "@react-navigation/native";
 import { deleteToken, getToken } from "@hongpung/utils/TokenHandler";
+import Toast from "react-native-toast-message";
 
 export const PasswordCheck: React.FC = () => {
     const navigation = useNavigation();
@@ -48,6 +49,12 @@ export const PasswordCheck: React.FC = () => {
                     }}>
                         <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'] }}>
                             {'로그인에 사용할 비밀번호를 변경해요.'}
+                        </Text>
+                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'],lineHeight:16 }}>
+                            {'새로운 비밀번호는 영문, 숫자, 특수문자를 포함한\n8~12자로 구성해야 해요.'}
+                        </Text>
+                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'],lineHeight:16 }}>
+                            {'허용 특수문자: !,@,#,$,%,^,&,+,='}
                         </Text>
                     </View>
                     <View style={{ alignSelf: 'center', marginTop: 12 }}>
@@ -91,6 +98,13 @@ export const PasswordCheck: React.FC = () => {
                             onPress={async () => {
                                 if (passwordRef.current?.validate() && confirmPasswordRef.current?.validate()) {
                                     const chageResult = await changePassword(password)
+                                    Toast.show({
+                                        type: 'success',
+                                        text1: '비밀번호가 변경 되었어요!\n다시 로그인해주세요',
+                                        position: 'bottom',
+                                        bottomOffset: 60,
+                                        visibilityTime: 3000
+                                      });
                                     if(chageResult) navigation.goBack();
                                 }
                                 else if (!passwordRef.current?.validate()) passwordRef.current?.focus()

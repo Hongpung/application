@@ -153,7 +153,7 @@ export function parseToReservation(reservationDTO: ReservationDTO): Reservation 
         isRegular: reservationDTO.type === "정규연습",  // `type`에 따라 정기 예약 여부 판단
         isParticipatible: reservationDTO.participationAvailable,  // 참여 가능 여부 매핑
         participants: reservationDTO.participators?.filter(user => user.email != reservationDTO.email) ?? [],  // 참여자 목록 그대로 매핑
-        borrowInstruments: [],  // 사용 중인 악기 정보는 기본적으로 빈 배열로 설정 (필요시 추가)
+        borrowInstruments: reservationDTO?.borrowedInstruments ?? [],  // 사용 중인 악기 정보는 기본적으로 빈 배열로 설정 (필요시 추가)
         hasToWait: false,  // 대기 여부는 기본적으로 false로 설정 (필요시 추가 로직)
         lastmodified: new Date(reservationDTO.lastmodified)
     };

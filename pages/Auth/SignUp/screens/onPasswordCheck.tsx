@@ -31,10 +31,16 @@ export const PasswordCheck: React.FC = () => {
                         회원가입
                     </Text>
                     <View style={{
-                        marginVertical: 8, paddingHorizontal: 16, marginHorizontal: 36, backgroundColor: Color['grey100'], paddingVertical: 16, borderRadius: 5
+                        marginVertical: 8, paddingHorizontal: 16, marginHorizontal: 36, backgroundColor: Color['grey100'], paddingVertical: 16, borderRadius: 5, gap:4
                     }}>
                         <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'] }}>
                             {'로그인에 사용할 비밀번호를 정해요.'}
+                        </Text>
+                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'],lineHeight:16 }}>
+                            {'비밀번호는 영문, 숫자, 특수문자를 포함한\n8~12자로 구성해야 해요.'}
+                        </Text>
+                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'],lineHeight:16 }}>
+                            {'허용 특수문자: !,@,#,$,%,^,&,+,='}
                         </Text>
                     </View>
                     <View style={{ alignSelf: 'center', marginTop: 12 }}>

@@ -13,11 +13,12 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Header from '@hongpung/components/Header';
 import { ScreenParams } from "./HomeStacks";
 import ReservationParticipatorsViewScreen from "@hongpung/pages/Reserve/ViewDetailReservation/ReservationParticipatorsViewScreen";
+import ReservationInstrumentsViewScreen from "@hongpung/pages/Reserve/ViewDetailReservation/ReservationInstrumentsViewScreen";
 
 
 
 export type InReservationStackParamList = {
-    inReservation?: { reservationId: number, date: string };
+    inReservation?: { reservationId: number | null, date: string };
 
     ResrvationDateSelect: undefined;
     TimeSelect: undefined;
@@ -140,6 +141,16 @@ const ReservationStacks = () => {
                 options={{
                     headerShown: true,
                     header: () => <Header leftButton='close' HeaderName='참여 인원' />
+                }}
+
+            />
+
+            <ReservationStack.Screen
+                name='ReservationInstrumentsView'
+                component={ReservationInstrumentsViewScreen}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='close' HeaderName='대여 악기' />
                 }}
 
             />

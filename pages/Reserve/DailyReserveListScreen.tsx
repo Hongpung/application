@@ -41,7 +41,7 @@ const DailyReserveListScreen: React.FC<DailyReserveProps> = ({ navigation, route
     const { data, loading, error } = useFetchUsingToken<briefReservation[]>(
         `${process.env.BASE_URL}/reservation/day?date=${selectedDate.toISOString().split('T')[0]}`,
         {
-        }, 2000, [selectedDate,isFocusing]
+        }, 2000, [selectedDate, isFocusing]
     )
 
     // if (loading)
@@ -131,7 +131,7 @@ const DailyReserveListScreen: React.FC<DailyReserveProps> = ({ navigation, route
                     </Pressable>
                 </View>
                 {today <= selectedDate && <Pressable onPress={() => {
-                    navigation.navigate('ReservationStack', { screen: 'inReservation', params: { date: selectedDate.toISOString().split('T')[0] } });
+                    navigation.navigate('ReservationStack', { screen: 'inReservation', params: { date: selectedDate.toISOString().split('T')[0], reservationId: null } });
 
                 }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}>
                     <Text style={{
@@ -194,14 +194,14 @@ const DailyReserveListScreen: React.FC<DailyReserveProps> = ({ navigation, route
                     return (
                         <Pressable key={reserve.reservationId} style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36, overflow: 'hidden' }}
                             onPress={() => { navigation.navigate('ReservationDetail', { reservationId: reserve.reservationId }) }}>
-                            <Text numberOfLines={1} style={{ position: 'absolute', width: width / 2, top: 10, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>{reserve.message}</Text>
+                            <Text numberOfLines={1} style={{ position: 'absolute', width: width / 2, top: Timegap > 30?16: 8, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>{reserve.message}</Text>
 
-                            <View style={{ position: 'absolute', top: 46, left: 14, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                <Icons size={24} name={'people'} color={Color['grey300']} />
-                                <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>24</Text>
-                            </View>
+                            {Timegap > 30 && <View style={{ position: 'absolute', bottom: 12, right: 16, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                <Icons size={24} name={'time-outline'} color={Color['grey300']} />
+                                <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>{reserve.startTime.slice(0, -3)}~{reserve.endTime.slice(0, -3)}</Text>
+                            </View>}
                             {reserve.type == '정규연습' ?
-                                <View style={{ position: 'absolute', top: -4, right: 8, }} >
+                                Timegap > 30 && <View style={{ position: 'absolute', top: -4, right: 8, }} >
                                     <Icons size={48} name={'bookmark-sharp'} color={Color['blue500']} />
                                 </View>
                                 :

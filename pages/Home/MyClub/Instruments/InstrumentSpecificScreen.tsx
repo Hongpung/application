@@ -6,17 +6,25 @@ import { Color } from '@hongpung/ColorSet';
 import { Instrument } from '@hongpung/UserType';
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import Header from '@hongpung/components/Header';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { ClubInstrumentStackParamList } from '@hongpung/nav/InstrumentStack';
+import { useRecoilValue } from 'recoil';
+import { loginUserState } from '@hongpung/recoil/authState';
 
 
 const { width } = Dimensions.get('window');
 
-const InstrumentSpecificScreen: React.FC<{ navigation: any, route: any }> = ({ navigation, route }) => {
+type InstrumentSpecificProps = NativeStackScreenProps<ClubInstrumentStackParamList, 'InstrumentSpecific'>
+
+const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigation, route }) => {
+
     const { instrumentId } = route?.params;
 
     const daysOfWeek = useMemo(() => ['일', '월', '화', '수', '목', '금', '토'], [])
 
     const [imageModalVsible, setImageModalVsible] = useState(false);
     const [aspectRatio, setAspectRatio] = useState<number | null>(null);
+    const loginUser = useRecoilValue(loginUserState)
     const isFocusing = useIsFocused();
     const { data, loading, error } = useFetchUsingToken<Instrument>(
         `${process.env.BASE_URL}/instrument/${instrumentId}`
@@ -24,13 +32,13 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any, route: any }> = ({ n
     )
 
     useEffect(() => {
-            if (!!data?.imageUrl) {
-                Image.getSize(data.imageUrl!, (width, height) => {
-                    setAspectRatio(width / height);
-                }, (error) => {
-                    console.error(`Couldn't get the image size: ${error.message}`);
-                });
-            }
+        if (!!data?.imageUrl) {
+            Image.getSize(data.imageUrl!, (width, height) => {
+                setAspectRatio(width / height);
+            }, (error) => {
+                console.error(`Couldn't get the image size: ${error.message}`);
+            });
+        }
     }, [data])
 
     if (loading)
@@ -42,12 +50,18 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any, route: any }> = ({ n
         return (<View><Text>Error:Can't find the instrument</Text></View>)
     return (
         <View style={{ flex: 1, backgroundColor: `#FFF` }}>
-            <Header
+            {loginUser?.club == data.club && loginUser.role != '패원' ? <Header
                 leftButton='close'
                 HeaderName='악기 상세'
-                RightButton='수정'
+                RightButton={'수정'}
                 RightAction={() => navigation.push('InstrumentEdit', { instrumentInform: JSON.stringify(data) })}
             />
+                :
+                <Header
+                    leftButton='close'
+                    HeaderName='악기 상세'
+                />
+            }
             <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
                 <View style={{ height: 12 }} />
                 <Pressable style={styles.imageContainer}
@@ -71,7 +85,7 @@ const InstrumentSpecificScreen: React.FC<{ navigation: any, route: any }> = ({ n
                         style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
                         {data.imageUrl ?
                             <Image
-                                source={{ uri:data.imageUrl }}
+                                source={{ uri: data.imageUrl }}
                                 style={[styles.image, { width: width - 36, height: (width - 36) / aspectRatio!, borderRadius: 15 }]}
                             />
                             :

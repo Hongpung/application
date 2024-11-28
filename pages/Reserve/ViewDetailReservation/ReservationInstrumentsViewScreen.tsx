@@ -7,10 +7,10 @@ import { briefInstrument, instrumentOrder } from "@hongpung/UserType"
 import { Color } from "@hongpung/ColorSet"
 
 import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack"
-import { ClubInstrumentStackParamList } from "@hongpung/nav/InstrumentStack"
 import { ReservationStackParamList } from "@hongpung/nav/ReservationStack"
+import { MainStackParamList } from "@hongpung/nav/HomeStacks"
 
-type InstrumentNavParams = NativeStackNavigationProp<ClubInstrumentStackParamList, 'InstrumentsHome'>
+type InstrumentNavParams = NativeStackNavigationProp<MainStackParamList, 'Home'>
 
 const BorrowInstrumentsList: React.FC<{ instrumentList: briefInstrument[] }> = ({ instrumentList }) => {
 
@@ -41,8 +41,8 @@ const BorrowInstrumentsList: React.FC<{ instrumentList: briefInstrument[] }> = (
                         <InstrumentCard
                             key={instrument.name + index}
                             instrument={instrument}
-                            view="inManage"
-                            onSelectInstrument={(instrument) => { navigation.navigate('InstrumentSpecific', { instrumentId: instrument.instrumentId }); }}
+                            view="inBorrow"
+                            onSelectInstrument={(instrument) => { navigation.navigate('MyClub',{screen:'Instruments', params:{ screen: 'InstrumentSpecific', params: { instrumentId: instrument.instrumentId } }}); }}
                         />
                     ))}
                     {group.length % 2 == 1 && <View style={{ height: 168, width: 154 }} />}

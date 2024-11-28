@@ -339,7 +339,6 @@ const AppLoader: React.FC = () => {
 
         const bannerData = await fetch(`${process.env.SUB_API}/banners/on-post`, {
           signal,
-          
         })
 
         if (!bannerData.ok) throw Error();
@@ -349,7 +348,7 @@ const AppLoader: React.FC = () => {
         setBanners({ state: 'LOADED', value: serverData })
 
       } catch (e) {
-        console.error(e);
+        console.error(e+'배너 오류');
         setBanners(prev => ({ state: 'FAILED', value: prev.value }))
       } finally {
         clearTimeout(timeoutId);

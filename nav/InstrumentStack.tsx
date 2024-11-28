@@ -11,8 +11,8 @@ import InstrumentCreateScreen from "@hongpung/pages/Home/MyClub/Instruments/Inst
 
 
 export type ClubInstrumentStackParamList = {
-    InstrumentsHome:undefined;
-    InstrumentSpecific:{ instrumentId: number };
+    InstrumentsHome: undefined;
+    InstrumentSpecific: { instrumentId: number };
     InstrumentCreate: undefined;
     InstrumentEdit: { instrumentInform: string };
 };
@@ -30,7 +30,12 @@ const InstrumentStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: ({ navigation }) => <Header leftButton='arrow-back' HeaderName='악기 관리' RightButton='추가' RightAction={() => navigation.navigate('InstrumentCreate')} />
+                    header: ({ navigation }) => {
+                        if (userInfo?.role == '패원')
+                            return (<Header leftButton='arrow-back' HeaderName='악기 관리'/>)
+                        else
+                            return (<Header leftButton='arrow-back' HeaderName='악기 관리' RightButton='추가' RightAction={() => navigation.navigate('InstrumentCreate')} />)
+                    }
                 }}
             />
             <InstrumentStack.Screen
