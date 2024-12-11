@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useRef, useState } from 'react'
-import LongButton from '../../components/buttons/LongButton';
-import { Color } from '../../ColorSet';
+import LongButton from '@hongpung/components/buttons/LongButton';
+import { Color } from '@hongpung/ColorSet';
 import PagerView from 'react-native-pager-view';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CheckOutStackParamList } from '@hongpung/nav/HomeStacks';
@@ -43,23 +43,22 @@ const CheckOutDescriptScreen: React.FC = () => {
             }} initialPage={0}
                 onPageScroll={(e) => { const { position, offset } = e.nativeEvent; setPageNum(position); }}
                 ref={pagerRef}>
-                {sessionState?.borrowInstruments &&
-                    <View style={{
-                        flex: 1,
-                        alignItems: 'center',
-                    }}
-                        key={Pages[0]}>
-                        <View style={[styles.CheckOutPicture, { backgroundColor: "#dddddd" }]}>
-                            {/* <Image source={require('사진 경로')}/> */}
-                            {/* 나중에 위 코드로 바꿔서 넣으면 됨 */}
-                            <Text>
-                                사진 1
-                            </Text>
-                        </View>
-                        <Text style={styles.CheckOutDescript}>
-                            {`사용한 ${sessionState?.borrowInstruments}개의 악기들을\n제자리에 돌려놓고 찍어주세요`}
+                <View style={{
+                    flex: 1,
+                    alignItems: 'center',
+                }}
+                    key={Pages[0]}>
+                    <View style={[styles.CheckOutPicture, { backgroundColor: "#dddddd" }]}>
+                        {/* <Image source={require('사진 경로')}/> */}
+                        {/* 나중에 위 코드로 바꿔서 넣으면 됨 */}
+                        <Text>
+                            사진 1
                         </Text>
-                    </View>}
+                    </View>
+                    <Text style={styles.CheckOutDescript}>
+                        {`사용한 ${sessionState?.borrowInstruments}개의 악기들을\n제자리에 돌려놓고 찍어주세요`}
+                    </Text>
+                </View>
                 <View style={{
                     flex: 1,
                     alignItems: 'center',
