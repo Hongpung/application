@@ -125,7 +125,6 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
                 returnKeyType='done'
                 autoCapitalize='none'
                 clearTextOnFocus={false}
-                autoComplete='off'
                 multiline={false}
             />
             <View style={[styles.underline, { borderBottomColor: isValid ? underlineColor : Color["red500"], width: length + 16 }]} />

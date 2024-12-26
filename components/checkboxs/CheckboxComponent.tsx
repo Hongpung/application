@@ -13,7 +13,7 @@ const CheckboxComponent: React.FC<CheckBoxProps> = ({ innerText, onCheck, isChec
 
     return (
         <Pressable
-            style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}
+            style={{ display:'flex', flexDirection: 'row', alignItems: 'center', gap:12 }}
             onPress={() => { onCheck(!isChecked) }}>
             <View style={styles.checkboxBorder}>
                 {isChecked ? <View style={styles.checkboxFill} /> : null}
@@ -41,7 +41,6 @@ const styles = StyleSheet.create({
     }, innerText: {
         fontFamily: "NanumSquareNeo-Bold",
         fontSize: 14,
-        marginLeft: 10,
         color: Color['blue800']
     }
 })

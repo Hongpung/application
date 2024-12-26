@@ -27,7 +27,7 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
 
     // 토큰을 불러온 후 useFetch 실행
     const { data, loading, error } = useFetchUsingToken<any[]>(
-        `${process.env.BASE_URL}/reservation/year-month?year=${calendarMonth.getFullYear()}&month=${calendarMonth.getMonth() + 1}`,
+        `${process.env.SUB_API}/reservation/month-calendar?year=${calendarMonth.getFullYear()}&month=${calendarMonth.getMonth() + 1}`,
         {
             method: 'GET',
             headers: {

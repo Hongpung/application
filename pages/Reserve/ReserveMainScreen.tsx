@@ -60,7 +60,7 @@ const ReserveMainScreen: React.FC = () => {
             let onAir = false;
             const fetchReservationCards: ReservationCard[] = []
             registeredSessions.map((session, index) => {
-                if (session.sessionType == 'Reservation') {
+                if (session.sessionType == 'RESERVED') {
                     console.log(session.onAir)
                     if (session.onAir) {
                         onAir=true
@@ -102,7 +102,7 @@ const ReserveMainScreen: React.FC = () => {
                         fetchReservationCards.push({ nextReservationTime: '없음' })
 
                     }
-                } if (session.sessionType == 'RealTime') {
+                } if (session.sessionType == 'REALTIME') {
                     console.log(session.onAir)
                     
                     if (session.onAir) {
@@ -141,7 +141,7 @@ const ReserveMainScreen: React.FC = () => {
             if (socketRef.current) {
                 socketRef.current.disconnect(); // 기존 소켓 연결 해제
             }
-            const token = await getToken('utilToken')
+            const token = await getToken('token')
             const socket = io(`${process.env.SUB_API}/reservation`, {
                 transports: ['websocket'],
                 reconnection: true,
@@ -223,7 +223,7 @@ const ReserveMainScreen: React.FC = () => {
     //     socket.on('connect_error', (error) => {
     //         Toast.show({
     //             type: 'error',
-    //             text1: error.message,
+    //             text1: error.title,
     //             position: 'bottom',
     //             bottomOffset: 60,
     //             visibilityTime: 3000
@@ -314,7 +314,7 @@ const ReserveMainScreen: React.FC = () => {
                             if (!!item?.nextReservationTime) {
                                 if (isOnAir) return null
                                 return (
-                                    <View key={item.message + index} style={[{ marginVertical: 8, height: 200, borderWidth: 1, backgroundColor: '#FFF', borderColor: Color['grey200'], borderRadius: 10, marginHorizontal: 8 }, { width: width - 48 }]}>
+                                    <View key={item.title + index} style={[{ marginVertical: 8, height: 200, borderWidth: 1, backgroundColor: '#FFF', borderColor: Color['grey200'], borderRadius: 10, marginHorizontal: 8 }, { width: width - 48 }]}>
 
                                         <Text numberOfLines={1} style={{ fontFamily: 'NanumSquareNeo-Bold', marginHorizontal: 64, top: 72, textAlign: 'center', fontSize: 20 }}>
                                             즉시 이용 가능해요
@@ -345,7 +345,7 @@ const ReserveMainScreen: React.FC = () => {
                                         </View>
                                     }
 
-                                    {item.sessionType == 'Reservation' ?
+                                    {item.sessionType == 'RESERVED' ?
                                         <Pressable key={item.sessionId + index} style={[{ marginVertical: 8, height: 200, borderWidth: 1, backgroundColor: '#FFF', borderColor: Color['grey200'], borderRadius: 10, marginHorizontal: 8 }, { width: width - 48 }]}
                                             onPress={() => {
                                                 navigation.push('Reservation', { screen: 'ReservationDetail', params: { reservationId: item.reservationId } })
@@ -360,7 +360,7 @@ const ReserveMainScreen: React.FC = () => {
                                                     {item.creatorNickname && <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 12, color: Color['grey400'] }}>{item.creatorNickname}</Text>}
                                                 </View>
                                             }
-                                            <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontFamily: 'NanumSquareNeo-Bold', marginHorizontal: 64, top: 72, textAlign: 'center', fontSize: 20 }}>{item.message}</Text>
+                                            <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontFamily: 'NanumSquareNeo-Bold', marginHorizontal: 64, top: 72, textAlign: 'center', fontSize: 20 }}>{item.title}</Text>
                                             <View style={{ position: 'absolute', right: 24, bottom: 12, alignItems: 'flex-end', gap: 4 }}>
                                                 <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>{`${item.startTime.slice(0, -3)} ~ ${item.endTime.slice(0, -3)}`}</Text>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><Icons size={24} name={'people'} color={Color['grey300']} />
@@ -379,7 +379,7 @@ const ReserveMainScreen: React.FC = () => {
                                                     {item.creatorNickname && <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 12, color: Color['grey400'] }}>{item.creatorNickname}</Text>}
                                                 </View>
                                             }
-                                            <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontFamily: 'NanumSquareNeo-Bold', marginHorizontal: 64, top: 72, textAlign: 'center', fontSize: 20 }}>{item.message}</Text>
+                                            <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontFamily: 'NanumSquareNeo-Bold', marginHorizontal: 64, top: 72, textAlign: 'center', fontSize: 20 }}>{item.title}</Text>
                                             <View style={{ position: 'absolute', right: 24, bottom: 12, alignItems: 'flex-end', gap: 4 }}>
                                                 <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>{`${item.startTime.slice(0, -3)} ~ ${item.endTime.slice(0, -3)}`}</Text>
                                                 <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>

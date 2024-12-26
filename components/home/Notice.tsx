@@ -23,12 +23,14 @@ const NoticePartition: React.FC = () => {
 
     const navigation = useNavigation<CombinedNavigationProp>();
 
-    const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.BASE_URL}/info`)
+    // const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.BASE_URL}/info`)
 
-    if (loading)
-        return (<>
-            <ActivityIndicator color={'white'} size={'large'} />
-        </>)
+    const data:any[]=[]
+
+    // if (loading)
+    //     return (<>
+    //         <ActivityIndicator color={'white'} size={'large'} />
+    //     </>)
 
     return (
         <View style={{ display: 'flex', gap: 14, width: '100%', flexDirection: 'column' }}>

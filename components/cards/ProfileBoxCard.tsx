@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { View, Text, Image, StyleSheet, Pressable, Linking } from "react-native"
 
 import { Color } from "../../ColorSet"
-import { User } from "../../UserType"
+import { clubIdMatchName, User } from "../../UserType"
 import { Icons } from "../Icon"
 import useFetch from "@hongpung/hoc/useFetch"
 import useFetchUsingUtilToken from "@hongpung/hoc/useFetchUsingutilToken"
@@ -16,9 +16,10 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ user }) => {
 
     const { data: snsData, loading, error } = useFetchUsingUtilToken<{ instagramUrl: string, blogUrl: string }>(user ? `${process.env.SUB_API}/member/sns/${user?.memberId}` : null, {}, 5000, [user])
 
-    console.log(snsData)
     const RoleTextRender = () => {
-        if (user?.role) { return user.role }
+
+        if (user?.role && user?.role.length > 0) { return user.role.map(role => role).filter(Boolean).join(', ') }
+
         return "동아리원"
     }
 
@@ -52,11 +53,11 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ user }) => {
             </View>
             <View style={styles.info}>
                 <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text>
-                <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{`${user.club == '신명화랑' ? '신명화랑' : user.club}` + `(${user.enrollmentNumber})`}</Text>
+                <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{`${user.club}` + ` (${user.enrollmentNumber})`}</Text>
             </View>
             <View style={styles.info}>
                 <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>역할</Text>
-                <Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'right', color: user.role == '상쇠' ? Color['red500'] : Color['blue500'], }}>{RoleTextRender()}</Text>
+                <Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'right', }}>{RoleTextRender()}</Text>
             </View>
         </View>
     )

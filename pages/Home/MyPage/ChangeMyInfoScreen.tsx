@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { View, Text, Image, TextInput, KeyboardAvoidingView, TouchableWithoutFeedback, Keyboard, Platform, Alert, Pressable, Modal, ActivityIndicator } from "react-native"
 import Toast from "react-native-toast-message";
-import { useRecoilValue } from "recoil"
+import { useRecoilState, useRecoilValue } from "recoil"
 import * as ImagePicker from 'expo-image-picker';
 import { getToken } from "@hongpung/utils/TokenHandler";
 import uploadImage from "@hongpung/utils/uploadImage";
@@ -10,10 +10,11 @@ import InputComponent from "@hongpung/components/inputs/InputComponent";
 import { Color } from "@hongpung/ColorSet";
 import LongButton from "@hongpung/components/buttons/LongButton";
 import { Icons } from "@hongpung/components/Icon";
-import useFetch from "@hongpung/hoc/useFetch";
 import { loginUserState } from "@hongpung/recoil/authState"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MyPageParamList } from "@hongpung/nav/MyPageStack";
+import useFetchUsingToken from "@hongpung/hoc/useFetchUsingToken";
+import { User } from "@hongpung/UserType";
 
 const showApplyCompleteToast = () => {
     Toast.show({
@@ -30,10 +31,8 @@ type ChangeMyInfoNav = NativeStackNavigationProp<MyPageParamList, 'ChangeMyInfo'
 const ChangeMyInfoScreen: React.FC = () => {
     const navigation = useNavigation<ChangeMyInfoNav>()
     const [isLoading, setLoading] = useState(false);
-    const [password, setPassword] = useState('')
-    const [modalVisible, setModalVisible] = useState(false);
 
-    const userData = useRecoilValue(loginUserState);
+    const [userData, setLoginUser] = useRecoilState(loginUserState);
     const [nickname, setNickname] = useState(userData?.nickname || '');
     const [instagramUrl, setInstagramUrl] = useState<string>('');
     const [blogUrl, setBlogUrl] = useState<string>('');
@@ -42,7 +41,7 @@ const ChangeMyInfoScreen: React.FC = () => {
     const [selectedImageUri, setImageUri] = useState<string | null>(null);
 
 
-    const { data: snsData, loading, error } = useFetch<{ instagramUrl: string, blogUrl: string }>(`${process.env.SUB_API}/member/sns/${userData?.memberId}`, {}, 5000, [userData])
+    const { data: snsData, loading, error } = useFetchUsingToken<{ instagramUrl: string, blogUrl: string }>(`${process.env.SUB_API}/member/sns/${userData?.memberId}`, {}, 5000, [userData])
 
     useEffect(() => {
         if (!!snsData) {
@@ -50,9 +49,11 @@ const ChangeMyInfoScreen: React.FC = () => {
             setBlogUrl(snsData.blogUrl || '');
         }
     }, [snsData])
+
     const RoleTextRender = () => {
-        if (userData?.role) { return userData.role }
-        return "동아리원"
+        if (userData?.role && userData?.role.length > 0) { return [...userData.role] }
+
+        return ["동아리원"]
     }
 
     const pickImageFromAlbum = async () => {
@@ -101,30 +102,20 @@ const ChangeMyInfoScreen: React.FC = () => {
                 setLoading(true)
 
                 const token = await getToken('token');
-                const utilToken = await getToken('utilToken')
-                if (!token || !utilToken) throw Error('invalid Token');
 
-                const submitForm: { [key: string]: string } = { password }
+                if (!token) throw Error('invalid Token');
 
-                if (snsData?.instagramUrl != instagramUrl || snsData?.blogUrl != blogUrl) {
-                    const snsDataForm = { instagramUrl: instagramUrl.length == 0 ? null : instagramUrl, blogUrl: blogUrl.length == 0 ? null : blogUrl }
-                    console.log(snsDataForm)
-                    const updateSns = await fetch(`${process.env.SUB_API}/member/sns/${userData?.memberId}`, {
-                        method: 'PATCH',
-                        headers: {
-                            Authorization: `Bearer ${utilToken}`,  // Authorization 헤더에 Bearer 토큰 추가
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(snsDataForm),
-                        signal
-                    })
+                const submitForm: { [key: string]: string | null } = {}
 
-                    if (!updateSns.ok) throw Error('Sns Update Failed')
-                }
+                if (snsData?.instagramUrl != instagramUrl)
+                    submitForm.instagramUrl = instagramUrl.length == 0 ? null : instagramUrl;
 
-                if (userData.nickname != nickname) {
+
+                if (snsData?.blogUrl != blogUrl)
+                    submitForm.blogUrl = blogUrl.length == 0 ? null : blogUrl
+
+                if (userData.nickname != nickname)
                     submitForm.nickname = nickname;
-                }
 
                 if (!!selectedImage) {
                     console.log('이미지 업로드 수행중')
@@ -139,7 +130,7 @@ const ChangeMyInfoScreen: React.FC = () => {
 
                 console.log('유저 정보 업데이트중', submitForm)
 
-                const response = await fetch(`${process.env.BASE_URL}/member`, {
+                const response = await fetch(`${process.env.SUB_API}/member/status`, {
                     method: 'PATCH',
                     headers: {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
@@ -154,12 +145,11 @@ const ChangeMyInfoScreen: React.FC = () => {
                     throw Error('Server Error' + response.status)
                 }
 
-                setPassword('')
-                setModalVisible(false)
+                const userStatus = await response.json() as User;
+                setLoginUser(userStatus);
+
                 showApplyCompleteToast();
-                setTimeout(() => {
-                    navigation.goBack()
-                }, 0)
+                navigation.goBack();
             } catch (err: any) {
                 if (err.name === 'AbortError') {
                     console.error('Request was canceled' + err.status);
@@ -172,10 +162,7 @@ const ChangeMyInfoScreen: React.FC = () => {
                 setLoading(false)
             }
         }
-        if (password.length == 0) {
-            Alert.alert('비밀번호를 입력하세요.')
-            return
-        }
+
         applyUserStatus();
     }
 
@@ -240,7 +227,13 @@ const ChangeMyInfoScreen: React.FC = () => {
                         </View>
                         <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 28, justifyContent: 'space-between' }}>
                             <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>역할</Text>
-                            <Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'right', color: userData.role == '상쇠' ? Color['red500'] : Color['blue500'], }}>{RoleTextRender()}</Text>
+                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: 2 }}>
+                                {Array.from(RoleTextRender()).map(role => (
+                                    <Text key={role} style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'right', color: role == 'SANGSOE' ? Color['red500'] : Color['blue500'], }}>{role}</Text>
+                                ))}
+                            </View>
+
+
                         </View>
                         <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 28, justifyContent: 'space-between' }}>
                             <Text style={{
@@ -277,25 +270,8 @@ const ChangeMyInfoScreen: React.FC = () => {
                         </View>
                     </View>
                 </View>
-                <Modal visible={modalVisible} transparent={true}>
-                    <Pressable style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center' }}
-                        onPress={() => setModalVisible(false)}>
-                        <Pressable style={{ backgroundColor: '#FFF', display: 'flex', gap: 24, marginHorizontal: 12, paddingTop: 36, paddingBottom: 24, borderRadius: 16 }}
-                            onPress={(e) => { e.defaultPrevented }}>
-                            <Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", marginHorizontal: 28 }}>
-                                정보를 수정하려면 비밀번호를 입력하세요.
-                            </Text>
-                            <View style={{ alignSelf: 'center' }}>
-                                <InputComponent inputValue={password} setInputValue={setPassword} isEncryption isRequired isRequiredMark isEditible color="green" label="password" />
-                            </View>
-                            <View style={{ width: '100%' }}>
-                                <LongButton color="green" innerText="확인" isAble={true} onPress={ApplyHandler} />
-                            </View>
-                        </Pressable>
-                    </Pressable>
-                </Modal>
                 <View style={{ position: 'absolute', bottom: 24, width: '100%' }}>
-                    <LongButton color="green" innerText="적용하기" isAble={true} onPress={() => setModalVisible(true)}>
+                    <LongButton color="green" innerText="적용하기" isAble={true} onPress={ApplyHandler}>
 
                     </LongButton>
                 </View>

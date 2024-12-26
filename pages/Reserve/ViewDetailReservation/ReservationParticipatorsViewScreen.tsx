@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, ScrollView, Modal, Pressable } from "react-native";
 import ProfileMiniCard from "@hongpung/components/cards/ProfileMiniCard";
-import ProfileBoxCard from "@hongpung/components/cards/PrifileBoxCard";
+import ProfileBoxCard from "@hongpung/components/cards/ProfileBoxCard";
 import { User } from "@hongpung/UserType";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Icons } from "@hongpung/components/Icon";
@@ -9,9 +9,6 @@ import { ReservationStackParamList } from "@hongpung/nav/ReservationStack";
 
 
 type ReservationParticipatorsViewProps = NativeStackScreenProps<ReservationStackParamList, 'ReservationParticipatorsView'>
-
-
-
 
 const ReservationParticipatorsViewScreen: React.FC<ReservationParticipatorsViewProps> = ({ navigation, route }) => {
 
@@ -21,7 +18,7 @@ const ReservationParticipatorsViewScreen: React.FC<ReservationParticipatorsViewP
         const { participators: jsonData } = route.params
         const data = JSON.parse(jsonData) as User[];
         console.log(data)
-        data?.sort((a, b) => (a.enrollmentNumber) - (b.enrollmentNumber)) // 악기 순으로 정렬
+        data?.sort((a, b) => Number(a.enrollmentNumber) - Number(b.enrollmentNumber)) // 악기 순으로 정렬
         setUsers(data ?? [])
     }, [route])
 
@@ -77,7 +74,7 @@ const ParticipatorList: React.FC<{ participatorList: User[] }> = ({ participator
                     >
                         <ProfileBoxCard
                             user={selectedUser!}
-                            isCard={true}
+                            // isCard={true}
                         />
                         <Pressable
                             style={{

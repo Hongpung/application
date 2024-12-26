@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { View, ScrollView, Modal, Pressable, Image, Text } from "react-native";
 import ProfileMiniCard from "../../../../components/cards/ProfileMiniCard";
 import { Color } from "../../../../ColorSet";
-import ProfileBoxCard from "../../../../components/cards/PrifileBoxCard";
+import ProfileBoxCard from "../../../../components/cards/ProfileBoxCard";
 import { instrumentOrder, User } from "../../../../UserType";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { UserProvider, useUser } from "../../../../context/UserContext";
@@ -26,7 +26,7 @@ const ClubMemeberScreen: React.FC<ClubMembersProps> = ({ navigation }) => {
     const [selectedUser, selectUser] = useState<User | null>(null);
 
     const { data, loading, error } = useFetchUsingToken<User[]>(
-        `${process.env.BASE_URL}/member`,
+        `${process.env.SUB_API}/club/my-club/members`,
         {
             method: 'GET',
             headers: {
@@ -36,9 +36,9 @@ const ClubMemeberScreen: React.FC<ClubMembersProps> = ({ navigation }) => {
     )
 
     useEffect(() => {
-        const clubUser = data?.filter(user => user.club == loginUser?.club);
-        clubUser?.sort((a, b) => instrumentOrder(a.instrument) - instrumentOrder(b.instrument)) // 악기 순으로 정렬
-        setUsers(clubUser ?? [])
+        console.log(data);
+        if (!!data)
+            setUsers(data)
     }, [data])
 
 

@@ -90,14 +90,14 @@ const CheckOutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     </View>
                     <View style={{ position: 'absolute', width: 208, top: 62, left: 56 }}>
                         <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, textAlign: 'center', }} numberOfLines={1} ellipsizeMode='tail' >
-                            {sessionData.message}
+                            {sessionData.title}
                         </Text>
                     </View>
                     <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 50 }}>
                         <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{sessionData.startTime.slice(0, -3)}~{sessionData.endTime.slice(0, -3)}</Text>
                     </View>
                     <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 20, height: 24, alignItems: 'center' }}>
-                        {sessionData.sessionType == 'Reservation' ?
+                        {sessionData.sessionType == 'RESERVED' ?
                             <>
                                 <Icons name='people' color={Color['grey400']} size={24} />
                                 <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{sessionData.participatorIds!.length}</Text></> :
@@ -111,7 +111,7 @@ const CheckOutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         fontSize: 22,
                         color: Color['blue500'], textAlign: 'center', marginBottom: 4
                     }}>
-                        {sessionData.message}
+                        {sessionData.title}
                     </Text>
                     <Text style={{
                         fontFamily: 'NanumSquareNeo-Bold',

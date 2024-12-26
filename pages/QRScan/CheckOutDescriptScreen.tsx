@@ -15,7 +15,7 @@ type PictureCheckNavProp = NativeStackNavigationProp<CheckOutStackParamList, 'Pi
 const CheckOutDescriptScreen: React.FC = () => {
 
     const navigation = useNavigation<PictureCheckNavProp>();
-    const [pageNum, setPageNum] = useState(0);
+    const [pageNum, setPageNum] = useState(1);
     const Pages = ["0", "1", "2"]
     const photo = 'phptoUrl'//나중에 추가할것
     const sessionState = useRecoilValue(onUseSession)
@@ -36,14 +36,18 @@ const CheckOutDescriptScreen: React.FC = () => {
                 fontFamily: "NanumSquareNeo-Bold",
                 fontSize: 20,
             }}>연습실 정리 안내</Text>
-            <PagerView style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center'
-            }} initialPage={0}
-                onPageScroll={(e) => { const { position, offset } = e.nativeEvent; setPageNum(position); }}
+            <PagerView
+                style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                }}
+                initialPage={0}
+                onPageScroll={(e) => { const { position, offset } = e.nativeEvent; 
+                setPageNum(position); }}
                 ref={pagerRef}>
-                {sessionState?.borrowInstruments &&
+                {
+                // sessionState?.borrowInstruments &&
                     <View style={{
                         flex: 1,
                         alignItems: 'center',

@@ -33,7 +33,7 @@ const CheckInScreen: React.FC = () => {
             try {
                 if (!loginUser) throw Error('유저 정보가 없습니다.')
 
-                const token = await getToken('utilToken')
+                const token = await getToken('token')
                 if (!token) throw Error('Invalid Token')
 
                 const response = await fetch(`${process.env.SUB_API}/room-session/start`,
@@ -75,7 +75,7 @@ const CheckInScreen: React.FC = () => {
         const attend = async () => {
             try {
                 if (!loginUser) throw Error('유저 정보가 없습니다.')
-                const token = await getToken('utilToken')
+                const token = await getToken('token')
                 if (!token) throw Error('Invalid Token')
                 const response = await fetch(`${process.env.SUB_API}/room-session/attend`,
                     {
@@ -157,6 +157,7 @@ const CheckInScreen: React.FC = () => {
                 </Modal>
             </View>
         )
+        
     if (!!sessionData?.message)
         return (
             <View style={{ flex: 1, backgroundColor: '#FFF' }}>

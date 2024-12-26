@@ -23,6 +23,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
 
     const loginUser = useRecoilValue(loginUserState)
 
+    
     const daysOfWeek = useMemo(() => ['일', '월', '화', '수', '목', '금', '토'], [])
     const [reservation, setReservation] = useState<Reservation | null>(null)
     const [isLoading, setLoading] = useState(false);
@@ -35,6 +36,8 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
         }
         return false;
     }
+
+    console.log(reservation?.creatorId, loginUser?.memberId)
     useEffect(() => {
         const load = async () => {
             const controller = new AbortController();
@@ -44,7 +47,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                 setLoading(true);
                 const token = await getToken('token');
                 if (!token) throw Error('token is not valid')
-                const response = await fetch(`${process.env.BASE_URL}/reservation/${reservationId}`,
+                const response = await fetch(`${process.env.SUB_API}/reservation/${reservationId}`,
                     {
                         method: 'GET',
                         headers: {
@@ -54,10 +57,13 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                         signal
                     }
                 )
+
+                if (!response.ok) throw Error('Server Error')
                 const loadedReservation = await response.json();
 
+                console.log('이값:' , loadedReservation)
                 const parsedReservation = parseToReservation(loadedReservation)
-                console.log(loadedReservation, parsedReservation)
+                console.log(parsedReservation)
                 setReservation(parsedReservation)
             } catch (e) {
                 console.error(e);
@@ -80,7 +86,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                 setLoading(true);
                 const token = await getToken('token');
                 if (!token) throw Error('token is not valid')
-                const response = await fetch(`${process.env.BASE_URL}/reservation/${reservationId}`,
+                const response = await fetch(`${process.env.SUB_API}/reservation/${reservationId}`,
                     {
                         method: 'DELETE',
                         headers: {
@@ -165,7 +171,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
 
                 <View style={{ marginHorizontal: 24, flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
                     <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey500'] }}>예약자</Text>
-                    <Text style={{ marginHorizontal: 12, paddingVertical: 4, fontSize: 16, textAlign: 'right' }}>{reservation.userName}</Text>
+                    <Text style={{ marginHorizontal: 12, paddingVertical: 4, fontSize: 16, textAlign: 'right' }}>{`${reservation?.userName}${!!reservation?.userNickname ? ` (${reservation.userNickname})` : ''}`}</Text>
                 </View>
 
                 <View style={{ height: 24 }} />
@@ -230,24 +236,24 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                     <View style={{ height: 16 }} />
 
                     <Pressable style={{ marginHorizontal: 16 }}
-                        onPress={() => reservation.participants.length > 0 && navigation.push('ReservationParticipatorsView', { participators: JSON.stringify(reservation.participants) })}>
-                        {reservation.participants.length > 0 ?
+                        onPress={() => reservation.participators.length > 0 && navigation.push('ReservationParticipatorsView', { participators: JSON.stringify(reservation.participators) })}>
+                        {reservation.participators.length > 0 ?
                             <View style={{ justifyContent: 'flex-end', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center' }}>
                                     <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', flex: 1, marginLeft: 24, bottom: 8 }}>
-                                        {reservation.participants.slice(0, 4).map(user => (user.profileImageUrl ? <Image
+                                        {reservation.participators.slice(0, 4).map(user => (user.profileImageUrl ? <Image
                                             key={user.memberId}
-                                            source={{ uri: user.profileImageUrl }} style={{ width: 42, height: 56, }} /> : <View key={user.memberId} style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -6 * Math.min(reservation.participants.length, 4), borderRadius: 5 }} />))}
+                                            source={{ uri: user.profileImageUrl }} style={{ width: 42, height: 56, }} /> : <View key={user.memberId} style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -6 * Math.min(reservation.participators.length, 4), borderRadius: 5 }} />))}
                                     </View>
                                     <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end', flex: 1, bottom: 12, gap: 8, paddingHorizontal: 12 }}>
 
                                         <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'] }} numberOfLines={1}>
-                                            {reservation.participants.slice(0, 2).map(user => `${user.name}`).filter(Boolean).join(', ')}{reservation.participants.length >= 3 && `등`}
+                                            {reservation.participators.slice(0, 2).map(user => `${user.name}`).filter(Boolean).join(', ')}{reservation.participators.length >= 3 && `등`}
                                         </Text>
 
                                         <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                                             <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Bold', color: Color['blue500'] }}>
-                                                {reservation.participants.length}
+                                                {reservation.participators.length}
                                             </Text>
                                             <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }}>
                                                 {` 명`}
@@ -292,7 +298,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                 </View>
 
                 <View style={{ height: 24 }} />
-                {isEditible() && loginUser?.email == reservation.userEmail && reservation.date! > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
+                {isEditible() && loginUser?.memberId == reservation.creatorId && reservation.date! > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
                     <LongButton
                         color={'red'}
                         innerText={'예약 취소하기'}
@@ -304,7 +310,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                     />
                 </View>}
             </ScrollView>
-            {isEditible() && loginUser?.email == reservation.userEmail && reservation.date! > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
+            {isEditible() && loginUser?.memberId == reservation.creatorId && reservation.date! > new Date() && <View style={{ paddingVertical: 8, bottom: 0 }}>
                 <LongButton
                     color={'green'}
                     innerText={'예약 수정하기'}

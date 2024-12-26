@@ -1,5 +1,5 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Color } from '../../../ColorSet'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ProfileMiniCard from '../../../components/cards/ProfileMiniCard'
@@ -8,12 +8,17 @@ import { UserModal } from './ClubMember/ClubMemeberScreen';
 import { throttle } from 'lodash';
 import { Icons } from '@hongpung/components/Icon';
 import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack';
+import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken';
+import { User } from '@hongpung/UserType';
 
 
 type MyClubProps = NativeStackScreenProps<MyClubStackStackParamList, 'MyClubHome'>;
 
 const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
 
+
+    const [leader, setLeader] = useState<User | null>(null)
+    const [sangsoe, setSangsoe] = useState<User | null>(null)
     const throttledNavigation = useMemo(
         () =>
             throttle((ScreenName: any) => {
@@ -26,6 +31,21 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
         name: string,
         link: string
     }
+
+    const { data, loading, error } = useFetchUsingUtilToken<{ roleData: { role: string, member: User }[] }>(`${process.env.SUB_API}/club/my-club`)
+
+    useEffect(() => {
+        if (!!data) {
+            const { roleData } = data;
+            roleData.map(roleAssignment => {
+                if (roleAssignment.role == '패짱')
+                    setLeader(roleAssignment.member)
+                else if (roleAssignment.role == '상쇠')
+                    setSangsoe(roleAssignment.member)
+            })
+        }
+    }, [data])
+    console.log(data, `${process.env.SUB_API}/club/my-club`)
 
     const manageClubMenu: subMenu[] = [{ name: '부원 관리', link: 'ClubMembers' }, { name: '악기 관리', link: 'Instruments' }, { name: '연습 기록 보기', link: 'ClubCalendar' },]
 
@@ -41,11 +61,11 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                         <View style={{ height: 10 }} />
                         <View style={styles.info}>
                             <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>상쇠</Text>
-                            <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>홍길동(길동색시)</Text>
+                            <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{sangsoe ? `${sangsoe?.name}${!!sangsoe?.nickname ? ` (${sangsoe.nickname})` : ''}` : '공석'}</Text>
                         </View>
                         <View style={styles.info}>
                             <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>패짱</Text>
-                            <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>임꺽정</Text>
+                            <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{leader ? `${leader?.name}${!!leader?.nickname ? ` (${leader.nickname})` : ''}` : '공석'}</Text>
                         </View>
                         <View style={{ marginHorizontal: 24, flexDirection: 'row', height: 20, alignSelf: 'flex-start', alignItems: 'flex-end', justifyContent: 'flex-start', marginTop: 20, marginBottom: 16 }}>
                             <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>동아리 관리</Text>
@@ -57,7 +77,7 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                                 <Icons size={20} name='chevron-forward' color={Color['grey400']} />
                             </Pressable>)
                         })}
-                        
+
                     </View>
 
                 </View>

@@ -17,7 +17,8 @@ const CheckOutEndScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <View style={{ height: '20%' }}></View>
-            {isLoading ? <ActivityIndicator style={{ alignSelf: 'center', marginVertical: 24, width: 180, height: 180 }} color={Color['blue500']} size={100}></ActivityIndicator> :
+            {
+            isLoading ? <ActivityIndicator style={{ alignSelf: 'center', marginVertical: 24, width: 180, height: 180 }} color={Color['blue500']} size={100}></ActivityIndicator> :
                 <View style={{ flex: 1 }}>
                     <Text style={{
                         fontFamily: 'NanumSquareNeo-Bold',

@@ -9,6 +9,7 @@ import Header from '@hongpung/components/Header';
 import PracticeInfoScreen from "@hongpung/pages/share/ClubPracticeInfoScreen";
 import ChangeMyInfoScreen from "@hongpung/pages/Home/MyPage/ChangeMyInfoScreen";
 import MyPracticeInfoScreen from "@hongpung/pages/share/MyPracticeInfoScreen";
+import ChangePasswordScreen from "@hongpung/pages/Home/MyPage/ChangePassword.screen";
 
 
 export type MyPageParamList = {
@@ -18,6 +19,7 @@ export type MyPageParamList = {
     NotificationSetting: undefined
     LoginSetting: undefined
     MyPracticeInfo: { sessionId: number }
+    ChangePassword: undefined
     ChangeMyInfo: undefined
 }
 
@@ -68,6 +70,14 @@ const MyPageStacks = () => {
                 options={{
                     headerShown: true,
                     header: () => <Header leftButton='arrow-back' HeaderName='내 활동' />
+                }}
+            />
+            <MyPageStack.Screen
+                name='ChangePassword'
+                component={ChangePasswordScreen}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='arrow-back' HeaderName='비밀번호 변경' />
                 }}
             />
 

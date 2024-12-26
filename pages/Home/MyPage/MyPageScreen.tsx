@@ -2,7 +2,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
-import ProfileBoxCard from "@hongpung/components/cards/PrifileBoxCard";
+import ProfileBoxCard from "@hongpung/components/cards/ProfileBoxCard";
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState'
 import { User } from '@hongpung/UserType';
@@ -68,8 +68,7 @@ const MyPageScreen: React.FC = () => {
                     name: loginUser!.name,
                     enrollmentNumber: loginUser!.enrollmentNumber,
                     nickname: loginUser!.nickname,
-                    role: loginUser!.role,
-                    instrument: '장구'
+                    role: loginUser!.role
                 }}
             />
             <View style={{ flexDirection: 'row', height: 20, justifyContent: 'flex-start', marginTop: 20, marginBottom: 16, marginHorizontal: 24 }}>
@@ -91,9 +90,13 @@ const MyPageScreen: React.FC = () => {
                 </Pressable>)
             })}
             <View style={styles.footer}>
-                <Pressable style={{ paddingBottom: 1, borderBottomWidth: 1, borderBottomColor: Color['grey300'], marginVertical: 14, alignItems: 'center' }}
+                <Pressable style={{ paddingBottom: 1, borderBottomWidth: 1, borderBottomColor: Color['grey300'], alignItems: 'center' }}
                     onPress={() => { navigation.push('ChangeMyInfo') }}>
                     <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'], textAlign: 'center' }}>개인 정보 수정</Text>
+                </Pressable>
+                <Pressable style={{ paddingBottom: 1, borderBottomWidth: 1, borderBottomColor: Color['grey300'], alignItems: 'center' }}
+                    onPress={() => { navigation.push('ChangePassword') }}>
+                    <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'], textAlign: 'center' }}>비밀 번호 수정</Text>
                 </Pressable>
                 <Pressable style={{ paddingBottom: 1, borderBottomWidth: 1, borderBottomColor: Color['grey300'], alignItems: 'center' }}>
                     <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'], textAlign: 'center' }}>회원탈퇴를 원하시나요?</Text>
@@ -137,6 +140,9 @@ const styles = StyleSheet.create({
     },
     footer: {
         flex: 1,
+        display:'flex',
+        flexDirection:'column',
+        gap:20,
         backgroundColor: Color['grey100'],
         alignItems: 'center',
         height: 200,

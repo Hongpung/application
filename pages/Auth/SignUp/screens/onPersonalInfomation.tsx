@@ -1,6 +1,6 @@
 import { Color } from "@hongpung/ColorSet";
 import InputComponent from "@hongpung/components/inputs/InputComponent";
-import { club, clubs, clubsEng } from "@hongpung/UserType";
+import { club, clubIds, clubs, clubsEng } from "@hongpung/UserType";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, TouchableWithoutFeedback, View, Text, Pressable, ScrollView, Modal, ActivityIndicator, Dimensions } from "react-native";
 import { useSignUp } from "../context/SignUpContext";
@@ -53,7 +53,7 @@ const ClubSeletor: React.FC<ClubSeletorProps> = ({ club, setClub, isValidClub, s
 
                 <View style={[styles.InputBox, { flexDirection: 'row', justifyContent: 'space-between', width: 126, alignItems: 'center' }]}>
                     <Text style={[styles.InputText, club == null && { color: Color['grey300'] }]}>{club ?? '동아리 선택'}</Text>
-                    <Icons name='caret-down' color={Color['green500']} size={20}/>
+                    <Icons name='caret-down' color={Color['green500']} size={20} />
                 </View>
 
                 <View style={[styles.underline, { borderBottomColor: isValidClub ? Color["green500"] : Color["red500"], width: 142 }]} />
@@ -78,7 +78,7 @@ const ClubSeletor: React.FC<ClubSeletorProps> = ({ club, setClub, isValidClub, s
                                 style={{ paddingVertical: 8, marginVertical: 4, width: 142 - 32, alignItems: 'flex-start', justifyContent: 'space-between', flexDirection: 'row' }}
                                 onPress={() => { setClub(item); setSelectClubVisible(false); setClubisValid(true); }}>
                                 <Text style={[{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, color: club == item ? Color['green600'] : Color['grey400'] }]}>{item}</Text>
-                                {club == item && <Icons name='checkmark' color={Color['green500']} size={20}/>}
+                                {club == item && <Icons name='checkmark' color={Color['green500']} size={20} />}
                             </Pressable>
                         )
                     })}</ScrollView>
@@ -119,13 +119,20 @@ export const PersonalInformationCheck: React.FC = () => {
         setLoading(true);
 
         try {
-            const response = await fetch(`${process.env.BASE_URL}/auth/signup`, {
+            const response = await fetch(`${process.env.SUB_API}/auth/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(
-                    { ...signUpInfo, enrollmentNumber: Number(signUpInfo.enrollmentNumber), club: clubsEng[clubs.indexOf(signUpInfo.club!)] }
+                    {
+                        email: signUpInfo.email,
+                        password: signUpInfo.password,
+                        name: signUpInfo.name,
+                        nickname: signUpInfo.nickname,
+                        enrollmentNumber: signUpInfo.enrollmentNumber,
+                        clubId: signUpInfo.club ? clubIds[signUpInfo.club] : null
+                    }
                 ),
                 // 이거 넣어야함 {clubsEng[clubs.indexOf(signUpInfo.club??'기타')]}
                 signal
@@ -181,7 +188,7 @@ export const PersonalInformationCheck: React.FC = () => {
                             </Text>
                         </View>
                         <View style={{ marginTop: 20 }} />
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', zIndex: 1,  width: 300, alignSelf: 'center'  }}>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', zIndex: 1, width: 300, alignSelf: 'center' }}>
                             <ClubSeletor
                                 club={club}
                                 setClub={setClub}
@@ -227,7 +234,7 @@ export const PersonalInformationCheck: React.FC = () => {
                         </View>
 
 
-                        <View style={{ marginTop: 24,  width: 300, alignSelf: 'center' }}>
+                        <View style={{ marginTop: 24, width: 300, alignSelf: 'center' }}>
                             <InputComponent
                                 label='패명'
                                 color={'green'}

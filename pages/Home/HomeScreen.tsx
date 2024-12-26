@@ -394,7 +394,7 @@ const BottomOnUser: React.FC<{ toggleBottomSheet: () => void, isSlideUp: boolean
             if (socketRef.current) {
                 socketRef.current.disconnect(); // 기존 소켓 연결 해제
             }
-            const token = await getToken('utilToken')
+            const token = await getToken('token')
             const socket = io(`${process.env.SUB_API}/roomsession`, {
                 transports: ['websocket'],
                 auth: { token },

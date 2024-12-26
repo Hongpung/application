@@ -9,11 +9,12 @@ export interface Reservation {
     reservationName: string
     isRegular: boolean
     isParticipatible: boolean
-    participants: User[]
+    participators: User[]
     borrowInstruments: briefInstrument[]
     hasToWait: boolean
-    userEmail: string
+    creatorId?: number
     userName: string
+    userNickname?: string
     lastmodified?: Date
     [key: string]: any
 };
@@ -87,8 +88,9 @@ export function findReservationDifferences(preReservation: Reservation, newReser
 
 export interface ReservationDTO extends Omit<ReservationSubmitForm, 'participaterIds' | 'borrowInstrumentIds'> {
     reservationId?: number;            // 예약 ID
+    creatorId?: number;
     creatorName: string;              // 생성자 이름
-    email: string;                    // 생성자 이메일
+    creatorNickname?: string;              // 생성자 이름
     lastmodified: string;             // 마지막 수정 날짜 (ISO 형식)
     participators: User[]
     borrowInstruments: briefInstrument[]
@@ -99,15 +101,16 @@ export interface ReservationSubmitForm {
     date: string;                     // 예약 날짜 (YYYY-MM-DD 형식)
     startTime: string;                // 시작 시간 (HH:MM:SS 형식)
     endTime: string;                  // 종료 시간 (HH:MM:SS 형식)
-    message: string;                  // 예약 메시지 또는 설명
-    type: string;                     // 예약 유형 (정기연습, 특별행사 등)
+    title: string;                  // 예약 메시지 또는 설명
+    reservationType: string;                     // 예약 유형 (정기연습, 특별행사 등)
     participationAvailable: boolean;  // 참여 가능 여부
-    participaterIds: number[];        // 참여자 목록
+    participatorIds: number[];        // 참여자 목록
     borrowInstrumentIds?: number[];    // 대여악기 목록 
     [key: string]: any
 }
 
 export const parseToReservationDetail = (reservation: Reservation, user: User): ReservationDTO => {
+
     return {
         creatorName: user.name,
         email: user.email,  // Reservation 타입에는 없는 필드
@@ -115,23 +118,26 @@ export const parseToReservationDetail = (reservation: Reservation, user: User): 
         type: reservation.isRegular ? "REGULAR" : "COMMON",  // 예약 유형 변환
         startTime: reservation.Time.startTime,  // Enum -> HH:MM:SS 변환
         endTime: reservation.Time.endTime,      // Enum -> HH:MM:SS 변환
-        message: reservation.reservationName,  // 필요시 채워야 함
+        title: reservation.reservationName,  // 필요시 채워야 함
         participationAvailable: reservation.isParticipatible,
         lastmodified: new Date().toISOString(),  // 현재 시각을 ISO 형식으로 설정
-        participators: reservation.participants,
+        participators: reservation.participators,
         borrowInstruments: reservation.borrowInstruments
     };
 }
 
 export const parseToReservationForm = (reservation: Reservation): ReservationSubmitForm => {
+
+    const startTime = reservation.Time.startTime.slice(-4, -2) + ':' + reservation.Time.startTime.slice(-2);
+    const endTime = reservation.Time.endTime.slice(-4, -2) + ':' + reservation.Time.endTime.slice(-2);
     return {
         date: reservation.date!.toISOString().split("T")[0],  // `Date` 객체를 `YYYY-MM-DD` 형식으로 변환
-        type: reservation.isRegular ? "REGULAR" : "COMMON",  // 예약 유형 변환
-        startTime: reservation.Time.startTime,  // Enum -> HH:MM:SS 변환
-        endTime: reservation.Time.endTime,      // Enum -> HH:MM:SS 변환
-        message: reservation.reservationName,  // 필요시 채워야 함
+        reservationType: reservation.isRegular ? "REGULAR" : "COMMON",  // 예약 유형 변환
+        startTime,  // Enum -> HH:MM:SS 변환
+        endTime,      // Enum -> HH:MM:SS 변환
+        title: reservation.reservationName,  // 필요시 채워야 함
         participationAvailable: reservation.isParticipatible,
-        participaterIds: reservation.participants.map(user => user.memberId),
+        participatorIds: reservation.participators.map(user => user.memberId),
         borrowInstrumentIds: reservation.borrowInstruments.map(instrument => instrument.instrumentId)
     };
 }
@@ -141,18 +147,19 @@ export function parseToReservation(reservationDTO: ReservationDTO): Reservation 
     const [startHour, startMinnute] = reservationDTO.startTime.split(':')
     const [endHour, endMinnute] = reservationDTO.endTime.split(':')
     return {
-        reservationId: reservationDTO?.reservationId,
+        reservationId: reservationDTO.reservationId,
+        creatorId: reservationDTO.creatorId,
         userName: reservationDTO.creatorName,
-        userEmail: reservationDTO.email,
+        userNickname: reservationDTO.creatorNickname,
         date: new Date(reservationDTO.date), // `YYYY-MM-DD` 형식을 `Date` 객체로 변환
         Time: {
             startTime: `TIME_${startHour}${startMinnute}`,  // `HH:MM:SS`를 분 단위 숫자로 변환
             endTime: `TIME_${endHour}${endMinnute}`,
         },
-        reservationName: reservationDTO.message,  // 생성자 이름을 예약 이름으로 사용
+        reservationName: reservationDTO.title,  // 생성자 이름을 예약 이름으로 사용
         isRegular: reservationDTO.type === "정규연습",  // `type`에 따라 정기 예약 여부 판단
         isParticipatible: reservationDTO.participationAvailable,  // 참여 가능 여부 매핑
-        participants: reservationDTO.participators?.filter(user => user.email != reservationDTO.email) ?? [],  // 참여자 목록 그대로 매핑
+        participators: reservationDTO.participators?.filter(user => user.memberId != reservationDTO.creatorId) ?? [],  // creator를 제외하고 매핑
         borrowInstruments: reservationDTO?.borrowedInstruments ?? [],  // 사용 중인 악기 정보는 기본적으로 빈 배열로 설정 (필요시 추가)
         hasToWait: false,  // 대기 여부는 기본적으로 false로 설정 (필요시 추가 로직)
         lastmodified: new Date(reservationDTO.lastmodified)

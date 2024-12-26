@@ -9,6 +9,21 @@ export const instrumentOrder = (instrument: InstrumentType) => {
 
 export type club = '들녘' | '산틀' | '신명화랑' | '악반' | '기타'
 export const clubs: club[] = ['들녘', '산틀', '신명화랑', '악반', '기타']//표시할 정보
+export const clubIds: Record<string, number | null> = { '들녘': 0, '산틀': 1, '신명화랑': 3, '악반': 2, '기타': null }//표시할 정보
+export function clubIdMatchName(clubId: string): string {
+    switch (clubId) {
+        case 'DEULNYEOK':
+            return '들녘'
+        case 'SANTLE':
+            return '산틀'
+        case 'AKBAN':
+            return '악반'
+        case 'HWARANG':
+            return '신명화랑'
+        default:
+            return '개인'
+    }
+}
 export const clubsEng: string[] = ['DEULNEOK', 'SANTLE', 'HWARANG', 'AKBAN', 'ETC']//실제로 가야하는 정보
 export const clubToEng = (club: club) => {
     const clubIndex = clubs.indexOf(club);
@@ -51,14 +66,13 @@ export interface InstrumentEditDTO {
 
 
 export interface User {
-    memberId: any
+    memberId: number
     name: string
     nickname?: string
     club: club,
     email: string,
-    instrument: InstrumentType
-    enrollmentNumber: number
-    role?: Role
+    enrollmentNumber: string
+    role: string[]
     profileImageUrl?: string
 }
 

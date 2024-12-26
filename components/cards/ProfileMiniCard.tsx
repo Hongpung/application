@@ -15,9 +15,9 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick 
 
     const [loading, setLoading] = useState(false);
 
-    const RoleTag = () => {
-        switch (user.role) {
-            case '상쇠':
+    const RoleTag = (role: string) => {
+        switch (role) {
+            case 'SANGSOE':
                 return (
                     <View>
                         <View style={{ height: 16, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4, backgroundColor: Color['red100'], borderRadius: 5, marginRight: 4 }}>
@@ -32,7 +32,7 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick 
                     <View>
                         <View style={{ height: 16, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4, backgroundColor: Color['blue100'], borderRadius: 5, marginRight: 4 }}>
                             <Text style={{ fontSize: 12, fontFamily: "NanumSquareNeo-Bold", color: Color['blue600'], }}>
-                                {String(user.role)}
+                                {String(role)}
                             </Text>
                         </View>
                     </View>
@@ -52,7 +52,7 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick 
                         borderColor: Color['grey300'],
                         backgroundColor: Color['grey200'],
                     }]} />}
-                <View style={{ height: 44, display:'flex', gap:2 }}>
+                <View style={{ height: 44, display: 'flex', gap: 2 }}>
                     <View style={[{ flexDirection: 'row', flex: 1, alignItems: 'center', }, user.nickname ? { marginTop: 3 } : null]}>
                         {/* <View style={styles.instrumnetMark} /> */}
                         <Text style={styles.UserName}>{user.name}</Text>
@@ -61,7 +61,7 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick 
                 </View>
             </View>
             <View style={{ position: 'absolute', flexDirection: 'row', left: 104, bottom: 16, alignItems: 'center', justifyContent: 'flex-start' }}>
-                {user.role && RoleTag()}
+                {user.role && user.role.map(role => RoleTag(role))}
             </View>
             <View style={{ position: 'absolute', width: 56, height: 56, borderRadius: 200, overflow: 'hidden', borderWidth: loading ? 1 : 0, borderColor: Color['grey500'], justifyContent: 'center', alignItems: 'center', right: 16, top: 24 }}>
                 {/* {user.badge &&
@@ -77,7 +77,7 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick 
                     <Text style={styles.moreBtn}>{`더 알아보기 >`}</Text>
                 </Pressable> :
                 <View style={{ position: 'absolute', borderRadius: 200, right: 16, bottom: 8, flexDirection: 'row', alignItems: 'flex-end' }}>
-                    <Text style={[{ marginRight: 1 }, styles.clubInfo]}>{`@ ` + (user.enrollmentNumber > 9 ? user.enrollmentNumber : '0' + user.enrollmentNumber)}</Text>
+                    <Text style={[{ marginRight: 1 }, styles.clubInfo]}>{`@ ` + user.enrollmentNumber}</Text>
                     <Text style={styles.clubInfo}>{user.club}</Text>
                 </View>}
         </Pressable>

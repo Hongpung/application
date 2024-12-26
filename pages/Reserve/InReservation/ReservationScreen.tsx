@@ -73,7 +73,7 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
                 setLoading(true);
                 const token = await getToken('token');
                 if (!token) throw Error('token is not valid')
-                const response = await fetch(`${process.env.BASE_URL}/reservation/${reservationId}`,
+                const response = await fetch(`${process.env.SUB_API}/reservation/${reservationId}`,
                     {
                         method: 'GET',
                         headers: {
@@ -83,9 +83,13 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
                         signal
                     }
                 )
+                if (!response.ok) throw Error('서버 에러')
+
                 const loadedReservation = await response.json();
+
                 const parsedReservation = parseToReservation(loadedReservation);
 
+                console.log(loadedReservation, parsedReservation)
                 setReservation(parsedReservation)
                 setPreReservation(parsedReservation)
             } catch (e) {
@@ -221,22 +225,22 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
 
                     <Pressable style={{ marginHorizontal: 16 }}
                         onPress={() => navigation.navigate('ParticipantsSelect')}>
-                        {reservation.participants.length > 0 ?
+                        {reservation.participators.length > 0 ?
                             <View style={{ justifyContent: 'flex-end', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
                                 <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'center' }}>
                                     <View style={{ flexDirection: 'row-reverse', justifyContent: 'center', flex: 1, marginLeft: 24, bottom: 8 }}>
-                                        {reservation.participants.slice(0, 4).map(user => (user.profileImageUrl ? <Image
-                                            source={{ uri: user.profileImageUrl }} style={{ width: 42, height: 56, }} /> : <View style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -6 * Math.min(reservation.participants.length,4), borderRadius: 5 }} />))}
+                                        {reservation.participators.slice(0, 4).map(user => (user.profileImageUrl ? <Image
+                                            source={{ uri: user.profileImageUrl }} style={{ width: 42, height: 56, }} /> : <View style={{ width: 42, height: 56, backgroundColor: Color['grey300'], borderWidth: 0.5, marginLeft: -6 * Math.min(reservation.participators.length, 4), borderRadius: 5 }} />))}
                                     </View>
-                                    <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end', flex: 1, bottom: 12, gap: 8, paddingHorizontal:12 }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end', flex: 1, bottom: 12, gap: 8, paddingHorizontal: 12 }}>
 
                                         <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'] }} numberOfLines={1}>
-                                            {reservation.participants.slice(0, 2).map(user => `${user.name}`).filter(Boolean).join(', ')}{reservation.participants.length >= 3 && `등`}
+                                            {reservation.participators.slice(0, 2).map(user => `${user.name}`).filter(Boolean).join(', ')}{reservation.participators.length >= 3 && `등`}
                                         </Text>
 
                                         <View style={{ flexDirection: 'row', alignItems: 'flex-end' }}>
                                             <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Bold', color: Color['blue500'] }}>
-                                                {reservation.participants.length}
+                                                {reservation.participators.length}
                                             </Text>
                                             <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }}>
                                                 {` 명`}
@@ -270,7 +274,7 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
                         {reservation.borrowInstruments.length > 0 ?
                             <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
                                 <View style={{ flexDirection: 'row' }}>
-                                    {InstrumentTypes.filter(type=> type!='징').map((type) => {
+                                    {InstrumentTypes.filter(type => type != '징').map((type) => {
                                         const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
                                         return (<View style={{ width: (width - 96) / 5, alignItems: 'center' }}>
                                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14 }}>{type}</Text>
@@ -288,8 +292,8 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
 
                 <View style={{ height: 16 }} />
             </ScrollView>
-            <View style={{ paddingVertical: 8, bottom: 0 }}>
-                <View style={{ height: 40, alignSelf: 'center' }}>
+            <View style={{ paddingTop: 16, bottom: 0, display:'flex',  }}>
+                <View style={{ height: 36, marginHorizontal: 28 }}>
                     <CheckboxComponent
                         isChecked={isAgree}
                         innerText={reservation.hasToWait ? '예약 전날 오후10시 이전까지 자동 취소돼요' : '예약 전날 오후10시까지 수정*취소할 수 있어요'}

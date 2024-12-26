@@ -341,6 +341,7 @@ const AppLoader: React.FC = () => {
           signal,
         })
 
+        console.log('?')
         if (!bannerData.ok) throw Error();
 
         const serverData = await bannerData.json() as BannerFetchData[];

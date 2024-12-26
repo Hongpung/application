@@ -196,7 +196,7 @@ const ParticipantsSelectScreen: React.FC = () => {
                     contentContainerStyle={{ marginHorizontal: 24, backgroundColor: '#FFF', zIndex: 1 }}
                     data={originList}
                     renderItem={({ item }: { item: User }) => {
-                        const isPicked = reservation.participants.some(participant =>
+                        const isPicked = reservation.participators.some(participant =>
                             JSON.stringify(participant) === JSON.stringify(item)
                         )
                         return (
@@ -205,8 +205,8 @@ const ParticipantsSelectScreen: React.FC = () => {
                                 user={item} view={'inReserveView'}
                                 isPicked={isPicked}
                                 onPick={() => {
-                                    if (!isPicked) setParticipants([...reservation.participants, item])
-                                    else setParticipants(reservation.participants.filter((participant) => JSON.stringify(participant) != JSON.stringify(item)))
+                                    if (!isPicked) setParticipants([...reservation.participators, item])
+                                    else setParticipants(reservation.participators.filter((participant) => JSON.stringify(participant) != JSON.stringify(item)))
                                 }}
 
                             ></ProfileMiniCard>)
@@ -215,11 +215,11 @@ const ParticipantsSelectScreen: React.FC = () => {
                 />
             </View>
 
-            {reservation.participants.length > 0 && <View style={{ paddingTop: 12, width: '100%' }}>
+            {reservation.participators.length > 0 && <View style={{ paddingTop: 12, width: '100%' }}>
                 <LongButton
                     color='blue'
                     isAble={true}
-                    innerText={`선택완료 (${reservation.participants.length})`}
+                    innerText={`선택완료 (${reservation.participators.length})`}
                     onPress={() => navigation.pop()}
                 />
             </View>}

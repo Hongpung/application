@@ -16,6 +16,7 @@ export const verifyingEmail = async (email: string, code: string) => {
 
     try {
 
+        console.log(`${process.env.SUB_API}/verification/verify/password`, JSON.stringify({ email, code }))
         const response = await fetch(`${process.env.SUB_API}/verification/verify/password`, {
             method: 'POST',
             headers: {
@@ -30,13 +31,13 @@ export const verifyingEmail = async (email: string, code: string) => {
             result = response.status;
         } else {
             console.error('서버에서 데이터 가져오기 실패: ', response.status);
-            result = response.status;
-            throw Error('Failed to Authorization')
+            const { message } = await response.json();
+            throw Error('Failed to Authorization: ' + message)
         }
 
         const data = await response.json();
         console.log(data)
-        const {token} = data;
+        const { token } = await data;
         await saveToken('PWtoken', token)
     } catch (error) {
         console.error(error)
@@ -52,16 +53,17 @@ export const changePassword = async (newPassword: string) => {
     const signal = controller.signal;
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 6초 타임아웃
 
-    
+
     try {
         const token = await getToken('PWtoken')
-        console.log(JSON.stringify({ token, newPassword }))
-        const response = await fetch(`${process.env.BASE_URL}/member/password`, {
-            method: 'PUT',
+        console.log(token, JSON.stringify({ newPassword }))
+        const response = await fetch(`${process.env.SUB_API}/auth/resetPW`, {
+            method: 'PATCH',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ token, newPassword }),
+            body: JSON.stringify({ newPassword }),
             signal
         });
 

@@ -19,7 +19,7 @@ const TodaySchedule: React.FC = () => {
     useEffect(() => {
 
         const loadReservationData = async () => {
-            await loadUserReservation();
+            // await loadUserReservation();
         }
         loadReservationData();
 

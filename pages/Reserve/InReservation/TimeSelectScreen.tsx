@@ -137,10 +137,11 @@ const TimeSelectScreen: React.FC = () => {
 
 
     const { data, loading, error } = useFetchUsingToken<briefReservation[]>(
-        reservation.date ? `${process.env.BASE_URL}/reservation/day?date=${reservation.date.toISOString().split('T')[0]}` : null,
+        reservation.date ? `${process.env.SUB_API}/reservation/daily?date=${reservation.date.toISOString().split('T')[0]}` : null,
         {
-        }, 2000, [reservation]
+        }, 2000, [reservation.date]
     )
+    console.log(data)
 
     const parsedTimeRange = (reservation: briefReservation) => {
         const [startHour, startMinnute] = reservation.startTime.split(':')
@@ -151,9 +152,10 @@ const TimeSelectScreen: React.FC = () => {
     useEffect(() => {
         if (data) {
             const occupied: string[] = [];
-            data.forEach(reserve => {
-                if (reserve.reservationId == reservation.reservationId) return;
-                const [startTime, endTime] = parsedTimeRange(reserve);
+            data.forEach(reservationData => {
+                console.log(reservation.reservationId, reservationData.reservationId)
+                if (reservationData.reservationId == reservation.reservationId) return;
+                const [startTime, endTime] = parsedTimeRange(reservationData);
                 for (let i = times.indexOf(startTime); i < times.indexOf(endTime); i++)
                     occupied.push(times[i]);
             });

@@ -3,8 +3,8 @@ import { briefInstrument, User } from "@hongpung/UserType";
 
 export interface BaseSession {
     sessionId: number;           // 세션 ID
-    sessionType: 'RealTime' | 'Reservation';                // 세션 유형 (공통 속성)
-    message: string;                  // 예약 메시지 또는 설명
+    sessionType: 'REALTIME' | 'RESERVED';                // 세션 유형 (공통 속성)
+    title: string;                  // 예약 메시지 또는 설명
     date: string;
     startTime: string;                // 시작 시간 (HH:MM:SS 형식)
     endTime: string;                  // 종료 시간 (HH:MM:SS 형식)
@@ -21,7 +21,7 @@ export interface BaseSession {
 }
 
 export interface RealtimeSession extends BaseSession {
-    sessionType: 'RealTime';         // 세션 유형
+    sessionType: 'REALTIME';         // 세션 유형
     participators?: null;           // 실시간 생성 세션은 참여자, 대여 악기가 없읍
     participatorIds?: User[] | null;           // 참여자 목록 (optional)
     borrowInstruments?: null;
@@ -30,7 +30,7 @@ export interface RealtimeSession extends BaseSession {
 
 export interface ReservationSession extends BaseSession {
     reservationId: number;            // 예약 ID
-    sessionType: 'Reservation';              // 세션 유형 (예약으로 고정)
+    sessionType: 'RESERVED';              // 세션 유형 (예약으로 고정)
     reservationType: string;          // 예약 유형 (정기연습, 특별행사 등)
     participationAvailable: boolean;  // 참여 가능 여부
     participators: User[]

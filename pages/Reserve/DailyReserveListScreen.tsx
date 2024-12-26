@@ -13,12 +13,14 @@ const { width } = Dimensions.get(`window`)
 interface briefReservation {
     reservationId: number;              // 예약 ID
     creatorName: string;                // 생성자 이름
+    creatorNickname?: string;
     date: string;                       // 예약 날짜 (YYYY-MM-DD 형식)
-    type: string;                       // 예약 유형
+    reservationType: string;                       // 예약 유형
     startTime: string;                  // 시작 시간 (HH:MM:SS 형식)
     endTime: string;                    // 종료 시간 (HH:MM:SS 형식)
-    message: string;                    // 예약 메시지
+    title: string;                    // 예약 메시지
     participationAvailable: boolean;    // 참여 가능 여부
+    participators: number[]
     lastmodified: string;               // 마지막 수정 시간 (ISO 8601 형식)
 }
 
@@ -39,10 +41,12 @@ const DailyReserveListScreen: React.FC<DailyReserveProps> = ({ navigation, route
     useEffect(() => { TimesRef.current?.scrollTo({ y: 0, animated: false }) }, [selectedDate])
 
     const { data, loading, error } = useFetchUsingToken<briefReservation[]>(
-        `${process.env.BASE_URL}/reservation/day?date=${selectedDate.toISOString().split('T')[0]}`,
+        `${process.env.SUB_API}/reservation/daily?date=${selectedDate.toISOString().split('T')[0]}`,
         {
         }, 2000, [selectedDate, isFocusing]
     )
+    
+    console.log(selectedDate.toISOString().split('T')[0], ':', data)
 
     // if (loading)
     //     return (<View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFF' }}>
@@ -190,24 +194,34 @@ const DailyReserveListScreen: React.FC<DailyReserveProps> = ({ navigation, route
                     const Timegap = endHour * 60 - startHour * 60 + endMinnute - startMinnute
                     const reserveTop = 12 + (Number(startHour) - 10) * 80 + (startMinnute > 0 ? 40 : 0);
                     const reserveHeight = 40 * (Timegap / 30);
-                    const color = reserve.type == '정규연습' ? Color['blue500'] : reserve.participationAvailable ? Color['green500'] : Color['red500'];
+                    const color = reserve.reservationType == '정규연습' ? Color['blue500'] : reserve.participationAvailable ? Color['green500'] : Color['red500'];
                     return (
                         <Pressable key={reserve.reservationId} style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36, overflow: 'hidden' }}
                             onPress={() => { navigation.navigate('ReservationDetail', { reservationId: reserve.reservationId }) }}>
-                            <Text numberOfLines={1} style={{ position: 'absolute', width: width / 2, top: Timegap > 30?16: 8, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>{reserve.message}</Text>
+                            <Text numberOfLines={1} style={{ position: 'absolute', width: width / 2, top: Timegap > 30 ? 16 : 8, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>{reserve.title}</Text>
 
-                            {Timegap > 30 && <View style={{ position: 'absolute', bottom: 12, right: 16, flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                <Icons size={24} name={'time-outline'} color={Color['grey300']} />
-                                <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>{reserve.startTime.slice(0, -3)}~{reserve.endTime.slice(0, -3)}</Text>
-                            </View>}
-                            {reserve.type == '정규연습' ?
+                            {Timegap > 30 &&
+                                <View style={{ position: 'absolute', bottom: 12, flexDirection: 'row', width: '100%', paddingHorizontal: 12, gap: 4, alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                        <Icons size={24} name={'people'} color={Color['grey300']} />
+                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>{reserve.participators.length}</Text>
+                                    </View>
+                                    
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                        <Icons size={24} name={'time-outline'} color={Color['grey300']} />
+                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>{reserve.startTime}~{reserve.endTime}</Text>
+                                    </View>
+
+                                </View>
+                            }
+                            {reserve.reservationType == '정규연습' ?
                                 Timegap > 30 && <View style={{ position: 'absolute', top: -4, right: 8, }} >
                                     <Icons size={48} name={'bookmark-sharp'} color={Color['blue500']} />
                                 </View>
                                 :
-                                <View style={{ position: 'absolute', top: 10, right: 14, alignItems: 'flex-end' }}>
+                                <View style={{ position: 'absolute', top: 10, right: 14, paddingVertical: 4, gap: 2, alignItems: 'flex-end', justifyContent: 'flex-start' }}>
                                     <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }}>{reserve.creatorName}</Text>
-                                    {/* {reserve.nickname && <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{reserve.nickname}</Text>} */}
+                                    {reserve.creatorNickname && <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{reserve.creatorNickname}</Text>}
                                 </View>
                             }
                         </Pressable>

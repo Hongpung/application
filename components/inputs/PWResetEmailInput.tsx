@@ -13,7 +13,7 @@ type InputProps = {
     setInputValue: (email: string) => void,
 }
 
-const isValidEmail = async (email: string, callbackFn?: () => void) => {
+const isRegisteredEmail = async (email: string, callbackFn?: () => void) => {
     const controller = new AbortController();
     const signal = controller.signal;
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃
@@ -21,7 +21,7 @@ const isValidEmail = async (email: string, callbackFn?: () => void) => {
     let result = false;
 
     try {
-        const response = await fetch(`${process.env.BASE_URL}/auth/email`, {
+        const response = await fetch(`${process.env.SUB_API}/auth/check-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -34,8 +34,9 @@ const isValidEmail = async (email: string, callbackFn?: () => void) => {
 
         if (response.ok) {
 
-            const { valid } = data;
-            result = valid;
+            const { isRegistered } = data;
+            console.log(isRegistered)
+            result = isRegistered == true;
         } else {
             console.error('서버에서 데이터 가져오기 실패: ', response.status);
         }
@@ -118,8 +119,8 @@ const PWResetEmailInput: React.FC<InputProps> = ({ label, setValid, isEditible =
         setIsValid(newCondition);
         if (!newCondition) setErrorText("이메일 주소가 유효하지 않습니다")
         else {
-            const duplication = await isValidEmail(inputValue) || false
-            if (duplication) {
+            const isRegistered = await isRegisteredEmail(inputValue) || false
+            if (!isRegistered) {
                 setIsValid(false);
                 setErrorText("존재하지 않는 이메일 입니다.")
             }

@@ -38,7 +38,7 @@ const PictureCheckScreen: React.FC<PictureCheckProps> = ({ navigation, route }) 
             try {
                 if (!sessionData) throw Error('진행 중인 세션 정보가 없습니다.')
 
-                const token = await getToken('utilToken')
+                const token = await getToken('token')
 
                 setLoading(true)
 

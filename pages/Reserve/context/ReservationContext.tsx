@@ -28,7 +28,7 @@ const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         reservationName: '',
         isRegular: false,
         isParticipatible: true,
-        participants: [],
+        participators: [],
         borrowInstruments: [],
         hasToWait: false
     });
@@ -40,7 +40,7 @@ const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         reservationName: '',
         isRegular: false,
         isParticipatible: true,
-        participants: [],
+        participators: [],
         borrowInstruments: [],
         hasToWait: false
     });
@@ -50,7 +50,7 @@ const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const setName = (name: string) => setReservation(prev => ({ ...prev, reservationName: name }));
     const setIsRegular = (isRegular: boolean) => setReservation(prev => ({ ...prev, isRegular }));
     const setIsParticipatible = (isParticipatible: boolean) => setReservation(prev => ({ ...prev, isParticipatible }));
-    const setParticipants = (participants: User[]) => setReservation(prev => ({ ...prev, participants }));
+    const setParticipants = (participants: User[]) => setReservation(prev => ({ ...prev, participators: participants }));
     const setBorrowInstruments = (borrowInstruments: briefInstrument[]) => setReservation(prev => ({ ...prev, borrowInstruments }));
     const setHasWait = (hasToWait: boolean) => setReservation(prev => ({ ...prev, hasToWait }));
 

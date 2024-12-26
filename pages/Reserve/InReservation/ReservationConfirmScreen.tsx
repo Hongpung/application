@@ -38,10 +38,11 @@ const ReservationConfirmScreen: React.FC = () => {
     const ConfirmHandler = () => {
         const createReservation = async () => {
 
+            console.log('onclicked')
             const data = parseToReservationForm(reservation) as ReservationSubmitForm
 
-            if (data.message.length == 0) {
-                data.message = `${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`
+            if (data.title.length == 0) {
+                data.title = `${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`
             }
 
             const sendFormat = JSON.stringify(data)
@@ -53,9 +54,9 @@ const ReservationConfirmScreen: React.FC = () => {
             try {
                 const token = await getToken('token');
 
-                console.log(sendFormat, `${process.env.BASE_URL}/reservation`)
+                console.log(sendFormat, `${process.env.SUB_API}/reservation`)
                 const response = await fetch(
-                    `${process.env.BASE_URL}/reservation`
+                    `${process.env.SUB_API}/reservation`
                     , {
                         method: 'POST',
                         headers: {
@@ -81,7 +82,7 @@ const ReservationConfirmScreen: React.FC = () => {
                     },
                     body: JSON.stringify(
                         {
-                            to: [...data.participaterIds.map(id => { if (id != loginUser?.memberId) return id })],
+                            to: [...data.participatorIds.map(id => { if (id != loginUser?.memberId) return id })],
                             title: '예약에 포함되었습니다',
                             text: `예약명: ${result.message}\n일시: ${data.date}/${data.startTime.slice(-4, -2)}~${data.endTime.slice(-2)}`
                         }
@@ -166,14 +167,14 @@ const ReservationConfirmScreen: React.FC = () => {
 
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
                     <Text style={styles.leftText}>참여자</Text>
-                    <View style={[{ display: 'flex', flexDirection: 'row', }, reservation.participants.length > 0 && { marginRight: 12 }]}>
+                    <View style={[{ display: 'flex', flexDirection: 'row', }, reservation.participators.length > 0 && { marginRight: 12 }]}>
                         <Text style={[styles.rightText, { maxWidth: 156 }]} numberOfLines={1}>
-                            {reservation.participants.length > 0 ? `${reservation.participants.slice(0, reservation.participants.length > 3 ? 3 : reservation.participants.length).map(user => `${user.name} `)}` : '없음'}
+                            {reservation.participators.length > 0 ? `${reservation.participators.slice(0, reservation.participators.length > 3 ? 3 : reservation.participators.length).map(user => `${user.name} `)}` : '없음'}
                         </Text>
-                        {reservation.participants.length >= 3 && <Text style={styles.rightText}>{`외 ${reservation.participants?.length} 명`}</Text>}
+                        {reservation.participators.length >= 3 && <Text style={styles.rightText}>{`외 ${reservation.participators?.length} 명`}</Text>}
                     </View>
-                    {reservation.participants.length > 0 &&
-                        <Pressable style={{ position: 'absolute', right: -12 }} onPress={() => { navigation.navigate('ReservationParticipatorsView', { participators: JSON.stringify(reservation.participants) }) }}>
+                    {reservation.participators.length > 0 &&
+                        <Pressable style={{ position: 'absolute', right: -12 }} onPress={() => { navigation.navigate('ReservationParticipatorsView', { participators: JSON.stringify(reservation.participators) }) }}>
                             <Icons size={16} color={Color['grey300']} name={'chevron-forward'}></Icons>
                         </Pressable>}
                 </View>

@@ -87,6 +87,7 @@ export const EmailCheck: React.FC = () => {
                             if (verificationCodeRef.current?.validate()) {
                                 try {
                                     setLoading(true);
+                                    console.log(passwordResetInfo.email, verificationCode)
                                     const verified = await verifyingEmail(passwordResetInfo.email, verificationCode);
 
                                     if (verified == 201) {

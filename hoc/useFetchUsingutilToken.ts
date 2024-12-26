@@ -23,7 +23,7 @@ const useFetchUsingUtilToken = <T>(url: string | null, options: UseFetchOptions 
 
         if (!url) throw Error('invalid url');;
 
-        const token = await getToken('utilToken');
+        const token = await getToken('token');
 
         if (!token) { throw Error('invalid Token'); }
 
@@ -49,7 +49,7 @@ const useFetchUsingUtilToken = <T>(url: string | null, options: UseFetchOptions 
           // `invalid Token` 메시지일 경우 처리
           if (err.message === 'invalid Token') {
             setError('Invalid Token - Please login again.');
-            navigation.dispatch(StackActions.replace('Login'))
+            // navigation.dispatch(StackActions.replace('Login'))
             return;
           }
           // `AbortError`일 경우 처리
