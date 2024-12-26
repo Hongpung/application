@@ -1,19 +1,18 @@
 import { FlatList, ScrollView, StyleSheet, Text, View, Image, Modal, Pressable, Dimensions } from 'react-native'
 import React, { useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
-import InstrumentCard from '@hongpung/components/cards/InstrumentCard'
-import { InstrumentProvider } from '@hongpung/context/InstrumentContext'
+
+
 import LongButton from '@hongpung/components/buttons/LongButton'
 import { Icons } from '@hongpung/components/Icon'
-import { CompositeScreenProps } from '@react-navigation/native'
-import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
-import { ReservationDTO } from '../Reserve/ReserveInterface'
+
 import { User } from '@hongpung/UserType'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack'
+
 import { MyPageParamList } from '@hongpung/nav/MyPageStack'
 import { Session } from '../Home/MyPage/MyPractices/MyPracticesScreen'
-import useFetch from '@hongpung/hoc/useFetch'
+
+
 import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken'
 
 interface AttendanceDTO {
@@ -29,8 +28,6 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
     const aspectRatio = 3 / 4;
     const [selectedImage, selectImage] = useState<string | null>(null)
     const { data, loading, error } = useFetchUsingUtilToken<Session>(`${process.env.SUB_API}/room-session/log/specific/${sessionId}`)
-
-    console.log(data, sessionId, `${process.env.SUB_API}/log/specific/${sessionId}`)
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
 

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useRef, useState } from 'react'
-import LongButton from '../../components/buttons/LongButton';
-import { Color } from '../../ColorSet';
+import LongButton from '@hongpung/components/buttons/LongButton';
+import { Color } from '@hongpung/ColorSet';
 import PagerView from 'react-native-pager-view';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { CheckOutStackParamList } from '@hongpung/nav/HomeStacks';
@@ -46,8 +46,7 @@ const CheckOutDescriptScreen: React.FC = () => {
                 onPageScroll={(e) => { const { position, offset } = e.nativeEvent; 
                 setPageNum(position); }}
                 ref={pagerRef}>
-                {
-                // sessionState?.borrowInstruments &&
+                {sessionState?.borrowInstruments &&
                     <View style={{
                         flex: 1,
                         alignItems: 'center',
