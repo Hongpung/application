@@ -17,7 +17,7 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick 
 
     const RoleTag = (role: string) => {
         switch (role) {
-            case 'SANGSOE':
+            case '상쇠':
                 return (
                     <View>
                         <View style={{ height: 16, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4, backgroundColor: Color['red100'], borderRadius: 5, marginRight: 4 }}>
@@ -32,7 +32,7 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick 
                     <View>
                         <View style={{ height: 16, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4, backgroundColor: Color['blue100'], borderRadius: 5, marginRight: 4 }}>
                             <Text style={{ fontSize: 12, fontFamily: "NanumSquareNeo-Bold", color: Color['blue600'], }}>
-                                {String(role)}
+                                {role}
                             </Text>
                         </View>
                     </View>

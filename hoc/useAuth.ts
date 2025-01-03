@@ -18,7 +18,7 @@ export const useAuth = () => {
       const token = await getToken('token');
 
       if (token) {
-        const loadUser = await fetch(`${process.env.SUB_API}/member/status`,
+        const loadUser = await fetch(`${process.env.SUB_API}/member/my-status`,
           {
             method: 'GET',
             headers: {
@@ -30,7 +30,6 @@ export const useAuth = () => {
         if (!loadUser.ok) throw Error('유저 정보 로드 실패')
         const userStatus = await loadUser.json() as User;
 
-        console.log(userStatus)//
         if (!userStatus) throw Error('유저 정보가 비어 있음')
 
         const { status } = await Notifications.requestPermissionsAsync();
@@ -38,15 +37,15 @@ export const useAuth = () => {
         const sendFormat: { pushEnable: boolean, notificationToken: null | string } = { pushEnable: (status === 'granted'), notificationToken: null }
 
         if (status === 'granted') {
-          const token = await registerForPushNotificationsAsync()
-          sendFormat.notificationToken = token//
+          const Ntoken = await registerForPushNotificationsAsync()
+          sendFormat.notificationToken = Ntoken;
         }
 
         setLoginUser(userStatus);
 
-        const fetchFCM = await fetch(`${process.env.SUB_API}/member/token`,
+        const fetchFCM = await fetch(`${process.env.SUB_API}/member/NToken`,
           {
-            method: 'PUT',
+            method: 'PATCH',
             headers: {
               'Authorization': `Bearer ${token}`,
               'Content-Type': `application/json`,
@@ -66,7 +65,6 @@ export const useAuth = () => {
         if (!useSession.ok) throw Error('세션 불러오기 실패')
 
         const { isCheckin } = await useSession.json()
-        console.log('isCheckin:', isCheckin)
 
         if (isCheckin == true) {
           console.log('세션 연겨룀')
@@ -154,7 +152,7 @@ export const useAuth = () => {
       if (!loginUser) console.log('유저 정보가 없음')
       const token = await getToken('token');
 
-      const fetchFCM = await fetch(`${process.env.SUB_API}/member/token/${loginUser?.memberId}`,
+      const fetchFCM = await fetch(`${process.env.SUB_API}/member/NToken/${loginUser?.memberId}`,
         {
           method: 'DELETE',
           headers: {

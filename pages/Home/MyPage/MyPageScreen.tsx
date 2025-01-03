@@ -61,14 +61,7 @@ const MyPageScreen: React.FC = () => {
         <ScrollView style={styles.container}>
             <ProfileBoxCard
                 user={{
-                    profileImageUrl: loginUser?.profileImageUrl,
-                    email: loginUser!.email,
-                    memberId: loginUser!.memberId,
-                    club: loginUser!.club,
-                    name: loginUser!.name,
-                    enrollmentNumber: loginUser!.enrollmentNumber,
-                    nickname: loginUser!.nickname,
-                    role: loginUser!.role
+                    ...loginUser
                 }}
             />
             <View style={{ flexDirection: 'row', height: 20, justifyContent: 'flex-start', marginTop: 20, marginBottom: 16, marginHorizontal: 24 }}>

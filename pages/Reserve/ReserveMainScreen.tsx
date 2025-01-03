@@ -362,7 +362,7 @@ const ReserveMainScreen: React.FC = () => {
                                             }
                                             <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontFamily: 'NanumSquareNeo-Bold', marginHorizontal: 64, top: 72, textAlign: 'center', fontSize: 20 }}>{item.title}</Text>
                                             <View style={{ position: 'absolute', right: 24, bottom: 12, alignItems: 'flex-end', gap: 4 }}>
-                                                <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>{`${item.startTime.slice(0, -3)} ~ ${item.endTime.slice(0, -3)}`}</Text>
+                                                <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>{`${item.startTime} ~ ${item.endTime}`}</Text>
                                                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><Icons size={24} name={'people'} color={Color['grey300']} />
                                                     <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>
                                                         {item.participators.length}

@@ -74,6 +74,8 @@ export interface User {
     enrollmentNumber: string
     role: string[]
     profileImageUrl?: string
+    instagramUrl?: string
+    blogUrl?: string
 }
 
 export interface signUpInfo {

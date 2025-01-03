@@ -23,6 +23,20 @@ interface briefReservation {
     participators: number[]
     lastmodified: string;               // 마지막 수정 시간 (ISO 8601 형식)
 }
+interface dateReservation{
+    amountOfParticipators: number;
+    reservationId: number;
+    creatorName: string;
+    creatorNickname: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+    title: string;
+    reservationType: reservationType;
+    participationAvailable: boolean;
+}
+
+type reservationType = 'COMMON' | 'REGULAR' | 'EXTERNAL'
 
 type DailyReserveProps = NativeStackScreenProps<ReservationStackParamList, 'DailyReserveList'>
 
@@ -40,7 +54,7 @@ const DailyReserveListScreen: React.FC<DailyReserveProps> = ({ navigation, route
     useEffect(() => { if (date != null) setDate(new Date(date)) }, [])
     useEffect(() => { TimesRef.current?.scrollTo({ y: 0, animated: false }) }, [selectedDate])
 
-    const { data, loading, error } = useFetchUsingToken<briefReservation[]>(
+    const { data, loading, error } = useFetchUsingToken<dateReservation[]>(
         `${process.env.SUB_API}/reservation/daily?date=${selectedDate.toISOString().split('T')[0]}`,
         {
         }, 2000, [selectedDate, isFocusing]
@@ -194,7 +208,7 @@ const DailyReserveListScreen: React.FC<DailyReserveProps> = ({ navigation, route
                     const Timegap = endHour * 60 - startHour * 60 + endMinnute - startMinnute
                     const reserveTop = 12 + (Number(startHour) - 10) * 80 + (startMinnute > 0 ? 40 : 0);
                     const reserveHeight = 40 * (Timegap / 30);
-                    const color = reserve.reservationType == '정규연습' ? Color['blue500'] : reserve.participationAvailable ? Color['green500'] : Color['red500'];
+                    const color = reserve.reservationType == 'REGULAR' ? Color['blue500'] : reserve.participationAvailable ? Color['green500'] : Color['red500'];
                     return (
                         <Pressable key={reserve.reservationId} style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36, overflow: 'hidden' }}
                             onPress={() => { navigation.navigate('ReservationDetail', { reservationId: reserve.reservationId }) }}>
@@ -204,7 +218,7 @@ const DailyReserveListScreen: React.FC<DailyReserveProps> = ({ navigation, route
                                 <View style={{ position: 'absolute', bottom: 12, flexDirection: 'row', width: '100%', paddingHorizontal: 12, gap: 4, alignItems: 'center', justifyContent: 'space-between' }}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                                         <Icons size={24} name={'people'} color={Color['grey300']} />
-                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>{reserve.participators.length}</Text>
+                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>{reserve.amountOfParticipators}</Text>
                                     </View>
                                     
                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -214,7 +228,7 @@ const DailyReserveListScreen: React.FC<DailyReserveProps> = ({ navigation, route
 
                                 </View>
                             }
-                            {reserve.reservationType == '정규연습' ?
+                            {reserve.reservationType == 'REGULAR' ?
                                 Timegap > 30 && <View style={{ position: 'absolute', top: -4, right: 8, }} >
                                     <Icons size={48} name={'bookmark-sharp'} color={Color['blue500']} />
                                 </View>

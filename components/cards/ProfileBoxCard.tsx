@@ -14,13 +14,18 @@ interface ProfileBoxProps {
 
 const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ user }) => {
 
-    const { data: snsData, loading, error } = useFetchUsingUtilToken<{ instagramUrl: string, blogUrl: string }>(user ? `${process.env.SUB_API}/member/sns/${user?.memberId}` : null, {}, 5000, [user])
-
     const RoleTextRender = () => {
 
-        if (user?.role && user?.role.length > 0) { return user.role.map(role => role).filter(Boolean).join(', ') }
+        console.log(user)
+        if (user?.role && user?.role.length > 0) {
+            return user.role.map((roleName, index) =>
+            (<>
+                <Text style={{ color: roleName == '상쇠' ? Color['red500'] : Color['blue500'] }}>{roleName}</Text>
+                {index != user.role.length - 1 && <Text>, </Text>}
+            </>))
+        }
 
-        return "동아리원"
+        return <Text>동아리원</Text>
     }
 
     if (!user) return;
@@ -38,15 +43,24 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ user }) => {
                         {user?.nickname && <Text style={{ fontSize: 14, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>{user?.nickname}</Text>}
                     </View>
                     <View style={{ flexDirection: 'row', width: 64, justifyContent: 'flex-start', gap: 4 }}>
-                        {snsData && Object.entries(snsData)?.map(([key, value]) => !!value && (
-                            <Pressable key={key} style={styles.icons}
+                        {user?.instagramUrl != undefined &&
+                            <Pressable style={styles.icons}
                                 onPress={() => {
-                                    Linking.openURL(value)
+                                    Linking.openURL('https://www.instagram.com/' + user.instagramUrl)
                                         .catch((err) => { console.error('Failed to open URL:', err); })
                                 }}>
-                                <Icons name={key == 'instagramUrl' ? "logo-instagram" : 'chatbox-outline'} size={24} color={key == 'instagramUrl' ? Color['grey400'] : Color['green500']} />
+                                <Icons name={"logo-instagram"} size={24} color={Color['grey400']} />
                             </Pressable>
-                        ))
+                        }
+
+                        {user?.blogUrl && <Pressable style={styles.icons}
+                            onPress={() => {
+                                Linking.openURL('https://blog.naver.com/' + user.blogUrl)
+                                    .catch((err) => { console.error('Failed to open URL:', err); })
+                            }}>
+                            <Icons name={'chatbox-outline'} size={24} color={Color['green500']} />
+                        </Pressable>
+
                         }
                     </View>
                 </View>

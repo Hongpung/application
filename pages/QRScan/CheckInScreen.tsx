@@ -6,11 +6,9 @@ import LongButton from '../../components/buttons/LongButton'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import { MainStackParamList } from '@hongpung/nav/HomeStacks'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { loginUserState, useOnReserve } from '@hongpung/recoil/authState'
-import useFetch from '@hongpung/hoc/useFetch'
 import { RealtimeSession, ReservationSession } from '../Reserve/SessionTypes'
-import { io } from 'socket.io-client'
 import { Icons } from '@hongpung/components/Icon'
 import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken'
 import { getToken } from '@hongpung/utils/TokenHandler'
@@ -228,7 +226,7 @@ const CheckInScreen: React.FC = () => {
                                 width: 180, height: 180, borderRadius: 5, borderWidth: 1, borderColor: Color['blue500'], marginVertical: 24, overflow: 'hidden', alignSelf: 'center', backgroundColor: Color['blue200']
                             }}></View>
                         : !!sessionData?.session ?
-                            sessionData.session.sessionType == 'Reservation' ?
+                            sessionData.session.sessionType == 'RESERVED' ?
                                 <View style={{
                                     width: 320, height: 180, borderRadius: 5, borderWidth: 1, borderColor: Color['grey100'], marginVertical: 24, overflow: 'hidden', alignSelf: 'center',
                                 }}>

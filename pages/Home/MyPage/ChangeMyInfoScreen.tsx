@@ -34,21 +34,12 @@ const ChangeMyInfoScreen: React.FC = () => {
 
     const [userData, setLoginUser] = useRecoilState(loginUserState);
     const [nickname, setNickname] = useState(userData?.nickname || '');
-    const [instagramUrl, setInstagramUrl] = useState<string>('');
-    const [blogUrl, setBlogUrl] = useState<string>('');
+    const [instagramUrl, setInstagramUrl] = useState(userData?.instagramUrl||'');
+    const [blogUrl, setBlogUrl] = useState(userData?.blogUrl||'');
 
     const [selectedImage, setImageFile] = useState<File | null>(null);
     const [selectedImageUri, setImageUri] = useState<string | null>(null);
 
-
-    const { data: snsData, loading, error } = useFetchUsingToken<{ instagramUrl: string, blogUrl: string }>(`${process.env.SUB_API}/member/sns/${userData?.memberId}`, {}, 5000, [userData])
-
-    useEffect(() => {
-        if (!!snsData) {
-            setInstagramUrl(snsData.instagramUrl || '');
-            setBlogUrl(snsData.blogUrl || '');
-        }
-    }, [snsData])
 
     const RoleTextRender = () => {
         if (userData?.role && userData?.role.length > 0) { return [...userData.role] }
@@ -107,11 +98,11 @@ const ChangeMyInfoScreen: React.FC = () => {
 
                 const submitForm: { [key: string]: string | null } = {}
 
-                if (snsData?.instagramUrl != instagramUrl)
+                if (userData?.instagramUrl != instagramUrl)
                     submitForm.instagramUrl = instagramUrl.length == 0 ? null : instagramUrl;
 
 
-                if (snsData?.blogUrl != blogUrl)
+                if (userData?.blogUrl != blogUrl)
                     submitForm.blogUrl = blogUrl.length == 0 ? null : blogUrl
 
                 if (userData.nickname != nickname)
@@ -130,7 +121,7 @@ const ChangeMyInfoScreen: React.FC = () => {
 
                 console.log('유저 정보 업데이트중', submitForm)
 
-                const response = await fetch(`${process.env.SUB_API}/member/status`, {
+                const response = await fetch(`${process.env.SUB_API}/member/my-status`, {
                     method: 'PATCH',
                     headers: {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
@@ -175,7 +166,7 @@ const ChangeMyInfoScreen: React.FC = () => {
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }} >
             <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#FFF" }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}>
-                <Modal visible={isLoading || loading} transparent={true}>
+                <Modal visible={isLoading} transparent={true}>
                     <View style={{ flex: 1, zIndex: 5, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <ActivityIndicator color={'white'} size={'large'} />
                     </View>
