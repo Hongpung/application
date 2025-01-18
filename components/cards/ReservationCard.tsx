@@ -1,6 +1,6 @@
 import { View, Text, Pressable } from "react-native"
 import { Color } from "@hongpung/ColorSet"
-import { ReservationDTO } from "@hongpung/pages/Reserve/ReserveInterface"
+import { ReservationDTO } from "@hongpung/pages/Reserve/ReservationInterface"
 import { Icons } from "@hongpung/components/Icon"
 import { useMemo } from "react"
 import { useNavigation } from "@react-navigation/native"

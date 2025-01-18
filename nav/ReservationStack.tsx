@@ -1,5 +1,5 @@
 import { ReservationProvider } from "@hongpung/pages/Reserve/context/ReservationContext";
-import DailyReserveListScreen from "@hongpung/pages/Reserve/DailyReserveListScreen";
+import DailyReservationListScreen from "@hongpung/pages/Reserve/DailyReservationListScreen";
 import BorrowInstrumentSelectScreen from "@hongpung/pages/Reserve/InReservation/BorrowInstrumentSelectScreen";
 import DateSelcectScreen from "@hongpung/pages/Reserve/InReservation/DateSelcectScreen";
 import ParticipantsSelectScreen from "@hongpung/pages/Reserve/InReservation/ParticipantsSelectScreen";
@@ -7,7 +7,7 @@ import ReservationConfirmScreen from "@hongpung/pages/Reserve/InReservation/Rese
 import ReservationEditConfirmScreen from "@hongpung/pages/Reserve/InReservation/ReservationEditConfirm";
 import ReservationScreen from "@hongpung/pages/Reserve/InReservation/ReservationScreen";
 import TimeSelectScreen from "@hongpung/pages/Reserve/InReservation/TimeSelectScreen";
-import ReserveCalendarScreen from "@hongpung/pages/Reserve/ReserveCalendarScreen";
+import ReservationCalendarScreen from "@hongpung/pages/Reserve/ReservationCalendarScreen";
 import ReservationDetailScreen from "@hongpung/pages/Reserve/ViewDetailReservation/ReservationDetailScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Header from '@hongpung/components/Header';
@@ -116,7 +116,7 @@ const ReservationStacks = () => {
         <ReservationStack.Navigator initialRouteName="ReserveCalendar" screenOptions={{ headerShown: false, animationDuration: 100, animation: 'slide_from_right' }}>
             <ReservationStack.Screen
                 name='ReserveCalendar'
-                component={ReserveCalendarScreen}
+                component={ReservationCalendarScreen}
                 options={{
                     headerShown: true,
                     header: ({ navigation }) => <Header leftButton='close' HeaderName='연습실 예약 조회' RightButton='예약'
@@ -128,7 +128,7 @@ const ReservationStacks = () => {
             />
             <ReservationStack.Screen
                 name='DailyReserveList'
-                component={DailyReserveListScreen}
+                component={DailyReservationListScreen}
                 options={{
                     animation: 'none',
                 }}

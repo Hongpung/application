@@ -88,7 +88,6 @@ export const UserModal: React.FC<{ selectUser: (user: User | null) => void, sele
                 >
                     <ProfileBoxCard
                         user={selectedUser!}
-                        isCard={true}
                     />
                     <Pressable
                         style={{

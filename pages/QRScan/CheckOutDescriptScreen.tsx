@@ -46,7 +46,7 @@ const CheckOutDescriptScreen: React.FC = () => {
                 onPageScroll={(e) => { const { position, offset } = e.nativeEvent; 
                 setPageNum(position); }}
                 ref={pagerRef}>
-                {sessionState?.borrowInstruments &&
+                {
                     <View style={{
                         flex: 1,
                         alignItems: 'center',

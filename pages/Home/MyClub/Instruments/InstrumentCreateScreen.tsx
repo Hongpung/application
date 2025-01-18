@@ -1,7 +1,7 @@
 import { StyleSheet, TextInput, Text, View, ScrollView, Image, Modal, Pressable, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Keyboard, TextInputChangeEventData, NativeSyntheticEvent, FlatList, Alert, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { Color } from '../../../../ColorSet';
-import { Instrument, InstrumentCreateDTO,  InstrumentType, InstrumentTypes } from '../../../../UserType';
+import { Instrument, InstrumentCreateDTO,  InstrumentType, instrumentTypes } from '../../../../UserType';
 import LongButton from '../../../../components/buttons/LongButton';
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';
@@ -41,7 +41,7 @@ const InstrumentEditScreen: React.FC = () => {
     const [onSelectType, setSelectTypeVisible] = useState(false);
     const [isLoading, setLoading] = useState(false);
 
-    const [instrument, setInstrument] = useState<Instrument>({ available: true, club: loginUser?.club == '기타' ? '들녘' : loginUser?.club!, borrowHistory: [], name: '', instrumentId: -1, type: '꽹과리' })
+    const [instrument, setInstrument] = useState<Instrument>({ available: true, club: loginUser?.club == '기타' ? '들녘' : loginUser?.club!, borrowHistory: [], name: '', instrumentId: -1, instrumentType: '꽹과리' })
 
 
     const pickImageFromAlbum = async () => {
@@ -78,7 +78,7 @@ const InstrumentEditScreen: React.FC = () => {
     };
 
     const parseInstrument = (type: InstrumentType): string => {
-        const instrumentEnumNo = InstrumentTypes.indexOf(type)
+        const instrumentEnumNo = instrumentTypes.indexOf(type)
         return instrumentsEngType[instrumentEnumNo];
     }
 
@@ -106,7 +106,7 @@ const InstrumentEditScreen: React.FC = () => {
 
                 if (!token) throw Error('invalid Token');
 
-                const submitForm: InstrumentCreateDTO = { name: instrument.name, type: parseInstrument(instrument.type) }
+                const submitForm: InstrumentCreateDTO = { name: instrument.name, instrumentType: instrument.instrumentType }
 
                 if (!!selectedImage) {
                     console.log('이미지 업로드 수행중')
@@ -121,7 +121,7 @@ const InstrumentEditScreen: React.FC = () => {
 
 
                 console.log('신규 악기 생성 수행중', submitForm)
-                const response = await fetch(`${process.env.BASE_URL}/instrument`, {
+                const response = await fetch(`${process.env.SUB_API}/instrument/create`, {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
@@ -189,7 +189,7 @@ const InstrumentEditScreen: React.FC = () => {
                             <Text style={styles.RowLeft}>{`악기 타입`}</Text>
                             <Pressable style={{ position: 'relative', zIndex: 0 }}
                                 onPress={() => { Keyboard.dismiss(); setSelectTypeVisible(true); }}>
-                                <Text style={styles.RowRight}>{instrument.type}</Text>
+                                <Text style={styles.RowRight}>{instrument.instrumentType}</Text>
                                 {
                                     onSelectType && <View style={{
                                         position: 'absolute', top: 0, right: 0, zIndex: 2, width: 120, backgroundColor: '#FFF', alignItems: 'flex-start', paddingHorizontal: 16, borderRadius: 5, shadowColor: Color['grey700'],
@@ -202,14 +202,14 @@ const InstrumentEditScreen: React.FC = () => {
                                         <ScrollView
                                             contentContainerStyle={{ alignItems: 'flex-start' }}
                                             showsVerticalScrollIndicator={false}
-                                        >{InstrumentTypes.map((item) => {
+                                        >{instrumentTypes.map((item) => {
                                             return (
                                                 <Pressable
                                                     key={item + 'seletor'}
                                                     style={{ paddingVertical: 4, marginVertical: 4, width: 120 - 32, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row-reverse' }}
-                                                    onPress={() => { setInstrument({ ...instrument, type: item }); setSelectTypeVisible(false); }}>
-                                                    <Text style={[{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, color: instrument.type == item ? Color['green600'] : Color['grey400'] }]}>{item}</Text>
-                                                    {instrument.type == item && <Icons name='checkmark' color={Color['green500']} size={24} />}
+                                                    onPress={() => { setInstrument({ ...instrument, instrumentType: item }); setSelectTypeVisible(false); }}>
+                                                    <Text style={[{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, color: instrument.instrumentType == item ? Color['green600'] : Color['grey400'] }]}>{item}</Text>
+                                                    {instrument.instrumentType == item && <Icons name='checkmark' color={Color['green500']} size={24} />}
                                                 </Pressable>
                                             )
                                         })}</ScrollView>

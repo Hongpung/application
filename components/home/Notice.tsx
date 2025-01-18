@@ -3,15 +3,16 @@ import React from 'react'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { Color } from '@hongpung/ColorSet'
 import { Icons } from '../Icon'
-import { CompositeNavigationProp, StackActions, useNavigation } from '@react-navigation/native'
+import { CompositeNavigationProp, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { MainStackParamList, NoticeStackParamList } from '@hongpung/nav/HomeStacks'
 
 
 interface BriefNotice {
-    infoId: number
+    noticeId: number
     title: string
-    date: string//dateString
+    createdAt: string//dateString
+    updatedAt: string//dateString
 }
 
 type CombinedNavigationProp = CompositeNavigationProp<
@@ -23,15 +24,16 @@ const NoticePartition: React.FC = () => {
 
     const navigation = useNavigation<CombinedNavigationProp>();
 
-    // const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.BASE_URL}/info`)
+    const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.SUB_API}/notice`)
 
-    const data:any[]=[]
+    // const data:any[]=[]
 
-    // if (loading)
-    //     return (<>
-    //         <ActivityIndicator color={'white'} size={'large'} />
-    //     </>)
+    if (loading)
+        return (<>
+            <ActivityIndicator color={'white'} size={'large'} />
+        </>)
 
+    console.log(data)
     return (
         <View style={{ display: 'flex', gap: 14, width: '100%', flexDirection: 'column' }}>
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -41,21 +43,21 @@ const NoticePartition: React.FC = () => {
             <View style={{ display: 'flex', gap: 16, width: '100%', flexDirection: 'column' }}>
                 {data && data?.length > 0 ?
                     data.slice(0, 4).map((notice) => (
-                        <TouchableOpacity key={notice.infoId} style={{ display: 'flex', alignItems: 'center', marginHorizontal: 12, flexDirection: 'row', gap: 2 }}
+                        <TouchableOpacity key={notice.noticeId} style={{ display: 'flex', alignItems: 'center', marginHorizontal: 12, flexDirection: 'row', gap: 2 }}
                             onPress={() => {
                                 navigation.setOptions({
                                     animation: 'none', // 애니메이션 끄기
-                                  });
+                                });
                                 navigation.push('NoticeStack');
                                 navigation.setOptions({
                                     animation: 'slide_from_right', // 애니메이션 끄기
-                                  });
-                                navigation.push('NoticeStack', { screen: 'NoticeDetail', params: { infoId: notice.infoId } })
+                                });
+                                navigation.push('NoticeStack', { screen: 'NoticeDetail', params: { noticeId: notice.noticeId } })
                             }}>
                             <Text numberOfLines={1} ellipsizeMode='tail' style={{ flex: 1, fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>
                                 [공지사항] {notice.title}
                             </Text>
-                            <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{notice.date.split('T')[0]}</Text>
+                            <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{notice.createdAt.split('T')[0]}</Text>
                         </TouchableOpacity>
                     )) :
                     <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>공지 사항이 없습니다.</Text>

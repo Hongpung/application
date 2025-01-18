@@ -1,13 +1,15 @@
-import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { Color } from '../../../ColorSet';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 
-import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { HomeStackParamList } from '../../../pageTypes';
-import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken';
+import { Color } from '../../../ColorSet';
+import Animated, { interpolate, SharedValue, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable'
+
 import { getToken } from '@hongpung/utils/TokenHandler';
 import { StackActions, useNavigation } from '@react-navigation/native';
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 
 
 enum NotificationType {
@@ -18,13 +20,13 @@ enum NotificationType {
     // 다른 알림 타입들을 여기에 추가할 수 있습니다.
 }
 
-type Notification = {
-    id: any,
-    title: string;
-    type: NotificationType,
-    message: string
-    time: Date;
-};
+// type Notification = {
+//     id: any,
+//     title: string;
+//     type: NotificationType,
+//     message: string
+//     time: Date;
+// };
 
 type NotificationCard = {
     notification: NotificationDTO,
@@ -74,19 +76,22 @@ const calculateTimeDifference = (date1: Date) => {
 
 const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }) => {
 
-    const swipeableRef = useRef<Swipeable>(null);
-    let DragX = 0;
 
-    const renderRightActions = (progress: any, dragX: any) => {
-        dragX.addListener(({ value }: { value: number }) => {
-            DragX = value
-        });
-        const opacity = dragX.interpolate({
-            inputRange: [-80, -20, 0],
-            outputRange: [1, 0.5, 0],
-            extrapolate: 'clamp',
+    const dragX = useSharedValue<number>(0);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        opacity: dragX.value < -20 ? 0.2 : 1,
+    }));
+
+    const renderRightActions = (progress: SharedValue<number>, dragXParam: SharedValue<number>, swipeable: SwipeableMethods) => {
+        const rightActionAnimatedStyle = useAnimatedStyle(() => {
+            const opacity = interpolate(dragXParam.value, [-100, -50, 0], [1, 0.5, 0], 'clamp');
+            return {
+                opacity
+            };
         });
 
+        dragX.set(dragXParam.get())
 
         return (
             <Pressable
@@ -96,69 +101,66 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
                 }}
                 onPress={() => {
                     onDelete();
-                    if (swipeableRef.current) {
-                        swipeableRef.current.close();
-                    }
-                }}>
-                <Animated.View style={{
+                    swipeable.close();
+                }}
+            >
+                <Animated.View style={[{
                     flex: 1,
-                    backgroundColor: Color[`red500`],
+                    backgroundColor: Color['red500'],
                     marginVertical: 6,
+                    alignItems: 'center',
+                    justifyContent: "center",
                     marginRight: 28,
                     marginLeft: -20,
                     borderRadius: 5,
-                    width: 140,
-                    opacity: opacity
-                }}
-                >
-
+                    width: 140
+                }, rightActionAnimatedStyle]}>
+                    <Text style={{
+                        textAlign: 'center',
+                        width: 140,
+                        color: Color['red100'],
+                        fontSize: 16,
+                        fontFamily: "NanumSquareNeo-Bold",
+                    }}>삭제</Text>
                 </Animated.View>
-                <Text style={{
-                    position: 'absolute',
-                    width: 140,
-                    left: 32,
-                    color: Color[`red100`],
-                    fontSize: 16,
-                    fontFamily: "NanumSquareNeo-Bold",
-                }}>삭제</Text>
             </Pressable>
-
         );
-    }
-
-
+    };
     return (
+
         <Swipeable
             renderRightActions={renderRightActions}
-            dragOffsetFromRightEdge={16}
+            rightThreshold={40} // 오른쪽 스와이프 임계값
+            friction={2} // 스와이프 감도 조절
+            overshootRight={false}
         >
-            <View style={[styles.NotificationCard]}>
-                <View style={{ margin: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Animated.View style={[styles.NotificationCard, animatedStyle]}>
+                <Animated.View style={{ margin: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                    <Animated.View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         {/* <View><Text style={{ fontSize: 16 }}>{getIcon(notification.data)}</Text></View> */}
                         <Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'] }}>{notification.data.title}</Text>
-                    </View>
+                    </Animated.View>
                     <Text style={{ fontSize: 12, height: 14, fontFamily: "NanumSquareNeo-Regular", color: Color['grey300'] }} >
                         {calculateTimeDifference(new Date(notification.timestamp))} 전
                     </Text>
-                </View>
+                </Animated.View>
                 <View style={{ marginHorizontal: 24, justifyContent: 'center', height: 60 }}>
                     <Text style={{ textAlignVertical: 'center', color: Color['grey600'], fontFamily: "NanumSquareNeo-Regular", fontSize: 14 }}>
                         {notification.data.body}
                     </Text>
                 </View>
-            </View>
+            </Animated.View>
         </Swipeable>
     )
 }
 
 
-type NotificationList = {
+type NotificationListProps = {
     notifications: NotificationDTO[],
     onDelete: (any: any) => void
 }
 
-const NotificationList: React.FC<NotificationList> = ({ notifications, onDelete }) => {
+const NotificationList: React.FC<NotificationListProps> = ({ notifications, onDelete }) => {
 
     let showOldNotificationHeader = false;
     return (
@@ -200,6 +202,7 @@ interface NotificationDTO {
     timestamp: string
 }
 
+
 const NotificationScreen: React.FC = () => {
     const navigation = useNavigation();
 
@@ -207,10 +210,10 @@ const NotificationScreen: React.FC = () => {
     const handleDelete = (id: number) => {
         const deleteFetch = async () => {
             try {
-                const token = await getToken('utilToken');
+                const token = await getToken('token');
                 if (!token) { throw Error('invalid Token'); }
 
-                const response = await fetch(`${process.env.SUB_API}/notification/delete/${id}`, {
+                const response = await fetch(`${process.env.BASE_URL}/notification/delete/${id}`, {
                     method: 'DELETE',
                     headers: { Authorization: `Bearer ${token}`, }
                 })
@@ -240,12 +243,16 @@ const NotificationScreen: React.FC = () => {
 
     };
 
-    const { data: notifications, loading, error } = useFetchUsingUtilToken<NotificationDTO[]>(`${process.env.SUB_API}/notification/my`);
-    useFetchUsingUtilToken<NotificationDTO[]>(`${process.env.SUB_API}/notification/read`,{method:'PATCH'})
+    const { data: notifications, loading, error } = useFetchUsingToken<NotificationDTO[]>(`${process.env.SUB_API}/notification/my`);
+
+    useFetchUsingToken<NotificationDTO[]>(`${process.env.SUB_API}/notification/read`, { method: 'PATCH' })
+
     useEffect(() => {
+        console.log('notifications:'+notifications)
         if (notifications)
             setNotifications(notifications)
     }, [notifications])
+
     if (!notifications || loading)
         return (
             <View style={{ flex: 1, backgroundColor: '#FFF' }} />

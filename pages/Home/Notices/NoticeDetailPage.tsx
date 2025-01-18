@@ -7,18 +7,19 @@ import { NoticeStackParamList } from '@hongpung/nav/HomeStacks'
 
 
 interface Notice {
-    infoId: number
+    noticeId: number
     title: string
     content: string
-    date: string//dateString
+    createdAt: string//dateString    
+    updatedAt: string//dateString
 }
 
 type NoticeDetailProps = NativeStackScreenProps<NoticeStackParamList, 'NoticeDetail'>
 
 const NoticeDetailPage: React.FC<NoticeDetailProps> = ({ route }) => {
 
-    const { infoId } = route.params;
-    const { data, loading } = useFetchUsingToken<Notice>(`${process.env.BASE_URL}/info/${infoId}`)
+    const { noticeId } = route.params;
+    const { data, loading } = useFetchUsingToken<Notice>(`${process.env.SUB_API}/notice/${noticeId}`)
 
     if (loading)
         return (
@@ -31,7 +32,7 @@ const NoticeDetailPage: React.FC<NoticeDetailProps> = ({ route }) => {
         <View style={{ display: 'flex', flex: 1, backgroundColor: Color['grey100'] }}>
             <View style={{ flex: 1, display: 'flex', marginHorizontal: 12, paddingHorizontal: 12, paddingVertical: 12, marginVertical: 16, backgroundColor: '#FFF', borderRadius: 12 }}>
                 <Text textBreakStrategy='balanced' style={{ marginHorizontal: 4, fontSize: 24, fontFamily: "NanumSquareNeo-Bold", marginBottom: 4 }}>{data?.title}</Text>
-                <Text style={{ alignSelf: 'flex-end', marginHorizontal: 4, fontSize: 12, fontFamily: "NanumSquareNeo-Light", color: Color['grey400'], }}>{data?.date.split('T')[0]} {data?.date.split('T')[1].slice(0, 2)}시{data?.date.split('T')[1].slice(3, 5)}분</Text>
+                <Text style={{ alignSelf: 'flex-end', marginHorizontal: 4, fontSize: 12, fontFamily: "NanumSquareNeo-Light", color: Color['grey400'], }}>{data?.createdAt.split('T')[0]} {data?.createdAt.split('T')[1].slice(0, 2)}시{data?.createdAt.split('T')[1].slice(3, 5)}분</Text>
                 <View>
                     <View style={{ marginVertical: 12, borderWidth: 0.25, borderColor: Color['grey200'] }}></View>
                 </View>

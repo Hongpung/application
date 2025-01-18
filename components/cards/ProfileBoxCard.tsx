@@ -1,11 +1,9 @@
 import React, { useState } from "react"
 import { View, Text, Image, StyleSheet, Pressable, Linking } from "react-native"
 
-import { Color } from "../../ColorSet"
-import { clubIdMatchName, User } from "../../UserType"
-import { Icons } from "../Icon"
-import useFetch from "@hongpung/hoc/useFetch"
-import useFetchUsingUtilToken from "@hongpung/hoc/useFetchUsingutilToken"
+import { Color } from "@hongpung/ColorSet"
+import { User } from "@hongpung/UserType"
+import { Icons } from "@hongpung/components/Icon"
 
 
 interface ProfileBoxProps {
@@ -15,7 +13,6 @@ interface ProfileBoxProps {
 const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ user }) => {
 
     const RoleTextRender = () => {
-
         console.log(user)
         if (user?.role && user?.role.length > 0) {
             return user.role.map((roleName, index) =>
@@ -24,26 +21,34 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ user }) => {
                 {index != user.role.length - 1 && <Text>, </Text>}
             </>))
         }
-
         return <Text>동아리원</Text>
     }
 
     if (!user) return;
 
     return (
+
         <View style={{ position: 'relative', flex: 1, flexDirection: 'column', display: 'flex', marginHorizontal: 36, gap: 24, marginVertical: 16 }}>
             <View style={{ position: 'relative', flexDirection: 'row', flex: 1 }}>
                 {user.profileImageUrl ?
-                    <Image source={{ uri: user.profileImageUrl }} style={styles.ProfilePhoto} /> :
-                    <View style={[styles.ProfilePhoto, { backgroundColor: Color['grey200'], borderWidth: 1, borderColor: Color['grey300'] }]} />}
+                    <Image source={{ uri: user.profileImageUrl }} style={styles.ProfilePhoto} />
+                    :
+                    <View style={[styles.ProfilePhoto, { backgroundColor: Color['grey200'], borderWidth: 1, borderColor: Color['grey300'] }]} />
+                }
 
                 <View style={{ flexDirection: 'column', flex: 1, height: 120, justifyContent: 'space-between', paddingVertical: 12 }}>
                     <View style={{ display: 'flex', gap: 4 }}>
+
                         <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>{user.name}</Text>
+
                         {user?.nickname && <Text style={{ fontSize: 14, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>{user?.nickname}</Text>}
+
                     </View>
+
                     <View style={{ flexDirection: 'row', width: 64, justifyContent: 'flex-start', gap: 4 }}>
-                        {user?.instagramUrl != undefined &&
+
+                        {
+                            user?.instagramUrl != undefined &&
                             <Pressable style={styles.icons}
                                 onPress={() => {
                                     Linking.openURL('https://www.instagram.com/' + user.instagramUrl)
@@ -53,18 +58,20 @@ const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ user }) => {
                             </Pressable>
                         }
 
-                        {user?.blogUrl && <Pressable style={styles.icons}
-                            onPress={() => {
-                                Linking.openURL('https://blog.naver.com/' + user.blogUrl)
-                                    .catch((err) => { console.error('Failed to open URL:', err); })
-                            }}>
-                            <Icons name={'chatbox-outline'} size={24} color={Color['green500']} />
-                        </Pressable>
-
+                        {
+                            user?.blogUrl && <Pressable style={styles.icons}
+                                onPress={() => {
+                                    Linking.openURL('https://blog.naver.com/' + user.blogUrl)
+                                        .catch((err) => { console.error('Failed to open URL:', err); })
+                                }}>
+                                <Icons name={'chatbox'} size={24} color={Color['green500']} />
+                            </Pressable>
                         }
+
                     </View>
                 </View>
             </View>
+
             <View style={styles.info}>
                 <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text>
                 <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{`${user.club}` + ` (${user.enrollmentNumber})`}</Text>

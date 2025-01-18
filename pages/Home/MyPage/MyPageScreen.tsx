@@ -1,11 +1,8 @@
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect,  useMemo, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
-import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ProfileBoxCard from "@hongpung/components/cards/ProfileBoxCard";
-import { useRecoilValue } from 'recoil';
-import { loginUserState } from '@hongpung/recoil/authState'
-import { User } from '@hongpung/UserType';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Icons } from '@hongpung/components/Icon';
 import { MyPageParamList } from '@hongpung/nav/MyPageStack';

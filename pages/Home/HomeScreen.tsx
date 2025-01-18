@@ -20,7 +20,7 @@ import { RealtimeSession, ReservationSession } from '../Reserve/SessionTypes';
 import LongButton from '@hongpung/components/buttons/LongButton';
 import { onUseSession } from '@hongpung/recoil/sessionState';
 import { getToken } from '@hongpung/utils/TokenHandler';
-import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken';
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 
 
 type HomeNavProps = NativeStackNavigationProp<MainStackParamList, 'Home'>
@@ -70,8 +70,8 @@ const HomeScreen: React.FC = () => {
         }
     }, [])
 
-    const {data:isNotRead} = useFetchUsingUtilToken<{status:boolean}>(`${process.env.SUB_API}/notification/notRead`,{},5000,[isFocusing])
-    console.log('isread:'+isNotRead?.status)
+    const { data: isNotRead } = useFetchUsingToken<{ status: boolean }>(`${process.env.SUB_API}/notification/notRead`, {}, 5000, [isFocusing])
+    console.log('isread:' + isNotRead?.status)
 
     return (
         <View style={{ flex: 1 }}>
@@ -266,7 +266,7 @@ const HomeScreen: React.FC = () => {
                 {isUsed && <View style={{ height: 24 }} />}
             </ScrollView>
             {isSession &&
-                <Animated.View style={{ position: 'absolute', left: 0, right: 0, bottom: animatedValue, height: 196, flex: 1, }}>
+                <Animated.View style={{ position: 'absolute', left: 0, right: 0, bottom: animatedValue, height: 184, flex: 1, }}>
                     <BottomOnUser isFocusing={isFocusing} isSlideUp={isSlideUp} toggleBottomSheet={toggleBottomSheet} />
                 </Animated.View>}
         </View>
@@ -395,12 +395,12 @@ const BottomOnUser: React.FC<{ toggleBottomSheet: () => void, isSlideUp: boolean
                 socketRef.current.disconnect(); // 기존 소켓 연결 해제
             }
             const token = await getToken('token')
+            console.log(token)
             const socket = io(`${process.env.SUB_API}/roomsession`, {
                 transports: ['websocket'],
                 auth: { token },
                 reconnection: true,
             });
-
 
             socket.on('connect', () => {
                 console.log('Connected to WebSocket Gateway');
@@ -427,6 +427,7 @@ const BottomOnUser: React.FC<{ toggleBottomSheet: () => void, isSlideUp: boolean
 
             socket.on('forceEnded', () => {
                 console.log('sessionForceEnded')
+                alert('세션 강제 종료')
                 OnEnd(true)
                 setUseSession(null)
             })

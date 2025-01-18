@@ -3,7 +3,7 @@ import React from 'react';
 import Header from '../components/Header';
 import HomeScreen from '../pages/Home/HomeScreen';
 import QRScanScreen from '../pages/QRScan/QRScanScreen';
-import ReserveMainScreen from '../pages/Reserve/ReserveMainScreen';
+import ReservationMainScreen from '../pages/Reserve/ReservationMainScreen';
 import { Color } from '../ColorSet';
 import { Icons } from '@hongpung/components/Icon';
 import { Text, View } from 'react-native';
@@ -43,7 +43,7 @@ const BottomTab = () => {
                 }} />
 
             <Tab.Screen name="Reserve"
-                component={ReserveMainScreen}
+                component={ReservationMainScreen}
                 options={{
                     tabBarIcon: ({ color, focused }) => <Icons name={focused ? 'calendar' : 'calendar-outline'} color={color} />,
                     tabBarLabel: '예약'

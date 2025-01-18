@@ -27,7 +27,7 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
     const loginUser = useRecoilValue(loginUserState)
     const isFocusing = useIsFocused();
     const { data, loading, error } = useFetchUsingToken<Instrument>(
-        `${process.env.BASE_URL}/instrument/${instrumentId}`
+        `${process.env.SUB_API}/instrument/${instrumentId}`
         , {}, 5000, [instrumentId, isFocusing]
     )
 
@@ -50,7 +50,7 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
         return (<View><Text>Error:Can't find the instrument</Text></View>)
     return (
         <View style={{ flex: 1, backgroundColor: `#FFF` }}>
-            {loginUser?.club == data.club && loginUser.role != '패원' ? <Header
+            {loginUser?.club == data.club && loginUser.role.length != 0 ? <Header
                 leftButton='close'
                 HeaderName='악기 상세'
                 RightButton={'수정'}
@@ -104,7 +104,7 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
                 <View style={styles.Row}>
 
                     <Text style={styles.RowLeft}>{`악기 타입`}</Text>
-                    <Text style={styles.RowRight}>{data.type}</Text>
+                    <Text style={styles.RowRight}>{data.instrumentType}</Text>
 
                 </View>
 
@@ -115,7 +115,7 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
                     </View>
                 </View>
                 <View style={{ paddingVertical: 6 }}>
-                    {data!.borrowHistory.map(borrowHistory =>
+                    {data!.borrowHistory.length > 0 ? data!.borrowHistory.map(borrowHistory =>
                     (<View key={borrowHistory.borrowerName + borrowHistory.borrowDate} style={{ width: 320, height: 76, borderRadius: 5, borderWidth: 1, borderColor: Color['grey200'], marginVertical: 6 }}>
                         <View style={{ flexDirection: 'row', alignItems: 'flex-end', position: 'absolute', left: 14, top: 12 }}>
                             <Text style={{
@@ -145,7 +145,16 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
                                 color: Color['grey400']
                             }}>{borrowHistory.borrowDate}</Text>
                         </View>
-                    </View>))}
+                    </View>)) :
+                        <View style={{display:'flex', alignItems:'center', justifyContent:'center', paddingVertical:32}}>
+                            <Text style={{
+                                textAlign: 'right',
+                                fontSize: 17,
+                                fontFamily: "NanumSquareNeo-Regular",
+                                color: Color['grey400']
+                            }}>대여 내역이 없습니다...</Text>
+                        </View>
+                    }
                 </View>
                 <View style={{ height: 18 }} />
             </ScrollView>

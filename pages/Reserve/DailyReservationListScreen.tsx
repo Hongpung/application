@@ -40,7 +40,7 @@ type reservationType = 'COMMON' | 'REGULAR' | 'EXTERNAL'
 
 type DailyReserveProps = NativeStackScreenProps<ReservationStackParamList, 'DailyReserveList'>
 
-const DailyReserveListScreen: React.FC<DailyReserveProps> = ({ navigation, route }) => {
+const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, route }) => {
 
     const isFocusing = useIsFocused();
     const today = useMemo(() => new Date(), [])
@@ -253,7 +253,7 @@ const DailyReserveListScreen: React.FC<DailyReserveProps> = ({ navigation, route
     )
 }
 
-export default DailyReserveListScreen
+export default DailyReservationListScreen
 
 const styles = StyleSheet.create({
     DayText: {

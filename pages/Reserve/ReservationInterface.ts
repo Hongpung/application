@@ -1,5 +1,5 @@
 import { loginUserState } from '@hongpung/recoil/authState'
-import { User, Instrument, briefInstrument } from '@hongpung/UserType'
+import { User, Instrument, InstrumentWithOutBorrowHistory } from '@hongpung/UserType'
 import { useRecoilValue } from 'recoil'
 
 export interface Reservation {
@@ -10,7 +10,7 @@ export interface Reservation {
     isRegular: boolean
     isParticipatible: boolean
     participators: User[]
-    borrowInstruments: briefInstrument[]
+    borrowInstruments: InstrumentWithOutBorrowHistory[]
     hasToWait: boolean
     creatorId?: number
     userName: string
@@ -93,7 +93,7 @@ export interface ReservationDTO extends Omit<ReservationSubmitForm, 'participate
     creatorNickname?: string;              // 생성자 이름
     lastmodified: string;             // 마지막 수정 날짜 (ISO 형식)
     participators: User[]
-    borrowInstruments: briefInstrument[]
+    borrowInstruments: InstrumentWithOutBorrowHistory[]
     [key: string]: any
 }
 

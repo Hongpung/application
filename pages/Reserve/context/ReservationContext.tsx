@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { briefInstrument, Instrument, User } from "../../../UserType"
-import { Reservation } from '../ReserveInterface'
+import { InstrumentWithOutBorrowHistory, Instrument, User } from "../../../UserType"
+import { Reservation } from '../ReservationInterface'
 
 interface ReservationContextProps {
     preReservation: Reservation;
@@ -13,7 +13,7 @@ interface ReservationContextProps {
     setIsRegular: (isRegular: boolean) => void;
     setIsParticipatible: (isParticipatible: boolean) => void;
     setParticipants: (participants: User[]) => void;
-    setBorrowInstruments: (borrowInstruments: briefInstrument[]) => void;
+    setBorrowInstruments: (borrowInstruments: InstrumentWithOutBorrowHistory[]) => void;
     setHasWait: (hasToWait: boolean) => void
 }
 
@@ -51,7 +51,7 @@ const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const setIsRegular = (isRegular: boolean) => setReservation(prev => ({ ...prev, isRegular }));
     const setIsParticipatible = (isParticipatible: boolean) => setReservation(prev => ({ ...prev, isParticipatible }));
     const setParticipants = (participants: User[]) => setReservation(prev => ({ ...prev, participators: participants }));
-    const setBorrowInstruments = (borrowInstruments: briefInstrument[]) => setReservation(prev => ({ ...prev, borrowInstruments }));
+    const setBorrowInstruments = (borrowInstruments: InstrumentWithOutBorrowHistory[]) => setReservation(prev => ({ ...prev, borrowInstruments }));
     const setHasWait = (hasToWait: boolean) => setReservation(prev => ({ ...prev, hasToWait }));
 
     return (

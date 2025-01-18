@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { club } from '@hongpung/UserType';
+import { Club } from '@hongpung/UserType';
 
 
 export interface SignUpInfo {
     email: string
     password: string
-    club: club | null
+    club: Club | null
     enrollmentNumber: string
     name: string
     nickname: string | null
@@ -18,7 +18,7 @@ interface SignUpContextProps {
     setStep: (step: step) => void;
     setSignUpInfo: (info: SignUpInfo) => void;
     setEmail: (email: string) => void;
-    setClub: (club: club) => void;
+    setClub: (club: Club) => void;
     setEnrollmentNumber: (enrollmentNumber: string) => void;
     setPassword: (password: string) => void;
     setNickName: (nickname: string) => void;
@@ -39,7 +39,7 @@ const SignUpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [onStep, setStep] = useState<step>('이메일 인증')
 
     const setEmail = (email: string) => { setSignUpInfo(prev => ({ ...prev, email })) }
-    const setClub = (club: club) => { setSignUpInfo(prev => ({ ...prev, club })) }
+    const setClub = (club: Club) => { setSignUpInfo(prev => ({ ...prev, club })) }
     const setEnrollmentNumber = (enrollmentNumber: string) => { setSignUpInfo(prev => ({ ...prev, enrollmentNumber: enrollmentNumber })) }
     const setPassword = (password: string) => { setSignUpInfo(prev => ({ ...prev, password })) }
     const setNickName = (nickname: string) => { setSignUpInfo(prev => ({ ...prev, nickname: nickname.length > 0 ? nickname : null })) }

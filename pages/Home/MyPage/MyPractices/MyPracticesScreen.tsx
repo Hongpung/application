@@ -2,26 +2,24 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
 import PracticeCard from '@hongpung/components/cards/PracticeCard'
-import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { Icons } from '@hongpung/components/Icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { MyPageParamList } from '@hongpung/nav/MyPageStack'
 import { useNavigation } from '@react-navigation/native'
-import { ReservationDTO } from '@hongpung/pages/Reserve/ReserveInterface'
 import { useRecoilValue } from 'recoil'
 import { loginUserState } from '@hongpung/recoil/authState'
-import useFetch from '@hongpung/hoc/useFetch'
 import { User } from '@hongpung/UserType'
-import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken'
-
-
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 
 type MyPracticesNavProps = NativeStackNavigationProp<MyPageParamList, 'MyPractices'>;
+
+
+export interface AttendanceStatus { member: User, status: '참가' | '출석' | '결석' | '지각' };
 
 export interface Session {
     sessionId: number;
     date: string;
-    message: string;
+    title: string;
     startTime: string;
     endTime: string;
     creatorId: number;
@@ -33,7 +31,7 @@ export interface Session {
     participationAvailable: boolean;
     returnImageUrl: string[];
     forceEnd: boolean;
-    attendanceList: { user: User, status: '참가' | '출석' | '결석' | '지각' }[];
+    attendanceList: AttendanceStatus[];
 }
 
 export type breifSessionInfo = Omit<Session, 'returnImageUrl' | 'extendCount' | 'attendanceList'>;
@@ -48,7 +46,7 @@ const MyPracticesScreen: React.FC = () => {
     const userInfo = useRecoilValue(loginUserState);
 
 
-    const { data: sessionDatas, loading, error } = useFetchUsingUtilToken<breifSessionInfo[]>(`${process.env.SUB_API}/room-session/log`,
+    const { data: sessionDatas, loading, error } = useFetchUsingToken<breifSessionInfo[]>(`${process.env.SUB_API}/session-log`,
         {},
         5000,
         [userInfo, calendarMonth]
@@ -167,7 +165,7 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
                         <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginTop: 2, gap: 2 }}>
                             {!!dateReservaData &&
                                 dateReservaData?.slice(0, 3).map(reserve => (
-                                    <View style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: reserve.regularType == '정규연습' ? Color['blue500'] : reserve.isParticipable ? Color['green500'] : Color['red500'] }} />))
+                                    <View style={{ width: 4, height: 4, borderRadius: 20, backgroundColor: reserve.regularType == 'REGULAR' ? Color['blue500'] : reserve.isParticipable ? Color['green500'] : Color['red500'] }} />))
                             }
                         </View>
                     </Pressable>
@@ -254,7 +252,7 @@ const PrevPracticeList: React.FC<{ prevPractice: breifSessionInfo[] | null, onPr
                             {date.getFullYear()}.{date.getMonth() + 1}.{date.getDate()}({daysOfWeek[date.getDay()]})
                         </Text>
 
-                        {/* 해당 날짜의 모든 예약을 출력 */}
+                        {/* 해당 날짜의 모든 세션들을 출력 */}
                         {session.map((session, index) => (
                             <View key={dateKey + '-' + index} style={{ marginVertical: 6 }}>
                                 <PracticeCard session={session} onPress={onPress} />

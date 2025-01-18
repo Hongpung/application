@@ -7,13 +7,13 @@ import CheckboxComponent from '../../../components/checkboxs/CheckboxComponent'
 import { useRecoilValue } from 'recoil'
 import { loginUserState } from '@hongpung/recoil/authState'
 import { getToken } from '@hongpung/utils/TokenHandler'
-import { parseToReservationDetail, parseToReservationForm, ReservationDTO, ReservationSubmitForm } from '../ReserveInterface'
+import { parseToReservationForm, ReservationSubmitForm } from '../ReservationInterface'
 import { Icons } from '@hongpung/components/Icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { InReservationStackParamList, ReservationStackParamList } from '@hongpung/nav/ReservationStack'
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native'
 import Toast from 'react-native-toast-message'
-import { InstrumentTypes } from '@hongpung/UserType'
+import { instrumentTypes } from '@hongpung/UserType'
 
 type ReservationConfirmNavProp = CompositeNavigationProp<
     NativeStackNavigationProp<InReservationStackParamList, 'ReservationConfirm'>,
@@ -33,7 +33,7 @@ const ReservationConfirmScreen: React.FC = () => {
         return `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}.${selectedDate.getDate().toString().padStart(2, '0')}(${daysOfWeek[selectedDate.getDay()]})`;
     }, [])
 
-    const { reservation } = useReservation();
+    const { reservation, setTime } = useReservation();
 
     const ConfirmHandler = () => {
         const createReservation = async () => {
@@ -69,43 +69,24 @@ const ReservationConfirmScreen: React.FC = () => {
 
                 if (!response.ok) {
                     console.log(response.status + response.statusText)
+                    if (response.status == 409) {
+                        alert('이 시간에 다른 예약이 생겼어요\n다시 선택해주세요.')
+                        navigation.goBack();
+                        setTime('', '')
+                    }
                     throw new Error('Network response was not ok');
                 }
                 const result: any = await response.json();
 
-                const utilToken = await getToken('utilToken');
-                const notificationResponse = await fetch(`${process.env.SUB_API}/notification/send`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${utilToken}`,
-                    },
-                    body: JSON.stringify(
-                        {
-                            to: [...data.participatorIds.map(id => { if (id != loginUser?.memberId) return id })],
-                            title: '예약에 포함되었습니다',
-                            text: `예약명: ${result.message}\n일시: ${data.date}/${data.startTime.slice(-4, -2)}~${data.endTime.slice(-2)}`
-                        }
-                    )
-                })
 
-                if (!notificationResponse.ok) {
-                    Toast.show({
-                        type: 'success',
-                        text1: '알림 전송에는 실패했어요',
-                        position: 'bottom',
-                        bottomOffset: 60,
-                        visibilityTime: 3000
-                    });
-                }else{
-                    Toast.show({
-                        type: 'success',
-                        text1: '예약을 생성하고 알림을 전송했어요',
-                        position: 'bottom',
-                        bottomOffset: 60,
-                        visibilityTime: 3000
-                    });
-                }
+                Toast.show({
+                    type: 'success',
+                    text1: '예약에 성공했어요',
+                    position: 'bottom',
+                    bottomOffset: 60,
+                    visibilityTime: 3000
+                });
+
 
                 if (result != null)
                     navigation.navigate('DailyReserveList', { date: reservation.date!.toISOString() })
@@ -182,8 +163,8 @@ const ReservationConfirmScreen: React.FC = () => {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
                     <Text style={styles.leftText}>대여 악기</Text>
                     {reservation.borrowInstruments.length > 0 ?
-                        <Text style={[styles.rightText, { marginRight: 12 }]}>{InstrumentTypes.filter(type=> type!='징').map((type) => {
-                            const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
+                        <Text style={[styles.rightText, { marginRight: 12 }]}>{instrumentTypes.filter(type => type != '징').map((type) => {
+                            const instCount = reservation.borrowInstruments.filter((instrument) => instrument.instrumentType == type).length
                             if (instCount > 0)
                                 return `${type} ${instCount}`
                         }).filter(Boolean).join(', ')}

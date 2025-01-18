@@ -11,31 +11,18 @@ import SignUpScreen from './pages/Auth/SignUp/SignUpScreen';
 import Header from './components/Header';
 import MainStacks from './nav/HomeStacks';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast, { BaseToastProps } from 'react-native-toast-message';
-import { Color } from '@hongpung/ColorSet';
+import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SignUpProvider } from '@hongpung/pages/Auth/SignUp/context/SignUpContext';
 import { RecoilRoot, useRecoilState } from 'recoil';
 import { deleteToken, getToken } from './utils/TokenHandler';
 import { bannersState } from './recoil/bannerState';
 import * as Notifications from 'expo-notifications';
-import { Icons } from './components/Icon';
 import PWResetScreen from './pages/Auth/PWReset/PWReset';
 import { PasswordResetProvider } from './pages/Auth/PWReset/context/PWResetContext';
 import { RootStackParamList } from './pageTypes';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => {
-    const appState = AppState.currentState;
-    const receive = await AsyncStorage.getItem('receive-push')
-    return {
-      shouldShowAlert: appState !== 'active' && receive == 'true',
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-    }
-  },
-});
-
+import { toastConfig } from './utils/toast.config';
+import { useAuth } from './hoc/useAuth';
 
 const fetchFonts = async () => {
   await Font.loadAsync({
@@ -46,126 +33,6 @@ const fetchFonts = async () => {
     "NanumSquareNeo-Heavy": require("./assets/fonts/NanumSquareNeoOTF-Hv.otf")
   })
 }
-
-const toastConfig = {
-  notification: ({ text1, text2, ...rest }: BaseToastProps) => (//success시 알림 모양
-    <TouchableOpacity style={{ width: '100%', }}>
-      <View
-        style={{
-          backgroundColor: '#FFF',
-          paddingVertical: 16,
-          borderRadius: 12,
-          paddingHorizontal: 12,
-          marginHorizontal: 24,
-          minHeight: 56,
-          gap: 12,
-          shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: 0.1,
-          shadowRadius: 24,
-          elevation: 1,
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center'
-        }}
-        {...rest}
-      >
-        <Icons name='notifications' size={36} color={Color['blue500']} />
-        <View style={{
-          flexDirection: 'column',
-          gap: 4
-        }}>
-          <Text style={{ color: '#000', fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>
-            {text1}
-          </Text>
-          <Text style={{ color: Color['grey400'], lineHeight: 18, fontSize: 14, fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>
-            {text2}
-          </Text>
-        </View>
-
-      </View>
-    </TouchableOpacity>
-  ),
-  successHasReturn: ({ text1, text2, ...rest }: BaseToastProps) => (//success 및 되돌리기 버튼 포함
-    <View style={{ width: '100%' }}>
-      <View
-        style={{
-          backgroundColor: 'rgba(0,0,0,0.8)',
-          paddingVertical: 12,
-          borderRadius: 50,
-          paddingHorizontal: 24,
-          marginHorizontal: 24,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-        {...rest}
-      >
-        <View>
-          <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold', maxWidth: '100%', fontFamily: "NanumSquareNeo-Bold" }}>
-            {text1}
-          </Text>
-        </View>
-
-        <Pressable
-          style={{
-            paddingHorizontal: 4,
-            paddingVertical: 5,
-            borderRadius: 5,
-          }}
-          onPress={() => {
-            console.log('Undo action');
-            Toast.hide();
-          }}
-        >
-          <Text style={{ fontSize: 14, color: Color['blue500'], fontFamily: "NanumSquareNeo-Bold" }}>되돌리기</Text>
-        </Pressable>
-      </View>
-    </View>
-  ),
-  success: ({ text1, text2, ...rest }: BaseToastProps) => (//success시 알림 모양
-    <View style={{ width: '100%' }}>
-      <View
-        style={{
-          backgroundColor: 'rgba(0,0,0,0.8)',
-          paddingVertical: 12,
-          borderRadius: 50,
-          paddingHorizontal: 24,
-          marginHorizontal: 48,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        {...rest}
-      >
-        <Text style={{ color: '#FFF', fontSize: 14, fontWeight: 'bold', fontFamily: "NanumSquareNeo-Bold", textAlign: 'center' }}>
-          {text1}
-        </Text>
-      </View>
-    </View>
-  ),
-  fail: ({ text1, text2, ...rest }: BaseToastProps) => (//fail 시 알림 모양
-    <View style={{ width: '100%' }}>
-      <View
-        style={{
-          backgroundColor: 'rgba(242,107,87,0.8)',
-          paddingVertical: 12,
-          borderRadius: 50,
-          paddingHorizontal: 24,
-          marginHorizontal: 48,
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-        {...rest}
-      >
-        <Text style={{ color: '#FFF', fontSize: 14, fontFamily: "NanumSquareNeo-Bold", textAlign: 'center', lineHeight: 20 }}>
-          {text1}
-        </Text>
-      </View>
-    </View>
-  ),
-};
-
 
 const ContentsContainer: React.FC<{ startDomain: "Login" | "Tutorial" | "HomeStack" }> = ({ startDomain }) => {
   return (
@@ -212,7 +79,7 @@ const SafeZone: React.FC<{ children: any, style: StyleProp<ViewStyle> }> = ({ ch
 
   if (Platform.OS == 'android')
     return (
-      <SafeAreaView style={[style, {paddingBottom:12, backgroundColor:'#FFF', borderBottomLeftRadius:20, borderBottomRightRadius:20}]} >
+      <SafeAreaView style={[style, { paddingBottom: 12, backgroundColor: '#FFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }]} >
         {children}
       </SafeAreaView>
     )
@@ -227,9 +94,9 @@ const SafeZone: React.FC<{ children: any, style: StyleProp<ViewStyle> }> = ({ ch
 const App: React.FC = () => {
 
   const notificationListener = useRef<Notifications.EventSubscription>();
-  const responseListener = useRef<Notifications.EventSubscription>();
 
   useEffect(() => {
+
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
       Toast.show({
         type: 'notification',
@@ -241,17 +108,12 @@ const App: React.FC = () => {
       });
     });
 
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
-    });
-
 
     return () => {
       notificationListener.current &&
         Notifications.removeNotificationSubscription(notificationListener.current);
-      responseListener.current &&
-        Notifications.removeNotificationSubscription(responseListener.current);
     };
+
   }, [])
   return (
     <RecoilRoot>
@@ -270,16 +132,18 @@ interface BannerFetchData {
 }
 
 const AppLoader: React.FC = () => {
+
   const [fontLoaded, setFontLoaded] = useState(false);
   const [firstScreen, setFirstScreen] = useState<"Tutorial" | "Login" | "HomeStack" | null>(null);
   const [banners, setBanners] = useRecoilState<{ state: 'BEFORE' | 'PENDING' | 'LOADED' | 'FAILED', value: BannerFetchData[] | null }>(bannersState)
 
+  const { logout } = useAuth()
   const loadFonts = async () => {
     await fetchFonts();
     setFontLoaded(true);
   };
 
-  const FirstScreenSetting = async () => {
+  const firstScreenSetting = async () => {
     const launchFlag = await AsyncStorage.getItem('isLaunched');
 
     if (!launchFlag) setFirstScreen("Tutorial")
@@ -287,7 +151,7 @@ const AppLoader: React.FC = () => {
       const autoLogin = await AsyncStorage.getItem('autoLogin');
       if (autoLogin) {
 
-        const token = await getToken('token');
+        const token = null;//await getToken('token');
         if (token) {
           setFirstScreen('HomeStack')
           Toast.show({
@@ -314,63 +178,56 @@ const AppLoader: React.FC = () => {
     }
   }
 
-  useEffect(() => {
+  const fetchBanner = async () => {
 
-    const loadResources = async () => {
-      try {
-
-        await loadFonts();
-        await FirstScreenSetting();
-
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    loadResources();
+    setBanners(prev => ({ state: 'PENDING', value: prev.value }))
 
     const controller = new AbortController();
     const signal = controller.signal;
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-    const fetchBanner = async () => {
-      setBanners(prev => ({ state: 'PENDING', value: prev.value }))
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
-      try {
+    try {
 
-        const bannerData = await fetch(`${process.env.SUB_API}/banners/on-post`, {
-          signal,
-        })
+      const bannerData = await fetch(`${process.env.SUB_API}/banners/on-post`,
+        {
+          signal
+        }
+      )
 
-        console.log('?')
-        if (!bannerData.ok) throw Error();
+      if (!bannerData.ok) throw Error();
 
-        const serverData = await bannerData.json() as BannerFetchData[];
+      const serverData = await bannerData.json() as BannerFetchData[];
 
-        setBanners({ state: 'LOADED', value: serverData })
+      setBanners({ state: 'LOADED', value: serverData })
 
-      } catch (e) {
-        console.error(e+'배너 오류');
-        setBanners(prev => ({ state: 'FAILED', value: prev.value }))
-      } finally {
-        clearTimeout(timeoutId);
-      }
-    };
+    } catch (e) {
+      console.error(e + '배너 오류');
+      setBanners(prev => ({ state: 'FAILED', value: prev.value }))
+    } finally {
+      clearTimeout(timeoutId);
+    }
 
-    fetchBanner();
+  };
+
+  const initProcess = async () => {
+    try {
+
+      await loadFonts();
+      await firstScreenSetting();
+      await fetchBanner();
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+
+    initProcess();
 
     return () => {
-      const Logout = async () => {
-        try {
-          const autoLogin = await AsyncStorage.getItem('autoLogin')
-          if (!autoLogin)
-            await deleteToken('token');
 
-        } catch (e) {
-          console.log(e)
-        }
-      }
-
-      Logout();
+      logout();
 
     }
   }, [])

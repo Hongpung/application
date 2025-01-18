@@ -7,7 +7,7 @@ export default async function uploadImage(imageFile: File, toUse: string): Promi
     const timeoutId = setTimeout(() => controller.abort(), 8000);
     try {
         console.log('진입')
-        const token = await getToken('utilToken')
+        const token = await getToken('token')
         if(!token) throw Error('Invalid Token')
         const formData = new FormData();
         formData.append('image', imageFile, `${imageFile.name}-${(new Date).toISOString()}`);

@@ -2,11 +2,11 @@ import { StyleSheet, Text, Pressable } from 'react-native'
 import React from 'react';
 import { Color } from '../../ColorSet';
 
-interface ShortButtonProps{
-    innerText:string,
-    onPress:()=>void,
-    isFilled:boolean,
-    color:string
+type ShortButtonProps = {
+    innerText: string,
+    onPress: () => void,
+    isFilled: boolean,
+    color: string
 }
 
 const ShortButton: React.FC<ShortButtonProps>= React.memo(({innerText, onPress, isFilled, color}) => {

@@ -7,12 +7,12 @@ import { useReservation } from '@hongpung/pages/Reserve/context/ReservationConte
 import { loginUserState } from '@hongpung/recoil/authState'
 import { useRecoilValue } from 'recoil'
 import { getToken } from '@hongpung/utils/TokenHandler'
-import { areReservationsEqual, parseToReservation } from '../ReserveInterface'
+import { areReservationsEqual, parseToReservation } from '../ReservationInterface'
 import { useFocusEffect } from '@react-navigation/native'
 import { Icons } from '@hongpung/components/Icon'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { InReservationStackParamList } from '@hongpung/nav/ReservationStack'
-import { InstrumentTypes } from '@hongpung/UserType'
+import { instrumentTypes } from '@hongpung/UserType'
 
 const { width } = Dimensions.get('window')
 
@@ -274,8 +274,8 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
                         {reservation.borrowInstruments.length > 0 ?
                             <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
                                 <View style={{ flexDirection: 'row' }}>
-                                    {InstrumentTypes.filter(type => type != '징').map((type) => {
-                                        const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
+                                    {instrumentTypes.filter(type => type != '징').map((type) => {
+                                        const instCount = reservation.borrowInstruments.filter((instrument) => instrument.instrumentType == type).length
                                         return (<View style={{ width: (width - 96) / 5, alignItems: 'center' }}>
                                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14 }}>{type}</Text>
                                             <View style={{ height: 8 }} />

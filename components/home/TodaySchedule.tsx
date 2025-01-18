@@ -3,7 +3,6 @@ import React, { useEffect, useMemo } from 'react'
 import { debounce } from 'lodash'
 import { useNavigation } from '@react-navigation/native';
 import { Color } from '@hongpung/ColorSet';
-import { useUserReserve } from '@hongpung/hoc/useUserReserve';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '@hongpung/nav/HomeStacks';
 
@@ -13,8 +12,7 @@ const TodaySchedule: React.FC = () => {
 
     const navigation = useNavigation<TodayScheduleNavParams>();
 
-    const { userReservations, loadUserReservation } = useUserReserve();
-    const hasReservation = useMemo(() => userReservations.length > 0, [userReservations])
+    const hasReservation = false;
 
     useEffect(() => {
 
@@ -24,12 +22,15 @@ const TodaySchedule: React.FC = () => {
         loadReservationData();
 
     }, [])
+
     const navigateToMySchedules = debounce(() => {
         navigation.navigate('MyPage', { screen: 'MySchedules' })
     }, 50);
+
     const navigateToReservation = debounce(() => {
         navigation.navigate('Reservation')
     }, 50);
+
 
     return (
         <TouchableOpacity activeOpacity={0.95} style={[styles.ScheduleContainer, { backgroundColor: hasReservation ? Color['blue500'] : Color['green500'] }]}
@@ -52,7 +53,9 @@ const TodaySchedule: React.FC = () => {
     )
 }
 
+
 export default TodaySchedule
+
 
 const styles = StyleSheet.create({
     ScheduleContainer: {

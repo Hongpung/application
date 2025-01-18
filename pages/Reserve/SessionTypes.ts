@@ -1,4 +1,4 @@
-import { briefInstrument, User } from "@hongpung/UserType";
+import { InstrumentWithOutBorrowHistory, User } from "@hongpung/UserType";
 
 
 export interface BaseSession {
@@ -13,10 +13,10 @@ export interface BaseSession {
     creatorName: string;              // 생성자 이름
     creatorNickname: string           //생성자 닉네임
     participationAvailable: boolean;  // 참여 가능 여부
-    onAir: boolean;
+    status: 'BEFORE'|'ONAIR'|'AFTER'|'DISCARDED';
     participators?: User[] | null;           // 참여자 목록 (optional)
     participatorIds?: User[] | null;           // 참여자 목록 (optional)
-    borrowInstruments?: briefInstrument[] | null; // 대여 악기 목록 (optional)
+    borrowInstruments?: InstrumentWithOutBorrowHistory[] | null; // 대여 악기 목록 (optional)
     attendanceList: { user: User, status: '참가' | '출석' | '결석' | '지각' }[]
 }
 
@@ -31,10 +31,10 @@ export interface RealtimeSession extends BaseSession {
 export interface ReservationSession extends BaseSession {
     reservationId: number;            // 예약 ID
     sessionType: 'RESERVED';              // 세션 유형 (예약으로 고정)
-    reservationType: string;          // 예약 유형 (정기연습, 특별행사 등)
+    reservationType: "REGULAR" | "COMMON"| "EXTERNAL"          // 예약 유형 (정기연습, 특별행사 등)
     participationAvailable: boolean;  // 참여 가능 여부
     participators: User[]
-    borrowInstruments: briefInstrument[]
+    borrowInstruments: InstrumentWithOutBorrowHistory[]
     attendanceList: { user: User, status: '출석' | '결석' | '지각' }[]
 }
 

@@ -1,23 +1,22 @@
-import { useState, useEffect, useRef } from 'react';
-import { Text, View, Button, Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import * as Device from 'expo-device';
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-async function schedulePushNotification() {
-    await Notifications.scheduleNotificationAsync({
-        content: {
-            title: "You've got mail! 📬",
-            body: 'Here is the notification body',
-            data: { data: 'goes here', test: { test1: 'more data' } },
-        },
-        trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.DAILY,
-            hour: 2,
-            minute: 1
-        },
-    });
-}
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => {
+    const appState = AppState.currentState;
+    const receive = await AsyncStorage.getItem('receive-push')
+    return {
+      shouldShowAlert: appState !== 'active' && receive == 'true',
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }
+  },
+});
+
 
 export async function registerForPushNotificationsAsync() {
     let token = null;

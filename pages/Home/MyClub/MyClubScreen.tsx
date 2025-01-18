@@ -8,7 +8,7 @@ import { UserModal } from './ClubMember/ClubMemeberScreen';
 import { throttle } from 'lodash';
 import { Icons } from '@hongpung/components/Icon';
 import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack';
-import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken';
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import { User } from '@hongpung/UserType';
 
 
@@ -32,7 +32,7 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
         link: string
     }
 
-    const { data, loading, error } = useFetchUsingUtilToken<{ roleData: { role: string, member: User }[] }>(`${process.env.SUB_API}/club/my-club`)
+    const { data, loading, error } = useFetchUsingToken<{ roleData: { role: string, member: User }[] }>(`${process.env.SUB_API}/club/my-club`)
 
     useEffect(() => {
         if (!!data) {

@@ -11,34 +11,35 @@ export interface MiniCardType {
     onPick: (user: User) => void
 }
 
+
+const RoleTag: React.FC<{ role: string }> = ({ role }) => {
+    switch (role) {
+        case '상쇠':
+            return (
+                <View>
+                    <View style={{ height: 16, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4, backgroundColor: Color['red100'], borderRadius: 5, marginRight: 4 }}>
+                        <Text style={{ fontSize: 12, fontFamily: "NanumSquareNeo-Bold", color: Color['red600'], }}>
+                            {'상쇠'}
+                        </Text>
+                    </View>
+                </View>
+            )
+        default:
+            return (
+                <View>
+                    <View style={{ height: 16, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4, backgroundColor: Color['blue100'], borderRadius: 5, marginRight: 4 }}>
+                        <Text style={{ fontSize: 12, fontFamily: "NanumSquareNeo-Bold", color: Color['blue600'], }}>
+                            {role}
+                        </Text>
+                    </View>
+                </View>
+            )
+    }
+}
+
 const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick }) => {
 
     const [loading, setLoading] = useState(false);
-
-    const RoleTag = (role: string) => {
-        switch (role) {
-            case '상쇠':
-                return (
-                    <View>
-                        <View style={{ height: 16, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4, backgroundColor: Color['red100'], borderRadius: 5, marginRight: 4 }}>
-                            <Text style={{ fontSize: 12, fontFamily: "NanumSquareNeo-Bold", color: Color['red600'], }}>
-                                {'상쇠'}
-                            </Text>
-                        </View>
-                    </View>
-                )
-            default:
-                return (
-                    <View>
-                        <View style={{ height: 16, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 4, backgroundColor: Color['blue100'], borderRadius: 5, marginRight: 4 }}>
-                            <Text style={{ fontSize: 12, fontFamily: "NanumSquareNeo-Bold", color: Color['blue600'], }}>
-                                {role}
-                            </Text>
-                        </View>
-                    </View>
-                )
-        }
-    }
 
     return (
         <Pressable style={[styles.ProfileContainer, isPicked && styles.PickedProfile]} onPress={() => { if (view == 'inReserveView') onPick(user) }}>
@@ -61,7 +62,7 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick 
                 </View>
             </View>
             <View style={{ position: 'absolute', flexDirection: 'row', left: 104, bottom: 16, alignItems: 'center', justifyContent: 'flex-start' }}>
-                {user.role && user.role.map(role => RoleTag(role))}
+                {user.role && user.role.map(role => <RoleTag role={role} />)}
             </View>
             <View style={{ position: 'absolute', width: 56, height: 56, borderRadius: 200, overflow: 'hidden', borderWidth: loading ? 1 : 0, borderColor: Color['grey500'], justifyContent: 'center', alignItems: 'center', right: 16, top: 24 }}>
                 {/* {user.badge &&

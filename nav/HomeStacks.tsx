@@ -163,7 +163,7 @@ const MainStacks = () => {
 
 export type NoticeStackParamList = {
     Notices: undefined;
-    NoticeDetail: { infoId: number }
+    NoticeDetail: { noticeId: number }
 };
 
 const NoticeStack = createNativeStackNavigator<NoticeStackParamList>();

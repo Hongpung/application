@@ -4,14 +4,13 @@ import { Color } from '@hongpung/ColorSet'
 import InstrumentCard from '@hongpung/components/cards/InstrumentCard'
 import LongButton from '@hongpung/components/buttons/LongButton'
 import { Icons } from '@hongpung/components/Icon'
-import { ReservationDTO } from '../Reserve/ReserveInterface'
+import { ReservationDTO } from '../Reserve/ReservationInterface'
 import { User } from '@hongpung/UserType'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack'
 import useFetch from '@hongpung/hoc/useFetch'
 import { Session } from '../Home/MyPage/MyPractices/MyPracticesScreen'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
-import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken'
 
 
 type PracticeProps = NativeStackScreenProps<MyClubStackStackParamList, 'MyClubPracticeInfo'>
@@ -21,8 +20,8 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
     const { reservationId } = route.params;
 
     console.log(reservationId)
-    const { data: reservationData } = useFetchUsingToken<ReservationDTO>(`${process.env.BASE_URL}/reservation/${reservationId}`)
-    const { data, loading, error } = useFetchUsingUtilToken<Session>(`${process.env.SUB_API}/room-session/log/specific/reservation/${reservationId}`)
+    const { data: reservationData } = useFetchUsingToken<ReservationDTO>(`${process.env.SUB_API}/reservation/${reservationId}`)
+    const { data, loading, error } = useFetchUsingToken<Session>(`${process.env.SUB_API}/session-log/specific/reservation/${reservationId}`)
 
     console.log(data)
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
@@ -41,7 +40,7 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 18,
                             color: Color['grey700']
-                        }}>{data?.message}</Text>
+                        }}>{data?.title}</Text>
                         <Text style={{
                             position: 'absolute', left: 18, bottom: 12,
                             fontFamily: 'NanumSquareNeo-Light',
@@ -232,7 +231,7 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                                 return (
                                     <View style={{ marginHorizontal: 6 }}>
                                         <InstrumentCard
-                                            onSelectInstrument={() => { }}
+                                            onClickInstrument={() => { }}
                                             instrument={item} view={'inBorrow'} />
                                     </View>
                                 )
@@ -254,9 +253,6 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                 <View style={{ height: 8 }} />
 
             </ScrollView>
-            <View style={{ paddingVertical: 8, marginHorizontal: 24 }}>
-                <LongButton color='green' innerText='이미지로 저장' isAble={true} onPress={() => { }} />
-            </View>
         </View>
     )
 }

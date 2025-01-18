@@ -10,8 +10,20 @@ import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { loginUserState, useOnReserve } from '@hongpung/recoil/authState'
 import { RealtimeSession, ReservationSession } from '../Reserve/SessionTypes'
 import { Icons } from '@hongpung/components/Icon'
-import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken'
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { getToken } from '@hongpung/utils/TokenHandler'
+
+type CheckPossible =
+    {
+        session: ReservationSession | RealtimeSession | null,
+        nextReservation: ReservationSession | null,
+        timeLimit: boolean | undefined,
+        creatPossible: boolean,
+        isPariticipant: boolean | undefined,
+        message: string | null,
+        participationAvailable: boolean | undefined
+    }
+
 
 const CheckInScreen: React.FC = () => {
 
@@ -22,7 +34,7 @@ const CheckInScreen: React.FC = () => {
     const [isCheckin, CheckIn] = useState(false);
     const [checkinStatus, setStatus] = useState<'create' | 'attend' | 'start' | 'late' | null>(null);
 
-    const { data: sessionData, loading, error } = useFetchUsingUtilToken<{ session: ReservationSession | RealtimeSession | null, nextReservation: ReservationSession | null, timeLimit: boolean | undefined, creatPossible: boolean, isPariticipant: boolean | undefined, message: string | null, participationAvailable: boolean | undefined }>(`${process.env.SUB_API}/room-session/check-possible`,)
+    const { data: sessionData, loading, error } = useFetchUsingToken<CheckPossible>(`${process.env.SUB_API}/check-in/check-possible`,)
 
     useEffect(() => { navigation.setOptions({ animation: 'none' }); }, [])
 
@@ -34,7 +46,7 @@ const CheckInScreen: React.FC = () => {
                 const token = await getToken('token')
                 if (!token) throw Error('Invalid Token')
 
-                const response = await fetch(`${process.env.SUB_API}/room-session/start`,
+                const response = await fetch(`${process.env.SUB_API}/check-in/start`,
                     {
                         method: 'POST',
                         headers: {
@@ -75,7 +87,7 @@ const CheckInScreen: React.FC = () => {
                 if (!loginUser) throw Error('유저 정보가 없습니다.')
                 const token = await getToken('token')
                 if (!token) throw Error('Invalid Token')
-                const response = await fetch(`${process.env.SUB_API}/room-session/attend`,
+                const response = await fetch(`${process.env.SUB_API}/check-in/attend`,
                     {
                         method: 'POST',
                         headers: {
@@ -155,7 +167,7 @@ const CheckInScreen: React.FC = () => {
                 </Modal>
             </View>
         )
-        
+
     if (!!sessionData?.message)
         return (
             <View style={{ flex: 1, backgroundColor: '#FFF' }}>

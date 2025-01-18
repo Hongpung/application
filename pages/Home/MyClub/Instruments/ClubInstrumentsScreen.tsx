@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
 
 import InstrumentCard from "@hongpung/components/cards/InstrumentCard"
-import { briefInstrument, instrumentOrder } from "@hongpung/UserType"
+import { InstrumentWithOutBorrowHistory, instrumentOrder } from "@hongpung/UserType"
 import { Color } from "@hongpung/ColorSet"
 import useFetchUsingToken from "@hongpung/hoc/useFetchUsingToken"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -11,23 +11,23 @@ import { ClubInstrumentStackParamList } from "@hongpung/nav/InstrumentStack"
 
 type InstrumentNavParams = NativeStackNavigationProp<ClubInstrumentStackParamList, 'InstrumentsHome'>
 
-const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ instrumentsList }) => {
+const InstrumentsList: React.FC<{ instrumentsList: InstrumentWithOutBorrowHistory[] }> = ({ instrumentsList }) => {
 
     const navigation = useNavigation<InstrumentNavParams>();
 
     const renderInstruments = () => {
         const rows = [];
-        let cnt = instrumentOrder(instrumentsList[0]?.type) - 1;
+        let cnt = instrumentOrder(instrumentsList[0]?.instrumentType) - 1;
         for (let i = 0; i < instrumentsList.length;) {
             let sliceCnt = 2;
-            if (instrumentsList[i].type != instrumentsList[i + 1]?.type) sliceCnt = 1;
+            if (instrumentsList[i].instrumentType != instrumentsList[i + 1]?.instrumentType) sliceCnt = 1;
             const group = instrumentsList.slice(i, i + sliceCnt);
-            if (cnt < instrumentOrder(group[0].type)) {
+            if (cnt < instrumentOrder(group[0].instrumentType)) {
                 rows.push(
-                    <View key={group[0].type + 'header' + i} style={{ marginTop: 16, marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
+                    <View key={group[0].instrumentType + 'header' + i} style={{ marginTop: 16, marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
                         <View style={{ width: 24, height: 24, backgroundColor: Color['grey400'] }} />
                         <Text style={{ fontSize: 18, color: Color['grey400'], marginLeft: 8 }}>
-                            {group[0].type}
+                            {group[0].instrumentType}
                         </Text>
                     </View>
                 )
@@ -41,7 +41,7 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ ins
                             key={instrument.name + index}
                             instrument={instrument}
                             view="inManage"
-                            onSelectInstrument={(instrument) => { navigation.navigate('InstrumentSpecific', { instrumentId: instrument.instrumentId }); }}
+                            onClickInstrument={(instrument) => { navigation.navigate('InstrumentSpecific', { instrumentId: instrument.instrumentId }); }}
                         />
                     ))}
                     {group.length % 2 == 1 && <View style={{ height: 168, width: 154 }} />}
@@ -54,7 +54,7 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ ins
 
     return (
         <View style={{ flex: 1 }}>
-            {instrumentsList && renderInstruments()}
+            {renderInstruments()}
         </View>
     )
 }
@@ -62,10 +62,10 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ ins
 const ClubInstrumentsScreen: React.FC = () => {
 
     const isFocusing = useIsFocused();
-    const [instruments, setInstruments] = useState<briefInstrument[]>([])
+    const [instruments, setInstruments] = useState<InstrumentWithOutBorrowHistory[]>([])
 
-    const { data, loading, error } = useFetchUsingToken<briefInstrument[]>(
-        `${process.env.BASE_URL}/instrument/list`,
+    const { data, loading, error } = useFetchUsingToken<InstrumentWithOutBorrowHistory[]>(
+        `${process.env.SUB_API}/club/my-club/instruments`,
         {
             method: 'GET',
             headers: {
@@ -77,7 +77,7 @@ const ClubInstrumentsScreen: React.FC = () => {
     useEffect(() => {
         const clubInstruements = data ?? [];
         console.log(data);
-        clubInstruements?.sort((a, b) => instrumentOrder(a.type) - instrumentOrder(b.type))
+        clubInstruements?.sort((a, b) => instrumentOrder(a.instrumentType) - instrumentOrder(b.instrumentType))
         setInstruments(clubInstruements ?? [])
     }, [data])
 

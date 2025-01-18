@@ -56,7 +56,7 @@ export const useAuth = () => {
 
         if (!fetchFCM.ok) throw Error('토큰 생성 실패')
 
-        const useSession = await fetch(`${process.env.SUB_API}/room-session/isCheckin`, {
+        const useSession = await fetch(`${process.env.SUB_API}/session/is-checkin`, {
           headers: {
             'Authorization': `Bearer ${token}`
           },

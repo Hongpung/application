@@ -1,11 +1,10 @@
 import { NativeSyntheticEvent, Pressable, StyleSheet, Text, View, Image, Linking } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
-import PagerView from 'react-native-pager-view'
-import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
-
-import { Icons } from '@hongpung/components/Icon'
-import { Color } from '@hongpung/ColorSet'
+import PagerView from 'react-native-pager-view';
+import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/specs/PagerViewNativeComponent';
+import { Icons } from '@hongpung/components/Icon';
+import { Color } from '@hongpung/ColorSet';
 import { useNavigation } from '@react-navigation/native';
 
 import { MainStackParamList } from '@hongpung/nav/HomeStacks';
@@ -51,7 +50,7 @@ const Banner: React.FC<{ withIndicator?: boolean }> = ({ withIndicator = true })
             setBannerNum(position - 1)
         }
     }, [banners])
-    
+
     useEffect(() => {
         const interval = setInterval(() => {
             const nextPage = (bannerNum + 1 + 1);//+1은 보정치 (맨앞에 중첩 배너 있음) +1 은 증가치

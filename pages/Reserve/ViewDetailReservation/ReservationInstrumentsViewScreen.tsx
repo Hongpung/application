@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
 
 import InstrumentCard from "@hongpung/components/cards/InstrumentCard"
-import { briefInstrument, instrumentOrder } from "@hongpung/UserType"
+import { InstrumentWithOutBorrowHistory, instrumentOrder } from "@hongpung/UserType"
 import { Color } from "@hongpung/ColorSet"
 
 import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack"
@@ -12,23 +12,23 @@ import { MainStackParamList } from "@hongpung/nav/HomeStacks"
 
 type InstrumentNavParams = NativeStackNavigationProp<MainStackParamList, 'Home'>
 
-const BorrowInstrumentsList: React.FC<{ instrumentList: briefInstrument[] }> = ({ instrumentList }) => {
+const BorrowInstrumentsList: React.FC<{ instrumentList: InstrumentWithOutBorrowHistory[] }> = ({ instrumentList }) => {
 
     const navigation = useNavigation<InstrumentNavParams>();
 
     const renderInstruments = () => {
         const rows = [];
-        let cnt = instrumentOrder(instrumentList[0]?.type) - 1;
+        let cnt = instrumentOrder(instrumentList[0]?.instrumentType) - 1;
         for (let i = 0; i < instrumentList.length;) {
             let sliceCnt = 2;
-            if (instrumentList[i].type != instrumentList[i + 1]?.type) sliceCnt = 1;
+            if (instrumentList[i].instrumentType != instrumentList[i + 1]?.instrumentType) sliceCnt = 1;
             const group = instrumentList.slice(i, i + sliceCnt);
-            if (cnt < instrumentOrder(group[0].type)) {
+            if (cnt < instrumentOrder(group[0].instrumentType)) {
                 rows.push(
-                    <View key={group[0].type + 'header'} style={{ marginTop: 16, marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
+                    <View key={group[0].instrumentType + 'header'} style={{ marginTop: 16, marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
                         <View style={{ width: 24, height: 24, backgroundColor: Color['grey400'] }} />
                         <Text style={{ fontSize: 18, color: Color['grey400'], marginLeft: 8 }}>
-                            {group[0].type}
+                            {group[0].instrumentType}
                         </Text>
                     </View>
                 )
@@ -42,7 +42,7 @@ const BorrowInstrumentsList: React.FC<{ instrumentList: briefInstrument[] }> = (
                             key={instrument.name + index}
                             instrument={instrument}
                             view="inBorrow"
-                            onSelectInstrument={(instrument) => { navigation.navigate('MyClub',{screen:'Instruments', params:{ screen: 'InstrumentSpecific', params: { instrumentId: instrument.instrumentId } }}); }}
+                            onClickInstrument={(instrument) => { navigation.navigate('MyClub',{screen:'Instruments', params:{ screen: 'InstrumentSpecific', params: { instrumentId: instrument.instrumentId } }}); }}
                         />
                     ))}
                     {group.length % 2 == 1 && <View style={{ height: 168, width: 154 }} />}
@@ -64,13 +64,13 @@ type ReservationInstrumentsViewProps = NativeStackScreenProps<ReservationStackPa
 
 const ReservationInstrumentsViewScreen: React.FC<ReservationInstrumentsViewProps> = ({ navigation, route }) => {
 
-    const [instrumentList, setInstrumentList] = useState<briefInstrument[]>([])
+    const [instrumentList, setInstrumentList] = useState<InstrumentWithOutBorrowHistory[]>([])
 
     useEffect(() => {
         const { instruments } = route.params
-        const borrowInstruements = instruments ? JSON.parse(instruments) as briefInstrument[] : [];
+        const borrowInstruements = instruments ? JSON.parse(instruments) as InstrumentWithOutBorrowHistory[] : [];
         console.log(borrowInstruements);
-        borrowInstruements?.sort((a, b) => instrumentOrder(a.type) - instrumentOrder(b.type))
+        borrowInstruements?.sort((a, b) => instrumentOrder(a.instrumentType) - instrumentOrder(b.instrumentType))
         setInstrumentList(borrowInstruements)
     }, [route])
 

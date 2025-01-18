@@ -2,7 +2,7 @@ import { StyleSheet, Text, Pressable } from 'react-native'
 import React from 'react';
 import { Color } from '../../ColorSet';
 
-export type LongButtonProps = {
+type LongButtonProps = {
     innerText: string,
     onPress: () => void,
     isAble: boolean,

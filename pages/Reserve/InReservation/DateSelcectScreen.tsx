@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Calendar } from '../ReserveCalendarScreen'
+import { Calendar } from '../ReservationCalendarScreen'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useReservation } from '../context/ReservationContext';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';

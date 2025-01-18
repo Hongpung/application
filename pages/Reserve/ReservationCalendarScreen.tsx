@@ -175,7 +175,7 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
 
 type ReserveCalendarProps = NativeStackScreenProps<ReservationStackParamList, 'ReserveCalendar'>
 
-const ReserveCalendarScreen: React.FC<ReserveCalendarProps> = ({ navigation, route }) => {
+const ReservationCalendarScreen: React.FC<ReserveCalendarProps> = ({ navigation, route }) => {
 
     const [calendarDate, setCalendarDate] = useState(new Date())
 
@@ -229,7 +229,7 @@ const ReserveCalendarScreen: React.FC<ReserveCalendarProps> = ({ navigation, rou
     )
 }
 
-export default ReserveCalendarScreen;
+export default ReservationCalendarScreen;
 
 
 const styles = StyleSheet.create({

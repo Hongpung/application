@@ -7,13 +7,13 @@ import CheckboxComponent from '@hongpung/components/checkboxs/CheckboxComponent'
 import { useRecoilValue } from 'recoil'
 import { loginUserState } from '@hongpung/recoil/authState'
 import { getToken } from '@hongpung/utils/TokenHandler'
-import { findReservationDifferences, parseToReservationForm } from '../ReserveInterface'
+import { findReservationDifferences, parseToReservationForm } from '../ReservationInterface'
 import { Icons } from '@hongpung/components/Icon'
 import { InReservationStackParamList, ReservationStackParamList } from '@hongpung/nav/ReservationStack'
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Toast from 'react-native-toast-message'
-import { InstrumentTypes } from '@hongpung/UserType'
+import { instrumentTypes } from '@hongpung/UserType'
 
 
 type ReservationEditConfirmNavProp = CompositeNavigationProp<
@@ -172,8 +172,8 @@ const ReservationEditConfirmScreen: React.FC = () => {
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14, }}                    >
                                 <Text style={styles.leftText}>대여 악기</Text>
                                 {preReservation.borrowInstruments.length > 0 ?
-                                    <Text style={[styles.rightText, { color: Color['grey300'] }]}>{InstrumentTypes.filter(type => type != '징').map((type) => {
-                                        const instCount = preReservation.borrowInstruments.filter((instrument) => instrument.type == type).length
+                                    <Text style={[styles.rightText, { color: Color['grey300'] }]}>{instrumentTypes.filter(type => type != '징').map((type) => {
+                                        const instCount = preReservation.borrowInstruments.filter((instrument) => instrument.instrumentType == type).length
                                         if (instCount > 0)
                                             return `${type} ${instCount}`
                                     })}
@@ -238,8 +238,8 @@ const ReservationEditConfirmScreen: React.FC = () => {
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
                                 <Text style={styles.leftText}>대여 악기</Text>
                                 {reservation.borrowInstruments.length > 0 ?
-                                    <Text style={[styles.rightText, { marginRight: 12, color: Color['blue500'] }]}>{InstrumentTypes.filter(type => type != '징').map((type) => {
-                                        const instCount = reservation.borrowInstruments.filter((instrument) => instrument.type == type).length
+                                    <Text style={[styles.rightText, { marginRight: 12, color: Color['blue500'] }]}>{instrumentTypes.filter(type => type != '징').map((type) => {
+                                        const instCount = reservation.borrowInstruments.filter((instrument) => instrument.instrumentType == type).length
                                         if (instCount > 0)
                                             return `${type} ${instCount}`
                                     })}

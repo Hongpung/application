@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { briefInstrument, instrumentOrder } from '@hongpung/UserType'
+import { InstrumentWithOutBorrowHistory, instrumentOrder } from '@hongpung/UserType'
 import InstrumentCard from '@hongpung/components/cards/InstrumentCard'
 import { Color } from '@hongpung/ColorSet'
 import LongButton from '@hongpung/components/buttons/LongButton'
@@ -11,12 +11,12 @@ import { Icons } from '@hongpung/components/Icon'
 
 const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
-    const { data, loading, error } = useFetchUsingToken<briefInstrument[]>(
-        `${process.env.BASE_URL}/instrument`, {}, 5000, []
+    const { data, loading, error } = useFetchUsingToken<InstrumentWithOutBorrowHistory[]>(
+        `${process.env.SUB_API}/instrument/borrow-list`, {}, 5000, []
     )
     const { reservation, setBorrowInstruments } = useReservation();
 
-    const [originList, setOrigin] = useState<briefInstrument[]>([])
+    const [originList, setOrigin] = useState<InstrumentWithOutBorrowHistory[]>([])
 
     useEffect(() => {
         setOrigin(reservation.borrowInstruments);
@@ -49,7 +49,7 @@ const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigatio
     )
 }
 
-const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ instrumentsList }) => {
+const InstrumentsList: React.FC<{ instrumentsList: InstrumentWithOutBorrowHistory[] }> = ({ instrumentsList }) => {
 
     const { setBorrowInstruments, reservation } = useReservation();
 
@@ -104,20 +104,20 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ ins
         }
     }
 
-    const haveSameInstrument = (existInstruments: briefInstrument[], instrument: briefInstrument) => existInstruments.some(existInstrument => JSON.stringify(existInstrument) === JSON.stringify(instrument));
+    const haveSameInstrument = (existInstruments: InstrumentWithOutBorrowHistory[], instrument: InstrumentWithOutBorrowHistory) => existInstruments.some(existInstrument => JSON.stringify(existInstrument) === JSON.stringify(instrument));
 
     useEffect(() => {
-        setGGwangSelected(reservation.borrowInstruments.filter((instrument) => instrument.type == '꽹과리').length)
-        setJangguSelected(reservation.borrowInstruments.filter((instrument) => instrument.type == '장구').length)
-        setBukSelected(reservation.borrowInstruments.filter((instrument) => instrument.type == '북').length)
-        setSogoSelected(reservation.borrowInstruments.filter((instrument) => instrument.type == '소고').length)
-        setETCSelected(reservation.borrowInstruments.filter((instrument) => instrument.type == '기타').length)
+        setGGwangSelected(reservation.borrowInstruments.filter((instrument) => instrument.instrumentType == '꽹과리').length)
+        setJangguSelected(reservation.borrowInstruments.filter((instrument) => instrument.instrumentType == '장구').length)
+        setBukSelected(reservation.borrowInstruments.filter((instrument) => instrument.instrumentType == '북').length)
+        setSogoSelected(reservation.borrowInstruments.filter((instrument) => instrument.instrumentType == '소고').length)
+        setETCSelected(reservation.borrowInstruments.filter((instrument) => instrument.instrumentType == '기타').length)
     }, [])
 
-    const addInstruments = (instrument: briefInstrument) => {
+    const addInstruments = (instrument: InstrumentWithOutBorrowHistory) => {
 
         setBorrowInstruments([...reservation.borrowInstruments, instrument])
-        switch (instrument.type) {
+        switch (instrument.instrumentType) {
             case '꽹과리':
                 setGGwangSelected(prevCount => prevCount + 1);
                 break;
@@ -135,10 +135,10 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ ins
         }
     }
 
-    const removeInstruments = (instrument: briefInstrument) => {
+    const removeInstruments = (instrument: InstrumentWithOutBorrowHistory) => {
         setBorrowInstruments(reservation.borrowInstruments.filter((existInstrument) => JSON.stringify(existInstrument) != JSON.stringify(instrument)))
 
-        switch (instrument.type) {
+        switch (instrument.instrumentType) {
             case '꽹과리':
                 setGGwangSelected(prevCount => prevCount > 0 ? prevCount - 1 : 0);
                 break;
@@ -158,39 +158,39 @@ const InstrumentsList: React.FC<{ instrumentsList: briefInstrument[] }> = ({ ins
 
     const renderInstruments = () => {
         const rows = [];
-        let cnt = instrumentOrder(instrumentsList[0]?.type) - 1;
+        let cnt = instrumentOrder(instrumentsList[0]?.instrumentType) - 1;
         for (let i = 0; i < instrumentsList.length;) {
             let sliceCnt = 2;
-            if (instrumentsList[i].type != instrumentsList[i + 1]?.type) sliceCnt = 1;
+            if (instrumentsList[i].instrumentType != instrumentsList[i + 1]?.instrumentType) sliceCnt = 1;
             const group = instrumentsList.slice(i, i + sliceCnt);
-            if (cnt < instrumentOrder(group[0].type)) {
-                const selectedCount = getCount(group[0].type);
+            if (cnt < instrumentOrder(group[0].instrumentType)) {
+                const selectedCount = getCount(group[0].instrumentType);
                 rows.push(
-                    <Pressable key={group[0].type + 'header'}
+                    <Pressable key={group[0].instrumentType + 'header'}
                         style={{ paddingVertical: 16, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
-                        onPress={toggleFunction(group[0].type)}
+                        onPress={toggleFunction(group[0].instrumentType)}
                     >
                         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                             <View style={{ width: 24, height: 24, backgroundColor: Color['grey400'] }} />
                             <Text style={[{ fontSize: 18, color: Color['grey400'], marginLeft: 8 }, selectedCount > 0 && { color: Color['blue500'] }]}>
-                                {group[0].type} {selectedCount > 0 && `(` + selectedCount + `)`}
+                                {group[0].instrumentType} {selectedCount > 0 && `(` + selectedCount + `)`}
                             </Text>
                         </View>
-                        <Icons name={isOpen(instrumentsList[i].type) ? 'chevron-up' : 'chevron-down'} size={24} color={Color['grey300']} />
+                        <Icons name={isOpen(instrumentsList[i].instrumentType) ? 'chevron-up' : 'chevron-down'} size={24} color={Color['grey300']} />
                     </Pressable>
                 )
                 cnt++;
             }
             rows.push(
                 <View>
-                    {isOpen(instrumentsList[i].type) && <View key={i} style={{ height: 168, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 4, marginHorizontal: 12 }}>
+                    {isOpen(instrumentsList[i].instrumentType) && <View key={i} style={{ height: 168, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 4, marginHorizontal: 12 }}>
                         {group.map((instrument, index) => (
                             <InstrumentCard
                                 key={instrument.name + instrument.imageUrl?.slice(-10, -5) + index}
                                 instrument={instrument}
                                 view="inBorrow"
                                 isPicked={haveSameInstrument(reservation.borrowInstruments, instrument)}
-                                onSelectInstrument={(item: briefInstrument) => {
+                                onClickInstrument={(item: InstrumentWithOutBorrowHistory) => {
                                     if (haveSameInstrument(reservation.borrowInstruments, item))
                                         removeInstruments(item)
                                     else

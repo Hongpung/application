@@ -1,6 +1,7 @@
+import React from 'react'
 import { Color } from "@hongpung/ColorSet";
 import InputComponent from "@hongpung/components/inputs/InputComponent";
-import { club, clubIds, clubs, clubsEng } from "@hongpung/UserType";
+import { Club, clubIds, clubs } from "@hongpung/UserType";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, TouchableWithoutFeedback, View, Text, Pressable, ScrollView, Modal, ActivityIndicator, Dimensions } from "react-native";
 import { useSignUp } from "../context/SignUpContext";
@@ -14,14 +15,45 @@ const { width } = Dimensions.get('window');
 
 interface ClubSeletorProps {
 
-    club: club | null,
-    setClub: (club: club) => void,
+    club: Club | null,
+    setClub: (club: Club) => void,
     isValidClub: boolean,
     setSelectClubVisible: (value: boolean) => void,
     onSelectClub: boolean,
     setClubisValid: (value: boolean) => void,
 
 }
+
+interface SelectorProps<T> {
+    label: string
+    value: T | null
+    onChange: (newValue: T) => void
+    trriger: () => void
+    options: T[]
+}
+
+const SelectorLable: React.FC<{ label: string, value: string | null }> = ({ label, value }) => {
+    return (
+        <View style={{ width: '100%', paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderRadius: 20 }}>
+            {
+                value ?
+                    <Text>{value}</Text>
+                    :
+                    <Text>{label}</Text>
+            }
+        </View>
+    )
+}
+
+const Selector: React.FC<SelectorProps<string>> = ({ label, value, onChange, trriger, options }) => {
+    return (
+        <View>
+            {/* input */}
+            <SelectorLable label={label} value={value}/>
+        </View>
+    )
+}
+
 const ClubSeletor: React.FC<ClubSeletorProps> = ({ club, setClub, isValidClub, setSelectClubVisible, onSelectClub, setClubisValid }) => {
     const labelAnimation = useRef(new Animated.Value(0)).current; // 애니메이션 초기 값
     const labelStyle = {
@@ -44,7 +76,7 @@ const ClubSeletor: React.FC<ClubSeletorProps> = ({ club, setClub, isValidClub, s
 
 
     return (
-        <>
+        <React.Fragment>
             <Pressable style={[styles.inputGroup, { width: 142, zIndex: 0 }]}
                 onPress={() => { Keyboard.dismiss(); setSelectClubVisible(true); }}>
 
@@ -84,7 +116,7 @@ const ClubSeletor: React.FC<ClubSeletorProps> = ({ club, setClub, isValidClub, s
                     })}</ScrollView>
                 </View>
             }
-        </>
+        </React.Fragment>
     )
 }
 

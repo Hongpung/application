@@ -2,7 +2,6 @@ import { StyleSheet, Text, View, ScrollView, Modal } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Color } from '../../ColorSet'
 import ProfileMiniCard from '../../components/cards/ProfileMiniCard'
-import { UserProvider } from '../../context/UserContext'
 import { User } from '../../UserType'
 import LongButton from '../../components/buttons/LongButton'
 import { debounce } from 'lodash'
@@ -36,7 +35,7 @@ const UsingManageScreen: React.FC = () => {
         const lates: User[] = []
         const absences: User[] = []
 
-        if (sessionData?.sessionType == 'Reservation') {
+        if (sessionData?.sessionType == 'RESERVED') {
             attendanceList?.map(({ user, status }) => {
                 if (status == '참가' || status == '출석')
                     attends.push(user)
@@ -68,9 +67,9 @@ const UsingManageScreen: React.FC = () => {
     const extendSession = () => {
         const endfetch = async () => {
             try {
-                const token = await getToken('utilToken')
+                const token = await getToken('token')
 
-                const response = await fetch(`${process.env.SUB_API}/room-session/extend`, {
+                const response = await fetch(`${process.env.SUB_API}/session/extend`, {
                     method: 'POST', 
                     headers: {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
@@ -168,7 +167,6 @@ const UsingManageScreen: React.FC = () => {
     )
 
     return (
-        <UserProvider>
             <View style={{ flex: 1, backgroundColor: '#FFF' }}>
                 <ScrollView style={{ flex: 1, backgroundColor: '#FFF' }} showsVerticalScrollIndicator={false}>
                     <View style={{ height: 16 }} />
@@ -185,13 +183,13 @@ const UsingManageScreen: React.FC = () => {
                     <View style={{ height: 16 }} />
 
                     <View style={{ marginHorizontal: 24, display: 'flex', gap: 8 }}>
-                        <Text style={{ marginHorizontal: 8, fontFamily: 'NanumSquareNeo-Bold', fontSize: 18 }}>{sessionData?.sessionType == 'Reservation' ? '출석한 사람' : '참가한 사람'}</Text>
+                        <Text style={{ marginHorizontal: 8, fontFamily: 'NanumSquareNeo-Bold', fontSize: 18 }}>{sessionData?.sessionType == 'RESERVED' ? '출석한 사람' : '참여한 사람'}</Text>
                         {attendUsers.map((user) => (
                             <View key={user.memberId + 'container'} style={{ marginVertical: 4 }}>
                                 <ProfileMiniCard key={user.name} user={user} isPicked={false} view={'inReserveView'} onPick={() => { }} />
                             </View>
                         ))}
-                        {sessionData.sessionType == 'Reservation' && <>
+                        {sessionData.sessionType == 'RESERVED' && <>
                             {lateUsers.length != 0 &&
                                 <>
                                     <Text style={{ marginHorizontal: 8, fontFamily: 'NanumSquareNeo-Bold', fontSize: 18 }}>지각한 사람</Text>
@@ -221,7 +219,6 @@ const UsingManageScreen: React.FC = () => {
                     <LongButton color='red' innerText='종료하기' isAble={canReturn} onPress={() => { navigation.replace('CheckOut') }} />
                 </View>
             </View>
-        </UserProvider>
     )
 }
 

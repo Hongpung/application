@@ -35,4 +35,4 @@ export const Color:ColorType={
     blue600: "#0047B8",
     blue700: "#001D4B",
     blue800: "#001029"
-  };
+  } as const;

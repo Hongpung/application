@@ -1,4 +1,4 @@
-import { FlatList, ScrollView, StyleSheet, Text, View, Image, Modal, Pressable, Dimensions } from 'react-native'
+import { FlatList, ScrollView, StyleSheet, Text, View, Image, Modal, Pressable, Dimensions, TouchableWithoutFeedback, KeyboardAvoidingView } from 'react-native'
 import React, { useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
 
@@ -10,16 +10,13 @@ import { User } from '@hongpung/UserType'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
 import { MyPageParamList } from '@hongpung/nav/MyPageStack'
-import { Session } from '../Home/MyPage/MyPractices/MyPracticesScreen'
+import { AttendanceStatus, Session } from '../Home/MyPage/MyPractices/MyPracticesScreen'
 
 
-import useFetchUsingUtilToken from '@hongpung/hoc/useFetchUsingutilToken'
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 
-interface AttendanceDTO {
-    member: User
-    attendance: string
-}
 const { width, height } = Dimensions.get('window')
+
 type PracticeProps = NativeStackScreenProps<MyPageParamList, 'MyPracticeInfo'>
 
 const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
@@ -27,11 +24,12 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
     const { sessionId } = route.params;
     const aspectRatio = 3 / 4;
     const [selectedImage, selectImage] = useState<string | null>(null)
-    const { data, loading, error } = useFetchUsingUtilToken<Session>(`${process.env.SUB_API}/room-session/log/specific/${sessionId}`)
+    const [modalState, setModalState] = useState<'Images' | 'AttendanceList' | 'None'>('None')
+    const { data, loading, error } = useFetchUsingToken<Session>(`${process.env.SUB_API}/session-log/specific/${sessionId}`)
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
 
-
+    console.log(data)
     if (!data) return (
         <View>
 
@@ -39,8 +37,8 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
     )
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
-            <Modal visible={!!selectedImage} transparent={true}>
-                <Pressable onPress={() => selectImage(null)}
+            <Modal visible={modalState == 'Images' && !!selectedImage} transparent={true}>
+                <Pressable onPress={() => { selectImage(null); setModalState('None') }}
                     style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
                     {selectedImage &&
                         <Image
@@ -50,6 +48,7 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                     }
                 </Pressable>
             </Modal>
+            <AttendanceModal attendanceList={data.attendanceList} visible={modalState == 'AttendanceList'} onClose={() => setModalState('None')} />
             <ScrollView contentContainerStyle={{ backgroundColor: '#FFF' }}>
                 <View style={{ height: 12 }} />
                 <View style={{ marginHorizontal: 24, height: 80, borderWidth: 1, borderRadius: 10, borderColor: Color['grey200'] }}>
@@ -59,7 +58,7 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 18,
                             color: Color['grey700']
-                        }}>{data?.message}</Text>
+                        }}>{data?.title}</Text>
                         <Text style={{
                             position: 'absolute', left: 18, bottom: 12,
                             fontFamily: 'NanumSquareNeo-Light',
@@ -73,9 +72,9 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             fontFamily: 'NanumSquareNeo-Light',
                             fontSize: 14,
                             color: Color['grey400']
-                        }}>{data?.startTime.slice(0, -3)}~{data?.endTime.slice(0, -3)}</Text>
+                        }}>{data?.startTime}~{data?.endTime}</Text>
 
-                        {data?.reservationType == '정규연습' ?
+                        {data?.reservationType == 'RESERVED' ?
                             <View style={{
                                 position: 'absolute', right: 12, top: -4, width: 48, height: 48
                             }} >
@@ -126,7 +125,7 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey700']
-                    }}>{data?.startTime.slice(0, -3)}</Text>
+                    }}>{data?.startTime}</Text>
                 </View>
 
                 <View style={{ height: 12 }} />
@@ -143,7 +142,7 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey700']
-                    }}>{data?.endTime.slice(0, -3)}</Text>
+                    }}>{data?.endTime}</Text>
                 </View>
 
                 <View style={{ height: 12 }} />
@@ -177,7 +176,9 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                         fontFamily: 'NanumSquareNeo-Regular',
                         fontSize: 14,
                         color: Color['grey300']
-                    }}>{'전체 보기 >'}</Text>
+                    }}
+                        onPress={() => setModalState('AttendanceList')}
+                    >{'전체 보기 >'}</Text>
                 </View>
 
                 <View style={{ height: 20 }} />
@@ -255,7 +256,7 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                                     borderColor: Color['grey200'],
                                     overflow: 'hidden'
                                 }}
-                                onPress={()=>selectImage(item)}>
+                                    onPress={() => { selectImage(item); setModalState('Images'); }}>
                                     <Image
                                         source={{ uri: item }}
                                         style={{
@@ -278,13 +279,52 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                 <View style={{ height: 8 }} />
 
             </ScrollView>
-            <View style={{ paddingVertical: 8, marginHorizontal: 24 }}>
-                <LongButton color='green' innerText='이미지로 저장' isAble={true} onPress={() => { }} />
-            </View>
         </View>
     )
 }
 
-export default MyPracticeInfoScreen
 
-const styles = StyleSheet.create({})
+
+const AttendanceModal: React.FC<{ attendanceList: AttendanceStatus[], visible: boolean, onClose: () => void }> = ({ attendanceList, visible, onClose }) => {
+
+    return (
+        <Modal visible={visible} transparent={true}>
+            <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+                <TouchableWithoutFeedback onPress={onClose}>
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
+                        <Pressable
+                            style={{
+                                height: 360,
+                                width: '100%',
+                                marginHorizontal: 24,
+                                paddingVertical: 16,
+                                paddingHorizontal: 12,
+                                borderRadius: 25,
+                                backgroundColor: 'white',
+                            }}
+                            onPress={(e) => e.stopPropagation()}
+                        >
+                            <FlatList
+                                data={[...attendanceList]}
+                                contentContainerStyle={{ flexDirection: 'column', gap: 24 }}
+                                alwaysBounceVertical={false}
+                                renderItem={({ item: { member, status } }) => (
+                                    <View style={{ marginHorizontal:8, backgroundColor:'#DDDDDD', paddingVertical:24, paddingHorizontal:8 }}>
+                                        <Text>
+                                            {member.name}{status}
+                                        </Text>
+                                    </View>
+                                )}
+                                keyboardShouldPersistTaps="handled"
+                            />
+                        </Pressable>
+                    </View>
+                </TouchableWithoutFeedback>
+            </KeyboardAvoidingView>
+        </Modal>
+
+    )
+
+}
+
+export default MyPracticeInfoScreen

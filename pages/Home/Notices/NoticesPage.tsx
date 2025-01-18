@@ -7,9 +7,10 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
 
 interface BriefNotice {
-    infoId: number
+    noticeId: number
     title: string
-    date: string//dateString
+    createdAt: string//dateString
+    updatedAt: string//dateString
 }
 
 type NoticeDetailNav = NativeStackNavigationProp<NoticeStackParamList, 'Notices'>
@@ -17,7 +18,7 @@ const NoticesPage: React.FC = () => {
 
     const navigation = useNavigation<NoticeDetailNav>();
     const today = new Date().toISOString().split('T')[0]
-    const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.BASE_URL}/info`)
+    const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.SUB_API}/notice`)
 
     return (
         <View style={{ display: 'flex', flex: 1, backgroundColor: Color['grey100'], flexDirection: 'column', paddingTop: 24, paddingBottom: 16 }}>
@@ -27,9 +28,9 @@ const NoticesPage: React.FC = () => {
                     :
                     data && data?.length > 0 ?
                         data.slice(0, 10).map((notice) => (
-                            <TouchableOpacity key={notice.infoId} style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', gap: 2 }}
-                                onPress={() => { navigation.navigate('NoticeDetail', { infoId: notice.infoId }) }}>
-                                {today == notice.date.split('T')[0] &&
+                            <TouchableOpacity key={notice.noticeId} style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', gap: 2 }}
+                                onPress={() => { navigation.navigate('NoticeDetail', { noticeId: notice.noticeId }) }}>
+                                {today == notice.createdAt.split('T')[0] &&
                                     <View style={{ paddingHorizontal: 4, paddingVertical: 2, backgroundColor: Color['red100'], borderRadius: 4 }}>
                                         <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['red400'] }}>new</Text>
                                     </View>
@@ -37,7 +38,7 @@ const NoticesPage: React.FC = () => {
                                 <Text numberOfLines={2} ellipsizeMode='tail' style={{ flex: 1, fontSize: 18, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>
                                     [공지사항] {notice.title}
                                 </Text>
-                                <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{notice.date.split('T')[0]}</Text>
+                                <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{notice.createdAt.split('T')[0]}</Text>
                             </TouchableOpacity>
                         )) :
                         <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>공지 사항이 없습니다.</Text>

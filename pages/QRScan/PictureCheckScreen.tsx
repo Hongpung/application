@@ -89,7 +89,7 @@ const PictureCheckScreen: React.FC<PictureCheckProps> = ({ navigation, route }) 
                 const imageUrls = uploadUrls.map(url => (url.imageUrl))
                 console.log(imageUrls)
 
-                const response = await fetch(`${process.env.SUB_API}/room-session/end`, {
+                const response = await fetch(`${process.env.SUB_API}/session/end`, {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가

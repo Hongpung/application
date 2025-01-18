@@ -1,7 +1,7 @@
 import { StyleSheet, TextInput, Text, View, ScrollView, Image, Modal, Pressable, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Keyboard, TextInputChangeEventData, NativeSyntheticEvent, Alert, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { Color } from '../../../../ColorSet';
-import { Instrument, InstrumentCreateDTO, InstrumentEditDTO, InstrumentType, InstrumentTypes } from '../../../../UserType';
+import { Instrument, InstrumentCreateDTO, InstrumentEditDTO, InstrumentType, instrumentTypes } from '../../../../UserType';
 import LongButton from '../../../../components/buttons/LongButton';
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';
@@ -52,7 +52,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
         { available: true, club: loginUser?.club, borrowHistory: [], name: '', instrumentId: -1, type: '쇠' })
 
     const parseInstrument = (type: InstrumentType): string => {
-        const instrumentEnumNo = InstrumentTypes.indexOf(type)
+        const instrumentEnumNo = instrumentTypes.indexOf(type)
         return instrumentsEngType[instrumentEnumNo];
     }
 
@@ -148,7 +148,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
 
                 if (!token) throw Error('invalid Token');
 
-                const submitForm: InstrumentEditDTO = { available: true, name: instrument.name, type: parseInstrument(instrument.type) }
+                const submitForm: InstrumentEditDTO = { available: true, name: instrument.name, type: parseInstrument(instrument.instrumentType) }
 
                 if (!!selectedImage) {
                     console.log('이미지 업로드 수행중')
@@ -231,7 +231,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
                             <Text style={styles.RowLeft}>{`악기 타입`}</Text>
                             <Pressable style={{ position: 'relative', zIndex: 0 }}
                                 onPress={() => { Keyboard.dismiss(); setSelectTypeVisible(true); }}>
-                                <Text style={styles.RowRight}>{instrument.type}</Text>
+                                <Text style={styles.RowRight}>{instrument.instrumentType}</Text>
                                 {
                                     onSelectType &&
                                     <View style={{
@@ -245,14 +245,14 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
                                         <ScrollView
                                             contentContainerStyle={{ alignItems: 'flex-start' }}
                                             showsVerticalScrollIndicator={false}
-                                        >{InstrumentTypes.map((item) => {
+                                        >{instrumentTypes.map((item) => {
                                             return (
                                                 <Pressable
                                                     key={item + 'seletor'}
                                                     style={{ paddingVertical: 4, marginVertical: 4, width: 120 - 32, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row-reverse' }}
-                                                    onPress={() => { setInstrument({ ...instrument, type: item }); setSelectTypeVisible(false); }}>
-                                                    <Text style={[{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, color: instrument.type == item ? Color['green600'] : Color['grey400'] }]}>{item}</Text>
-                                                    {instrument.type == item && <Icons name='checkmark' color={Color['green500']} size={24} />}
+                                                    onPress={() => { setInstrument({ ...instrument, instrumentType: item }); setSelectTypeVisible(false); }}>
+                                                    <Text style={[{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, color: instrument.instrumentType == item ? Color['green600'] : Color['grey400'] }]}>{item}</Text>
+                                                    {instrument.instrumentType == item && <Icons name='checkmark' color={Color['green500']} size={24} />}
                                                 </Pressable>
                                             )
                                         })}</ScrollView>
