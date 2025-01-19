@@ -1,8 +1,8 @@
 import { Keyboard, KeyboardAvoidingView, Modal, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { StackActions } from '@react-navigation/native'
+import { StackActions, useNavigation } from '@react-navigation/native'
 import Toast from 'react-native-toast-message'
-import { NativeStackScreenProps } from '@react-navigation/native-stack'
+import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { debounce } from 'lodash'
 
@@ -14,24 +14,32 @@ import CheckboxComponent from '@hongpung/components/checkboxs/CheckboxComponent'
 import { InputBaseComponent } from '@hongpung/components/inputs/InputBaseComponent'
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, "Login">;
+
+type LoginNavProps = NativeStackNavigationProp<RootStackParamList, "Login">;
 type validationCondition = { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
 
-const LoginForm: React.FC = () => {
-
+const useEmailInput = () => {
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
 
     const [emailValidation, setEmailValidation] = useState<validationCondition>({ state: 'BEFORE' })
-    const [passwordValidation, setPasswordValidation] = useState<validationCondition>({ state: 'BEFORE' })
 
     const validateEmail = useCallback((email: string) => {
-        const regex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (regex.test(email)) {
+        const emailFormRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailFormRegex.test(email)) {
             setEmailValidation({ state: 'VALID' })
             return;
         }
         setEmailValidation({ state: 'ERROR', errorText: '이메일 형식이 올바르지 않습니다.' })
     }, [])
+
+    return { email, setEmail, setEmailValidation, emailValidation, validateEmail }
+}
+
+const usePasswordInput = () => {
+
+    const [password, setPassword] = useState('');
+
+    const [passwordValidation, setPasswordValidation] = useState<validationCondition>({ state: 'BEFORE' })
 
     const validatePassword = useCallback((password: string) => {
         const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;
@@ -42,8 +50,136 @@ const LoginForm: React.FC = () => {
         setPasswordValidation({ state: 'ERROR', errorText: '비밀번호는 8~12자 입니다.' })
     }, [])
 
+    return { password, setPassword, setPasswordValidation, passwordValidation, validatePassword }
+}
+
+
+const LoginForm: React.FC = () => {
+
+    const navigation = useNavigation<LoginNavProps>();
+
+    const { email, setEmail, setEmailValidation, emailValidation, validateEmail } = useEmailInput();
+    const { password, setPassword, setPasswordValidation, passwordValidation, validatePassword } = usePasswordInput();
+
     const emailRef = useRef<TextInput>(null);
     const passwordRef = useRef<TextInput>(null);
+
+    const [saveID, setSaveID] = useState(false);
+    const [autoLogin, setAutoLogin] = useState(false);
+
+    const { login } = useAuth();
+
+    useEffect(() => {
+        const loadLoginSetting = async () => {
+            try {
+                const loadedAutoLogin = await AsyncStorage.getItem('autoLogin')//오토 로그인 로두
+                setAutoLogin(loadedAutoLogin != null);
+
+                if (loadedAutoLogin == null) {
+                    const loadedSaveID = await AsyncStorage.getItem('saveID')//아이디 세이브인지 확인
+                    setSaveID(loadedSaveID != null);
+
+                    if (loadedSaveID) {
+                        const loadedEmail = await AsyncStorage.getItem('Email') || '';
+                        setEmail(loadedEmail)
+                    }
+
+                    return;
+                }
+                else {
+                    const loadedEmail = await AsyncStorage.getItem('Email') || '';
+                    setEmail(loadedEmail)
+
+                    return;
+                }
+            } catch (e) { console.error(e) }
+        }
+
+        loadLoginSetting()
+    }, [])
+
+    const LoginBtnHandler = async () => {
+
+        if (emailValidation.state == 'ERROR') {
+            emailRef.current?.focus();
+            return;
+        }
+
+        if (passwordValidation.state == 'ERROR') {
+            passwordRef.current?.focus();
+            return;
+        }
+
+        try {
+            const loginResult = await login(email, password);
+
+            if (!loginResult) throw Error('로그인 정보 불일치')
+
+            if (autoLogin) {
+                AsyncStorage.setItem('autoLogin', 'true');
+                await AsyncStorage.setItem('saveID', 'true')
+                await AsyncStorage.setItem('Email', email)
+
+                Toast.show({
+                    type: 'success',
+                    text1: '앞으로 앱 실행시 자동으로 로그인 돼요',
+                    position: 'bottom',
+                    bottomOffset: 60,
+                    visibilityTime: 3000
+                });
+            }
+
+            else if (saveID) {
+                const autoLogin = await AsyncStorage.getItem('autoLogin') || false
+                if (autoLogin) {
+                    try {
+                        await AsyncStorage.removeItem('autoLogin');
+                    }
+                    catch (e) { console.error(e) }
+                }
+                await AsyncStorage.setItem('saveID', 'true')
+                await AsyncStorage.setItem('Email', email)
+                Toast.show({
+                    type: 'success',
+                    text1: '아이디를 저장했어요',
+                    position: 'bottom',
+                    bottomOffset: 60,
+                    visibilityTime: 3000
+                });
+            }
+
+            else {
+                const loadedSaveID = await AsyncStorage.getItem('saveID') || false
+
+                if (loadedSaveID) {
+                    try {
+                        await AsyncStorage.removeItem('saveID');
+                    }
+                    catch (e) { console.error(e) }
+                }
+            }
+
+            navigation.dispatch(StackActions.replace('HomeStack'))
+
+        } catch (e: unknown) {
+
+            if (e instanceof Error) {
+                if (e.message == '로그인 정보 불일치') {
+                    setEmailValidation({ state: 'ERROR', errorText: '비밀번호가 틀리거나 가입되지 않은 이메일이에요.' });
+                    setPasswordValidation({ state: 'ERROR', errorText: '비밀번호가 틀리거나 가입되지 않은 이메일이에요.' });
+                }
+            }
+            else console.error(e)
+        }
+    }
+
+    useEffect(() => {
+        if (autoLogin) setSaveID(true)
+    }, [autoLogin])
+
+    useEffect(() => {
+        if (!saveID) setAutoLogin(false)
+    }, [saveID])
 
     return (
         <>
@@ -77,6 +213,29 @@ const LoginForm: React.FC = () => {
                     onBlur={() => validatePassword(password)}
                 />
             </View>
+            <View style={{
+                marginTop: 16, width: '100%', paddingHorizontal: 60, flexDirection: 'row', justifyContent: 'space-between',
+                alignSelf: 'center'
+            }}>
+                <CheckboxComponent
+                    innerText={'ID 저장'}
+                    isChecked={saveID}
+                    onCheck={setSaveID}
+                />
+                <CheckboxComponent
+                    innerText={'자동 로그인'}
+                    isChecked={autoLogin}
+                    onCheck={setAutoLogin}
+                />
+            </View>
+            <View style={{ marginTop: 20, marginHorizontal: 12 }}>
+                <LongButton
+                    color={'blue'}
+                    innerText={'로그인'}
+                    isAble={true}
+                    onPress={debounce(LoginBtnHandler, 500, { leading: true, trailing: false })}
+                />
+            </View>
         </>
     )
 }
@@ -84,136 +243,13 @@ const LoginForm: React.FC = () => {
 const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
     const adminEmail = 'admin@gmail.com'
+
     const [emailFoundModal, setVisibleEmailFoundModal] = useState(false)
-    const { login } = useAuth();
-    const [Email, setEmail] = useState('');
-    const [password, setPassWord] = useState('')
-    const [saveID, setSaveID] = useState(false);
-    const [autoLogin, setAutoLogin] = useState(false);
-    const [checkVaildID, setValidID] = useState(false);
-    const [checkVaildPW, setValidPW] = useState(false);
 
-    const IDRef = useRef<any | null>(null);
-    const PWRef = useRef<any | null>(null);
-
-    useEffect(() => {
-        const loadLoginSetting = async () => {
-            try {
-                const loadedAutoLogin = await AsyncStorage.getItem('autoLogin')//오토 로그인 로두
-                setAutoLogin(loadedAutoLogin != null);
-
-                if (loadedAutoLogin == null) {
-                    const loadedSaveID = await AsyncStorage.getItem('saveID')//아이디 세이브인지 확인
-                    setSaveID(loadedSaveID != null);
-
-                    if (loadedSaveID) {
-                        const loadedEmail = await AsyncStorage.getItem('Email') || '';
-                        setEmail(loadedEmail)
-                    }
-
-                    return;
-                }
-                else {
-                    const loadedEmail = await AsyncStorage.getItem('Email') || '';
-                    setEmail(loadedEmail)
-
-                    return;
-                }
-            } catch (e) { console.error(e) }
-        }
-
-        loadLoginSetting()
-    }, [])
-
-    const LoginBtnHandler = async () => {
-        IDRef.current?.validate();
-        PWRef.current?.validate();
-
-        if (!checkVaildID) {
-            IDRef.current?.focus();
-            return;
-        }
-
-        if (!checkVaildPW) {
-            PWRef.current?.focus();
-            return;
-        }
-
-        try {
-            const loginResult = await login(Email, password);
-
-            if (!loginResult) throw Error('로그인 정보 불일치')
-
-            if (autoLogin) {
-                AsyncStorage.setItem('autoLogin', 'true');
-                await AsyncStorage.setItem('saveID', 'true')
-                await AsyncStorage.setItem('Email', Email)
-
-                Toast.show({
-                    type: 'success',
-                    text1: '앞으로 앱 실행시 자동으로 로그인 돼요',
-                    position: 'bottom',
-                    bottomOffset: 60,
-                    visibilityTime: 3000
-                });
-            }
-
-            else if (saveID) {
-                const autoLogin = await AsyncStorage.getItem('autoLogin') || false
-                if (autoLogin) {
-                    try {
-                        await AsyncStorage.removeItem('autoLogin');
-                    }
-                    catch (e) { console.error(e) }
-                }
-                await AsyncStorage.setItem('saveID', 'true')
-                await AsyncStorage.setItem('Email', Email)
-                Toast.show({
-                    type: 'success',
-                    text1: '아이디를 저장했어요',
-                    position: 'bottom',
-                    bottomOffset: 60,
-                    visibilityTime: 3000
-                });
-            }
-
-            else {
-                const loadedSaveID = await AsyncStorage.getItem('saveID') || false
-
-                if (loadedSaveID) {
-                    try {
-                        await AsyncStorage.removeItem('saveID');
-                    }
-                    catch (e) { console.error(e) }
-                }
-            }
-
-            navigation.dispatch(StackActions.replace('HomeStack'))
-
-        } catch (e: unknown) {
-
-            if (e instanceof Error) {
-                if (e.message == '로그인 정보 불일치') {
-                    IDRef.current?.errored('');
-                    PWRef.current?.errored('비밀번호가 틀리거나 가입되지 않은 이메일이에요.');
-                }
-            }
-
-            else console.error(e)
-        }
-    }
 
     const SignupBtnHandler = () => {
         navigation.push('SignUp');
     }
-
-    useEffect(() => {
-        if (autoLogin) setSaveID(true)
-    }, [autoLogin])
-
-    useEffect(() => {
-        if (!saveID) setAutoLogin(false)
-    }, [saveID])
 
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }} >
@@ -236,28 +272,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                     }}>
                         <LoginForm />
                     </View>
-                    <View style={{
-                        marginTop: 16, width: '100%', paddingHorizontal: 60, flexDirection: 'row', justifyContent: 'space-between',
-                        alignSelf: 'center'
-                    }}>
-                        <CheckboxComponent
-                            innerText={'ID 저장'}
-                            isChecked={saveID}
-                            onCheck={setSaveID}
-                        /><CheckboxComponent
-                            innerText={'자동 로그인'}
-                            isChecked={autoLogin}
-                            onCheck={setAutoLogin}
-                        />
-                    </View>
-                    <View style={{ marginTop: 20, marginHorizontal: 12 }}>
-                        <LongButton
-                            color={'blue'}
-                            innerText={'로그인'}
-                            isAble={true}
-                            onPress={debounce(LoginBtnHandler, 500, { leading: true, trailing: false })}
-                        />
-                    </View>
+
                     <View style={{ display: 'flex', flexDirection: 'row', marginTop: 16, width: 300, height: 26, marginHorizontal: 48 }}>
                         <Pressable style={{ flex: 1, alignItems: 'center' }}
                             onPress={() => setVisibleEmailFoundModal(true)}>
