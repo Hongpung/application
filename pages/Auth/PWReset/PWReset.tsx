@@ -1,9 +1,18 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { usePasswordReset } from './context/PWResetContext';
+import { PasswordResetProvider, usePasswordReset } from './context/PWResetContext';
 import PasswordCheck from './onPasswordCheck';
 import EmailCheck from './onEmailCheck';
 
+
+export const PasswordReset: React.FC = () => {
+    return (
+      <PasswordResetProvider>
+        <PWResetScreen />
+      </PasswordResetProvider>
+    )
+  }
+  
 const PWResetScreen: React.FC = () => {
 
     const { onStep } = usePasswordReset();

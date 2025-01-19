@@ -47,14 +47,6 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
         }
     }, [setInputValue]);
 
-    const handleFocus = useCallback(() => {
-        if (setInputValue) {
-            setInputValue(inputValue);
-        }
-        setIsTyped(true);
-        onFocus && onFocus();
-    }, [onFocus]);
-
     const errored = useCallback((text: string) => {
         setIsValid(false);
         setErrorText(text)
@@ -115,7 +107,6 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
                 style={[styles.InputBox, { width: length }]}
                 placeholder={`${josa(label, '을/를')} 입력하세요` + `${!isRequired ? ' (없으면 빈칸)' : ``}`}
                 value={inputValue}
-                onFocus={handleFocus}
                 onEndEditing={validateInput}
                 onChangeText={handleTextChange}
                 secureTextEntry={isEncryption ? !isVisible : false}
@@ -123,8 +114,6 @@ const InputComponent = forwardRef<TextInput, InputProps>(({ length = 284, label,
                 keyboardType={keyboardType}
                 maxLength={maxLength}
                 returnKeyType='done'
-                autoCapitalize='none'
-                clearTextOnFocus={false}
                 multiline={false}
             />
             <View style={[styles.underline, { borderBottomColor: isValid ? underlineColor : Color["red500"], width: length + 16 }]} />

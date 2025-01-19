@@ -1,5 +1,5 @@
-import { Keyboard, KeyboardAvoidingView, Modal, Pressable, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import { Keyboard, KeyboardAvoidingView, Modal, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { StackActions } from '@react-navigation/native'
 import Toast from 'react-native-toast-message'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -8,12 +8,78 @@ import { debounce } from 'lodash'
 
 import { RootStackParamList } from '@hongpung/pageTypes'
 import { useAuth } from '@hongpung/hoc/useAuth'
-import InputComponent from '@hongpung/components/inputs/InputComponent'
 import { Color } from '@hongpung/ColorSet'
 import LongButton from '@hongpung/components/buttons/LongButton'
 import CheckboxComponent from '@hongpung/components/checkboxs/CheckboxComponent'
+import { InputBaseComponent } from '@hongpung/components/inputs/InputBaseComponent'
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, "Login">;
+type validationCondition = { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
+
+const LoginForm: React.FC = () => {
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const [emailValidation, setEmailValidation] = useState<validationCondition>({ state: 'BEFORE' })
+    const [passwordValidation, setPasswordValidation] = useState<validationCondition>({ state: 'BEFORE' })
+
+    const validateEmail = useCallback((email: string) => {
+        const regex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (regex.test(email)) {
+            setEmailValidation({ state: 'VALID' })
+            return;
+        }
+        setEmailValidation({ state: 'ERROR', errorText: '이메일 형식이 올바르지 않습니다.' })
+    }, [])
+
+    const validatePassword = useCallback((password: string) => {
+        const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;
+        if (regex.test(password)) {
+            setPasswordValidation({ state: 'VALID' })
+            return;
+        }
+        setPasswordValidation({ state: 'ERROR', errorText: '비밀번호는 8~12자 입니다.' })
+    }, [])
+
+    const emailRef = useRef<TextInput>(null);
+    const passwordRef = useRef<TextInput>(null);
+
+    return (
+        <>
+            <View style={{
+                marginTop: 36,
+                alignSelf: 'center'
+            }}>
+                <InputBaseComponent
+                    ref={emailRef}
+                    inputValue={email}
+                    setInputValue={setEmail}
+                    label='이메일'
+                    keyboardType={'email-address'}
+                    validationCondition={emailValidation}
+                    onFocus={() => setEmailValidation({ state: 'PENDING' })}
+                    onBlur={() => validateEmail(email)}
+                />
+            </View>
+            <View style={{
+                marginTop: 12,
+                alignSelf: 'center'
+            }}>
+                <InputBaseComponent
+                    ref={passwordRef}
+                    inputValue={password}
+                    setInputValue={setPassword}
+                    label='비밀번호'
+                    isEncryption={true}
+                    validationCondition={passwordValidation}
+                    onFocus={() => setPasswordValidation({ state: 'PENDING' })}
+                    onBlur={() => validatePassword(password)}
+                />
+            </View>
+        </>
+    )
+}
 
 const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
 
@@ -168,45 +234,7 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
                         marginTop: 36,
                         alignSelf: 'center'
                     }}>
-                        <InputComponent
-                            ref={IDRef}
-                            inputValue={Email}
-                            setInputValue={setEmail}
-                            label='이메일'
-                            keyboardType={'email-address'}
-                            validationCondition={
-                                [{
-                                    validation: () => {
-                                        const regex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                                        return regex.test(Email);
-                                    },
-                                    errorText: "이메일 주소가 유효하지 않습니다"
-                                }]
-                            }
-                            checkValid={setValidID}
-                        />
-                    </View>
-                    <View style={{
-                        marginTop: 12,
-                        alignSelf: 'center'
-                    }}>
-                        <InputComponent
-                            ref={PWRef}
-                            inputValue={password}
-                            setInputValue={setPassWord}
-                            label='비밀번호'
-                            isEncryption={true}
-                            validationCondition={
-                                [{
-                                    validation: () => {
-                                        const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;
-                                        return regex.test(password);
-                                    },
-                                    errorText: "비밀번호는 8~12자 입니다"
-                                }]
-                            }
-                            checkValid={setValidPW}
-                        />
+                        <LoginForm />
                     </View>
                     <View style={{
                         marginTop: 16, width: '100%', paddingHorizontal: 60, flexDirection: 'row', justifyContent: 'space-between',

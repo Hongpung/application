@@ -115,7 +115,7 @@ export const useAuth = () => {
       const loginData = { email, password };
 
       console.log(JSON.stringify(loginData))
-      const response = await fetch(`${process.env.SUB_API}/auth/login`, {
+      const response = await fetch(`${process.env.BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData),

@@ -2,13 +2,22 @@ import React from 'react'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { RootStackParamList } from '@hongpung/pageTypes';
 
-import { useSignUp } from '@hongpung/pages/Auth/SignUp/context/SignUpContext'
+import { SignUpProvider, useSignUp } from '@hongpung/pages/Auth/SignUp/context/SignUpContext'
 
 import EmailCheck from './screens/onEmailCheck';
 import PasswordCheck from './screens/onPasswordCheck';
 import PersonalInformationCheck from './screens/onPersonalInfomation';
 
 type SignUpProps = NativeStackScreenProps<RootStackParamList, "SignUp">;
+
+export const SignUp: React.FC = () => {
+    return (
+      <SignUpProvider>
+        <SignUpScreen />
+      </SignUpProvider>
+    )
+  
+  }
 
 const SignUpScreen: React.FC = () => {
 

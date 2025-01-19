@@ -30,7 +30,7 @@ const ChatListScreen: React.FC = () => {
 
     const [madeModal, setMadeState] = useState(false); //chat room 만드는 모달
     const [roomName, setRoomName] = useState<string>('');
-    const [chatMember, setMember] = useState<number[]>([loginUser?.memberId]);
+    const [chatMember, setMember] = useState<number[]>([loginUser!.memberId]);
 
     const { data, loading, error } = useFetchUsingToken<ChatRoom[]>(
         `${process.env.BASE_URL}/chat`,
@@ -70,7 +70,7 @@ const ChatListScreen: React.FC = () => {
                 setMadeState(false);
                 setRoomName('')
                 setMember([])
-                
+
                 navigation.navigate('ChatRoomStack', { screen: 'ChatRoom', params: { roomId: answer.chatroomId, roomName: answer.roomName } })
 
 
@@ -105,7 +105,7 @@ const ChatListScreen: React.FC = () => {
                 <Pressable style={{ backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', flex: 1, justifyContent: 'center' }}
                     onPress={() => setMadeState(false)}>
                     <Pressable style={{ display: 'flex', flexDirection: 'column', gap: 24, marginHorizontal: 12, paddingVertical: 32, borderRadius: 24, backgroundColor: 'white' }}
-                    onPress={(e)=>e.isDefaultPrevented()}>
+                        onPress={(e) => e.isDefaultPrevented()}>
                         <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 36, justifyContent: 'space-between' }}>
                             <Text style={{ fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'], fontSize: 16 }}>채팅방 이름</Text>
                             <TextInput placeholder='제목 입력' value={roomName} onChangeText={(newText) => setRoomName(newText)} textAlign='right' style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey500'], fontSize: 16 }}></TextInput>
