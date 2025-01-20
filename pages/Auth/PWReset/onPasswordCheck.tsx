@@ -1,33 +1,91 @@
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View, Text } from "react-native";
 
-import InputComponent from "@hongpung/components/inputs/InputComponent";
-import { useEffect, useRef, useState } from "react";
-import { vaildatePassword } from "../SignUp/Utils";
+import { useCallback, useEffect, useRef, useState } from "react";
 import LongButton from "@hongpung/components/buttons/LongButton";
 import { Color } from "@hongpung/ColorSet";
 import { changePassword } from "./Utils";
 import { useNavigation } from "@react-navigation/native";
-import { deleteToken, getToken } from "@hongpung/utils/TokenHandler";
+import { deleteToken } from "@hongpung/utils/TokenHandler";
 import Toast from "react-native-toast-message";
+import { InputBaseComponent } from "@hongpung/components/common/inputs/InputBaseComponent";
 
-export const PasswordCheck: React.FC = () => {
-    const navigation = useNavigation();
+type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
+
+const usePasswordInput = () => {
 
     const [password, setPassword] = useState('');
+
+    const [passwordValidation, setPasswordValidation] = useState<validationCondition>({ state: 'BEFORE' })
+
+    const validatePassword = useCallback((password: string) => {
+        const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;
+        if (regex.test(password)) {
+            setPasswordValidation({ state: 'VALID' })
+            return;
+        }
+        setPasswordValidation({ state: 'ERROR', errorText: '비밀번호는 8~12자 입니다.' })
+    }, [])
+
+    return { password, setPassword, setPasswordValidation, passwordValidation, validatePassword }
+}
+
+const useConfirmPasswordInput = () => {
+
     const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [confirmPasswordValidation, setConfirmPasswordValidation] = useState<validationCondition>({ state: 'BEFORE' })
+
+    const validateConfirmPassword = useCallback((password: string, confirmPassword: string) => {
+
+        if (password == confirmPassword) {
+            setConfirmPasswordValidation({ state: 'VALID' })
+            return;
+        }
+        setConfirmPasswordValidation({ state: 'ERROR', errorText: '비밀번호와 일치하지 않습니다.' })
+    }, [])
+
+    return { confirmPassword, setConfirmPassword, setConfirmPasswordValidation, confirmPasswordValidation, validateConfirmPassword }
+}
+export const PasswordCheck: React.FC = () => {
+
+    const navigation = useNavigation();
+
+    const { password, setPassword, passwordValidation, setPasswordValidation, validatePassword } = usePasswordInput()
+    const { confirmPassword, setConfirmPassword, confirmPasswordValidation, setConfirmPasswordValidation, validateConfirmPassword } = useConfirmPasswordInput();
 
     const passwordRef = useRef<any | null>(null);
     const confirmPasswordRef = useRef<any | null>(null);
 
-    useEffect(()=>{
+    useEffect(() => {
         return () => {
             // 비동기 함수를 클린업 함수 내에서 호출
             const deleteAsyncToken = async () => {
-              await deleteToken('PWtoken');
+                await deleteToken('PWtoken');
             };
             deleteAsyncToken();
-          };
-    },[])
+        };
+    }, [])
+
+    const handleChangePasswordButton = async () => {
+        if (password != confirmPassword) { validateConfirmPassword(password, confirmPassword); return; }
+        if (passwordValidation.state == 'VALID' && confirmPasswordValidation.state == 'VALID') {
+            try {
+                const chageResult = await changePassword(password)
+                Toast.show({
+                    type: 'success',
+                    text1: '비밀번호가 변경 되었어요!\n다시 로그인해주세요',
+                    position: 'bottom',
+                    bottomOffset: 60,
+                    visibilityTime: 3000
+                });
+                if (chageResult) navigation.goBack();
+            } catch { 
+                console.error('에러 발생')
+            }
+        }
+        else if (passwordValidation.state=='ERROR') passwordRef.current?.focus()
+        else if (confirmPasswordValidation.state=='ERROR') confirmPasswordRef.current?.focus();
+    }
 
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }} >
@@ -50,66 +108,42 @@ export const PasswordCheck: React.FC = () => {
                         <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'] }}>
                             {'로그인에 사용할 비밀번호를 변경해요.'}
                         </Text>
-                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'],lineHeight:16 }}>
+                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'], lineHeight: 16 }}>
                             {'새로운 비밀번호는 영문, 숫자, 특수문자를 포함한\n8~12자로 구성해야 해요.'}
                         </Text>
-                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'],lineHeight:16 }}>
+                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'], lineHeight: 16 }}>
                             {'허용 특수문자: !,@,#,$,%,^,&,+,='}
                         </Text>
                     </View>
-                    <View style={{ alignSelf: 'center', marginTop: 12 }}>
-                        <InputComponent
+                    <View style={{ marginHorizontal: 48, marginTop: 12 }}>
+                        <InputBaseComponent
                             ref={passwordRef}
                             label='비밀번호'
                             color={'green'}
                             isEncryption
                             inputValue={password}
                             setInputValue={setPassword}
-                            validationCondition={
-                                [{
-                                    validation: vaildatePassword,
-                                    errorText: "영문, 숫자, 특수문자(!,@,#,$,%,^,&,+,=)를\n포함한 8~12자로 구성되어야 합니다."
-                                }]}
-                        />
+                            onBlur={() => validatePassword(password)}
+                            validationCondition={passwordValidation} />
                     </View>
-                    <View style={{ alignSelf: 'center', marginTop: 24 }}>
-                        <InputComponent
+                    <View style={{ marginHorizontal: 48, marginTop: 24 }}>
+                        <InputBaseComponent
                             ref={confirmPasswordRef}
                             label='비밀번호 확인'
                             color={'green'}
                             isEncryption
                             inputValue={confirmPassword}
                             setInputValue={setConfirmPassword}
-                            validationCondition={[
-                                {
-                                    validation: () => {
-                                        const newCondition = password == confirmPassword
-                                        return newCondition;
-                                    },
-                                    errorText: "비밀번호가 일치하지 않습니다."
-                                }]}
+                            onBlur={() => validateConfirmPassword(password, confirmPassword)}
+                            validationCondition={confirmPasswordValidation}
                         />
                     </View>
                     <View style={[{ paddingHorizontal: 12, marginTop: 24 }]}>
                         <LongButton
                             color={'green'}
                             innerText='비밀번호 저장'
-                            isAble={password.length > 0 && confirmPassword.length > 0}
-                            onPress={async () => {
-                                if (passwordRef.current?.validate() && confirmPasswordRef.current?.validate()) {
-                                    const chageResult = await changePassword(password)
-                                    Toast.show({
-                                        type: 'success',
-                                        text1: '비밀번호가 변경 되었어요!\n다시 로그인해주세요',
-                                        position: 'bottom',
-                                        bottomOffset: 60,
-                                        visibilityTime: 3000
-                                      });
-                                    if(chageResult) navigation.goBack();
-                                }
-                                else if (!passwordRef.current?.validate()) passwordRef.current?.focus()
-                                else if (!confirmPasswordRef.current?.validate()) confirmPasswordRef.current?.focus();
-                            }}
+                            isAble={passwordValidation.state == 'VALID' && confirmPasswordValidation.state == 'VALID'}
+                            onPress={handleChangePasswordButton}
                         />
                     </View>
                 </View>

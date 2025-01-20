@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { Color } from '../../ColorSet';
-import Header from '@hongpung/components/Header';
+import Header from '@hongpung/components/common/Header';
 import { loginUserState, useOnReserve } from '@hongpung/recoil/authState';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { onUseSession } from '@hongpung/recoil/sessionState';

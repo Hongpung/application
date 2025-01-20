@@ -1,11 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
-import Header from '../components/Header';
+import Header from '../components/common/Header';
 import HomeScreen from '../pages/Home/HomeScreen';
 import QRScanScreen from '../pages/QRScan/QRScanScreen';
 import ReservationMainScreen from '../pages/Reserve/ReservationMainScreen';
 import { Color } from '../ColorSet';
-import { Icons } from '@hongpung/components/Icon';
+import { Icons } from '@hongpung/components/common/Icon';
 import { Text, View } from 'react-native';
 import ChatListScreen from '@hongpung/pages/Chat/ChatListScreen';
 

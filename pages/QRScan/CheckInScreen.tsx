@@ -9,7 +9,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { loginUserState, useOnReserve } from '@hongpung/recoil/authState'
 import { RealtimeSession, ReservationSession } from '../Reserve/SessionTypes'
-import { Icons } from '@hongpung/components/Icon'
+import { Icons } from '@hongpung/components/common/Icon'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { getToken } from '@hongpung/utils/TokenHandler'
 

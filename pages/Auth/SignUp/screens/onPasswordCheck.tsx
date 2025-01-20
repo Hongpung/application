@@ -1,20 +1,69 @@
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View, Text } from "react-native";
 import { useSignUp } from "../context/SignUpContext";
-import InputComponent from "@hongpung/components/inputs/InputComponent";
-import { useRef, useState } from "react";
-import { vaildatePassword } from "../Utils";
+
+import { useCallback, useRef, useState } from "react";
 import LongButton from "@hongpung/components/buttons/LongButton";
 import { Color } from "@hongpung/ColorSet";
+import { InputBaseComponent } from "@hongpung/components/common/inputs/InputBaseComponent";
+
+type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
+
+const usePasswordInput = () => {
+
+    const [password, setPassword] = useState('');
+
+    const [passwordValidation, setPasswordValidation] = useState<validationCondition>({ state: 'BEFORE' })
+
+    const validatePassword = useCallback((password: string) => {
+        const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;
+        if (regex.test(password)) {
+            setPasswordValidation({ state: 'VALID' })
+            return;
+        }
+        setPasswordValidation({ state: 'ERROR', errorText: '비밀번호는 8~12자 입니다.' })
+    }, [])
+
+    return { password, setPassword, setPasswordValidation, passwordValidation, validatePassword }
+}
+
+const useConfirmPasswordInput = () => {
+
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [confirmPasswordValidation, setConfirmPasswordValidation] = useState<validationCondition>({ state: 'BEFORE' })
+
+    const validateConfirmPassword = useCallback((password: string, confirmPassword: string) => {
+
+        if (password == confirmPassword) {
+            setConfirmPasswordValidation({ state: 'VALID' })
+            return;
+        }
+        setConfirmPasswordValidation({ state: 'ERROR', errorText: '비밀번호와 일치하지 않습니다.' })
+    }, [])
+
+    return { confirmPassword, setConfirmPassword, setConfirmPasswordValidation, confirmPasswordValidation, validateConfirmPassword }
+}
 
 export const PasswordCheck: React.FC = () => {
     const { setPassword: setContexPassword, setStep } = useSignUp();
 
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const { password, setPassword, passwordValidation, setPasswordValidation, validatePassword } = usePasswordInput()
+    const { confirmPassword, setConfirmPassword, confirmPasswordValidation, setConfirmPasswordValidation, validateConfirmPassword } = useConfirmPasswordInput();
 
     const passwordRef = useRef<any | null>(null);
     const confirmPasswordRef = useRef<any | null>(null);
 
+
+    const handlePasswordCheckOut = () => {
+        if (password != confirmPassword) { validateConfirmPassword(password, confirmPassword); return; }
+        if (passwordValidation.state == 'VALID' && confirmPasswordValidation.state == 'VALID') {
+            setContexPassword(password)
+            setStep('개인 정보 입력')
+        }
+        else if (passwordValidation.state == 'ERROR') passwordRef.current?.focus()
+        else if (confirmPasswordValidation.state == 'ERROR') confirmPasswordRef.current?.focus();
+
+    }
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }} >
             <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#FFF" }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}>
@@ -31,65 +80,47 @@ export const PasswordCheck: React.FC = () => {
                         회원가입
                     </Text>
                     <View style={{
-                        marginVertical: 8, paddingHorizontal: 16, marginHorizontal: 36, backgroundColor: Color['grey100'], paddingVertical: 16, borderRadius: 5, gap:4
+                        marginVertical: 8, paddingHorizontal: 16, marginHorizontal: 36, backgroundColor: Color['grey100'], paddingVertical: 16, borderRadius: 5, gap: 4
                     }}>
                         <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'] }}>
                             {'로그인에 사용할 비밀번호를 정해요.'}
                         </Text>
-                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'],lineHeight:16 }}>
+                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'], lineHeight: 16 }}>
                             {'비밀번호는 영문, 숫자, 특수문자를 포함한\n8~12자로 구성해야 해요.'}
                         </Text>
-                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'],lineHeight:16 }}>
+                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey500'], lineHeight: 16 }}>
                             {'허용 특수문자: !,@,#,$,%,^,&,+,='}
                         </Text>
                     </View>
-                    <View style={{ alignSelf: 'center', marginTop: 12 }}>
-                        <InputComponent
+                    <View style={{ marginHorizontal: 48, marginTop: 12 }}>
+                        <InputBaseComponent
                             ref={passwordRef}
                             label='비밀번호'
                             color={'green'}
                             isEncryption
                             inputValue={password}
                             setInputValue={setPassword}
-                            validationCondition={
-                                [{
-                                    validation: vaildatePassword,
-                                    errorText: "영문, 숫자, 특수문자(!,@,#,$,%,^,&,+,=)를\n포함한 8~12자로 구성되어야 합니다."
-                                }]}
-                        />
+                            onBlur={() => validatePassword(password)}
+                            validationCondition={passwordValidation} />
                     </View>
-                    <View style={{ alignSelf: 'center', marginTop: 24 }}>
-                        <InputComponent
+                    <View style={{ marginHorizontal: 48, marginTop: 24 }}>
+                        <InputBaseComponent
                             ref={confirmPasswordRef}
                             label='비밀번호 확인'
                             color={'green'}
                             isEncryption
                             inputValue={confirmPassword}
                             setInputValue={setConfirmPassword}
-                            validationCondition={[
-                                {
-                                    validation: () => {
-                                        const newCondition = password == confirmPassword
-                                        console.log(confirmPassword, newCondition)
-                                        return newCondition;
-                                    },
-                                    errorText: "비밀번호가 일치하지 않습니다."
-                                }]}
+                            onBlur={() => validateConfirmPassword(password, confirmPassword)}
+                            validationCondition={confirmPasswordValidation}
                         />
                     </View>
-                    <View style={[{ paddingHorizontal: 12, marginTop: 24 }]}>
+                    <View style={[{ paddingHorizontal: 12, marginTop: 48 }]}>
                         <LongButton
                             color={'green'}
                             innerText='비밀번호 저장'
-                            isAble={password.length > 0 && confirmPassword.length > 0}
-                            onPress={() => {
-                                if (passwordRef.current?.validate() && confirmPasswordRef.current?.validate()) {
-                                    setContexPassword(password)
-                                    setStep('개인 정보 입력')
-                                }
-                                else if (!passwordRef.current?.validate()) passwordRef.current?.focus()
-                                else if (!confirmPasswordRef.current?.validate()) confirmPasswordRef.current?.focus();
-                            }}
+                            isAble={passwordValidation.state == 'VALID' && confirmPasswordValidation.state == 'VALID'}
+                            onPress={handlePasswordCheckOut}
                         />
                     </View>
                 </View>

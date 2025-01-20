@@ -2,7 +2,7 @@ import { useFetchBanners } from "@hongpung/hoc/useBanner";
 import { useFirstPage } from "@hongpung/hoc/useFirstPage";
 import { useFonts } from "./useFonts";
 import { useAuth } from "@hongpung/hoc/useAuth";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 
 export const useAppLoad = () => {
 
@@ -31,8 +31,5 @@ export const useAppLoad = () => {
         }
     }, [])
 
-    useEffect(() => {
-        console.log(firstScreen, fontLoaded, banners.state)
-    }, [firstScreen, fontLoaded, banners])
     return { firstScreen, fontLoaded, banners };
 }

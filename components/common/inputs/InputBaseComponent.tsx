@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, Ref } from 'react';
-import { View, Text, StyleSheet, TextInput, Animated, Pressable, KeyboardTypeOptions } from 'react-native';
-import { Color } from '../../ColorSet';
+import { View, Text, StyleSheet, TextInput, Animated, Pressable, KeyboardTypeOptions, Dimensions } from 'react-native';
+import { Color } from '@hongpung/ColorSet';
 import { josa } from 'es-hangul';
-import { Icons } from '../Icon';
+import { Icons } from '@hongpung/components/common/Icon';
 
 // 입력 상태 입력전, 입력 중, 입력 완료, 오류
 // 오류 판별은 외부에 일임해야함
+const { width } = Dimensions.get('window')
 
 type InputProps = {
     ref?: Ref<TextInput>
@@ -19,16 +20,13 @@ type InputProps = {
     isRequired?: boolean
     isEncryption?: boolean,
     keyboardType?: KeyboardTypeOptions
-    width?: number,
     color?: "red" | "blue" | "green";
     maxLength?: number
 }
 
-export const InputBaseComponent: React.FC<InputProps> = ({ width = 284, label, isEncryption = false, color = "blue", isEditible = true, isRequired = true, inputValue, setInputValue, keyboardType = 'default', maxLength = undefined, validationCondition, onBlur, onFocus }) => {
+export const InputBaseComponent = forwardRef<TextInput, InputProps>(({ label, isEncryption = false, color = "blue", isEditible = true, isRequired = true, inputValue, setInputValue, keyboardType = 'default', maxLength = undefined, validationCondition, onBlur, onFocus }, ref) => {
     // 암호화 상태일때 보이는지 안보이는지 판별
     const [isVisible, setIsVisible] = useState(!isEncryption);
-
-    const inputRef = useRef<TextInput>(null); // 내부적으로 TextInput 참조
 
     const labelAnimation = useRef(new Animated.Value(0)).current; // 애니메이션 초기 값
     //언더라인 색상 - 기본은 파란색
@@ -54,15 +52,15 @@ export const InputBaseComponent: React.FC<InputProps> = ({ width = 284, label, i
     }, [inputValue]);
 
     return (
-        <View style={[styles.inputGroup, { width: width + 16 }]}>
+        <View style={[styles.inputGroup]}>
             <Animated.Text style={[styles.labelText, labelStyle]}>
                 {label}
                 {isRequired && <Text style={{ color: 'red' }}>*</Text>}
             </Animated.Text>
             <TextInput
                 key={label}
-                ref={inputRef}
-                style={[styles.InputBox, { width: width }]}
+                ref={ref}
+                style={[styles.InputBox]}
                 placeholder={`${josa(label, '을/를')} 입력하세요` + `${!isRequired ? ' (없으면 빈칸)' : ``}`}
                 value={inputValue}
                 onChangeText={setInputValue}
@@ -75,7 +73,7 @@ export const InputBaseComponent: React.FC<InputProps> = ({ width = 284, label, i
                 returnKeyType='done'
                 multiline={false}
             />
-            <View style={[styles.underline, { borderBottomColor: validationCondition?.state == 'ERROR' ? underlineColor : Color["red500"], width: width + 16 }]} />
+            <View style={[styles.underline, { borderBottomColor: validationCondition?.state != 'ERROR' ? underlineColor : Color["red500"] }]} />
             {isEncryption &&
                 <Pressable
                     style={[styles.VisibleBtn]}
@@ -86,19 +84,18 @@ export const InputBaseComponent: React.FC<InputProps> = ({ width = 284, label, i
             {validationCondition?.state == 'ERROR' && <Text style={styles.errorText}>{validationCondition?.errorText}</Text>}
         </View>
     );
-};
+});
 
 const styles = StyleSheet.create({
     inputGroup: {
-        width: 300,
+        width: '100%',
+        height:'auto'
     },
     underline: {
-        width: 300,
         borderBottomWidth: 1,
         marginTop: 1,
     },
     InputBox: {
-        width: 284,
         color: Color['grey800'],
         fontSize: 16,
         height: 36,
@@ -108,7 +105,6 @@ const styles = StyleSheet.create({
         placeholderTextColor: Color['grey500']
     },
     labelText: {
-        width: 150,
         color: Color['grey800'],
         fontSize: 10,
         fontFamily: 'NanumSquareNeo-Bold',

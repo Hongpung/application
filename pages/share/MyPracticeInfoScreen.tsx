@@ -4,7 +4,7 @@ import { Color } from '@hongpung/ColorSet'
 
 
 import LongButton from '@hongpung/components/buttons/LongButton'
-import { Icons } from '@hongpung/components/Icon'
+import { Icons } from '@hongpung/components/common/Icon'
 
 import { User } from '@hongpung/UserType'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'

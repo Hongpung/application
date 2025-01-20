@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Modal, FlatList, Animated, NativeSyntheticEvent, AppStateStatus, AppState } from 'react-native';
 import { Color } from '@hongpung/ColorSet'
 
 import { debounce } from 'lodash';
 import { useAuth } from '@hongpung/hoc/useAuth';
-import { Icons } from '@hongpung/components/Icon';
+import { Icons } from '@hongpung/components/common/Icon';
 
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useOnReserve, loginUserState } from '@hongpung/recoil/authState';
@@ -21,6 +21,8 @@ import LongButton from '@hongpung/components/buttons/LongButton';
 import { onUseSession } from '@hongpung/recoil/sessionState';
 import { getToken } from '@hongpung/utils/TokenHandler';
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
+import { NotificationIcon } from '@hongpung/components/home/NotificationIcon';
+import { ProfileIcon } from '@hongpung/components/home/ProfileIcon';
 
 
 type HomeNavProps = NativeStackNavigationProp<MainStackParamList, 'Home'>
@@ -39,7 +41,7 @@ const HomeScreen: React.FC = () => {
     const today = new Date();
     const animatedValue = useRef(new Animated.Value(-82)).current; // 초기 bottom 값
 
-    const toggleBottomSheet = () => {
+    const toggleBottomSheet = useCallback(() => {
         if (isSlideUp) {
             // 바텀 시트 닫기
             Animated.timing(animatedValue, {
@@ -56,7 +58,7 @@ const HomeScreen: React.FC = () => {
                 useNativeDriver: false,
             }).start();
         }
-    };
+    }, [isSlideUp, isSession]);
 
     useEffect(() => {
 
@@ -70,28 +72,20 @@ const HomeScreen: React.FC = () => {
         }
     }, [])
 
-    const { data: isNotRead } = useFetchUsingToken<{ status: boolean }>(`${process.env.SUB_API}/notification/notRead`, {}, 5000, [isFocusing])
-    console.log('isread:' + isNotRead?.status)
-
     return (
         <View style={{ flex: 1 }}>
-            <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+            <ScrollView style={styles.container}
+                alwaysBounceVertical={false}
+                showsVerticalScrollIndicator={false}
+            >
+
                 {/* 상단 아이콘 부분*/}
 
 
                 <View style={styles.iconsRow}>
                     <View style={styles.iconContainer}>
-                        <Pressable
-                            style={styles.icons}
-                            onPress={() => { navigation.navigate('Notification'); }}>
-                            <Icons size={28} name={'notifications'} color={Color['blue500']} />
-                            {isNotRead?.status && <View style={{ position: 'absolute', width: 8, height: 8, backgroundColor: 'orange', bottom: 4, right: 4, borderRadius: 100 }} />}
-                        </Pressable>
-                        <Pressable
-                            style={styles.icons}
-                            onPress={() => { navigation.navigate('MyPage', { screen: 'MyPageHome' }); }}>
-                            <Icons size={32} name={'person'} color={Color['blue500']} />
-                        </Pressable>
+                        <NotificationIcon />
+                        <ProfileIcon />
                     </View>
                 </View>
 
@@ -114,17 +108,24 @@ const HomeScreen: React.FC = () => {
 
                 {/* 우리 동아리 */}
                 <View style={{ marginHorizontal: 24, marginTop: 32, }}>
-                    <Text style={{
-                        fontSize: 18,
-                        fontFamily: 'NanumSquareNeo-Bold',
-                        marginBottom: 12,
-                        marginHorizontal: 4
-                    }}>
-                        우리 동아리
-                    </Text>
                     <TouchableOpacity activeOpacity={0.85}
                         onPress={() => navigation.navigate('MyClub', { screen: 'MyClubHome' })}>
-                        <View style={{ height: 120, backgroundColor: Color['grey300'], borderRadius: 10 }} />
+                        <View style={{
+                            height: 120,
+                            backgroundColor: Color['grey300'],
+                            borderRadius: 10,
+                            justifyContent: 'flex-end',
+                            alignItems: 'flex-end',
+                            paddingRight: 16,
+                            paddingBottom: 12
+                        }} >
+                            <Text style={{
+                                fontSize: 18,
+                                fontFamily: 'NanumSquareNeo-Bold',
+                            }}>
+                                우리 동아리
+                            </Text>
+                        </View>
                     </TouchableOpacity>
                 </View>
 
@@ -272,6 +273,7 @@ const HomeScreen: React.FC = () => {
         </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {

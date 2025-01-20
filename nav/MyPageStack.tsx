@@ -5,7 +5,7 @@ import MySchedulesScreen from "@hongpung/pages/Home/MyPage/MySchedule/MySchedule
 import LoginSettingScreen from "@hongpung/pages/Setting/LoginSetting";
 import NotificationSettingScreen from "@hongpung/pages/Setting/NotificationSetting";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Header from '@hongpung/components/Header';
+import Header from '@hongpung/components/common/Header';
 import PracticeInfoScreen from "@hongpung/pages/share/ClubPracticeInfoScreen";
 import ChangeMyInfoScreen from "@hongpung/pages/Home/MyPage/ChangeMyInfoScreen";
 import MyPracticeInfoScreen from "@hongpung/pages/share/MyPracticeInfoScreen";

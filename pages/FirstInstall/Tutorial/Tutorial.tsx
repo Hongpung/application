@@ -16,7 +16,6 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
     const photo = 'phptoUrl'//나중에 추가할것
 
     const pagerRef = useRef<PagerView>(null);//러페런스 추가
-
     // 페이지 이동 함수
     const goToPage = () => {
         if (pagerRef.current) {
@@ -26,6 +25,7 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
     const SkipHandler = () => {
         navigation.replace('Permission')
     }
+
     return (
         // 배경용
         <View style={styles.basicBackground}>

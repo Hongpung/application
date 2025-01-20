@@ -9,7 +9,7 @@ import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import { debounce } from 'lodash';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Icons } from '@hongpung/components/Icon';
+import { Icons } from '@hongpung/components/common/Icon';
 
 type PermissionProps = NativeStackScreenProps<RootStackParamList, "Permission">;
 // 추후 보강

@@ -10,7 +10,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { Color } from '@hongpung/ColorSet'
 import LongButton from '@hongpung/components/buttons/LongButton';
-import { Icons } from '@hongpung/components/Icon';
+import { Icons } from '@hongpung/components/common/Icon';
 import { getToken } from '@hongpung/utils/TokenHandler';
 import { ChatStackParamList } from '@hongpung/nav/HomeStacks';
 

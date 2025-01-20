@@ -5,7 +5,7 @@ import { Instrument, InstrumentCreateDTO,  InstrumentType, instrumentTypes } fro
 import LongButton from '../../../../components/buttons/LongButton';
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';
-import { Icons } from '@hongpung/components/Icon';
+import { Icons } from '@hongpung/components/common/Icon';
 import { getToken } from '@hongpung/utils/TokenHandler';
 import Toast from 'react-native-toast-message';
 import uploadImages from '@hongpung/utils/uploadImage';

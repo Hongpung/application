@@ -9,7 +9,7 @@ import { loginUserState, useOnReserve } from '@hongpung/recoil/authState'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { onUseSession } from '@hongpung/recoil/sessionState'
 import { josa } from 'es-hangul'
-import { Icons } from '@hongpung/components/Icon'
+import { Icons } from '@hongpung/components/common/Icon'
 
 const CheckOutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 

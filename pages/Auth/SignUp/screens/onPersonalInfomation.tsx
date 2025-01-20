@@ -1,148 +1,132 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Color } from "@hongpung/ColorSet";
-import InputComponent from "@hongpung/components/inputs/InputComponent";
+
 import { Club, clubIds, clubs } from "@hongpung/UserType";
-import { useEffect, useRef, useState } from "react";
-import { Animated, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, TouchableWithoutFeedback, View, Text, Pressable, ScrollView, Modal, ActivityIndicator, Dimensions } from "react-native";
+import { useRef, useState } from "react";
+import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, TouchableWithoutFeedback, View, Text, Pressable, ScrollView, Modal, ActivityIndicator, Dimensions, TextInput } from "react-native";
 import { useSignUp } from "../context/SignUpContext";
 import LongButton from "@hongpung/components/buttons/LongButton";
 import ShortButton from "@hongpung/components/buttons/ShortButton";
 import { showSignUpCompleteToast } from "../toasts/sign-up-toast";
 import { useNavigation } from "@react-navigation/native";
-import { Icons } from "@hongpung/components/Icon";
+import { InputBaseComponent } from '@hongpung/components/common/inputs/InputBaseComponent';
+import { ClubSelector } from '@hongpung/components/common/Selector';
 
 const { width } = Dimensions.get('window');
+type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
+
 
 interface ClubSeletorProps {
-
-    club: Club | null,
-    setClub: (club: Club) => void,
-    isValidClub: boolean,
-    setSelectClubVisible: (value: boolean) => void,
-    onSelectClub: boolean,
-    setClubisValid: (value: boolean) => void,
+    club: Club | null
+    setClub: (club: string) => void
+    dropDownVisible: boolean
+    setDropDownVisible: (value: boolean) => void,
+    isErrored: boolean
+    errorText: string
 
 }
 
-interface SelectorProps<T> {
-    label: string
-    value: T | null
-    onChange: (newValue: T) => void
-    trriger: () => void
-    options: T[]
+const useClub = () => {
+    const { signUpInfo, setClub } = useSignUp();
+    const { club } = signUpInfo;
+
+    const [clubValidation, setClubValidation] = useState<validationCondition>({ state: 'BEFORE' })
+
+    const validateClub = useCallback((club: Club | null) => {
+        if (!club) { setClubValidation({ state: 'ERROR', errorText: '동아리를 선택해주세요.' }); return }
+        setClubValidation({ state: 'VALID' })
+    }, [])
+
+    return { club, setClub, clubValidation, setClubValidation, validateClub }
 }
 
-const SelectorLable: React.FC<{ label: string, value: string | null }> = ({ label, value }) => {
+const ClubSeletor: React.FC<ClubSeletorProps> = ({ club, setClub, dropDownVisible, setDropDownVisible, isErrored, errorText }) => {
+
     return (
-        <View style={{ width: '100%', paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderRadius: 20 }}>
-            {
-                value ?
-                    <Text>{value}</Text>
-                    :
-                    <Text>{label}</Text>
-            }
-        </View>
+        <ClubSelector
+            label='동아리'
+            value={club}
+            onChange={setClub}
+            options={clubs}
+            dropDownVisible={dropDownVisible}
+            setDropDownVisible={setDropDownVisible}
+            isErrored={isErrored}
+            errorText={errorText}
+        />
     )
 }
 
-const Selector: React.FC<SelectorProps<string>> = ({ label, value, onChange, trriger, options }) => {
-    return (
-        <View>
-            {/* input */}
-            <SelectorLable label={label} value={value}/>
-        </View>
-    )
+const useEnollmentNumber = () => {
+    const { signUpInfo, setEnrollmentNumber } = useSignUp();
+    const { enrollmentNumber } = signUpInfo;
+
+    const [enrollmentNumberValidation, setEnrollmentNumberValidation] = useState<validationCondition>({ state: 'BEFORE' })
+
+    const validateEnrollmentNumber = useCallback((enrollmentNumber: string) => {
+        if (enrollmentNumber.length < 2) {
+            setEnrollmentNumberValidation({ state: 'ERROR', errorText: '학번은 두자리수 입니다.' })
+            return
+        }
+        setEnrollmentNumberValidation({ state: 'VALID' })
+    }, [])
+
+    return { enrollmentNumber, setEnrollmentNumber, enrollmentNumberValidation, setEnrollmentNumberValidation, validateEnrollmentNumber }
 }
 
-const ClubSeletor: React.FC<ClubSeletorProps> = ({ club, setClub, isValidClub, setSelectClubVisible, onSelectClub, setClubisValid }) => {
-    const labelAnimation = useRef(new Animated.Value(0)).current; // 애니메이션 초기 값
-    const labelStyle = {
-        fontSize: labelAnimation.interpolate({
-            inputRange: [0, 1],
-            outputRange: [12, 10],
-        }),
-        top: labelAnimation.interpolate({
-            inputRange: [0, 1],
-            outputRange: [5, 3],
-        }),
-    };
-    useEffect(() => {
-        Animated.timing(labelAnimation, {
-            toValue: club ? 1 : 0,
-            duration: 100,
-            useNativeDriver: false,
-        }).start();
-    }, [club]);
+const useName = () => {
+    const { signUpInfo, setName } = useSignUp();
+    const { name } = signUpInfo;
 
+    const [nameValidation, setNameValidation] = useState<validationCondition>({ state: 'BEFORE' })
 
-    return (
-        <React.Fragment>
-            <Pressable style={[styles.inputGroup, { width: 142, zIndex: 0 }]}
-                onPress={() => { Keyboard.dismiss(); setSelectClubVisible(true); }}>
+    const validateName = useCallback((name: string) => {
+        const koreanRegex = /^[가-힣]+$/;
 
-                <Animated.Text style={[styles.labelText, labelStyle]}>{'동아리'}
-                    {!club && <Text style={{ color: 'red' }}>*</Text>}</Animated.Text>
+        if (name.length == 0) {
+            setNameValidation({ state: 'ERROR', errorText: '이름을 입력하세요' })
+            return
+        }
+        if (!koreanRegex.test(name)) {
+            setNameValidation({ state: 'ERROR', errorText: '이름은 한글로만 입력 가능해요' })
+            return
+        }
+        setNameValidation({ state: 'VALID' })
+    }, [])
 
-                <View style={[styles.InputBox, { flexDirection: 'row', justifyContent: 'space-between', width: 126, alignItems: 'center' }]}>
-                    <Text style={[styles.InputText, club == null && { color: Color['grey300'] }]}>{club ?? '동아리 선택'}</Text>
-                    <Icons name='caret-down' color={Color['green500']} size={20} />
-                </View>
-
-                <View style={[styles.underline, { borderBottomColor: isValidClub ? Color["green500"] : Color["red500"], width: 142 }]} />
-                {!isValidClub ? <Text style={styles.errorText}>{'동아리를 선택해주세요'}</Text> : null}
-            </Pressable>
-            {
-                onSelectClub && <View style={{
-                    position: 'absolute', top: 24, zIndex: 2, width: 142, backgroundColor: '#FFF', alignItems: 'flex-start', paddingHorizontal: 16, borderRadius: 5, shadowColor: Color['grey700'],
-                    shadowOffset: { width: -2, height: 2 }, // 그림자 오프셋 (x, y)
-                    shadowOpacity: 0.1,         // 그림자 투명도 (0에서 1)
-                    shadowRadius: 5,          // 그림자 반경
-                    elevation: 5,
-                    height: 180,
-                }}>
-                    <ScrollView
-                        contentContainerStyle={{ alignItems: 'flex-start' }}
-                        showsVerticalScrollIndicator={false}
-                    >{clubs.map((item) => {
-                        return (
-                            <Pressable
-                                key={item + 'seletor'}
-                                style={{ paddingVertical: 8, marginVertical: 4, width: 142 - 32, alignItems: 'flex-start', justifyContent: 'space-between', flexDirection: 'row' }}
-                                onPress={() => { setClub(item); setSelectClubVisible(false); setClubisValid(true); }}>
-                                <Text style={[{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, color: club == item ? Color['green600'] : Color['grey400'] }]}>{item}</Text>
-                                {club == item && <Icons name='checkmark' color={Color['green500']} size={20} />}
-                            </Pressable>
-                        )
-                    })}</ScrollView>
-                </View>
-            }
-        </React.Fragment>
-    )
+    return { name, setName, nameValidation, setNameValidation, validateName }
 }
 
-export const PersonalInformationCheck: React.FC = () => {
+const useNickName = () => {
+    const { signUpInfo, setNickName } = useSignUp();
+    const { nickname } = signUpInfo;
+
+    const [nickNameValidation, setNickNameValidation] = useState<validationCondition>({ state: 'VALID' })
+
+    const validateNickName = useCallback((nickname: string) => {
+
+        const koreanRegex = /^[가-힣]+$/;
+
+        console.log(nickname)
+        if (nickname.length > 0 && !koreanRegex.test(nickname)) {
+            setNickNameValidation({ state: 'ERROR', errorText: '패명 한글로만 입력 가능해요' })
+            return
+        }
+
+        setNickNameValidation({ state: 'VALID' })
+    }, [])
+
+    return { nickname, setNickName, nickNameValidation, setNickNameValidation, validateNickName }
+}
+
+
+const usePersonalInformation = () => {
+
 
     const navigation = useNavigation();
 
-    const { signUpInfo, setClub, setEnrollmentNumber, setName, setNickName } = useSignUp();
-    const { club, enrollmentNumber, nickname, name } = signUpInfo;
+    const { signUpInfo } = useSignUp();
 
     const [isLoading, setLoading] = useState(false);
-    const [alertVisible, setAlertVisible] = useState(false);
-    const [onSelectClub, setSelectClubVisible] = useState(false);
-    const [isValidClub, setClubisValid] = useState(true)
-
-    const enrollmentNumberRef = useRef<any | null>(null);
-    const nameRef = useRef<any | null>(null);
-
-    const dropdownCloseHandler = () => {
-        if (onSelectClub) club ? setClubisValid(true) : setClubisValid(false)
-        setSelectClubVisible(false)
-    }
-
-    useEffect(() => {
-
-    }, [enrollmentNumber])
 
     const SignUp = async () => {
         const controller = new AbortController();
@@ -195,11 +179,63 @@ export const PersonalInformationCheck: React.FC = () => {
 
     };
 
+    return { isLoading, SignUp }
+}
+
+const NoNicknameAlretModal: React.FC<{ visible: boolean, onClose: () => void, onSignUp: () => void }> = ({ visible, onClose, onSignUp }) => {
+
+    return (<Modal visible={visible} transparent>
+        <Pressable style={{ backgroundColor: 'rgba(0,0,0,0.4)', flex: 1, justifyContent: 'center' }} onPress={onClose}>
+            <Pressable style={{ marginHorizontal: 28, height: 200, backgroundColor: '#FFF', borderRadius: 15 }} onPress={(e) => e.stopPropagation()} >
+                <Text style={alertStyle.Header}>패명 없음</Text>
+                <Text style={alertStyle.Script}>{`패명이 존재 하지 않는게 맞나요?`}</Text>
+                <View style={{ position: 'absolute', flexDirection: 'row', justifyContent: 'space-around', marginHorizontal: 8, width: width - 56 - 16, bottom: 16 }}>
+                    <ShortButton color='red' innerText='취소' isFilled={true} onPress={onClose} />
+                    <ShortButton color='blue' innerText='네' isFilled={true} onPress={onSignUp} />
+                </View>
+            </Pressable>
+        </Pressable>
+    </Modal>)
+}
+
+
+export const PersonalInformationCheck: React.FC = () => {
+
+
+    const { isLoading, SignUp } = usePersonalInformation();
+
+    const { club, setClub, clubValidation, validateClub } = useClub();
+    const { enrollmentNumber, setEnrollmentNumber, enrollmentNumberValidation, validateEnrollmentNumber } = useEnollmentNumber()
+    const { name, setName, nameValidation, validateName } = useName()
+    const { nickname, setNickName, nickNameValidation, validateNickName } = useNickName();
+
+    const handleSignUpButton = () => {
+        if (clubValidation.state == 'BEFORE' || clubValidation.state == 'ERROR') { validateClub(club); return; }
+        else if (enrollmentNumberValidation.state == 'ERROR') { enrollmentNumberRef.current?.focus(); return; }
+        else if (nameValidation.state == 'ERROR') { nameRef.current?.focus(); return }
+        else if (nickNameValidation.state == 'ERROR') { nickNameRef.current?.focus(); return; }
+        else if (nickname?.length == 0 || !nickname) { setAlertVisible(true); return; }
+        else { SignUp() }
+    }
+
+    const [alertVisible, setAlertVisible] = useState(false);
+    const [onSelectClub, setSelectClubVisible] = useState(false);
+
+    const enrollmentNumberRef = useRef<TextInput>(null);
+    const nameRef = useRef<TextInput>(null);
+    const nickNameRef = useRef<TextInput>(null);
+
+    const dropdownCloseHandler = () => {
+        setSelectClubVisible(false)
+        validateClub(club)
+    }
 
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); dropdownCloseHandler() }} >
             <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#FFF" }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}>
-                <ScrollView contentContainerStyle={{ flex: 1, flexGrow: 1, backgroundColor: "#FFF" }}>
+                <ScrollView 
+                alwaysBounceVertical={false}
+                contentContainerStyle={{ flex: 1, flexGrow: 1, backgroundColor: "#FFF" }}>
                     <View style={{ flex: 1, flexGrow: 1 }}>
                         <Text style={{
                             alignSelf: 'flex-start',
@@ -220,54 +256,48 @@ export const PersonalInformationCheck: React.FC = () => {
                             </Text>
                         </View>
                         <View style={{ marginTop: 20 }} />
-                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', zIndex: 1, width: 300, alignSelf: 'center' }}>
-                            <ClubSeletor
-                                club={club}
-                                setClub={setClub}
-                                isValidClub={isValidClub}
-                                setClubisValid={setClubisValid}
-                                onSelectClub={onSelectClub}
-                                setSelectClubVisible={setSelectClubVisible}
-                            />
-                            <InputComponent
-                                ref={enrollmentNumberRef}
-                                label='학번'
-                                length={126}
-                                inputValue={enrollmentNumber ?? ''}
-                                setInputValue={setEnrollmentNumber}
-                                color={'green'}
-                                isRequiredMark={true}
-                                isRequired
-                                onFocus={dropdownCloseHandler}
-                                keyboardType='number-pad'
-                                maxLength={2}
-                                validationCondition={
-                                    [{
-                                        validation: () => {
-                                            const regex: RegExp = /^[\d@]{2}$/;
-                                            const newCondition = regex.test(enrollmentNumber ?? '');
-                                            return newCondition;
-                                        },
-                                        errorText: "두 자리가 필요해요"
-                                    }]}
-                            />
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', zIndex: 1, width: '100%', gap: 12, paddingHorizontal: 48, alignSelf: 'center' }}>
+                            <View style={{ flex: 1 }}>
+                                <ClubSeletor
+                                    club={club}
+                                    setClub={(club:string) => { setClub(club as Club); validateClub(club as Club); }}
+                                    setDropDownVisible={setSelectClubVisible}
+                                    dropDownVisible={onSelectClub}
+                                    isErrored={clubValidation.state == 'ERROR'}
+                                    errorText={clubValidation.state == 'ERROR' ? clubValidation.errorText : ''}
+                                />
+                            </View>
+                            <View style={{ flex: 1 }}>
+                                <InputBaseComponent
+                                    ref={enrollmentNumberRef}
+                                    label='학번'
+                                    inputValue={enrollmentNumber ?? ''}
+                                    setInputValue={setEnrollmentNumber}
+                                    color={'green'}
+                                    isRequired
+                                    onFocus={dropdownCloseHandler}
+                                    onBlur={() => validateEnrollmentNumber(enrollmentNumber)}
+                                    keyboardType='number-pad'
+                                    maxLength={2}
+                                    validationCondition={enrollmentNumberValidation}
+                                />
+                            </View>
                         </View>
                         <View style={{ marginTop: 24, width: 300, alignSelf: 'center' }}>
-                            <InputComponent
+                            <InputBaseComponent
                                 ref={nameRef}
                                 label='이름(본명)'
                                 color={'green'}
-                                inputValue={name ?? ''}
+                                inputValue={name}
                                 setInputValue={setName}
-                                isEditible={true}
-                                isRequiredMark={true}
-                                onFocus={dropdownCloseHandler}
+                                validationCondition={nameValidation}
+                                onBlur={() => validateName(name)}
                             />
                         </View>
 
-
                         <View style={{ marginTop: 24, width: 300, alignSelf: 'center' }}>
-                            <InputComponent
+                            <InputBaseComponent
+                                ref={nickNameRef}
                                 label='패명'
                                 color={'green'}
                                 inputValue={nickname ?? ''}
@@ -275,6 +305,8 @@ export const PersonalInformationCheck: React.FC = () => {
                                 isEditible={true}
                                 isRequired={false}
                                 onFocus={dropdownCloseHandler}
+                                onBlur={() => validateNickName(nickname || '')}
+                                validationCondition={nickNameValidation}
                             />
                         </View>
                     </View>
@@ -283,36 +315,23 @@ export const PersonalInformationCheck: React.FC = () => {
                             color={'green'}
                             innerText='회원가입 신청'
                             isAble={club != null && name.length > 0 && enrollmentNumber.length > 0}
-                            onPress={() => {
-                                if (!signUpInfo.club) setClubisValid(false);
-                                else if (!enrollmentNumberRef.current?.validate()) enrollmentNumberRef.current?.focus();
-                                else if (!nameRef.current?.validate()) nameRef.current?.focus();
-                                else if (!signUpInfo.nickname) setAlertVisible(true);
-                                else { SignUp() }
-                            }
-                            }
+                            onPress={handleSignUpButton}
                         />
                     </View>
+
                     <Modal visible={isLoading} transparent>
                         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', alignItems: 'center', justifyContent: 'center' }}>
                             <ActivityIndicator color={'#FFFFF'} size={'large'} />
                         </View>
                     </Modal>
-                    <Modal visible={alertVisible} transparent>
-                        <Pressable style={{ backgroundColor: 'rgba(0,0,0,0.4)', flex: 1, justifyContent: 'center' }} onPress={() => setAlertVisible(false)}>
-                            <Pressable style={{ marginHorizontal: 28, height: 200, backgroundColor: '#FFF', borderRadius: 15 }} onPress={(e) => e.stopPropagation()} >
-                                <Text style={alertStyle.Header}>패명 없음</Text>
-                                <Text style={alertStyle.Script}>{`패명이 존재 하지 않는게 맞나요?`}</Text>
-                                <View style={{ position: 'absolute', flexDirection: 'row', justifyContent: 'space-around', marginHorizontal: 8, width: width - 56 - 16, bottom: 16 }}>
-                                    <ShortButton color='red' innerText='취소' isFilled={true} onPress={() => { setAlertVisible(false) }} />
-                                    <ShortButton color='blue' innerText='네' isFilled={true} onPress={() => {
-                                        setAlertVisible(false);
-                                        SignUp();
-                                    }} />
-                                </View>
-                            </Pressable>
-                        </Pressable>
-                    </Modal>
+
+                    <NoNicknameAlretModal
+                        visible={alertVisible}
+                        onClose={() => setAlertVisible(false)}
+                        onSignUp={() => {
+                            SignUp();
+                            setAlertVisible(false);
+                        }} />
                 </ScrollView>
             </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
@@ -320,42 +339,6 @@ export const PersonalInformationCheck: React.FC = () => {
 }
 
 export default PersonalInformationCheck;
-
-const styles = StyleSheet.create({
-    inputGroup: {
-        width: 300,
-    },
-    underline: {
-        width: 300,
-        borderBottomWidth: 1,
-        marginTop: 1,
-    },
-    InputBox: {
-        height: 36,
-        paddingTop: 8,
-        marginLeft: 8,
-    },
-    InputText: {
-        color: Color['grey800'],
-        fontSize: 16,
-        fontFamily: 'NanumSquareNeo-Bold',
-    },
-    labelText: {
-        width: 150,
-        color: Color['grey800'],
-        fontSize: 10,
-        fontFamily: 'NanumSquareNeo-Bold',
-        height: 12
-    },
-    errorText: {
-        color: Color['red500'],
-        fontFamily: 'NanumSquareNeo-Bold',
-        marginTop: 8,
-        marginLeft: 8,
-        fontSize: 14
-    },
-})
-
 
 const alertStyle = StyleSheet.create({
     Header: {

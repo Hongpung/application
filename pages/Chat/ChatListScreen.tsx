@@ -10,7 +10,7 @@ import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { Color } from '@hongpung/ColorSet'
 import { getToken } from '@hongpung/utils/TokenHandler'
 import { loginUserState } from '@hongpung/recoil/authState'
-import { Icons } from '@hongpung/components/Icon'
+import { Icons } from '@hongpung/components/common/Icon'
 import LongButton from '@hongpung/components/buttons/LongButton'
 
 interface ChatRoom {

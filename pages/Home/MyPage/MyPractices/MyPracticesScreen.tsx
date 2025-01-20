@@ -1,18 +1,18 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useLayoutEffect, useState } from 'react'
-import { Color } from '@hongpung/ColorSet'
-import PracticeCard from '@hongpung/components/cards/PracticeCard'
-import { Icons } from '@hongpung/components/Icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { MyPageParamList } from '@hongpung/nav/MyPageStack'
 import { useNavigation } from '@react-navigation/native'
 import { useRecoilValue } from 'recoil'
+
+import { MyPageParamList } from '@hongpung/nav/MyPageStack'
 import { loginUserState } from '@hongpung/recoil/authState'
+import { Color } from '@hongpung/ColorSet'
+import PracticeCard from '@hongpung/components/cards/PracticeCard'
+import { Icons } from '@hongpung/components/common/Icon'
 import { User } from '@hongpung/UserType'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 
 type MyPracticesNavProps = NativeStackNavigationProp<MyPageParamList, 'MyPractices'>;
-
 
 export interface AttendanceStatus { member: User, status: '참가' | '출석' | '결석' | '지각' };
 
@@ -34,19 +34,19 @@ export interface Session {
     attendanceList: AttendanceStatus[];
 }
 
-export type breifSessionInfo = Omit<Session, 'returnImageUrl' | 'extendCount' | 'attendanceList'>;
+export type BreifSession = Omit<Session, 'returnImageUrl' | 'extendCount' | 'attendanceList'>;
 
 const MyPracticesScreen: React.FC = () => {
 
     const navigation = useNavigation<MyPracticesNavProps>()
     const [selectedDate, setDate] = useState<Date | null>(null)
-    const [reserveList, setReserveList] = useState<breifSessionInfo[] | null>(null)
+    const [reserveList, setReserveList] = useState<BreifSession[] | null>(null)
     const [calendarMonth, setMonth] = useState(new Date())
     const [reservedDate, setReservedDates] = useState<{ [key: number]: { regularType: string, isParticipable: boolean }[] }>([]);
     const userInfo = useRecoilValue(loginUserState);
 
 
-    const { data: sessionDatas, loading, error } = useFetchUsingToken<breifSessionInfo[]>(`${process.env.SUB_API}/session-log`,
+    const { data: sessionDatas, loading, error } = useFetchUsingToken<BreifSession[]>(`${process.env.SUB_API}/session-log`,
         {},
         5000,
         [userInfo, calendarMonth]
@@ -225,7 +225,7 @@ const MiniCalendar: React.FC<{ onSelect: (date: Date | null) => void, selectedDa
 
 
 
-const PrevPracticeList: React.FC<{ prevPractice: breifSessionInfo[] | null, onPress: (session: breifSessionInfo) => void }> = ({ prevPractice, onPress }) => {
+const PrevPracticeList: React.FC<{ prevPractice: BreifSession[] | null, onPress: (session: BreifSession) => void }> = ({ prevPractice, onPress }) => {
 
     const mapedList = prevPractice?.reduce((acc, session) => {
         const dateKey: string = session.date; // 날짜를 키로 사용 (YYYY-MM-DD 포맷)
@@ -236,7 +236,7 @@ const PrevPracticeList: React.FC<{ prevPractice: breifSessionInfo[] | null, onPr
 
         acc[dateKey].push(session); // 해당 날짜에 예약 추가
         return acc;
-    }, {} as Record<string, breifSessionInfo[]>);
+    }, {} as Record<string, BreifSession[]>);
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
 

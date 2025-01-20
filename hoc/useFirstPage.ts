@@ -1,3 +1,4 @@
+import { getToken } from "@hongpung/utils/TokenHandler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useState } from "react";
 import Toast from "react-native-toast-message";
@@ -12,7 +13,8 @@ export const useFirstPage = () => {
             const autoLogin = await AsyncStorage.getItem('autoLogin');
             if (autoLogin) {
 
-                const token = null;//await getToken('token');
+                const token = await getToken('token');
+                
                 if (token) {
                     setFirstScreen('HomeStack')
                     Toast.show({

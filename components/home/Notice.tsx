@@ -2,7 +2,7 @@ import { ActivityIndicator, TouchableOpacity, Text, View, Pressable } from 'reac
 import React from 'react'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { Color } from '@hongpung/ColorSet'
-import { Icons } from '../Icon'
+import { Icons } from '../common/Icon'
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { MainStackParamList, NoticeStackParamList } from '@hongpung/nav/HomeStacks'
@@ -23,17 +23,13 @@ type CombinedNavigationProp = CompositeNavigationProp<
 const NoticePartition: React.FC = () => {
 
     const navigation = useNavigation<CombinedNavigationProp>();
-
     const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.SUB_API}/notice`)
-
-    // const data:any[]=[]
 
     if (loading)
         return (<>
             <ActivityIndicator color={'white'} size={'large'} />
         </>)
 
-    console.log(data)
     return (
         <View style={{ display: 'flex', gap: 14, width: '100%', flexDirection: 'column' }}>
             <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
@@ -60,10 +56,15 @@ const NoticePartition: React.FC = () => {
                             <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>{notice.createdAt.split('T')[0]}</Text>
                         </TouchableOpacity>
                     )) :
-                    <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>공지 사항이 없습니다.</Text>
+                    <View style={{ paddingHorizontal: 12, paddingVertical:12, backgroundColor:Color['grey100'], borderRadius:60}}>
+                        <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>
+                            공지 사항이 없습니다.
+                        </Text>
+                    </View>
+
+
                 }
-                {true
-                    // data && data?.length > 4 
+                {data && data?.length > 4
                     &&
                     <Pressable style={{ alignItems: 'center', display: 'flex', flexDirection: 'row', gap: 4, alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 50, borderWidth: 1, borderColor: Color['grey400'] }}
                         onPress={() => { navigation.navigate('NoticeStack') }}>

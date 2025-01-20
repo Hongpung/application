@@ -11,7 +11,7 @@ import { StackActions, useNavigation } from '@react-navigation/native'
 import { loginUserState } from '@hongpung/recoil/authState'
 import { useRecoilValue } from 'recoil'
 import { onUseSession } from '@hongpung/recoil/sessionState'
-import { Icons } from '@hongpung/components/Icon'
+import { Icons } from '@hongpung/components/common/Icon'
 import { getToken } from '@hongpung/utils/TokenHandler'
 
 type UsingManageNavProp = NativeStackNavigationProp<MainStackParamList, 'UsingManage'>

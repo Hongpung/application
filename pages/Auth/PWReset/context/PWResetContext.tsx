@@ -5,6 +5,7 @@ export interface PasswordResetInfo {
     email: string
     newPassword: string
 };
+
 type step = "이메일 인증" | "비밀번호 재설정";
 
 interface PasswordResetContextProps {

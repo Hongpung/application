@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import PagerView from 'react-native-pager-view';
 import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/specs/PagerViewNativeComponent';
-import { Icons } from '@hongpung/components/Icon';
+import { Icons } from '@hongpung/components/common/Icon';
 import { Color } from '@hongpung/ColorSet';
 import { useNavigation } from '@react-navigation/native';
 
@@ -128,7 +128,6 @@ const Banner: React.FC<{ withIndicator?: boolean }> = ({ withIndicator = true })
 
                 }
             </View>
-
 
             {/* 배너 인디케이터 */}
             {withIndicator && bannerMass != 0 && <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 2, height: 20, justifyContent: 'center' }}>

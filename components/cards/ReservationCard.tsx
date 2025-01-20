@@ -1,7 +1,7 @@
 import { View, Text, Pressable } from "react-native"
 import { Color } from "@hongpung/ColorSet"
 import { ReservationDTO } from "@hongpung/pages/Reserve/ReservationInterface"
-import { Icons } from "@hongpung/components/Icon"
+import { Icons } from "@hongpung/components/common/Icon"
 import { useMemo } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { MyClubStackStackParamList } from "@hongpung/nav/MyClubStack"

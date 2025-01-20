@@ -6,7 +6,7 @@ import Tutorial from "@hongpung/pages/FirstInstall/Tutorial/Tutorial";
 import { RootStackParamList } from "@hongpung/pageTypes";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MainStacks from "./HomeStacks";
-import Header from "@hongpung/components/Header";
+import Header from "@hongpung/components/common/Header";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 

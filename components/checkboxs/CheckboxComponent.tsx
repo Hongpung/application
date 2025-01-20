@@ -5,20 +5,38 @@ import { Color } from '../../ColorSet';
 
 interface CheckBoxProps {
     innerText?: string,
-    onCheck: (check:boolean) => void,
+    onCheck: (check: boolean) => void,
     isChecked: boolean
 }
 
-const CheckboxComponent: React.FC<CheckBoxProps> = ({ innerText, onCheck, isChecked }) => {
+const CheckBox: React.FC<{ isChecked: boolean }> = ({ isChecked }) => {
+
+    if (!isChecked)
+        return (
+            <View style={styles.checkboxBorder} />
+        )
 
     return (
+        <View style={styles.checkboxBorder}>
+            <View style={styles.checkboxFill} />
+        </View>
+    )
+}
+
+const CheckBoxComment: React.FC<{ innerText: string }> = ({ innerText }) => {
+    return (<Text style={styles.innerText}>{innerText}</Text>)
+}
+
+const CheckboxComponent: React.FC<CheckBoxProps> = ({ isChecked, onCheck, innerText }) => {
+
+    const toggleCheck = () => { onCheck(!isChecked) }
+    return (
         <Pressable
-            style={{ display:'flex', flexDirection: 'row', alignItems: 'center', gap:12 }}
-            onPress={() => { onCheck(!isChecked) }}>
-            <View style={styles.checkboxBorder}>
-                {isChecked ? <View style={styles.checkboxFill} /> : null}
-            </View>
-            {innerText ? <Text style={styles.innerText}>{innerText}</Text> : null}
+            style={styles.container}
+            onPress={toggleCheck}
+        >
+            <CheckBox isChecked={isChecked} />
+            {innerText && <CheckBoxComment innerText={innerText} />}
         </Pressable>
     )
 }
@@ -26,6 +44,9 @@ const CheckboxComponent: React.FC<CheckBoxProps> = ({ innerText, onCheck, isChec
 export default CheckboxComponent
 
 const styles = StyleSheet.create({
+    container: {
+        display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12
+    },
     checkboxBorder: {
         height: 24,
         width: 24,

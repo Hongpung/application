@@ -1,7 +1,7 @@
 import { Button, Pressable, StyleSheet, Text, View } from 'react-native'
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useState } from 'react'
-import Header from '@hongpung/components/Header';
+import Header from '@hongpung/components/common/Header';
 import { useRecoilValue } from 'recoil';
 import { onUseSession } from '@hongpung/recoil/sessionState';
 import { useIsFocused } from '@react-navigation/native';

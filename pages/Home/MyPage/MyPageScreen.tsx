@@ -4,7 +4,7 @@ import { Color } from '@hongpung/ColorSet'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ProfileBoxCard from "@hongpung/components/cards/ProfileBoxCard";
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { Icons } from '@hongpung/components/Icon';
+import { Icons } from '@hongpung/components/common/Icon';
 import { MyPageParamList } from '@hongpung/nav/MyPageStack';
 import { useAuth } from '@hongpung/hoc/useAuth';
 

@@ -1,21 +1,22 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Color } from '../../../ColorSet'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ProfileMiniCard from '../../../components/cards/ProfileMiniCard'
 import { UserProvider } from '../../../context/UserContext';
 import { UserModal } from './ClubMember/ClubMemeberScreen';
 import { throttle } from 'lodash';
-import { Icons } from '@hongpung/components/Icon';
+import { Icons } from '@hongpung/components/common/Icon';
 import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack';
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import { User } from '@hongpung/UserType';
-
+import LottieView from 'lottie-react-native';
 
 type MyClubProps = NativeStackScreenProps<MyClubStackStackParamList, 'MyClubHome'>;
 
 const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
 
+    const animation = useRef<LottieView>(null);
 
     const [leader, setLeader] = useState<User | null>(null)
     const [sangsoe, setSangsoe] = useState<User | null>(null)
@@ -51,8 +52,11 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
 
 
     return (
-        <UserProvider>
-            <ScrollView style={styles.container}>
+        <View style={{
+            flex: 1,
+            backgroundColor: Color['grey100']
+        }}>
+            <ScrollView alwaysBounceVertical={false} contentContainerStyle={styles.container}>
                 <View style={{ flex: 1 }}>
                     <View style={{ flex: 1, alignItems: 'center' }}>
                         <View style={{ width: 96, height: 96, marginTop: 24, borderRadius: 25, backgroundColor: `grey` }} />
@@ -87,7 +91,7 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                     </Pressable>
                 </View>
             </ScrollView>
-        </UserProvider>
+        </View>
     )
 }
 
@@ -95,17 +99,17 @@ export default MyClubScreen
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+
         position: 'relative',
         backgroundColor: 'white',
     },
     ProfileContainer: {
-        flex: 1,
         height: 292,
         borderRadius: 15,
         backgroundColor: 'white',
         width: 352,
-    }, ProfilePhoto: {
+    },
+    ProfilePhoto: {
         width: 90,
         height: 120,
         borderRadius: 5,
@@ -121,7 +125,7 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         borderWidth: 1
     }, footer: {
-        flex: 1,
+
         backgroundColor: Color['grey100'],
         alignItems: 'center',
         height: 156,

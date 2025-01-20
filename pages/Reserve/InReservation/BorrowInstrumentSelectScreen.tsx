@@ -5,9 +5,9 @@ import InstrumentCard from '@hongpung/components/cards/InstrumentCard'
 import { Color } from '@hongpung/ColorSet'
 import LongButton from '@hongpung/components/buttons/LongButton'
 import { useReservation } from '@hongpung/pages/Reserve/context/ReservationContext'
-import Header from '@hongpung/components/Header'
+import Header from '@hongpung/components/common/Header'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
-import { Icons } from '@hongpung/components/Icon'
+import { Icons } from '@hongpung/components/common/Icon'
 
 const BorrowInstrumentSelectScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 

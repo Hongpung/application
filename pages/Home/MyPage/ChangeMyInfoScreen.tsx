@@ -9,7 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 import InputComponent from "@hongpung/components/inputs/InputComponent";
 import { Color } from "@hongpung/ColorSet";
 import LongButton from "@hongpung/components/buttons/LongButton";
-import { Icons } from "@hongpung/components/Icon";
+import { Icons } from "@hongpung/components/common/Icon";
 import { loginUserState } from "@hongpung/recoil/authState"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MyPageParamList } from "@hongpung/nav/MyPageStack";

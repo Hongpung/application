@@ -3,7 +3,7 @@ import ClubInstrumentsScreen from "@hongpung/pages/Home/MyClub/Instruments/ClubI
 import InstrumentEditScreen from "@hongpung/pages/Home/MyClub/Instruments/InstrumentEditScreen";
 import InstrumentSpecificScreen from "@hongpung/pages/Home/MyClub/Instruments/InstrumentSpecificScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Header from '@hongpung/components/Header';
+import Header from '@hongpung/components/common/Header';
 
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';

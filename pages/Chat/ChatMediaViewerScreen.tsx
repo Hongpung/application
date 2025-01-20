@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { Color } from '../../ColorSet';
-import { Icons } from '@hongpung/components/Icon';
+import { Icons } from '@hongpung/components/common/Icon';
 
 const { width, height } = Dimensions.get('window');
 

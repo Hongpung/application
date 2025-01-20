@@ -15,7 +15,7 @@ export const verifyingEmail = async (email: string, code: string) => {
 
     try {
 
-        const response = await fetch(`${process.env.SUB_API}/verification/verify/id`, {
+        const response = await fetch(`${process.env.BASE_URL}/verification/verify/id`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -24,6 +24,7 @@ export const verifyingEmail = async (email: string, code: string) => {
             signal
         });
 
+        console.log(email,code)
 
         if (!response.ok) {
             console.error('서버에서 데이터 가져오기 실패: ', response.status);

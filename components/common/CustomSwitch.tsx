@@ -1,6 +1,6 @@
 import { Animated, View, StyleSheet, Pressable } from 'react-native'
 import React, { useCallback, useRef, useState } from 'react'
-import { Color } from '../ColorSet'
+import { Color } from '../../ColorSet'
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 /**
@@ -120,7 +120,6 @@ const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolea
 
     return (
         <Pressable style={{ flexDirection: 'row' }} onPress={onPressHandler}>
-
             <View style={styles.switchContainer}>
                 <View
                     style={[

@@ -5,7 +5,7 @@ import LongButton from '@hongpung/components/buttons/LongButton';
 import { useReservation } from '@hongpung/pages/Reserve/context/ReservationContext';
 import ShortButton from '@hongpung/components/buttons/ShortButton';
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
-import { Icons } from '@hongpung/components/Icon';
+import { Icons } from '@hongpung/components/common/Icon';
 import { InReservationStackParamList } from '@hongpung/nav/ReservationStack';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';

@@ -1,16 +1,34 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, TextInput, Animated, Pressable, Modal, ActivityIndicator } from 'react-native';
-import { Color } from '../../ColorSet';
+import { Color } from '@hongpung/ColorSet';
 import { josa } from 'es-hangul';
 import Toast from 'react-native-toast-message';
+import { InputBaseComponent } from './InputBaseComponent';
 
 type InputProps = {
     label: string,
-    setValid: () => void,
-    color?: string
-    isEditible?: boolean
     inputValue: string,
+    onCodeSend: () => void
     setInputValue: (email: string) => void,
+}
+type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
+
+const useEmailInput = () => {
+    const [email, setEmail] = useState('');
+
+    const [emailValidation, setEmailValidation] = useState<validationCondition>({ state: 'BEFORE' })
+
+    const validateEmail = useCallback((email: string) => {
+        const emailFormRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailFormRegex.test(email)) {
+            setEmailValidation({ state: 'VALID' })
+            return;
+        }
+
+        setEmailValidation({ state: 'ERROR', errorText: '이메일 형식이 올바르지 않습니다.' })
+    }, [])
+
+    return { email, setEmail, setEmailValidation, emailValidation, validateEmail }
 }
 
 const isRegisteredEmail = async (email: string, callbackFn?: () => void) => {
@@ -32,11 +50,12 @@ const isRegisteredEmail = async (email: string, callbackFn?: () => void) => {
 
         const data = await response.json();
 
+        console.log(data)
         if (response.ok) {
 
             const { isRegistered } = data;
             console.log(isRegistered)
-            result = isRegistered == true;
+            result = isRegistered == false;
         } else {
             console.error('서버에서 데이터 가져오기 실패: ', response.status);
         }
@@ -67,7 +86,7 @@ const sendVerificationCode = async (email: string) => {
     let result = 500;
 
     try {
-        const response = await fetch(`${process.env.SUB_API}/verification/send/password`, {
+        const response = await fetch(`${process.env.SUB_API}/verification/send/id`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -78,6 +97,7 @@ const sendVerificationCode = async (email: string) => {
 
         if (response.ok) {
             result = 200;
+            console.log('success')
         } else {
             console.error('서버에서 데이터 가져오기 실패: ', response.status);
             result = response.status;
@@ -101,35 +121,33 @@ const sendVerificationCode = async (email: string) => {
 }
 
 
-const PWResetEmailInput: React.FC<InputProps> = ({ label, setValid, isEditible = true, inputValue, setInputValue }) => {
+const SignUpEmailInput: React.FC<InputProps> = ({ onCodeSend, inputValue, setInputValue }) => {
 
-    const [isTyped, setIsTyped] = useState(false);
-    const [isValid, setIsValid] = useState(true);
+    const { setEmailValidation, emailValidation, validateEmail } = useEmailInput();
+    const emailRef = useRef<TextInput>(null);
+
+    const [loading, setLoading] = useState(false);
     const [isSend, setIsSend] = useState(false);
 
-    const [errorText, setErrorText] = useState(``)
-    const labelAnimation = useRef(new Animated.Value(0)).current; // 애니메이션 초기 값
-    const [loading, setLoading] = useState(false);
-
-    const underlineColor = Color[`green500`];
-
     const SendCodeHandler = async () => {
-        const regex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const newCondition = regex.test(inputValue);
-        setIsValid(newCondition);
-        if (!newCondition) setErrorText("이메일 주소가 유효하지 않습니다")
+
+        if (emailValidation.state === 'ERROR') {
+            emailRef.current?.focus();
+            return
+        }
+
         else {
-            const isRegistered = await isRegisteredEmail(inputValue) || false
-            if (!isRegistered) {
-                setIsValid(false);
-                setErrorText("존재하지 않는 이메일 입니다.")
+            const duplication = await isRegisteredEmail(inputValue) || false
+            if (!duplication) {
+                setEmailValidation({ state: 'ERROR', errorText: '이미 가입된 이메일 입니다.' });
             }
+
             else {
                 try {
                     setLoading(true);
                     const sendResult = await sendVerificationCode(inputValue);
                     if (sendResult == 200) {
-                        setValid();
+                        onCodeSend();
                         setIsSend(true);
                         showSendToast();
                     }
@@ -145,38 +163,6 @@ const PWResetEmailInput: React.FC<InputProps> = ({ label, setValid, isEditible =
                     setLoading(false);
                 }
             }
-        }
-    }
-
-    useEffect(() => {
-        Animated.timing(labelAnimation, {
-            toValue: isTyped ? 1 : 0,
-            duration: 100,
-            useNativeDriver: false,
-        }).start();
-    }, [isTyped]);
-
-    const handleTextChange = (text: string) => {
-        setInputValue(text);
-    };
-
-    const handleFocus = () => {
-        setIsTyped(true);
-    }
-
-    const handleBlur = () => {
-        if (inputValue.length == 0) {
-            setIsTyped(false);
-            setIsValid(false);
-
-
-            setErrorText(josa(label, '을/를') + ' 입력해야해요')
-        } else {
-            const regex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const newCondition = regex.test(inputValue);
-            setIsValid(newCondition);
-            if (!newCondition) setErrorText("이메일 주소가 유효하지 않습니다")
-
         }
     }
 
@@ -220,36 +206,21 @@ const PWResetEmailInput: React.FC<InputProps> = ({ label, setValid, isEditible =
         }
     }
 
-    const labelStyle = {
-        fontSize: labelAnimation.interpolate({
-            inputRange: [0, 1],
-            outputRange: [12, 10],
-        }),
-        top: labelAnimation.interpolate({
-            inputRange: [0, 1],
-            outputRange: [5, 3],
-        }),
-    };
     return (
         <View style={styles.inputGroup}>
-            <View style={[styles.underline, { borderBottomColor: isValid ? underlineColor : Color["red500"] }]} />
-            <TextInput
-                style={styles.InputBox}
-                placeholder={josa(label, '을/를') + ' 입력하세요'}
-                value={inputValue}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                keyboardType='email-address'
-                onChangeText={handleTextChange}
-                editable={isEditible}
-                multiline={false}
-                autoCapitalize='none'
-                returnKeyType='done'
-                clearTextOnFocus={false}
-                autoComplete='off'
-            />
-            <Animated.Text style={[styles.labelText, labelStyle]}>{label}</Animated.Text>
-            {!isValid ? <Text style={styles.errorText}>{errorText}</Text> : null}
+            <View style={{ flex: 1 }}>
+                <InputBaseComponent
+                    ref={emailRef}
+                    inputValue={inputValue}
+                    setInputValue={setInputValue}
+                    label='이메일'
+                    color='green'
+                    isEditible={!isSend}
+                    keyboardType={'email-address'}
+                    validationCondition={emailValidation}
+                    onBlur={() => validateEmail(inputValue)}
+                />
+            </View>
             <Pressable style={styles.button}
                 onPress={SendCodeHandler}>
                 <Text style={styles.buttonText}>{isSend ? '인증번호\n재전송' : '인증번호\n전송'}</Text>
@@ -262,57 +233,21 @@ const PWResetEmailInput: React.FC<InputProps> = ({ label, setValid, isEditible =
         </View>
     );
 }
+
 const styles = StyleSheet.create({
     inputGroup: {
-        width: 300,
-        height: 54,
+        display: 'flex',
+        alignItems: 'flex-start',
+        flexDirection: 'row',
+        gap: 12,
+        width: '100%',
+        paddingHorizontal: 48,
         position: 'relative',
     },
-    underline: {
-        width: 232,
-        height: 35,
-        position: 'absolute',
-        borderBottomWidth: 1,
-        top: 19,
-    },
-    InputBox: {
-        width: 220,
-        height: 28,
-        position: 'absolute',
-        color: Color['grey800'],
-        fontSize: 16,
-        fontFamily: 'NanumSquareNeo-Regular',
-        lineHeight: 22,
-        top: 22,
-        left: 8,
-        placeholderTextColor: Color['grey500'],
-        outline: 0,
-    },
-    labelText: {
-        width: 150,
-        height: 22,
-        position: 'absolute',
-        color: Color['grey800'],
-        fontSize: 10,
-        fontFamily: 'NanumSquareNeo-Bold',
-        lineHeight: 22,
-        top: 0,
-        left: 4,
-    },
-    errorText: {
-        position: 'absolute',
-        color: Color['red500'],
-        fontFamily: 'NanumSquareNeo-Bold',
-        top: 60,
-        left: 8,
-        fontSize: 14
-    },
     button: {
+        marginTop: 12,
         width: 60,
         height: 40,
-        position: 'absolute',
-        left: 240,
-        top: 14,
         backgroundColor: '#3CB371',
         borderRadius: 5,
         borderWidth: 1,
@@ -329,4 +264,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default PWResetEmailInput;
+export default SignUpEmailInput;

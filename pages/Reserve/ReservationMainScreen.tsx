@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BlurView } from 'expo-blur';
 
 import { Color } from '@hongpung/ColorSet'
-import { Icons } from '@hongpung/components/Icon';
+import { Icons } from '@hongpung/components/common/Icon';
 
 import { CompositeNavigationProp, useIsFocused, useNavigation } from '@react-navigation/native';
 import { io } from 'socket.io-client';

@@ -4,7 +4,7 @@ import ProfileMiniCard from "@hongpung/components/cards/ProfileMiniCard";
 import ProfileBoxCard from "@hongpung/components/cards/ProfileBoxCard";
 import { User } from "@hongpung/UserType";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Icons } from "@hongpung/components/Icon";
+import { Icons } from "@hongpung/components/common/Icon";
 import { ReservationStackParamList } from "@hongpung/nav/ReservationStack";
 
 

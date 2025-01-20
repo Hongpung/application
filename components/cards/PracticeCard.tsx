@@ -1,11 +1,12 @@
 import { View, Text, Pressable } from "react-native"
 import { Color } from "@hongpung/ColorSet"
-import { Icons } from "@hongpung/components/Icon"
+import { Icons } from "@hongpung/components/common/Icon"
 import { useMemo } from "react"
-import { breifSessionInfo } from "@hongpung/pages/Home/MyPage/MyPractices/MyPracticesScreen"
+import { BreifSession } from "@hongpung/pages/Home/MyPage/MyPractices/MyPracticesScreen"
 
 
-const PracticeCard: React.FC<{ session: breifSessionInfo, onPress: (session: breifSessionInfo) => void }> = ({ session, onPress }) => {
+
+const PracticeCard: React.FC<{ session: BreifSession, onPress: (session: BreifSession) => void }> = ({ session, onPress }) => {
 
     const isBefore = useMemo(() => new Date(session.date) < new Date(), []);
 
@@ -30,68 +31,69 @@ const PracticeCard: React.FC<{ session: breifSessionInfo, onPress: (session: bre
                         Color['red500']
         }}>
 
-
-            <Text style={{
-                position: 'absolute', left: 18, top: 20,
-                fontFamily: 'NanumSquareNeo-Bold',
-                fontSize: 18,
-                color: isBefore ? Color['grey400'] : Color['grey700']
-            }}>
-                {session.title}
-            </Text>
-
-
-            <Text style={{
-                position: 'absolute', left: 18, bottom: 12,
-                fontFamily: 'NanumSquareNeo-Light',
-                fontSize: 14,
-                color: Color['grey400']
-            }}>
-                {session.startTime} ~ {session.endTime}
-            </Text>
-
-
-            <Pressable style={{ position: 'absolute', right: 16, bottom: 12 }} onPress={() => onPress(session)}>
-
+            <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', paddingHorizontal: 20 }}>
                 <Text style={{
-                    textAlign: 'right',
+                    fontFamily: 'NanumSquareNeo-Bold',
+                    paddingTop: 14,
+                    fontSize: 18,
+                    color: isBefore ? Color['grey400'] : Color['grey700']
+                }}>
+                    {session.title}
+                </Text>
+
+                {/* 동아리 개별 연습 유형 */
+                    session.reservationType == 'REGULAR' ?
+                        <View style={{
+                            width: 48, height: 48, marginTop: -4
+                        }} >
+                            <Icons name="bookmark-sharp" size={48} color={Color['blue500']} />
+                        </View>
+                        :
+                        <View style={{ paddingTop: 16, flexDirection: 'column', alignItems: 'flex-end' }}>
+                            <Text style={{
+                                textAlign: 'right',
+                                fontFamily: 'NanumSquareNeo-Regular',
+                                fontSize: 14,
+                                color: Color['grey600']
+                            }}>
+                                {session.creatorName}
+                            </Text>
+                            <View style={{ height: 4 }} />
+                            {session.creatorNickname &&
+                                <Text style={{
+                                    textAlign: 'right',
+                                    fontFamily: 'NanumSquareNeo-Regular',
+                                    fontSize: 12,
+                                    color: Color['grey400']
+                                }}>{session.creatorNickname}
+                                </Text>
+                            }
+                        </View>
+                }
+            </View>
+            
+            <View style={{ flex: 1 }} />
+
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 12 }}>
+                <Text style={{
                     fontFamily: 'NanumSquareNeo-Light',
                     fontSize: 14,
                     color: Color['grey400']
                 }}>
-                    {`자세히 보기 >`}
+                    {session.startTime} ~ {session.endTime}
                 </Text>
 
-            </Pressable>
-
-
-
-            {/* 동아리 개별 연습 유형 */
-                session.reservationType == 'REGULAR' ?
-                    <View style={{
-                        position: 'absolute', right: 12, top: -4, width: 48, height: 48
-                    }} >
-                        <Icons name="bookmark-sharp" size={48} color={Color['blue500']} />
-                    </View>
-                    : <View style={{
-                        position: 'absolute', right: 20, top: 20,
+                <Pressable style={{}} onPress={() => onPress(session)}>
+                    <Text style={{
+                        textAlign: 'right',
+                        fontFamily: 'NanumSquareNeo-Light',
+                        fontSize: 14,
+                        color: Color['grey400']
                     }}>
-                        <Text style={{
-                            textAlign: 'right',
-                            fontFamily: 'NanumSquareNeo-Regular',
-                            fontSize: 14,
-                            color: Color['grey600']
-                        }}>{session.creatorName}</Text>
-                        <View style={{ height: 4 }} />
-                        {session.creatorNickname && <Text style={{
-                            textAlign: 'right',
-                            fontFamily: 'NanumSquareNeo-Regular',
-                            fontSize: 12,
-                            color: Color['grey400']
-                        }}>{session.creatorNickname}</Text>}
-                    </View>
-            }
-            
+                        {`자세히 보기 >`}
+                    </Text>
+                </Pressable>
+            </View>
         </View>
     )
 }

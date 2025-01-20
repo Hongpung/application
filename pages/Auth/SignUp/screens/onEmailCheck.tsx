@@ -2,12 +2,32 @@ import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Vie
 import { useSignUp } from "../context/SignUpContext"
 import { useCallback, useRef, useState } from "react";
 import LongButton from "@hongpung/components/buttons/LongButton";
-import SignUpEmailInput from "@hongpung/components/inputs/SignupEmailInput";
-import InputComponent from "@hongpung/components/inputs/InputComponent";
+import SignUpEmailInput from "@hongpung/components/common/inputs/SignupEmailInput";
 import { Color } from "@hongpung/ColorSet";
 import { verifyingEmail } from "../Utils";
 import { showEmailVirificationCompleteToast, showExpiredCodeToast, showProblemToast, showUncorrectCodeToast } from "../toasts/sign-up-toast";
 import { debounce } from "lodash";
+import { InputBaseComponent } from "@hongpung/components/common/inputs/InputBaseComponent";
+
+type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
+
+const useVerificationCode = () => {
+
+    const [verificationCode, setVerificationCode] = useState('');
+    const [verificationCodeValidation, setVerificationCodeValidation] = useState<validationCondition>({ state: 'BEFORE' })
+
+    const validateVerificationCode = useCallback((verificationCode: string) => {
+        const regex: RegExp = /^\d{6}$/;
+
+        if (regex.test(verificationCode)) {
+            setVerificationCodeValidation({ state: 'VALID' })
+            return;
+        }
+        setVerificationCodeValidation({ state: 'ERROR', errorText: '인증번호는 6자리 숫자입니다.' })
+    }, [])
+
+    return { verificationCode, setVerificationCode, verificationCodeValidation, setVerificationCodeValidation, validateVerificationCode }
+}
 
 export const EmailCheck: React.FC = () => {
 
@@ -15,14 +35,34 @@ export const EmailCheck: React.FC = () => {
     const [isVerifed, setVerified] = useState(false);
     const [isLoading, setLoading] = useState(false);
 
-    const [verificationCode, setVerificationCode] = useState('');
+    const { verificationCode, setVerificationCode, verificationCodeValidation, setVerificationCodeValidation, validateVerificationCode } = useVerificationCode();
+
     const verificationCodeRef = useRef<any | null>(null)
 
-    const checkVerifiedCode = useCallback(() => {
-        const regex: RegExp = /^\d{6}$/;
-        console.log(regex.test(verificationCode))
-        return regex.test(verificationCode);
-    }, [verificationCode])
+    const verifyingEmailButton = debounce(async () => {
+        if (verificationCodeValidation.state == 'VALID' || !isLoading) {
+            try {
+                setLoading(true);
+                const verified = await verifyingEmail(signUpInfo.email, verificationCode);
+
+                if (verified == 200) {
+                    setStep('비밀번호 설정')
+                    showEmailVirificationCompleteToast()
+                }
+                else if (verified == 405) {
+                    setVerificationCodeValidation({state:'ERROR',errorText:'인증번호가 일치하지 않습니다.'})
+                } else if (verified == 403) {
+                    setVerificationCodeValidation({state:'ERROR',errorText:'인증번호 유효시간이 만료되었습니다.'})
+                } else {
+                    showProblemToast()
+                }
+            } catch (e) {
+                console.error(e)
+            } finally {
+                setLoading(false);
+            }
+        }
+    }, 100)
 
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }} >
@@ -46,21 +86,20 @@ export const EmailCheck: React.FC = () => {
                     </Text>
                 </View>
 
-                <View style={{ alignSelf: 'center', marginTop: 12 }}>
+                <View style={{ marginTop: 12 }}>
                     <SignUpEmailInput
                         label='이메일'
-                        color={'green'}
                         inputValue={signUpInfo.email}
                         setInputValue={setEmail}
-                        isEditible={!isVerifed}
-                        setValid={() => {
+                        onCodeSend={() => {
                             setVerified(true)
                         }}
                     />
                 </View>
-                <View style={{ marginTop: 20, alignSelf: 'center' }}>
+                <View style={{height:24}}></View>
+                <View style={{  marginHorizontal:48 }}>
                     {isVerifed &&
-                        <InputComponent
+                        <InputBaseComponent
                             ref={verificationCodeRef}
                             inputValue={verificationCode}
                             setInputValue={setVerificationCode}
@@ -68,13 +107,8 @@ export const EmailCheck: React.FC = () => {
                             isRequired={true}
                             label='인증번호'
                             color={'green'}
-                            checkValid={setVerified}
-                            validationCondition={
-                                [{
-                                    validation: checkVerifiedCode,
-                                    errorText: "인증번호는 6자리 숫자에요"
-                                }]
-                            }
+                            onBlur={() => validateVerificationCode(verificationCode)}
+                            validationCondition={verificationCodeValidation}
                         />}
                 </View>
                 <View style={[{ paddingHorizontal: 12, marginTop: 24 }]}>
@@ -82,31 +116,8 @@ export const EmailCheck: React.FC = () => {
                         key={verificationCode}
                         color={'green'}
                         innerText='이메일 인증'
-                        isAble={isVerifed}
-                        onPress={debounce(async () => {
-                            if (verificationCodeRef.current?.validate() || !isLoading) {
-                                try {
-                                    setLoading(true);
-                                    const verified = await verifyingEmail(signUpInfo.email, verificationCode);
-
-                                    if (verified == 200) {
-                                        setStep('비밀번호 설정')
-                                        showEmailVirificationCompleteToast()
-                                    }
-                                    else if (verified == 405) {
-                                        showUncorrectCodeToast();
-                                    } else if (verified == 403) {
-                                        showExpiredCodeToast()
-                                    } else {
-                                        showProblemToast()
-                                    }
-                                } catch (e) {
-                                    console.error(e)
-                                } finally {
-                                    setLoading(false);
-                                }
-                            }
-                        }, 100)}
+                        isAble={isVerifed&&verificationCodeValidation.state=='VALID'}
+                        onPress={verifyingEmailButton}
                     />
                 </View>
                 <Modal visible={isLoading} transparent>

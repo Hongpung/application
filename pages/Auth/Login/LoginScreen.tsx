@@ -1,57 +1,22 @@
-import { Keyboard, KeyboardAvoidingView, Modal, Pressable, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { Keyboard, KeyboardAvoidingView, Modal, Pressable, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native'
+import React, { useCallback, useRef, useState } from 'react'
 import { StackActions, useNavigation } from '@react-navigation/native'
-import Toast from 'react-native-toast-message'
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { debounce } from 'lodash'
 
 import { RootStackParamList } from '@hongpung/pageTypes'
-import { useAuth } from '@hongpung/hoc/useAuth'
 import { Color } from '@hongpung/ColorSet'
 import LongButton from '@hongpung/components/buttons/LongButton'
 import CheckboxComponent from '@hongpung/components/checkboxs/CheckboxComponent'
-import { InputBaseComponent } from '@hongpung/components/inputs/InputBaseComponent'
+import { InputBaseComponent } from '@hongpung/components/common/inputs/InputBaseComponent'
+import { useEmailInput, usePasswordInput } from './useLogin'
+import { saveLoginOptions } from './service/loginService'
+import { useLoginOptions } from './useLoginOptions'
+import { useAuth } from '@hongpung/hoc/useAuth'
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, "Login">;
 
 type LoginNavProps = NativeStackNavigationProp<RootStackParamList, "Login">;
-type validationCondition = { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
-
-const useEmailInput = () => {
-    const [email, setEmail] = useState('');
-
-    const [emailValidation, setEmailValidation] = useState<validationCondition>({ state: 'BEFORE' })
-
-    const validateEmail = useCallback((email: string) => {
-        const emailFormRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (emailFormRegex.test(email)) {
-            setEmailValidation({ state: 'VALID' })
-            return;
-        }
-        setEmailValidation({ state: 'ERROR', errorText: '이메일 형식이 올바르지 않습니다.' })
-    }, [])
-
-    return { email, setEmail, setEmailValidation, emailValidation, validateEmail }
-}
-
-const usePasswordInput = () => {
-
-    const [password, setPassword] = useState('');
-
-    const [passwordValidation, setPasswordValidation] = useState<validationCondition>({ state: 'BEFORE' })
-
-    const validatePassword = useCallback((password: string) => {
-        const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;
-        if (regex.test(password)) {
-            setPasswordValidation({ state: 'VALID' })
-            return;
-        }
-        setPasswordValidation({ state: 'ERROR', errorText: '비밀번호는 8~12자 입니다.' })
-    }, [])
-
-    return { password, setPassword, setPasswordValidation, passwordValidation, validatePassword }
-}
 
 
 const LoginForm: React.FC = () => {
@@ -61,44 +26,23 @@ const LoginForm: React.FC = () => {
     const { email, setEmail, setEmailValidation, emailValidation, validateEmail } = useEmailInput();
     const { password, setPassword, setPasswordValidation, passwordValidation, validatePassword } = usePasswordInput();
 
+    const { saveID, setSaveID, autoLogin, setAutoLogin } = useLoginOptions({ setEmail })
+
+    const { login } = useAuth();
+    
     const emailRef = useRef<TextInput>(null);
     const passwordRef = useRef<TextInput>(null);
 
-    const [saveID, setSaveID] = useState(false);
-    const [autoLogin, setAutoLogin] = useState(false);
+    const handleBlur = useCallback(() => {
+        if (passwordValidation.state != 'BEFORE')
+            validatePassword(password);
 
-    const { login } = useAuth();
+        if (emailValidation.state != 'BEFORE')
+            validateEmail(email);
+    }, [password, email, passwordValidation, emailValidation])
 
-    useEffect(() => {
-        const loadLoginSetting = async () => {
-            try {
-                const loadedAutoLogin = await AsyncStorage.getItem('autoLogin')//오토 로그인 로두
-                setAutoLogin(loadedAutoLogin != null);
 
-                if (loadedAutoLogin == null) {
-                    const loadedSaveID = await AsyncStorage.getItem('saveID')//아이디 세이브인지 확인
-                    setSaveID(loadedSaveID != null);
-
-                    if (loadedSaveID) {
-                        const loadedEmail = await AsyncStorage.getItem('Email') || '';
-                        setEmail(loadedEmail)
-                    }
-
-                    return;
-                }
-                else {
-                    const loadedEmail = await AsyncStorage.getItem('Email') || '';
-                    setEmail(loadedEmail)
-
-                    return;
-                }
-            } catch (e) { console.error(e) }
-        }
-
-        loadLoginSetting()
-    }, [])
-
-    const LoginBtnHandler = async () => {
+    const LoginBtnHandler = useCallback(async () => {
 
         if (emailValidation.state == 'ERROR') {
             emailRef.current?.focus();
@@ -115,49 +59,7 @@ const LoginForm: React.FC = () => {
 
             if (!loginResult) throw Error('로그인 정보 불일치')
 
-            if (autoLogin) {
-                AsyncStorage.setItem('autoLogin', 'true');
-                await AsyncStorage.setItem('saveID', 'true')
-                await AsyncStorage.setItem('Email', email)
-
-                Toast.show({
-                    type: 'success',
-                    text1: '앞으로 앱 실행시 자동으로 로그인 돼요',
-                    position: 'bottom',
-                    bottomOffset: 60,
-                    visibilityTime: 3000
-                });
-            }
-
-            else if (saveID) {
-                const autoLogin = await AsyncStorage.getItem('autoLogin') || false
-                if (autoLogin) {
-                    try {
-                        await AsyncStorage.removeItem('autoLogin');
-                    }
-                    catch (e) { console.error(e) }
-                }
-                await AsyncStorage.setItem('saveID', 'true')
-                await AsyncStorage.setItem('Email', email)
-                Toast.show({
-                    type: 'success',
-                    text1: '아이디를 저장했어요',
-                    position: 'bottom',
-                    bottomOffset: 60,
-                    visibilityTime: 3000
-                });
-            }
-
-            else {
-                const loadedSaveID = await AsyncStorage.getItem('saveID') || false
-
-                if (loadedSaveID) {
-                    try {
-                        await AsyncStorage.removeItem('saveID');
-                    }
-                    catch (e) { console.error(e) }
-                }
-            }
+            saveLoginOptions({ email, autoLogin, saveID })
 
             navigation.dispatch(StackActions.replace('HomeStack'))
 
@@ -171,21 +73,13 @@ const LoginForm: React.FC = () => {
             }
             else console.error(e)
         }
-    }
+    }, [email, password, emailValidation, passwordValidation, saveID, autoLogin])
 
-    useEffect(() => {
-        if (autoLogin) setSaveID(true)
-    }, [autoLogin])
-
-    useEffect(() => {
-        if (!saveID) setAutoLogin(false)
-    }, [saveID])
 
     return (
         <>
             <View style={{
-                marginTop: 36,
-                alignSelf: 'center'
+                paddingHorizontal: 48
             }}>
                 <InputBaseComponent
                     ref={emailRef}
@@ -195,12 +89,12 @@ const LoginForm: React.FC = () => {
                     keyboardType={'email-address'}
                     validationCondition={emailValidation}
                     onFocus={() => setEmailValidation({ state: 'PENDING' })}
-                    onBlur={() => validateEmail(email)}
+                    onBlur={() => handleBlur()}
                 />
             </View>
+            <View style={{ height: 24 }}></View>
             <View style={{
-                marginTop: 12,
-                alignSelf: 'center'
+                paddingHorizontal: 48
             }}>
                 <InputBaseComponent
                     ref={passwordRef}
@@ -210,7 +104,7 @@ const LoginForm: React.FC = () => {
                     isEncryption={true}
                     validationCondition={passwordValidation}
                     onFocus={() => setPasswordValidation({ state: 'PENDING' })}
-                    onBlur={() => validatePassword(password)}
+                    onBlur={() => handleBlur()}
                 />
             </View>
             <View style={{

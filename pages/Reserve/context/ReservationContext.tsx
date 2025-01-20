@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { InstrumentWithOutBorrowHistory, Instrument, User } from "../../../UserType"
+import { InstrumentWithOutBorrowHistory, Instrument, User } from "@hongpung/UserType"
 import { Reservation } from '../ReservationInterface'
 
 interface ReservationContextProps {

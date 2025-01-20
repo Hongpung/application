@@ -1,32 +1,81 @@
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View, Text } from "react-native";
 
-import InputComponent from "@hongpung/components/inputs/InputComponent";
-import { useEffect, useRef, useState } from "react";
+import { InputBaseComponent } from "@hongpung/components/common/inputs/InputBaseComponent";
+import { useCallback, useEffect, useRef, useState } from "react";
 import LongButton from "@hongpung/components/buttons/LongButton";
 import { Color } from "@hongpung/ColorSet";
 import { useNavigation } from "@react-navigation/native";
 import { deleteToken, getToken } from "@hongpung/utils/TokenHandler";
 import Toast from "react-native-toast-message";
 
+type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
+
+const useCurrentPasswordInput = () => {
+
+    const [currentPassword, setCurrentPassword] = useState('');
+
+    const [currentPasswordValidation, setCurrentPasswordValidation] = useState<validationCondition>({ state: 'BEFORE' })
+
+    const validateCurrentPassword = useCallback((password: string) => {
+        const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;
+        if (regex.test(password)) {
+            setCurrentPasswordValidation({ state: 'VALID' })
+            return;
+        }
+        setCurrentPasswordValidation({ state: 'ERROR', errorText: '비밀번호는 8~12자 입니다.' })
+    }, [])
+
+    return { currentPassword, setCurrentPassword, setCurrentPasswordValidation, currentPasswordValidation, validateCurrentPassword }
+}
+
+const useNewPasswordInput = () => {
+
+    const [newPassword, setNewPassword] = useState('');
+
+    const [newPasswordValidation, setNewPasswordValidation] = useState<validationCondition>({ state: 'BEFORE' })
+
+    const validateNewPassword = useCallback((password: string) => {
+        const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;
+        if (regex.test(password)) {
+            setNewPasswordValidation({ state: 'VALID' })
+            return;
+        }
+        setNewPasswordValidation({ state: 'ERROR', errorText: '비밀번호는 8~12자 입니다.' })
+    }, [])
+
+    return { newPassword, setNewPassword, setNewPasswordValidation, newPasswordValidation, validateNewPassword }
+}
+
+const useConfirmPasswordInput = () => {
+
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [confirmPasswordValidation, setConfirmPasswordValidation] = useState<validationCondition>({ state: 'BEFORE' })
+
+    const validateConfirmPassword = useCallback((password: string, confirmPassword: string) => {
+
+        if (password == confirmPassword) {
+            setConfirmPasswordValidation({ state: 'VALID' })
+            return;
+        }
+        setConfirmPasswordValidation({ state: 'ERROR', errorText: '비밀번호와 일치하지 않습니다.' })
+    }, [])
+
+    return { confirmPassword, setConfirmPassword, setConfirmPasswordValidation, confirmPasswordValidation, validateConfirmPassword }
+}
 
 
 export const ChangePasswordScreen: React.FC = () => {
     const navigation = useNavigation();
 
-    const [currentPassword, setCurrentPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const { currentPassword, setCurrentPassword, currentPasswordValidation, validateCurrentPassword } = useCurrentPasswordInput();
+    const { newPassword, setNewPassword, newPasswordValidation, validateNewPassword } = useNewPasswordInput();
+    const { confirmPassword, setConfirmPassword, confirmPasswordValidation, validateConfirmPassword } = useConfirmPasswordInput();
 
     const currentPasswordRef = useRef<any | null>(null);
     const newPasswordRef = useRef<any | null>(null);
     const confirmPasswordRef = useRef<any | null>(null);
 
-    const vaildatePassword = (password: string) => {
-        const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;
-        const newCondition = regex.test(password);
-        console.log(password, newCondition)
-        return newCondition;
-    }
 
     const changePassword = async ({ currentPassword, newPassword }: { currentPassword: string, newPassword: string }) => {
         const controller = new AbortController();
@@ -63,6 +112,24 @@ export const ChangePasswordScreen: React.FC = () => {
             clearTimeout(timeoutId);
         }
     }
+
+    const onPressChangeButton = async () => {
+        if (currentPasswordValidation.state == 'VALID' && newPasswordValidation.state == 'VALID' && confirmPasswordValidation.state == 'VALID') {
+            const chageResult = await changePassword({ currentPassword, newPassword })
+            Toast.show({
+                type: 'success',
+                text1: '비밀번호가 변경 되었어요!\n다시 로그인해주세요',
+                position: 'bottom',
+                bottomOffset: 60,
+                visibilityTime: 3000
+            });
+            if (chageResult) navigation.goBack();
+        }
+        else if (currentPasswordValidation.state != 'VALID') currentPasswordRef.current?.focus()
+        else if (newPasswordValidation.state != 'VALID') newPasswordRef.current?.focus()
+        else if (confirmPasswordValidation.state != 'VALID') confirmPasswordRef.current?.focus();
+    }
+
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }} >
             <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#FFF" }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}>
@@ -85,52 +152,40 @@ export const ChangePasswordScreen: React.FC = () => {
                         </Text>
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingVertical: 16 }}>
-                        <View style={{ alignSelf: 'center' }}>
-                            <InputComponent
+                        <View style={{ marginHorizontal: 48, }}>
+                            <InputBaseComponent
                                 ref={currentPasswordRef}
                                 label='현재 비밀번호'
                                 color={'green'}
                                 isEncryption
                                 inputValue={currentPassword}
                                 setInputValue={setCurrentPassword}
-                                validationCondition={
-                                    [{
-                                        validation: vaildatePassword,
-                                        errorText: "영문, 숫자, 특수문자(!,@,#,$,%,^,&,+,=)를\n포함한 8~12자로 구성되어야 합니다."
-                                    }]}
+                                onBlur={() => validateCurrentPassword(currentPassword)}
+                                validationCondition={currentPasswordValidation}
                             />
                         </View>
-                        <View style={{ alignSelf: 'center' }}>
-                            <InputComponent
+                        <View style={{ marginHorizontal: 48, }}>
+                            <InputBaseComponent
                                 ref={newPasswordRef}
                                 label='새로운 비밀번호'
                                 color={'green'}
                                 isEncryption
                                 inputValue={newPassword}
                                 setInputValue={setNewPassword}
-                                validationCondition={
-                                    [{
-                                        validation: vaildatePassword,
-                                        errorText: "영문, 숫자, 특수문자(!,@,#,$,%,^,&,+,=)를\n포함한 8~12자로 구성되어야 합니다."
-                                    }]}
+                                onBlur={() => validateNewPassword(newPassword)}
+                                validationCondition={newPasswordValidation}
                             />
                         </View>
-                        <View style={{ alignSelf: 'center' }}>
-                            <InputComponent
+                        <View style={{ marginHorizontal: 48, }}>
+                            <InputBaseComponent
                                 ref={confirmPasswordRef}
                                 label='새로운 비밀번호 확인'
                                 color={'green'}
                                 isEncryption
                                 inputValue={confirmPassword}
                                 setInputValue={setConfirmPassword}
-                                validationCondition={[
-                                    {
-                                        validation: () => {
-                                            const newCondition = newPassword == confirmPassword
-                                            return newCondition;
-                                        },
-                                        errorText: "비밀번호가 일치하지 않습니다."
-                                    }]}
+                                onBlur={() => validateConfirmPassword(newPassword, confirmPassword)}
+                                validationCondition={confirmPasswordValidation}
                             />
                         </View>
                     </View>
@@ -139,21 +194,7 @@ export const ChangePasswordScreen: React.FC = () => {
                             color={'green'}
                             innerText='비밀번호 변경'
                             isAble={newPassword.length > 0 && confirmPassword.length > 0}
-                            onPress={async () => {
-                                if (currentPasswordRef.current?.validate() && confirmPasswordRef.current?.validate()) {
-                                    const chageResult = await changePassword({ currentPassword, newPassword })
-                                    Toast.show({
-                                        type: 'success',
-                                        text1: '비밀번호가 변경 되었어요!\n다시 로그인해주세요',
-                                        position: 'bottom',
-                                        bottomOffset: 60,
-                                        visibilityTime: 3000
-                                    });
-                                    if (chageResult) navigation.goBack();
-                                }
-                                else if (!currentPasswordRef.current?.validate()) currentPasswordRef.current?.focus()
-                                else if (!confirmPasswordRef.current?.validate()) confirmPasswordRef.current?.focus();
-                            }}
+                            onPress={onPressChangeButton}
                         />
                     </View>
                 </View>

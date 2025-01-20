@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Color } from '@hongpung/ColorSet';
-import CustomSwitch from '@hongpung/components/CustomSwitch';
+import CustomSwitch from '@hongpung/components/common/CustomSwitch';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LongButton from '@hongpung/components/buttons/LongButton';
 import { StackActions, useNavigation } from '@react-navigation/native';

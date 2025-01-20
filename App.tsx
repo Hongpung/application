@@ -1,5 +1,5 @@
-import { Platform, View, SafeAreaView as SafeView, ViewStyle, StyleProp, Text, Pressable, ActivityIndicator, Image, ImageBackground, Modal, AppState, TouchableOpacity } from 'react-native';
-import React, { useEffect, useRef } from 'react';
+import { Platform, View, SafeAreaView as SafeView, ViewStyle, StyleProp, Text, ImageBackground, Modal, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,7 +27,7 @@ const SafeZone: React.FC<{ children: any, style: StyleProp<ViewStyle> }> = ({ ch
 
   if (Platform.OS == 'android')
     return (
-      <SafeAreaView style={[style, { paddingBottom: 12, backgroundColor: '#FFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }]} >
+      <SafeAreaView style={[style, Platform.OS === 'android' ? styles.androidStyle : {}]}>
         {children}
       </SafeAreaView>
     )
@@ -41,11 +41,9 @@ const SafeZone: React.FC<{ children: any, style: StyleProp<ViewStyle> }> = ({ ch
 
 const App: React.FC = () => {
 
-  const notificationListener = useRef<Notifications.EventSubscription>();
-
   useEffect(() => {
 
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+    const subcription = Notifications.addNotificationReceivedListener(notification => {
       Toast.show({
         type: 'notification',
         text1: notification.request.content.title || 'fail',
@@ -56,14 +54,12 @@ const App: React.FC = () => {
       });
     });
 
-
     return () => {
-      notificationListener.current &&
-        Notifications.removeNotificationSubscription(notificationListener.current);
+      subcription.remove();
     };
 
   }, [])
-  
+
   return (
     <RecoilRoot>
       <AppLoader />
@@ -75,6 +71,14 @@ const AppLoader: React.FC = () => {
 
   const { firstScreen, fontLoaded, banners } = useAppLoad();
 
+  const getLoadingText = () => {
+    if (!fontLoaded) return '폰트 로딩중';
+    if (!firstScreen) return '기본 정보 로딩중';
+    if (banners.state === 'LOADED') return '';
+    if (banners.state === 'FAILED') return '배너 로딩 실패';
+    return '배너 로딩중';
+  };
+
   if (!fontLoaded || !firstScreen || banners.state != 'LOADED') {
     return (
       <View style={{ flex: 1 }}>
@@ -83,7 +87,9 @@ const AppLoader: React.FC = () => {
           resizeMode='cover'
           onLoadEnd={SplashScreen.hideAsync} />
 
-        <Text style={{ position: 'absolute', bottom: 20, right: 20, color: '#FFF', fontFamily: 'NanumSquareNeo-Bold' }}>{fontLoaded ? firstScreen ? banners.state == 'FAILED' ? '' : '배너 로딩중' : '기본 정보 로딩중' : `폰트 로딩중`}</Text>
+        <Text style={{ position: 'absolute', bottom: 20, right: 20, color: '#FFF', fontFamily: 'NanumSquareNeo-Bold' }}>
+          {getLoadingText()}
+        </Text>
 
         <Modal visible={banners.state == 'FAILED'} transparent>
           <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -123,3 +129,7 @@ const AppLoader: React.FC = () => {
 }
 
 export default App;
+
+const styles = StyleSheet.create({
+  androidStyle: { paddingBottom: 12, backgroundColor: '#FFF', borderBottomLeftRadius: 20, borderBottomRightRadius: 20 }
+})
