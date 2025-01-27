@@ -42,7 +42,7 @@ export interface Instrument {
     name: string
     instrumentType: InstrumentType
     club: Omit<Club, '기타'>
-    available: boolean,
+    borrowAvailable: boolean,
     borrowHistory: BorrowHistory[]
 }
 
@@ -53,9 +53,9 @@ export interface InstrumentCreateDTO {
 }
 
 export interface InstrumentEditDTO {
-    type: string
+    instrumentType: string
     name: string
-    available: boolean,
+    borrowAvailable: boolean,
     imageUrl?: string
 }
 

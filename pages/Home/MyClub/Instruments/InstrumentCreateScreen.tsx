@@ -41,7 +41,7 @@ const InstrumentEditScreen: React.FC = () => {
     const [onSelectType, setSelectTypeVisible] = useState(false);
     const [isLoading, setLoading] = useState(false);
 
-    const [instrument, setInstrument] = useState<Instrument>({ available: true, club: loginUser?.club == '기타' ? '들녘' : loginUser?.club!, borrowHistory: [], name: '', instrumentId: -1, instrumentType: '꽹과리' })
+    const [instrument, setInstrument] = useState<Instrument>({ borrowAvailable: true, club: loginUser?.club == '기타' ? '들녘' : loginUser?.club!, borrowHistory: [], name: '', instrumentId: -1, instrumentType: '꽹과리' })
 
 
     const pickImageFromAlbum = async () => {

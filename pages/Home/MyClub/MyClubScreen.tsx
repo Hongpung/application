@@ -2,15 +2,14 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Color } from '../../../ColorSet'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import ProfileMiniCard from '../../../components/cards/ProfileMiniCard'
-import { UserProvider } from '../../../context/UserContext';
-import { UserModal } from './ClubMember/ClubMemeberScreen';
 import { throttle } from 'lodash';
 import { Icons } from '@hongpung/components/common/Icon';
 import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack';
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import { User } from '@hongpung/UserType';
 import LottieView from 'lottie-react-native';
+import { useRecoilValue } from 'recoil';
+import { loginUserState } from '@hongpung/recoil/authState';
 
 type MyClubProps = NativeStackScreenProps<MyClubStackStackParamList, 'MyClubHome'>;
 
@@ -20,6 +19,7 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
 
     const [leader, setLeader] = useState<User | null>(null)
     const [sangsoe, setSangsoe] = useState<User | null>(null)
+    const loginUserInformation = useRecoilValue(loginUserState);
     const throttledNavigation = useMemo(
         () =>
             throttle((ScreenName: any) => {
@@ -63,6 +63,10 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                     </View>
                     <View style={{ flex: 1 }}>
                         <View style={{ height: 10 }} />
+                        <View style={styles.info}>
+                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리</Text>
+                            <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{loginUserInformation?.club}</Text>
+                        </View>
                         <View style={styles.info}>
                             <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>상쇠</Text>
                             <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{sangsoe ? `${sangsoe?.name}${!!sangsoe?.nickname ? ` (${sangsoe.nickname})` : ''}` : '공석'}</Text>

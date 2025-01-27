@@ -4,7 +4,7 @@ import { Color } from '@hongpung/ColorSet'
 import InstrumentCard from '@hongpung/components/cards/InstrumentCard'
 import LongButton from '@hongpung/components/buttons/LongButton'
 import { Icons } from '@hongpung/components/common/Icon'
-import { ReservationDTO } from '../Reserve/ReservationInterface'
+import { ReservationDTO } from '../Reservation/ReservationInterface'
 import { User } from '@hongpung/UserType'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack'
@@ -25,7 +25,7 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
 
     console.log(data)
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
-    if (!data||!reservationData)
+    if (!data || !reservationData)
         return (
             <View></View>
         )
@@ -56,7 +56,7 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             color: Color['grey400']
                         }}>{data?.startTime.slice(0, -3)}~{data?.endTime.slice(0, -3)}</Text>
 
-                        {data?.reservationType == '정규연습' ?
+                        {data?.reservationType == 'REGULAR' ?
                             <View style={{
                                 position: 'absolute', right: 12, top: -4, width: 48, height: 48
                             }} >

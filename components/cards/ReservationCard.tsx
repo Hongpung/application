@@ -1,6 +1,6 @@
 import { View, Text, Pressable } from "react-native"
 import { Color } from "@hongpung/ColorSet"
-import { ReservationDTO } from "@hongpung/pages/Reserve/ReservationInterface"
+import { ReservationDTO } from "@hongpung/pages/Reservation/ReservationInterface"
 import { Icons } from "@hongpung/components/common/Icon"
 import { useMemo } from "react"
 import { useNavigation } from "@react-navigation/native"
@@ -49,7 +49,7 @@ const ReservationCard: React.FC<{ reservation: ReservationDTO }> = ({ reservatio
                 }}>{`자세히 보기 >`}</Text>
             </Pressable>
             {/* 동아리 개별 연습 유형 */
-                reservation.type == '정규연습' ?
+                reservation.reservationType == 'REGULAR' ?
                     <View style={{
                         position: 'absolute', right: 12, top: -4, width: 48, height: 48
                     }} >

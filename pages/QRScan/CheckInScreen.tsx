@@ -8,22 +8,30 @@ import { MainStackParamList } from '@hongpung/nav/HomeStacks'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { loginUserState, useOnReserve } from '@hongpung/recoil/authState'
-import { RealtimeSession, ReservationSession } from '../Reserve/SessionTypes'
+import { RealtimeSession, ReservationSession } from '../Reservation/SessionTypes'
 import { Icons } from '@hongpung/components/common/Icon'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { getToken } from '@hongpung/utils/TokenHandler'
+import CustomSwitch from '@hongpung/components/common/CustomSwitch'
 
 type CheckPossible =
     {
         session: ReservationSession | RealtimeSession | null,
         nextReservation: ReservationSession | null,
         timeLimit: boolean | undefined,
-        creatPossible: boolean,
+        createPossible: boolean,
         isPariticipant: boolean | undefined,
         message: string | null,
         participationAvailable: boolean | undefined
     }
 
+const TimetoDate = (time: string): Date => {
+    const utcTime = new Date();
+    const koreaTime = new Date(utcTime.getTime() + 9 * 60 * 60 * 1000);
+    const today = koreaTime.toISOString().split('T')[0]
+
+    return new Date(today + 'T' + time + 'Z')
+}
 
 const CheckInScreen: React.FC = () => {
 
@@ -33,9 +41,11 @@ const CheckInScreen: React.FC = () => {
     const setRoomSocket = useSetRecoilState(useOnReserve); // 쓰기 전용
     const [isCheckin, CheckIn] = useState(false);
     const [checkinStatus, setStatus] = useState<'create' | 'attend' | 'start' | 'late' | null>(null);
+    const [participationAvailable, setParticipationAvailable] = useState(false)
 
     const { data: sessionData, loading, error } = useFetchUsingToken<CheckPossible>(`${process.env.SUB_API}/check-in/check-possible`,)
 
+    console.log(sessionData)
     useEffect(() => { navigation.setOptions({ animation: 'none' }); }, [])
 
     const startSession = () => {
@@ -46,14 +56,15 @@ const CheckInScreen: React.FC = () => {
                 const token = await getToken('token')
                 if (!token) throw Error('Invalid Token')
 
-                const response = await fetch(`${process.env.SUB_API}/check-in/start`,
+                const response = await fetch(`${process.env.BASE_URL}/check-in/start`,
                     {
+
                         method: 'POST',
                         headers: {
                             Authorization: `Bearer ${token}`,
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify(loginUser)
+                        body: JSON.stringify({participationAvailable})
                     }
                 )
                 if (!response.ok) throw Error('session 입장에 실패했습니다.')
@@ -193,7 +204,7 @@ const CheckInScreen: React.FC = () => {
                 </Modal>
             </View>
         )
-    if (!sessionData?.creatPossible && !sessionData?.isPariticipant && !sessionData?.participationAvailable)
+    if (!sessionData?.createPossible && !sessionData?.isPariticipant && !sessionData?.participationAvailable)
         return (
             <View style={{ flex: 1, backgroundColor: '#FFF' }}>
                 <Modal visible={true} transparent>
@@ -323,6 +334,10 @@ const CheckInScreen: React.FC = () => {
                             }}>
                                 <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 20, color: Color['grey600'] }}>이 시간은 예약이 없어요</Text>
                                 <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 16, lineHeight: 24, color: Color['grey400'] }}>바로 사용할 수 있어요</Text>
+                                {sessionData.nextReservation &&
+                                    <Text style={{ position: 'absolute', bottom: 24, fontFamily: 'NanumSquareNeo-Regular', fontSize: 16, lineHeight: 24, color: Color['grey400'] }}>
+                                        다음 연습까지 남은 시간: {Math.floor((TimetoDate(sessionData.nextReservation?.startTime).getTime() - (new Date().getTime() + 9 * 60 * 60 * 1000)) / 1000 / 60 / 60)}시간 {Math.floor((TimetoDate(sessionData.nextReservation?.startTime).getTime() - (new Date().getTime() + 9 * 60 * 60 * 1000)) / 1000 / 60 % 60)}분
+                                    </Text>}
                             </View>}
                 {isCheckin ?
                     signRender()
@@ -345,12 +360,16 @@ const CheckInScreen: React.FC = () => {
                                 fontFamily: 'NanumSquareNeo-Bold',
                                 fontSize: 18,
                                 color: Color['green500'], textAlign: 'center', marginBottom: 4
-                            }}>{sessionData?.nextReservation ? `지금부터 ${sessionData.nextReservation.startTime.slice(0, -3)}까지 사용하실 수 있어요` : '제한 없이 사용할 수 있어요'}</Text>
+                            }}>{sessionData?.nextReservation ? `${sessionData.nextReservation.startTime.slice(0, 2) + '시 ' + sessionData.nextReservation.startTime.slice(-2)}분 까지 사용하실 수 있어요` : '제한 없이 사용할 수 있어요'}</Text>
                             <Text style={{
                                 fontFamily: 'NanumSquareNeo-Bold',
                                 fontSize: 20,
                                 color: Color['grey700'], textAlign: 'center'
-                            }}>{`바로 사용하시나요?`}</Text>
+                            }}>{`시작하시겠어요?`}</Text>
+                            <View style={{marginTop:64, flexDirection: 'row', gap: 12, justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: participationAvailable ? Color['green500'] : Color['red500'] }}>{participationAvailable ? '열린 연습' : '참여 불가'}</Text>
+                                <CustomSwitch onChange={setParticipationAvailable} value={participationAvailable} />
+                            </View>
                         </View>}
 
                 <View style={{ position: 'absolute', width: '100%', bottom: 16 }}>

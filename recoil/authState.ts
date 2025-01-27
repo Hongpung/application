@@ -1,7 +1,22 @@
-import { atom, selector } from 'recoil';
+import { atom } from 'recoil';
 import { User } from '@hongpung/UserType';
-import { getToken } from '@hongpung/utils/TokenHandler';
-import { Socket } from 'socket.io-client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+export interface TodayReservation{
+  reservationId: number,
+  creatorId: number,
+  creatorName: string,
+  creatorNickname: string,
+  date: string,
+  startTime: string,
+  endTime: string,
+  externalCreatorName: string | null,
+  participationAvailable: boolean,
+  reservationType: string,
+  title: string,
+  amountOfParticipators: number
+}
 
 // 로그인된 사용자 정보 관리 Atom
 export const loginUserState = atom<User | null>({
@@ -10,7 +25,7 @@ export const loginUserState = atom<User | null>({
 });
 
 // 사용자의 당일 예약 정보
-export const todayReservation = atom<any[]>({
+export const todayReservation = atom<TodayReservation[]>({
   key:'todayReservation',
   default:[]
 })

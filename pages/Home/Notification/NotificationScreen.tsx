@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 
 import { Color } from '../../../ColorSet';
@@ -53,25 +53,28 @@ const calculateTimeDifference = (date1: Date) => {
     const differenceInSeconds = Math.floor(differenceInMilliseconds / 1000);
 
     if (differenceInSeconds < 60) {
-        return `${differenceInSeconds}초`;
+        return `${differenceInSeconds}초 전`;
     }
 
     const differenceInMinutes = Math.floor(differenceInSeconds / 60);
     if (differenceInMinutes < 60) {
-        return `${differenceInMinutes}분`;
+        return `${differenceInMinutes}분 전`;
     }
 
     const differenceInHours = Math.floor(differenceInMinutes / 60);
     if (differenceInHours < 24) {
-        return `${differenceInHours}시간`;
+        return `${differenceInHours}시간 전`;
     }
 
     const differenceInDays = Math.floor(differenceInHours / 24);
+    if (differenceInDays == 1) {
+        return '어제';
+    }
     if (differenceInDays < 7) {
-        return `${differenceInDays}일`;
+        return `${differenceInDays}일 전`;
     }
     const differenceInWeeks = Math.floor(differenceInDays / 7);
-    return `${differenceInWeeks}주`;
+    return `${differenceInWeeks}주 전`;
 };
 
 const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }) => {
@@ -90,8 +93,6 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
                 opacity
             };
         });
-
-        dragX.set(dragXParam.get())
 
         return (
             <Pressable
@@ -141,7 +142,7 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
                         <Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'] }}>{notification.data.title}</Text>
                     </Animated.View>
                     <Text style={{ fontSize: 12, height: 14, fontFamily: "NanumSquareNeo-Regular", color: Color['grey300'] }} >
-                        {calculateTimeDifference(new Date(notification.timestamp))} 전
+                        {calculateTimeDifference(new Date(notification.timestamp))}
                     </Text>
                 </Animated.View>
                 <View style={{ marginHorizontal: 24, justifyContent: 'center', height: 60 }}>
@@ -151,47 +152,6 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
                 </View>
             </Animated.View>
         </Swipeable>
-    )
-}
-
-
-type NotificationListProps = {
-    notifications: NotificationDTO[],
-    onDelete: (any: any) => void
-}
-
-const NotificationList: React.FC<NotificationListProps> = ({ notifications, onDelete }) => {
-
-    let showOldNotificationHeader = false;
-    return (
-        <View style={styles.container}>
-            {notifications.map((notification) => {
-
-                const isOldNotification = new Date(notification.timestamp).getTime() < new Date('2024-07-05').getTime();
-                const shouldShowHeader = isOldNotification && !showOldNotificationHeader;
-
-                if (shouldShowHeader) {
-                    showOldNotificationHeader = true;
-                }
-                return (
-                    <View key={notification.notificationId}>
-                        {shouldShowHeader && (
-                            <View style={{ backgroundColor: 'transparent', marginVertical: 4, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center' }}>
-                                <View style={{ height: 0, borderWidth: 0.6, flex: 1, marginRight: 8, borderColor: Color['grey200'] }} />
-                                <Text style={{ color: Color['grey300'] }}>이전 알림</Text>
-                                <View style={{ height: 0, borderWidth: 0.6, flex: 1, marginLeft: 8, borderColor: Color['grey200'] }} />
-                            </View>
-                        )}
-                        <GestureHandlerRootView>
-                            <NotificationCard
-                                notification={notification}
-                                onDelete={() => { onDelete(notification.notificationId) }}
-                            />
-                        </GestureHandlerRootView>
-                    </View>
-                );
-            })}
-        </View>
     )
 }
 
@@ -207,6 +167,7 @@ const NotificationScreen: React.FC = () => {
     const navigation = useNavigation();
 
     const [Notifications, setNotifications] = useState<NotificationDTO[]>([]);
+    const [lastReadNotificationId, setLastNotificationId] = useState<number | null>(null)
     const handleDelete = (id: number) => {
         const deleteFetch = async () => {
             try {
@@ -243,24 +204,131 @@ const NotificationScreen: React.FC = () => {
 
     };
 
-    const { data: notifications, loading, error } = useFetchUsingToken<NotificationDTO[]>(`${process.env.SUB_API}/notification/my`);
 
-    useFetchUsingToken<NotificationDTO[]>(`${process.env.SUB_API}/notification/read`, { method: 'PATCH' })
+    const handleDeleteAll = () => {
+        const deleteAll = async () => {
+            try {
+                const token = await getToken('token');
+                if (!token) { throw Error('invalid Token'); }
+
+                const response = await fetch(`${process.env.BASE_URL}/notification/delete/all`, {
+                    method: 'DELETE',
+                    headers: { Authorization: `Bearer ${token}`, }
+                })
+
+                if (!response.ok) throw Error('Delete Fail')
+
+                setNotifications([]);
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                    // `invalid Token` 메시지일 경우 처리
+                    if (err.message === 'invalid Token') {
+
+                        navigation.dispatch(StackActions.replace('Login'))
+                        return;
+                    }
+                    // `AbortError`일 경우 처리
+                    if (err.name === 'AbortError') {
+                        const status = (err as any).status ?? ''; // status가 있으면 사용, 없으면 빈 문자열
+
+                    }
+                } else {
+                    console.error('An unknown error occurred');
+                }
+            }
+        }
+        deleteAll()
+        console.log('deleteAll')
+
+    };
+
+    const { data: notificationData, loading, error } = useFetchUsingToken<NotificationDTO[]>(`${process.env.SUB_API}/notification/my`);
+
 
     useEffect(() => {
-        console.log('notifications:'+notifications)
-        if (notifications)
-            setNotifications(notifications)
-    }, [notifications])
+        console.log('notifications:' + notificationData)
+        if (notificationData) {
+            setNotifications(notificationData)
+            const lastReadNotification = notificationData.find(notification => notification.isRead)
+            setLastNotificationId(lastReadNotification?.notificationId || null);
+        }
+    }, [notificationData])
 
-    if (!notifications || loading)
+    useEffect(() => {
+        return () => {
+            const readAll = async () => {
+                try {
+                    const token = await getToken('token');
+
+                    const response = await fetch(`${process.env.BASE_URL}/notification/read`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
+                            },
+                        }
+                    )
+                    if (!response.ok) {
+                        console.log(response.status + response.statusText)
+                        throw new Error('Network response was not ok');
+                    }
+                } catch {
+                    Alert.alert('네트워크 오류가 발생하였습니다.')
+                }
+            }
+
+            readAll()
+        }
+    }, [])
+
+    if (!notificationData || loading)
         return (
             <View style={{ flex: 1, backgroundColor: '#FFF' }} />
         )
     return (
         <ScrollView style={styles.container} >
             <View style={{ marginTop: 6 }} />
-            <NotificationList notifications={Notifications} onDelete={handleDelete} />
+            <View style={styles.container}>
+                {
+                    Notifications.length > 0 ?
+                        <>
+                            <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginHorizontal: 28, marginVertical: 8 }}>
+                                <Pressable onPress={handleDeleteAll}>
+                                    <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'], fontSize: 16 }}>전체 삭제</Text>
+                                </Pressable>
+                            </View>
+                            {Notifications.map((notification) => {
+                                return (
+                                    <>
+                                        {
+                                            lastReadNotificationId == notification.notificationId &&
+                                            <View style={{ backgroundColor: 'transparent', marginVertical: 4, marginHorizontal: 36, flexDirection: 'row', alignItems: 'center' }}>
+                                                <View style={{ height: 0, borderWidth: 0.6, flex: 1, marginRight: 8, borderColor: Color['grey200'] }} />
+                                                <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey300'] }}>이전 알림</Text>
+                                                <View style={{ height: 0, borderWidth: 0.6, flex: 1, marginLeft: 8, borderColor: Color['grey200'] }} />
+                                            </View>
+                                        }
+                                        <View key={notification.notificationId}>
+                                            <GestureHandlerRootView>
+                                                <NotificationCard
+                                                    notification={notification}
+                                                    onDelete={() => { handleDelete(notification.notificationId) }}
+                                                />
+                                            </GestureHandlerRootView>
+                                        </View>
+                                    </>
+                                );
+
+                            })}
+                        </>
+                        :
+                        <View style={{ flex: 1, height: 500, justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'], fontSize: 16 }}>
+                                새로운 알림이 없습니다.
+                            </Text>
+                        </View>
+                }
+            </View>
         </ScrollView>
     )
 }

@@ -127,11 +127,6 @@ const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolea
                         { backgroundColor: value ? Color['blue400'] : Color['grey300'] },
                     ]}
                 />
-                <PanGestureHandler
-                    onGestureEvent={gestureHandler}
-                    onHandlerStateChange={stateChangeHandler}
-
-                >
                     <Animated.View
                         style={[
                             styles.switchHandle,
@@ -176,7 +171,6 @@ const CustomSwitch: React.FC<{ onChange: (value: boolean) => void, value: boolea
                                     }
                         ]}
                     />
-                </PanGestureHandler>
             </View>
         </Pressable>
     );

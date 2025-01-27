@@ -58,7 +58,8 @@
         "expo-build-properties",
         {
           "android": {
-            "newArchEnabled": true
+            "newArchEnabled": true,
+            "usesCleartextTraffic": true
           },
           "ios": {
             "newArchEnabled": true
@@ -71,6 +72,12 @@
       "eas": {
         "projectId": "1de88024-4522-477b-99c9-b458d373a286"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1de88024-4522-477b-99c9-b458d373a286"
     }
   }
 }

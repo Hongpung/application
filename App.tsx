@@ -13,6 +13,7 @@ import { RecoilRoot } from 'recoil';
 import { toastConfig } from './utils/toast.config';
 import { useAppLoad } from './hoc/useAppLoad';
 import { RootStacks } from './nav/RootStack';
+import { Color } from './ColorSet';
 
 
 const ContentsContainer: React.FC<{ startDomain: "Login" | "Tutorial" | "HomeStack" }> = ({ startDomain }) => {
@@ -87,7 +88,7 @@ const AppLoader: React.FC = () => {
           resizeMode='cover'
           onLoadEnd={SplashScreen.hideAsync} />
 
-        <Text style={{ position: 'absolute', bottom: 20, right: 20, color: '#FFF', fontFamily: 'NanumSquareNeo-Bold' }}>
+        <Text style={{ position: 'absolute', bottom: 20, right: 20, color: Color['grey400'], fontFamily: 'NanumSquareNeo-Bold' }}>
           {getLoadingText()}
         </Text>
 

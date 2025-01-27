@@ -10,6 +10,7 @@ import { getToken } from '@hongpung/utils/TokenHandler';
 import Toast from 'react-native-toast-message';
 import uploadImage from '@hongpung/utils/uploadImage';
 import * as ImagePicker from 'expo-image-picker';
+import CustomSwitch from '@hongpung/components/common/CustomSwitch';
 
 
 const showDeleteCompleteToast = () => {
@@ -45,16 +46,17 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
     const [selectedImageUri, setImageUri] = useState<string | null>(null);
 
     const [onSelectType, setSelectTypeVisible] = useState(false);
+
     const [isLoading, setLoading] = useState(false);
 
 
     const [instrument, setInstrument] = useState<Instrument>(instrumentInform ? JSON.parse(instrumentInform) :
-        { available: true, club: loginUser?.club, borrowHistory: [], name: '', instrumentId: -1, type: '쇠' })
+        { borrowAvailable: true, club: loginUser?.club, borrowHistory: [], name: '', instrumentId: -1, type: '쇠' })
 
-    const parseInstrument = (type: InstrumentType): string => {
-        const instrumentEnumNo = instrumentTypes.indexOf(type)
-        return instrumentsEngType[instrumentEnumNo];
-    }
+    // const parseInstrument = (type: InstrumentType): string => {
+    //     const instrumentEnumNo = instrumentTypes.indexOf(type)
+    //     return instrumentsEngType[instrumentEnumNo];
+    // }
 
     const dropdownCloseHandler = () => {
         if (onSelectType)
@@ -64,6 +66,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
     const chageName = (e: string) => {
         setInstrument({ ...instrument, name: e })
     };
+
     const pickImageFromAlbum = async () => {
         // 권한 요청
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -148,7 +151,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
 
                 if (!token) throw Error('invalid Token');
 
-                const submitForm: InstrumentEditDTO = { available: true, name: instrument.name, type: parseInstrument(instrument.instrumentType) }
+                const submitForm: InstrumentEditDTO = { borrowAvailable: instrument.borrowAvailable, name: instrument.name, instrumentType: instrument.instrumentType }
 
                 if (!!selectedImage) {
                     console.log('이미지 업로드 수행중')
@@ -187,7 +190,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
                 clearTimeout(timeoutId);
             }
         }
-        
+
         editInstrument()
     }
 
@@ -262,6 +265,15 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
 
                         </View>
 
+                        <View style={{ height: 28 }} />
+
+                        <View style={[styles.Row]}>
+                            <Text style={styles.RowLeft}>{`대여 상태`}</Text>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                                <Text style={{ fontFamily: "NanumSquareNeo-Bold", fontSize: 16, color: instrument.borrowAvailable ? Color['blue400'] : Color['red400'] }}>{instrument.borrowAvailable ? '가능' : '불가'}</Text>
+                                <CustomSwitch onChange={() => setInstrument(prev => ({ ...prev, borrowAvailable: !prev.borrowAvailable }))} value={instrument.borrowAvailable} />
+                            </View>
+                        </View>
                     </ScrollView >
 
                     {instrument.instrumentId != -1 && <>

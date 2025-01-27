@@ -1,15 +1,14 @@
-import MyBadgeScreen from "@hongpung/pages/Home/MyPage/MyBadge/MyBadgeScreen";
-import MyPageScreen from "@hongpung/pages/Home/MyPage/MyPageScreen";
-import MyPracticesScreen from "@hongpung/pages/Home/MyPage/MyPractices/MyPracticesScreen";
-import MySchedulesScreen from "@hongpung/pages/Home/MyPage/MySchedule/MySchedulesScreen";
+import MyPageScreen from "@hongpung/pages/MyPage/MyPageScreen";
+import MyPracticesScreen from "@hongpung/pages/MyPage/MyPractices/MyPracticesScreen";
+import MySchedulesScreen from "@hongpung/pages/MyPage/MySchedule/MySchedulesScreen";
 import LoginSettingScreen from "@hongpung/pages/Setting/LoginSetting";
 import NotificationSettingScreen from "@hongpung/pages/Setting/NotificationSetting";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Header from '@hongpung/components/common/Header';
 import PracticeInfoScreen from "@hongpung/pages/share/ClubPracticeInfoScreen";
-import ChangeMyInfoScreen from "@hongpung/pages/Home/MyPage/ChangeMyInfoScreen";
+import ChangeMyInfoScreen from "@hongpung/pages/MyPage/ChangeMyInfoScreen";
 import MyPracticeInfoScreen from "@hongpung/pages/share/MyPracticeInfoScreen";
-import ChangePasswordScreen from "@hongpung/pages/Home/MyPage/ChangePassword.screen";
+import ChangePasswordScreen from "@hongpung/pages/MyPage/ChangePassword.screen";
 
 
 export type MyPageParamList = {

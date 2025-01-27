@@ -3,17 +3,17 @@ import React from 'react';
 import Header from '../components/common/Header';
 import HomeScreen from '../pages/Home/HomeScreen';
 import QRScanScreen from '../pages/QRScan/QRScanScreen';
-import ReservationMainScreen from '../pages/Reserve/ReservationMainScreen';
+import ReservationMainScreen from '../pages/Reservation/ReservationMainScreen';
 import { Color } from '../ColorSet';
 import { Icons } from '@hongpung/components/common/Icon';
-import { Text, View } from 'react-native';
-import ChatListScreen from '@hongpung/pages/Chat/ChatListScreen';
-
+import MyPageScreen from '@hongpung/pages/MyPage/MyPageScreen';
+import MyPageStacks from './MyPageStack';
 
 export type BottomTabParamList = {
     Home: undefined;
-    Reserve: undefined;
-    QRScan:undefined;
+    Reservation: undefined;
+    QRScan: undefined;
+    MyPage: undefined;
 };
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
@@ -42,7 +42,7 @@ const BottomTab = () => {
                     tabBarLabel: '홈'
                 }} />
 
-            <Tab.Screen name="Reserve"
+            <Tab.Screen name="Reservation"
                 component={ReservationMainScreen}
                 options={{
                     tabBarIcon: ({ color, focused }) => <Icons name={focused ? 'calendar' : 'calendar-outline'} color={color} />,
@@ -58,7 +58,14 @@ const BottomTab = () => {
                     tabBarLabel: 'QR 스캔',
                     tabBarStyle: { display: 'none' }
                 }} />
-
+            <Tab.Screen name="MyPage"
+                component={MyPageScreen}
+                options={{
+                    tabBarIcon: ({ color }) => <Icons name={'person'} color={color} />,
+                    headerShown: true,
+                    header: () => <Header leftButton={null} HeaderName='마이페이지' />,
+                    tabBarLabel: '내 정보',
+                }} />
 
             {/* <Tab.Screen name="Chat"
                 component={ChatListScreen}

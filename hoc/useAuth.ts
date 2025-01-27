@@ -1,5 +1,5 @@
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { loginUserState, useOnReserve } from '@hongpung/recoil/authState';
+import { loginUserState, todayReservation, useOnReserve } from '@hongpung/recoil/authState';
 import { User } from '@hongpung/UserType';
 import { deleteToken, getToken, saveToken } from '@hongpung/utils/TokenHandler';
 import * as Notifications from 'expo-notifications';
@@ -9,6 +9,7 @@ import { StackActions, useNavigation } from '@react-navigation/native';
 export const useAuth = () => {
   const [loginUser, setLoginUser] = useRecoilState(loginUserState);
   const setOnSession = useSetRecoilState(useOnReserve);
+  const setTodayReservation = useSetRecoilState(todayReservation);
   const controller = new AbortController();
   const signal = controller.signal;
 
@@ -22,7 +23,7 @@ export const useAuth = () => {
           {
             method: 'GET',
             headers: {
-              'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+              'Authorization': `Bearer ${token}`,
             }
           }
         )
@@ -43,7 +44,7 @@ export const useAuth = () => {
 
         setLoginUser(userStatus);
 
-        const fetchFCM = await fetch(`${process.env.SUB_API}/member/NToken`,
+        const fetchFCM = await fetch(`${process.env.BASE_URL}/member/NToken`,
           {
             method: 'PATCH',
             headers: {
@@ -56,7 +57,7 @@ export const useAuth = () => {
 
         if (!fetchFCM.ok) throw Error('토큰 생성 실패')
 
-        const useSession = await fetch(`${process.env.SUB_API}/session/is-checkin`, {
+        const useSession = await fetch(`${process.env.BASE_URL}/session/is-checkin`, {
           headers: {
             'Authorization': `Bearer ${token}`
           },
@@ -69,6 +70,20 @@ export const useAuth = () => {
         if (isCheckin == true) {
           console.log('세션 연겨룀')
           setOnSession(true)
+        }
+
+        const todayReservations = await fetch(`${process.env.BASE_URL}/reservation/today`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+        })
+
+        if (!todayReservations.ok) throw Error('오늘 예약 불러오기 실패')
+
+        const loadedReservations = await todayReservations.json()
+
+        if (!!loadedReservations) {
+          setTodayReservation(loadedReservations)
         }
 
       }
@@ -152,7 +167,7 @@ export const useAuth = () => {
       if (!loginUser) console.log('유저 정보가 없음')
       const token = await getToken('token');
 
-      const fetchFCM = await fetch(`${process.env.SUB_API}/member/NToken/${loginUser?.memberId}`,
+      const fetchFCM = await fetch(`${process.env.BASE_URL}/member/NToken`,
         {
           method: 'DELETE',
           headers: {

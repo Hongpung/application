@@ -60,7 +60,7 @@ export const PasswordCheck: React.FC = () => {
         return () => {
             // 비동기 함수를 클린업 함수 내에서 호출
             const deleteAsyncToken = async () => {
-                await deleteToken('PWtoken');
+
             };
             deleteAsyncToken();
         };
@@ -71,20 +71,33 @@ export const PasswordCheck: React.FC = () => {
         if (passwordValidation.state == 'VALID' && confirmPasswordValidation.state == 'VALID') {
             try {
                 const chageResult = await changePassword(password)
-                Toast.show({
-                    type: 'success',
-                    text1: '비밀번호가 변경 되었어요!\n다시 로그인해주세요',
-                    position: 'bottom',
-                    bottomOffset: 60,
-                    visibilityTime: 3000
-                });
-                if (chageResult) navigation.goBack();
-            } catch { 
+
+                if (chageResult) {
+                    navigation.goBack();
+                    Toast.show({
+                        type: 'success',
+                        text1: '비밀번호가 변경 되었어요!\n다시 로그인해주세요',
+                        position: 'bottom',
+                        bottomOffset: 60,
+                        visibilityTime: 3000
+                    });
+                    await deleteToken('PWtoken');
+                }
+                else{
+                    Toast.show({
+                        type: 'error',
+                        text1: '비밀번호 변경에 실패했어요!\n다시 시도해주세요',
+                        position: 'bottom',
+                        bottomOffset: 60,
+                        visibilityTime: 3000
+                    });
+                }
+            } catch {
                 console.error('에러 발생')
             }
         }
-        else if (passwordValidation.state=='ERROR') passwordRef.current?.focus()
-        else if (confirmPasswordValidation.state=='ERROR') confirmPasswordRef.current?.focus();
+        else if (passwordValidation.state == 'ERROR') passwordRef.current?.focus()
+        else if (confirmPasswordValidation.state == 'ERROR') confirmPasswordRef.current?.focus();
     }
 
     return (

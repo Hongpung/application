@@ -7,14 +7,14 @@ import Header from '@hongpung/components/common/Header';
 //screens
 import NotificationScreen from '@hongpung/pages/Home/Notification/NotificationScreen';
 import UsingManageScreen from '@hongpung/pages/Home/UsingManageScreen';
-import ChatMediaViewerScreen from '@hongpung/pages/Chat/ChatMediaViewerScreen';
+import ChatMediaViewerScreen from '@hongpung/_unused/Chat/ChatMediaViewerScreen';
 import CheckInScreen from '@hongpung/pages/QRScan/CheckInScreen';
 import CheckOutScreen from '@hongpung/pages/QRScan/CheckOutScreen';
 import CheckOutDescriptScreen from '@hongpung/pages/QRScan/CheckOutDescriptScreen';
 import CheckOutCameraScreen from '@hongpung/pages/QRScan/CheckOutCameraScreen';
 import PictureCheckScreen from '@hongpung/pages/QRScan/PictureCheckScreen';
 import CheckOutEndScreen from '@hongpung/pages/QRScan/CheckOutEndScreen';
-import ChatScreen from '@hongpung/pages/Chat/ChatScreen';
+import ChatScreen from '@hongpung/_unused/Chat/ChatScreen';
 
 //nav
 import BottomTab from './BottomNav';
@@ -36,6 +36,9 @@ export type ScreenParams<StackParamList> = {
 
 export type MainStackParamList = {
     Home: undefined;
+
+    QRScan: undefined;
+    
     BottomTab: undefined;
 
     Notification: undefined; // Home은 파라미터가 없음

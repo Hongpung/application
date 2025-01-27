@@ -16,13 +16,14 @@ import { MainStackParamList } from '@hongpung/nav/HomeStacks';
 import { StackActions, useIsFocused, useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { io } from 'socket.io-client';
-import { RealtimeSession, ReservationSession } from '../Reserve/SessionTypes';
+import { RealtimeSession, ReservationSession } from '../Reservation/SessionTypes';
 import LongButton from '@hongpung/components/buttons/LongButton';
 import { onUseSession } from '@hongpung/recoil/sessionState';
 import { getToken } from '@hongpung/utils/TokenHandler';
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
 import { NotificationIcon } from '@hongpung/components/home/NotificationIcon';
 import { ProfileIcon } from '@hongpung/components/home/ProfileIcon';
+import { ClubBanner } from '@hongpung/components/home/ClubBanner';
 
 
 type HomeNavProps = NativeStackNavigationProp<MainStackParamList, 'Home'>
@@ -31,14 +32,12 @@ const HomeScreen: React.FC = () => {
 
     const isFocusing = useIsFocused()
 
-    const navigation = useNavigation<HomeNavProps>()
     const { initAppFetchUser } = useAuth();
     const loginUser = useRecoilValue(loginUserState);
     const isSession = useRecoilValue(useOnReserve);
 
     const [isUsed, setUsed] = useState(true);
     const [isSlideUp, setSlide] = useState(false);
-    const today = new Date();
     const animatedValue = useRef(new Animated.Value(-82)).current; // 초기 bottom 값
 
     const toggleBottomSheet = useCallback(() => {
@@ -74,62 +73,37 @@ const HomeScreen: React.FC = () => {
 
     return (
         <View style={{ flex: 1 }}>
-            <ScrollView style={styles.container}
-                alwaysBounceVertical={false}
+            <ScrollView
+                style={styles.container}
+                bounces={false}
+                // alwaysBounceVertical={false}
                 showsVerticalScrollIndicator={false}
             >
 
                 {/* 상단 아이콘 부분*/}
 
 
-                <View style={styles.iconsRow}>
+                {/* <View style={styles.iconsRow}>
                     <View style={styles.iconContainer}>
-                        <NotificationIcon />
-                        <ProfileIcon />
                     </View>
-                </View>
-
-                {/* 상단 문구*/}
-                <View style={styles.textRow}>
-                    <Text style={styles.dateText}>{today.getFullYear()}년 {today.getMonth() + 1}월 {today.getDate()}일</Text>
-                    <Text style={styles.greetingText}>{loginUser?.name}님 안녕하세요</Text>
-                </View>
-
+                </View> */}
                 {/* 상단 일정*/}
 
-                <View style={{ marginHorizontal: 24, marginTop: 12 }}>
+                <View style={{ marginHorizontal: 24 }}>
                     <TodaySchedule />
                 </View>
 
                 {/* 배너 부분*/}
-                <View style={{ marginHorizontal: 24, marginTop: 20 }}>
+                <View style={{ marginHorizontal: 24 , marginTop: 32}}>
                     <Banner />
                 </View>
 
                 {/* 우리 동아리 */}
-                <View style={{ marginHorizontal: 24, marginTop: 32, }}>
-                    <TouchableOpacity activeOpacity={0.85}
-                        onPress={() => navigation.navigate('MyClub', { screen: 'MyClubHome' })}>
-                        <View style={{
-                            height: 120,
-                            backgroundColor: Color['grey300'],
-                            borderRadius: 10,
-                            justifyContent: 'flex-end',
-                            alignItems: 'flex-end',
-                            paddingRight: 16,
-                            paddingBottom: 12
-                        }} >
-                            <Text style={{
-                                fontSize: 18,
-                                fontFamily: 'NanumSquareNeo-Bold',
-                            }}>
-                                우리 동아리
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
+                <View style={{ marginHorizontal: 24, marginTop: 32 }}>
+                    <ClubBanner />
                 </View>
 
-                <View style={{ marginHorizontal: 24, marginTop: 24 }}>
+                <View style={{ marginHorizontal: 24, marginTop: 32, marginBottom: 32 }}>
                     <NoticePartition />
                 </View>
 
@@ -277,9 +251,7 @@ const HomeScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: 'white',
-        overflow: 'scroll',
     },
     iconsRow: {
         flexDirection: 'row-reverse',
@@ -304,10 +276,9 @@ const styles = StyleSheet.create({
     },
     textRow: {
         paddingHorizontal: 24,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'flex-end',
-        height: 24,
+        flexDirection: 'column',
+        gap: 8,
+        alignItems: 'flex-start',
         marginTop: 24
     },
     greetingText: {
@@ -324,7 +295,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: 'NanumSquareNeo-Regular',
         lineHeight: 16,
-        marginLeft: 4
     },
     ScheduleOfDate: {
         marginHorizontal: 24,
@@ -340,7 +310,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow: 'hidden'
     },
-    footer: { paddingHorizontal: 24, height: 180, marginTop: 12, paddingBottom: 96, backgroundColor: Color['grey200'] }
+    footer: { paddingHorizontal: 24, height: 184, marginTop: 12, paddingBottom: 96, backgroundColor: Color['grey200'] }
 });
 
 export default HomeScreen;
@@ -348,7 +318,7 @@ export default HomeScreen;
 
 const BottomOnUser: React.FC<{ toggleBottomSheet: () => void, isSlideUp: boolean, isFocusing: boolean }> = ({ toggleBottomSheet, isSlideUp, isFocusing }) => {
 
-    const [useRoom, setUseRoom] = useRecoilState(useOnReserve);
+    const [_, setUseRoom] = useRecoilState(useOnReserve);
     const [useSession, setUseSession] = useRecoilState(onUseSession);
     const [onEndModal, OnEnd] = useState(false);
 
@@ -356,8 +326,6 @@ const BottomOnUser: React.FC<{ toggleBottomSheet: () => void, isSlideUp: boolean
 
     const [remainingHour, setRemainingHour] = useState('');
     const [remainingMinnute, setRemainingMinnute] = useState('');
-
-    const loginUser = useRecoilValue(loginUserState);
 
     const calculateTimeDifference = () => {
         if (useSession) {

@@ -1,4 +1,4 @@
-import ActivitiesScreen from "@hongpung/pages/ExtaraActivities/ActivitiesListScreen";
+import ActivitiesScreen from "@hongpung/_unused/ExtaraActivities/ActivitiesListScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const ExtraActivitiesStack = createNativeStackNavigator();

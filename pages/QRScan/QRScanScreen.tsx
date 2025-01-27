@@ -1,19 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Button, Pressable, Linking, Dimensions, Modal } from 'react-native';
+import { StyleSheet, Text, View, Button, Pressable, Linking, Dimensions, Modal, Platform, Alert, Image } from 'react-native';
 
 import { CameraType, CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
-
+import QRScanBackDrop from '@hongpung/assets/images/QR_SCAN_BACKDROP.svg';
 import { Color } from '@hongpung/ColorSet';
 import LongButton from '@hongpung/components/buttons/LongButton';
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
+import { MainStackParamList } from '@hongpung/nav/HomeStacks';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { debounce } from 'lodash';
+import { Icons } from '@hongpung/components/common/Icon';
 
-const { width, height } = Dimensions.get('window');
 
-const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+type QRScanNavProps = NativeStackNavigationProp<MainStackParamList, 'QRScan'>;
+
+const { width, height } = Dimensions.get('screen');
+
+const QRScanScreen: React.FC = () => {
+
+    const navigation = useNavigation<QRScanNavProps>();
     const isFocusing = useIsFocused()
     const [permission, requestPermission] = useCameraPermissions();
     const [scanStatus, setScanStatus] = useState<'IDLE' | 'PROCESSING' | 'COMPLETE' | 'FAILED'>('IDLE');
+    const [flash, setFlash] = useState<'on' | 'off'>('off');
+
+    const toggleFlash = () => {
+        setFlash(prev => prev == 'on' ? 'off' : 'on');
+    }
 
     useEffect(() => {
         setScanStatus('IDLE')
@@ -38,9 +52,19 @@ const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         if (scanStatus != 'IDLE') return
         const openUrl = async () => {
             try {
-                // if (url != `${process.env.BASE_URL}`) throw Error('invalid Url')
-                await Linking.openURL(url)
-                setScanStatus('COMPLETE')
+
+                if (url != `${process.env.QR_URL}`) throw Error('invalid Url')
+
+                Alert.alert(
+                    'QR코드 인식 완료',
+                    'QR코드 인식이 완료되었습니다.',
+                    [{
+                        text: '확인', onPress: () => {
+                            navigation.navigate('CheckIn');
+                            setScanStatus('COMPLETE');
+                        }
+                    }])
+
             }
             catch (err) {
                 setScanStatus('FAILED')
@@ -50,11 +74,12 @@ const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     };
 
     const isInCenter = (x: number, y: number) => {
-        const centerWidth = 360;
-        const centerHeight = 360;
+        const centerWidth = 200;
+        const centerHeight = 200;
         const centerX = width / 2;
-        const centerY = height / 2;
+        const centerY = 220;
 
+        console.log({ x, y, centerX })
         return (
             x > centerX - centerWidth / 2 //범위 지정
             && x < centerX + centerWidth / 2
@@ -69,14 +94,31 @@ const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
         const { origin, size } = bounds;
 
-        const centerX = origin.x + size.width / 2;
-        const centerY = origin.y + size.height / 2;
+        if (Platform.OS == 'ios') {
+            console.log(origin, size)
+            const centerX = origin.x + size.width / 2;
+            const centerY = origin.y + size.height / 2;
 
-        if (isInCenter(centerX, centerY)) {
-            setScanStatus('PROCESSING')
-            handleOpen(data)
+            if (isInCenter(centerX, centerY)) {
+                setScanStatus('PROCESSING')
+                handleOpen(data)
+            }
+        } else if (Platform.OS == 'android') {
+
+            console.log(origin, size)
+
+            const centerX = origin.y + size.height / 2;
+            const centerY = origin.x + size.height / 2;
+
+            if (isInCenter(centerX, centerY)) {
+                setScanStatus('PROCESSING')
+                handleOpen(data)
+            }
         }
+
     }
+
+    const onScanned = debounce(handleScanned, 200, { leading: true, trailing: false })
 
     return (
         <View style={styles.container}>
@@ -87,10 +129,12 @@ const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                     barcodeScannerSettings={{
                         barcodeTypes: ["qr"],
                     }}
-                    onBarcodeScanned={handleScanned}
-
+                    enableTorch={flash == 'on'}
+                    onBarcodeScanned={onScanned}
+                    ratio='16:9'
                 >
-                    <View style={styles.overlay}>
+                    <QRScanBackDrop style={{ position: 'absolute', left: -420 + 120 + (width - 200) / 2, top: 0 }} />
+                    {/* <View style={styles.overlay}>
                         <BlurView tint='dark' intensity={80} style={styles.topOverlay} />
                         <View style={styles.centerOverlay}>
                             <BlurView tint='dark' intensity={80} style={styles.leftOverlay} />
@@ -98,12 +142,12 @@ const QRScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                             <BlurView tint='dark' intensity={80} style={styles.rightOverlay} />
                         </View>
                         <BlurView tint='dark' intensity={80} style={styles.bottomOverlay} />
-                    </View>
+                    </View> */}
                     <View style={styles.buttonContainer}>
                         <Pressable style={styles.button}
-                            onPress={
-                                () => navigation.push('CheckIn')
-                            } />
+                            onPress={toggleFlash} >
+                            <Icons name={flash === 'on' ? 'flashlight-outline' : 'flashlight'}></Icons>
+                        </Pressable>
                         <Text style={styles.descript}>QR코드를 스캔해주세요</Text>
                     </View>
                 </CameraView>
@@ -166,7 +210,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF',
         width: 64,
         height: 64,
-        borderRadius: 25
+        borderRadius: 25,
+        justifyContent: 'center',
     },
     descript: {
         color: '#FFF',

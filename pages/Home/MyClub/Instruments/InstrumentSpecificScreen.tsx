@@ -31,6 +31,8 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
         , {}, 5000, [instrumentId, isFocusing]
     )
 
+    console.log(loginUser?.role.length, loginUser?.club, data)
+
     useEffect(() => {
         if (!!data?.imageUrl) {
             Image.getSize(data.imageUrl!, (width, height) => {
@@ -50,7 +52,7 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
         return (<View><Text>Error:Can't find the instrument</Text></View>)
     return (
         <View style={{ flex: 1, backgroundColor: `#FFF` }}>
-            {loginUser?.club == data.club && loginUser.role.length != 0 ? <Header
+            {loginUser?.club == data.club && loginUser?.role.length != 0 ? <Header
                 leftButton='close'
                 HeaderName='악기 상세'
                 RightButton={'수정'}
@@ -146,7 +148,7 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
                             }}>{borrowHistory.borrowDate}</Text>
                         </View>
                     </View>)) :
-                        <View style={{display:'flex', alignItems:'center', justifyContent:'center', paddingVertical:32}}>
+                        <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingVertical: 32 }}>
                             <Text style={{
                                 textAlign: 'right',
                                 fontSize: 17,

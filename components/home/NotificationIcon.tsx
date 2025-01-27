@@ -19,9 +19,9 @@ export const NotificationIcon = () => {
         <Pressable
             style={styles.icons}
             onPress={() => { navigation.navigate('Notification'); }}>
-            <Icons size={28} name={'notifications'} color={Color['blue500']} />
+            <Icons size={28} name={'notifications'} color={Color['grey400']} />
             {isNotRead?.status &&
-                <View style={{ position: 'absolute', width: 8, height: 8, backgroundColor: 'orange', bottom: 4, right: 4, borderRadius: 100 }} />
+                <View style={{ position: 'absolute', width: 12, height: 12, backgroundColor: Color['red400'], borderWidth:2, borderColor:'#FFF', bottom: 4, right: 4, borderRadius: 100 }} />
             }
         </Pressable>
     )

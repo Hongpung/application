@@ -6,7 +6,6 @@ node_modules/
 .expo/
 dist/
 web-build/
-
 pre-build/
 # Native
 *.orig.*
@@ -33,3 +32,6 @@ yarn-error.*
 .env
 # typescript
 *.tsbuildinfo
+
+#unusedComponent
+_unused/

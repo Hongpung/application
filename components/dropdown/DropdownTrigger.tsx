@@ -4,7 +4,7 @@ import { useDropdown } from './Dropdown.context';
 
 export interface DropdownTriggerProps {
     as: React.ElementType;
-    children: React.FC<{ value: string | null }>
+    children: React.ReactNode
 }
 
 const DropdownTrigger: FC<DropdownTriggerProps> = ({ as: Component, children, ...props }) => {
@@ -12,7 +12,7 @@ const DropdownTrigger: FC<DropdownTriggerProps> = ({ as: Component, children, ..
 
     return (
         <Component onPress={toggle} {...props}>
-            {children({ value: value })}
+            {children}
         </Component>
     );
 };

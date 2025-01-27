@@ -19,7 +19,7 @@ const InstrumentTag: React.FC<{ borrowAvailable: boolean }> = ({ borrowAvailable
             backgroundColor: borrowAvailable ? Color['blue100'] : Color['red100']
         }]}>
             <Text style={[styles.tagText, { color: borrowAvailable ? Color['blue500'] : Color['red500'] }]}>
-                {borrowAvailable ? '대여 가능' : '분실'}
+                {borrowAvailable ? '대여 가능' : '대여 불가'}
             </Text>
         </View>
     )
@@ -44,7 +44,7 @@ const InstrumentCard: React.FC<instrumentCardProps> = ({ instrument, view, isPic
 
                 <View style={styles.tagContainer}>
                     {view == `inManage` ?
-                        <InstrumentTag borrowAvailable={instrument.available} />
+                        <InstrumentTag borrowAvailable={instrument.borrowAvailable} />
                         :
                         <Text style={styles.clubText}>
                             {'@ ' + instrument.club}

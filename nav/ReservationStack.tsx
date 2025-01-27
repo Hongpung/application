@@ -1,19 +1,19 @@
-import { ReservationProvider } from "@hongpung/pages/Reserve/context/ReservationContext";
-import DailyReservationListScreen from "@hongpung/pages/Reserve/DailyReservationListScreen";
-import BorrowInstrumentSelectScreen from "@hongpung/pages/Reserve/InReservation/BorrowInstrumentSelectScreen";
-import DateSelcectScreen from "@hongpung/pages/Reserve/InReservation/DateSelcectScreen";
-import ParticipantsSelectScreen from "@hongpung/pages/Reserve/InReservation/ParticipantsSelectScreen";
-import ReservationConfirmScreen from "@hongpung/pages/Reserve/InReservation/ReservationConfirmScreen";
-import ReservationEditConfirmScreen from "@hongpung/pages/Reserve/InReservation/ReservationEditConfirm";
-import ReservationScreen from "@hongpung/pages/Reserve/InReservation/ReservationScreen";
-import TimeSelectScreen from "@hongpung/pages/Reserve/InReservation/TimeSelectScreen";
-import ReservationCalendarScreen from "@hongpung/pages/Reserve/ReservationCalendarScreen";
-import ReservationDetailScreen from "@hongpung/pages/Reserve/ViewDetailReservation/ReservationDetailScreen";
+import { ReservationProvider } from "@hongpung/pages/Reservation/context/ReservationContext";
+import DailyReservationListScreen from "@hongpung/pages/Reservation/DailyReservationListScreen";
+import BorrowInstrumentSelectScreen from "@hongpung/pages/Reservation/InReservation/BorrowInstrumentSelectScreen";
+import DateSelcectScreen from "@hongpung/pages/Reservation/InReservation/DateSelcectScreen";
+import ParticipantsSelectScreen from "@hongpung/pages/Reservation/InReservation/ParticipantsSelectScreen";
+import ReservationConfirmScreen from "@hongpung/pages/Reservation/InReservation/ReservationConfirmScreen";
+import ReservationEditConfirmScreen from "@hongpung/pages/Reservation/InReservation/ReservationEditConfirm";
+import ReservationScreen from "@hongpung/pages/Reservation/InReservation/ReservationScreen";
+import TimeSelectScreen from "@hongpung/pages/Reservation/InReservation/TimeSelectScreen";
+import ReservationCalendarScreen from "@hongpung/pages/Reservation/ReservationCalendarScreen";
+import ReservationDetailScreen from "@hongpung/pages/Reservation/ViewDetailReservation/ReservationDetailScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Header from '@hongpung/components/common/Header';
 import { ScreenParams } from "./HomeStacks";
-import ReservationParticipatorsViewScreen from "@hongpung/pages/Reserve/ViewDetailReservation/ReservationParticipatorsViewScreen";
-import ReservationInstrumentsViewScreen from "@hongpung/pages/Reserve/ViewDetailReservation/ReservationInstrumentsViewScreen";
+import ReservationParticipatorsViewScreen from "@hongpung/pages/Reservation/ViewDetailReservation/ReservationParticipatorsViewScreen";
+import ReservationInstrumentsViewScreen from "@hongpung/pages/Reservation/ViewDetailReservation/ReservationInstrumentsViewScreen";
 
 
 

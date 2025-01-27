@@ -12,8 +12,9 @@ const PracticeCard: React.FC<{ session: BreifSession, onPress: (session: BreifSe
 
     return (
         <View style={{
+            backgroundColor:'#FFF',
             marginHorizontal: 24, height: 120, borderRadius: 10, borderWidth: 1.5,
-            borderColor: session.reservationType == '정규연습' ?
+            borderColor: session.reservationType == 'REGULAR' ?
                 isBefore ?
                     Color['blue200']
                     :

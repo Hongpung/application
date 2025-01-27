@@ -25,7 +25,7 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
     const aspectRatio = 3 / 4;
     const [selectedImage, selectImage] = useState<string | null>(null)
     const [modalState, setModalState] = useState<'Images' | 'AttendanceList' | 'None'>('None')
-    const { data, loading, error } = useFetchUsingToken<Session>(`${process.env.SUB_API}/session-log/specific/${sessionId}`)
+    const { data, loading, error } = useFetchUsingToken<Session>(`${process.env.BASE_URL}/session-log/specific/${sessionId}`)
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -74,7 +74,7 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             color: Color['grey400']
                         }}>{data?.startTime}~{data?.endTime}</Text>
 
-                        {data?.reservationType == 'RESERVED' ?
+                        {data?.reservationType == 'REGULAR' ?
                             <View style={{
                                 position: 'absolute', right: 12, top: -4, width: 48, height: 48
                             }} >

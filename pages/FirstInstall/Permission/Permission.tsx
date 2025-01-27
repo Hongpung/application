@@ -59,7 +59,7 @@ const Permission: React.FC<PermissionProps> = ({ navigation }) => {
               갤러리 사용 권한
             </Text>
             <Text style={styles.CardDescript}>
-              {"문의, 게시글 작성 등에 이용해요"}
+              {"프로필 이미지 등록, 악기 사진 등록 등등에\n이용해요"}
             </Text>
           </View>
         </View>
