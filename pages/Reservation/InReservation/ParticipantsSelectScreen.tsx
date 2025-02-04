@@ -1,7 +1,7 @@
-import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import { ActivityIndicator, FlatList, Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Color } from '../../../ColorSet'
-import { Club, clubs, InstrumentType, instrumentTypes, User } from '../../../UserType'
+import { Club, clubs, User } from '../../../UserType'
 import ProfileMiniCard from '../../../components/cards/ProfileMiniCard'
 import { useReservation } from '../context/ReservationContext'
 import LongButton from '../../../components/buttons/LongButton'
@@ -11,89 +11,83 @@ import { Icons } from '@hongpung/components/common/Icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { InReservationStackParamList } from '@hongpung/nav/ReservationStack'
 import { useNavigation } from '@react-navigation/native'
+import ShortButton from '@hongpung/components/buttons/ShortButton'
+import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 
 
 type ParticipantsSelectNavProps = NativeStackNavigationProp<InReservationStackParamList, 'ParticipantsSelect'>
 
 const ParticipantsSelectScreen: React.FC = () => {
 
+    const MaxEnrollmentNumber = useMemo<number>(() => {
+        const currentYear = new Date().getFullYear().toString()
+        return Number(currentYear.slice(-2))
+    }, []);
+
     const navigation = useNavigation<ParticipantsSelectNavProps>();
     const { reservation, setParticipants } = useReservation();
 
     const [prevUserPicked, setPrevUserPick] = useState<User[]>([])
-    const [originList, setOrigin] = useState<User[]>([])
+    const [findOptions, setFindOptions] = useState<{ club: Club[], enrollmentNumberRange: { startNumber?: string, endNumber?: string } }>({ club: [], enrollmentNumberRange: {} })
+
+    const [optionsSelectState, setOptionSelectState] = useState(false)
+
+    // const [originList, setOrigin] = useState<User[]>([])
     const [fiteredUsers, fiterUser] = useState<User[]>([])
 
     const [descendingOrder, setDescendingOrder] = useState(true)
-    const [club, setClub] = useState<Club | null>(null)
+    const [selectedClubs, setClubsOption] = useState<Club[]>([])
+    const [selectedEnrollmentNumberRange, setEnrollmentNumberRange] = useState<{ startNumber?: string, endNumber?: string }>({})
 
-    const [userInstrumentType, setUserInstermentType] = useState<InstrumentType | null>(null)
 
-    const [onSelect, setSelctFilter] = useState<`club` | 'instruement' | 'enrollmentNumber' | null>(null)
+    // const [onSelect, setSelctFilter] = useState<`club` | 'instruement' | 'enrollmentNumber' | null>(null)
 
     const [isLoading, setLoading] = useState(false)
 
-    useEffect(() => {
-        // setPrevUserPick(reservation.participants);
-        const load = async () => {
-            const controller = new AbortController();
-            const signal = controller.signal;
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-            try {
-                setLoading(true);
-                const token = await getToken('token');
-                if (!token) throw Error('token is not valid')
-                const response = await fetch(`${process.env.SUB_API}/member/invite-possible`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application',
-                            'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
-                        },
-                        signal
-                    }
-                )
-                const loadedUsers = await response.json() as User[];
+    const parsedUrl = useMemo<string>(() => {
+        const queryParams = new URLSearchParams();
 
-                console.log(loadedUsers)
-                setOrigin(loadedUsers);
-                fiterUser(loadedUsers)
-            } catch (e) {
-                console.error(e);
-                navigation.goBack();
-            } finally {
-                setLoading(false);
-                clearTimeout(timeoutId);
+        // clubId 배열을 쿼리 스트링에 추가
+        if (findOptions.club.length > 0) {
+            findOptions.club.forEach(club => {
+                queryParams.append('clubId', clubs.indexOf(club).toString()); // club.id가 문자열이 아닐 경우 변환
+            });
+        }
+
+        // 최소 학번 추가
+        if (findOptions.enrollmentNumberRange.startNumber) {
+            queryParams.append('minEnrollmentNumber', findOptions.enrollmentNumberRange.startNumber);
+        }
+
+        // 최대 학번 추가
+        if (findOptions.enrollmentNumberRange.endNumber) {
+            queryParams.append('maxEnrollmentNumber', findOptions.enrollmentNumberRange.endNumber);
+        }
+
+        // 최종 URL 생성
+        const queryString = queryParams.toString();
+
+        const apiUrl = `${process.env.EXPO_PUBLIC_BASE_URL}/member/invite-possible${queryString ? `?${queryString}` : ''}`;
+
+        return apiUrl;
+    }, [findOptions])
+
+    const { data: originList, loading, error }
+        = useFetchUsingToken<User[]>(parsedUrl, {}, 5000, [findOptions]);
+
+    useEffect(() => {
+        if (!!originList) {
+            const newUsers = [...originList];
+
+            if (descendingOrder) {
+                newUsers.sort((a, b) => Number(b.enrollmentNumber) - Number(a.enrollmentNumber))
+            } else {
+                newUsers.sort((a, b) => Number(a.enrollmentNumber) - Number(b.enrollmentNumber))
             }
 
+            fiterUser(newUsers);
         }
-
-        load();
-    }, [])
-
-
-
-    useEffect(() => {
-        let newUsers = [...originList];
-
-        // if (userInstrumentType && club) {
-        //     newUsers = originList.filter(user => user.instrument === userInstrumentType && user.club === club);
-        // } else if (userInstrumentType) {
-        //     newUsers = originList.filter(user => user.instrument === userInstrumentType);
-        // } else 
-        if (club) {
-            newUsers = originList.filter(user => user.club === club);
-        }
-
-        // if (descendingOrder) {
-        //     newUsers.sort((a, b) => b.enrollmentNumber - a.enrollmentNumber);
-        // } else {
-        //     newUsers.sort((a, b) => a.enrollmentNumber - b.enrollmentNumber);
-        // }
-
-        fiterUser(newUsers);
-
-    }, [club, userInstrumentType, descendingOrder, originList]);
+    }, [descendingOrder, originList]);
 
     if (isLoading)
         return (
@@ -106,103 +100,203 @@ const ParticipantsSelectScreen: React.FC = () => {
     //     return (
     //         )
     return (
+
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
             <Header leftButton='close' HeaderName='인원 선택' addLeftAction={() => setParticipants(prevUserPicked)} />
             {
-                originList.length == 0 ?
-                    <View style={{ backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-                        <Text style={{ marginHorizontal: 'auto',  fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, color: Color['grey400'] }}>
-                            함께 할 수 있는 인원이 없습니다.</Text>
-                    </View> :
-                    <>
-                        {onSelect && (
-                            <Pressable
-                                style={{ position: 'absolute', zIndex: 2, width: '100%', height: '100%' }}
-                                onPress={() => { setSelctFilter(null); }}>
-                                <View />
-                            </Pressable>
-                        )}
-                        <View style={{ zIndex: 5, position: 'relative' }}>
-                            <ScrollView horizontal contentContainerStyle={{ height: onSelect ? 232 : 32, marginTop: 8, marginHorizontal: 24, alignItems: 'flex-start', }}>
-                                {onSelect && (
-                                    <Pressable
-                                        style={{ position: 'absolute', zIndex: 2, width: '100%', height: 36 }}
-                                        onPress={() => { setSelctFilter(null); }}>
-                                        <View />
-                                    </Pressable>
-                                )}
-                                {onSelect && (
-                                    <Pressable
-                                        style={{ position: 'absolute', zIndex: 0, width: '100%', height: '100%' }}
-                                        onPress={() => { setSelctFilter(null); }}>
-                                        <View />
-                                    </Pressable>
-                                )}
-                                <Pressable style={[fiterBar.box, { flexDirection: 'row', alignItems: 'center', gap: 2 }]}
-                                    onPress={() => { setDescendingOrder(!descendingOrder); }}>
-                                    <Text style={fiterBar.text}>학번순</Text>
-                                    <Icons size={20} name={descendingOrder ? 'arrow-down' : 'arrow-up'} color={Color['blue400']} />
-                                </Pressable>
-                                <Pressable style={[fiterBar.box, club && { backgroundColor: Color['blue100'], borderColor: Color['blue500'] }]}
-                                    onPress={() => { setSelctFilter('club') }}>
-                                    <Text style={[fiterBar.text, club && { color: Color['blue500'] }]}>동아리{club && `:${club}`}</Text>
-                                    {onSelect == 'club' && <View style={{
-                                        position: 'absolute', top: 34, zIndex: 5, width: 108, backgroundColor: '#FFF', alignItems: 'flex-start', paddingHorizontal: 8, borderRadius: 5, shadowColor: Color['grey700'],
-                                        shadowOffset: { width: -2, height: 2 }, // 그림자 오프셋 (x, y)
-                                        shadowOpacity: 0.1,         // 그림자 투명도 (0에서 1)
-                                        shadowRadius: 5,          // 그림자 반경
-                                        elevation: 5,
-                                        maxHeight: 160,
-                                    }}>
-                                        <FlatList
-                                            contentContainerStyle={{ alignItems: 'flex-start' }}
-                                            showsVerticalScrollIndicator={false}
-                                            data={[null, ...clubs]}
-                                            renderItem={({ item }: { item: Club | null }) => {
-                                                return (
-                                                    <Pressable style={{ paddingVertical: 8, marginVertical: 4, width: 92, alignItems: 'flex-start', justifyContent: 'space-between' }}
-                                                        onPress={() => { item ? setClub(item) : setClub(null); setSelctFilter(null) }}>
-                                                        <Text style={{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, color: club == item ? Color['blue500'] : Color['grey400'] }}>{item ?? '전체'}</Text>
-                                                    </Pressable>
-                                                )
-                                            }}
-                                        />
-                                    </View>}
-                                </Pressable>
-                                {/* <Pressable style={fiterBar.box}>
-                        <Text style={fiterBar.text}>학번</Text>
-                    </Pressable> */}
-                                <Pressable style={[fiterBar.box, userInstrumentType && { backgroundColor: Color['blue100'], borderColor: Color['blue500'] }]}
-                                    onPress={() => { setSelctFilter('instruement') }}
-                                >
-                                    <Text style={[fiterBar.text, userInstrumentType && { color: Color['blue500'] }]}>악기{userInstrumentType && `:${userInstrumentType}`}</Text>
-                                    {onSelect == 'instruement' && <View style={{
-                                        position: 'absolute', top: 34, zIndex: 5, width: 80, backgroundColor: '#FFF', alignItems: 'flex-start', paddingHorizontal: 8, borderRadius: 5, shadowColor: Color['grey700'],
-                                        shadowOffset: { width: -2, height: 2 }, // 그림자 오프셋 (x, y)
-                                        shadowOpacity: 0.1,         // 그림자 투명도 (0에서 1)
-                                        shadowRadius: 5,          // 그림자 반경
-                                        elevation: 5,
-                                        height: 180,
-                                    }}>
-                                        <FlatList
-                                            contentContainerStyle={{ alignItems: 'flex-start' }}
-                                            showsVerticalScrollIndicator={false}
-                                            data={[null, ...instrumentTypes]}
-                                            renderItem={({ item }: { item: InstrumentType | null }) => {
-                                                return (
-                                                    <Pressable style={{ paddingVertical: 8, marginVertical: 4, width: 64, alignItems: 'flex-start', justifyContent: 'space-between' }}
-                                                        onPress={() => { item ? setUserInstermentType(item) : setUserInstermentType(null); setSelctFilter(null) }}>
-                                                        <Text style={{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, color: userInstrumentType == item ? Color['blue500'] : Color['grey400'] }}>{item ?? '전체'}</Text>
-                                                    </Pressable>
-                                                )
-                                            }}
-                                        />
-                                    </View>}
-                                </Pressable>
-                            </ScrollView>
-                        </View>
+                <>
+                    <Modal visible={optionsSelectState} transparent>
+                        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                            <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center' }}>
+                                <View style={{ marginHorizontal: 24, backgroundColor: '#FFF', paddingVertical: 16, borderRadius: 10, gap: 12 }}>
+                                    <View style={{ paddingHorizontal: 24, gap: 24 }}>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4 }}>
+                                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 16, color: Color['grey700'] }}>옵션</Text>
+                                        </View>
 
-                        <View style={{ flex: 1, zIndex: 1, marginTop: onSelect ? -(200 - 12) : 12, position: 'relative' }}>
+
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 8 }}>
+
+                                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 16, color: Color['grey700'] }}>동아리</Text>
+
+                                        </View>
+
+                                        <View style={{ flexDirection: 'row', paddingHorizontal: 4, gap: 8, flexWrap: 'wrap' }}>
+                                            <Pressable style={[fiterBar.box, selectedClubs.length == 0 && { borderColor: Color['blue500'], backgroundColor: Color['blue100'] }]}
+                                                onPress={() => setClubsOption([])}>
+                                                <Text style={[fiterBar.text, selectedClubs.length == 0 ? { color: Color['blue500'] } : { color: Color['grey600'] }]}>전체</Text>
+                                            </Pressable>
+                                            {clubs.filter(club => club != '기타').map(club => {
+                                                const isSelectedClub = selectedClubs.includes(club);
+
+                                                return (
+                                                    <Pressable style={[fiterBar.box, isSelectedClub && { borderColor: Color['blue500'], backgroundColor: Color['blue100'] }]}
+                                                        onPress={() => {
+
+                                                            if (!isSelectedClub && selectedClubs.length == 3) {
+                                                                setClubsOption([])
+                                                                return;
+                                                            }
+
+                                                            if (isSelectedClub)
+                                                                setClubsOption(prev => prev.filter(sclub => sclub != club))
+                                                            else
+                                                                setClubsOption(prev => ([...prev, club]))
+
+                                                        }}>
+                                                        <Text style={[fiterBar.text, isSelectedClub ? { color: Color['blue500'] } : { color: Color['grey600'] }]}>{club}</Text>
+                                                    </Pressable>
+                                                )
+                                            })}
+                                        </View>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 8 }}>
+
+                                            <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 16, color: Color['grey700'] }}>학번</Text>
+
+                                        </View>
+                                        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 4, position: 'relative', }}>
+
+                                            <View style={{ flexDirection: 'row' }}>
+                                                <Pressable style={{ alignItems: 'center', height: 36, width: 36, justifyContent: 'center', backgroundColor: Color['grey300'] }}
+                                                    onPress={() => { if (selectedEnrollmentNumberRange.startNumber && Number(selectedEnrollmentNumberRange.startNumber) > 0) setEnrollmentNumberRange(prev => ({ ...prev, startNumber: (Number(prev.startNumber) - 1).toString().padStart(2, '0') })) }}>
+                                                    <Icons name='remove' color={Number(selectedEnrollmentNumberRange.startNumber) > 0 ? 'white' : Color['grey200']} size={24}></Icons>
+                                                </Pressable>
+                                                <Pressable>
+                                                    <TextInput
+                                                        keyboardType='numeric'
+                                                        style={{ width: 48, textAlign: 'center', color: Color['grey600'], height: 36, backgroundColor: Color['grey100'] }}
+                                                        value={selectedEnrollmentNumberRange.startNumber}
+                                                        onChangeText={(e) => {
+                                                            if (e.length == 0) setEnrollmentNumberRange(prev => ({ ...prev, startNumber: undefined }))
+                                                            else setEnrollmentNumberRange(prev => ({ ...prev, startNumber: e }))
+                                                        }}
+                                                        onBlur={() => {
+                                                            Keyboard.dismiss();
+
+                                                            if (selectedEnrollmentNumberRange.startNumber?.length == 1) {
+                                                                setEnrollmentNumberRange(prev => ({ ...prev, startNumber: "0" + selectedEnrollmentNumberRange.startNumber }))
+                                                            } else if (selectedEnrollmentNumberRange.startNumber?.length == 2) {
+                                                                if (Number(selectedEnrollmentNumberRange.startNumber) > MaxEnrollmentNumber)
+                                                                    if (selectedEnrollmentNumberRange.endNumber)
+                                                                        setEnrollmentNumberRange({ endNumber: "25", startNumber: "25" })
+                                                                    else
+                                                                        setEnrollmentNumberRange(prev => ({ ...prev, startNumber: "25" }))
+                                                            }
+                                                        }}
+                                                        placeholder='-' />
+                                                </Pressable>
+                                                <Pressable style={{ alignItems: 'center', height: 36, width: 36, justifyContent: 'center', backgroundColor: Color['grey300'] }}
+                                                    onPress={() => { if (selectedEnrollmentNumberRange.startNumber && Number(selectedEnrollmentNumberRange.startNumber) < Number(selectedEnrollmentNumberRange.endNumber || MaxEnrollmentNumber) - 1) setEnrollmentNumberRange(prev => ({ ...prev, startNumber: (Number(prev.startNumber) + 1).toString().padStart(2, '0') })) }}>
+                                                    <Icons name='add' color={Number(selectedEnrollmentNumberRange.startNumber) < Number(selectedEnrollmentNumberRange.endNumber || MaxEnrollmentNumber) - 1 ? 'white' : Color['grey200']} size={24}></Icons>
+                                                </Pressable>
+                                            </View>
+                                            <View style={{ height: 36, justifyContent: 'center' }}>
+                                                <Text style={{ fontFamily: 'NanumSquareNeo-Light', textAlign: 'center', fontSize: 16 }}>~</Text>
+                                            </View>
+
+                                            <View style={{ flexDirection: 'row' }}>
+
+                                                <Pressable style={{ alignItems: 'center', height: 36, width: 36, justifyContent: 'center', backgroundColor: Color['grey300'] }}
+                                                    onPress={() => { if (selectedEnrollmentNumberRange.endNumber && Number(selectedEnrollmentNumberRange.endNumber) > Number(selectedEnrollmentNumberRange.startNumber || 0) + 1) setEnrollmentNumberRange(prev => ({ ...prev, endNumber: (Number(prev.endNumber) - 1).toString().padStart(2, '0') })) }}>
+                                                    <Icons name='remove' color={Number(selectedEnrollmentNumberRange.endNumber) > Number(selectedEnrollmentNumberRange.startNumber || 0) + 1 ? 'white' : Color['grey200']} size={24}></Icons>
+                                                </Pressable>
+                                                <Pressable>
+                                                    <TextInput
+                                                        keyboardType='numeric'
+                                                        maxLength={2}
+                                                        style={{ width: 48, textAlign: 'center', color: Color['grey600'], height: 36, backgroundColor: Color['grey100'] }}
+                                                        value={selectedEnrollmentNumberRange.endNumber}
+                                                        onChangeText={(e) => {
+                                                            if (e.length == 0) setEnrollmentNumberRange(prev => ({ ...prev, endNumber: undefined }))
+                                                            else setEnrollmentNumberRange(prev => ({ ...prev, endNumber: e }))
+                                                        }}
+                                                        onBlur={() => {
+                                                            Keyboard.dismiss();
+                                                            if (selectedEnrollmentNumberRange.endNumber?.length == 1) {
+                                                                setEnrollmentNumberRange(prev => ({ ...prev, endNumber: "0" + selectedEnrollmentNumberRange.endNumber }))
+                                                            } else if (selectedEnrollmentNumberRange.endNumber?.length == 2) {
+                                                                if (Number(selectedEnrollmentNumberRange.endNumber) > MaxEnrollmentNumber)
+                                                                    setEnrollmentNumberRange(prev => ({ ...prev, endNumber: "25" }))
+                                                            }
+                                                        }}
+                                                        placeholder='-' />
+                                                </Pressable>
+                                                <Pressable style={{ alignItems: 'center', height: 36, width: 36, justifyContent: 'center', backgroundColor: Color['grey300'] }}
+                                                    onPress={() => { if (selectedEnrollmentNumberRange.endNumber && Number(selectedEnrollmentNumberRange.endNumber) < MaxEnrollmentNumber) setEnrollmentNumberRange(prev => ({ ...prev, endNumber: (Number(prev.endNumber) + 1).toString().padStart(2, '0') })) }}>
+                                                    <Icons name='add' color={Number(selectedEnrollmentNumberRange.endNumber) < 25 ? 'white' : Color['grey200']} size={24}></Icons>
+                                                </Pressable>
+                                            </View>
+
+                                        </View>
+
+                                    </View>
+                                    <View style={{ paddingHorizontal: 16, justifyContent: 'space-between', paddingTop: 8, flexDirection: 'row' }}>
+                                        <ShortButton
+                                            color='blue'
+                                            isFilled={false}
+                                            innerText={`초기화 적용`}
+                                            onPress={() => {
+                                                setFindOptions({ club: [], enrollmentNumberRange: {} })
+                                                setClubsOption([])
+                                                setEnrollmentNumberRange({})
+                                                setOptionSelectState(false)
+                                            }}
+                                        />
+                                        <ShortButton
+                                            color='blue'
+                                            isFilled
+                                            innerText={`옵션 적용`}
+                                            onPress={() => {
+                                                setFindOptions({ club: selectedClubs, enrollmentNumberRange: selectedEnrollmentNumberRange })
+                                                setOptionSelectState(false)
+                                            }}
+                                        />
+                                    </View>
+
+                                </View>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </Modal>
+
+                    <View style={{ zIndex: 5, position: 'relative' }}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ height: 32, marginTop: 8, marginHorizontal: 24, gap: 8, alignItems: 'flex-start', paddingHorizontal: 4 }}>
+                            <Pressable style={[fiterBar.box, { flexDirection: 'row', alignItems: 'center', gap: 2 }]}
+                                onPress={() => { setDescendingOrder(!descendingOrder); }}>
+                                <Text style={fiterBar.text}>학번순</Text>
+                                <Icons size={20} name={descendingOrder ? 'arrow-down' : 'arrow-up'} color={Color['blue400']} />
+                            </Pressable>
+                            {findOptions.club.length > 0 &&
+                                <View style={[fiterBar.box, { borderColor: Color['blue500'], backgroundColor: Color['blue100'] }]}>
+                                    <Text style={[fiterBar.text, { fontFamily: 'NanumSquareNeo-Bold', color: Color['blue500'] }]}>동아리:{findOptions.club.map(club => club).join(', ')}</Text>
+                                </View>
+                            }
+                            {findOptions.enrollmentNumberRange.startNumber &&
+                                <View style={[fiterBar.box, { borderColor: Color['blue500'], backgroundColor: Color['blue100'] }]}>
+                                    <Text style={[fiterBar.text, { fontFamily: 'NanumSquareNeo-Bold', color: Color['blue500'] }]}>최소 학번:{findOptions.enrollmentNumberRange.startNumber}</Text>
+                                </View>
+                            }
+                            {findOptions.enrollmentNumberRange.endNumber &&
+                                <View style={[fiterBar.box, { borderColor: Color['blue500'], backgroundColor: Color['blue100'] }]}>
+                                    <Text style={[fiterBar.text, { fontFamily: 'NanumSquareNeo-Bold', color: Color['blue500'] }]}>최대 학번:{findOptions.enrollmentNumberRange.endNumber}</Text>
+                                </View>
+                            }
+                            <Pressable style={[fiterBar.filter, { flexDirection: 'row', alignItems: 'center', gap: 4 }]}
+                                onPress={() => { setOptionSelectState(true) }}>
+                                <Text style={{ color: Color['grey400'] }}>필터 변경</Text>
+                                <Icons size={20} name={'funnel'} color={Color['grey300']} />
+                            </Pressable>
+
+                        </ScrollView>
+                    </View>
+                    {originList?.length == 0 ?
+                        <View style={{ backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+                            <Text style={{ marginHorizontal: 'auto', fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, color: Color['grey400'] }}>
+                                함께 할 수 있는 인원이 없습니다.
+                            </Text>
+                        </View>
+                        :
+                        <View style={{ flex: 1, zIndex: 1, marginTop: 12, position: 'relative' }}>
+
                             <FlatList
                                 contentContainerStyle={{ marginHorizontal: 24, backgroundColor: '#FFF', zIndex: 1 }}
                                 data={originList}
@@ -217,24 +311,52 @@ const ParticipantsSelectScreen: React.FC = () => {
                                             isPicked={isPicked}
                                             onPick={() => {
                                                 if (!isPicked) setParticipants([...reservation.participators, item])
-                                                else setParticipants(reservation.participators.filter((participant) => JSON.stringify(participant) != JSON.stringify(item)))
+                                                else setParticipants(reservation.participators.filter((participantData) => participantData.memberId != item.memberId))
                                             }}
-
-                                        ></ProfileMiniCard>)
+                                        />
+                                    )
                                 }}
                                 ItemSeparatorComponent={() => (<View style={{ height: 12 }} />)}
                             />
                         </View>
+                    }
 
-                        {reservation.participators.length > 0 && <View style={{ paddingTop: 12, width: '100%' }}>
-                            <LongButton
-                                color='blue'
-                                isAble={true}
-                                innerText={`선택완료 (${reservation.participators.length})`}
-                                onPress={() => navigation.pop()}
-                            />
-                        </View>}
-                    </>
+                    {reservation.participators.length > 0 && <View style={{ paddingTop: 12, width: '100%' }}>
+                        <View style={{ paddingHorizontal: 28, }}>
+                            <Text style={{
+                                paddingHorizontal:4,
+                                fontFamily: 'NanumSquareNeo-Regular',
+                            }}>선택한 인원</Text>
+                        </View>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 28, paddingVertical: 12 }}>
+                            {reservation.participators.map(participator => (
+                                <View style={[{
+                                    paddingVertical: 4,
+                                    paddingHorizontal: 8,
+                                    borderRadius: 15,
+                                    borderWidth: 1,
+                                    borderColor: Color['grey200'],
+                                    justifyContent: 'center',
+                                    zIndex: 0,
+                                    backgroundColor: '#FFF',
+                                    flexDirection: 'row', alignItems: 'center', gap: 2
+                                }]}>
+                                    <Text style={[fiterBar.text, { color: Color['grey500'] }]}>{participator.name}{participator.nickname ? `(${participator.nickname})` : ''}</Text>
+                                    <Pressable
+                                        onPress={() => { setParticipants(reservation.participators.filter((participantData) => participantData.memberId != participator.memberId)) }}>
+                                        <Icons name='close-circle' size={24} color={Color['grey400']}></Icons>
+                                    </Pressable>
+                                </View>
+                            ))}
+                        </ScrollView>
+                        <LongButton
+                            color='blue'
+                            isAble={true}
+                            innerText={`선택완료 (${reservation.participators.length})`}
+                            onPress={() => navigation.pop()}
+                        />
+                    </View>}
+                </>
             }
 
         </View>
@@ -251,12 +373,20 @@ const fiterBar = StyleSheet.create({
         borderWidth: 1,
         borderColor: Color['grey200'],
         justifyContent: 'center',
-        marginHorizontal: 4,
         zIndex: 0,
         backgroundColor: '#FFF'
     },
     text: {
         fontFamily: 'NanumSquareNeo-Regular',
         fontSize: 14,
+    },
+    filter: {
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        backgroundColor: Color['grey100'],
+        height: 32,
+        fontFamily: 'NanumSquareNeo-Regular',
+        gap: 4,
+        justifyContent: 'center',
     }
 })

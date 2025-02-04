@@ -25,7 +25,7 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
 
     // 토큰을 불러온 후 useFetch 실행
     const { data, loading, error } = useFetchUsingToken<any[]>(
-        `${process.env.BASE_URL}/reservation/month-calendar?year=${calendarMonth.getFullYear()}&month=${calendarMonth.getMonth() + 1}`,
+        `${process.env.EXPO_PUBLIC_BASE_URL}/reservation/month-calendar?year=${calendarMonth.getFullYear()}&month=${calendarMonth.getMonth() + 1}`,
         {
             method: 'GET',
             headers: {
@@ -53,15 +53,13 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
     }, [data])
 
     const incrementMonth = () => {
-        const newDate = new Date(calendarMonth);
-        newDate.setMonth(calendarMonth.getMonth() + 1);
+        const newDate = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
         setMonth(newDate);
         setReservedDates([]);
     };
 
     const decrementMonth = () => {
-        const newDate = new Date(calendarMonth);
-        newDate.setMonth(calendarMonth.getMonth() - 1);
+        const newDate = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
         setMonth(newDate);
         setReservedDates([]);
     };

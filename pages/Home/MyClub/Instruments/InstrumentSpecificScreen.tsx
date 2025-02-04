@@ -27,7 +27,7 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
     const loginUser = useRecoilValue(loginUserState)
     const isFocusing = useIsFocused();
     const { data, loading, error } = useFetchUsingToken<Instrument>(
-        `${process.env.SUB_API}/instrument/${instrumentId}`
+        `${process.env.EXPO_PUBLIC_BASE_URL}/instrument/${instrumentId}`
         , {}, 5000, [instrumentId, isFocusing]
     )
 

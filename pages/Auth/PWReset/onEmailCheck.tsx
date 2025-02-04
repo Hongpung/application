@@ -71,7 +71,9 @@ export const EmailCheck: React.FC = () => {
 
     return (
         <TouchableWithoutFeedback onPress={() => { Keyboard.dismiss(); }} >
-            <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#FFF" }} behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}>
+            <KeyboardAvoidingView
+                style={{ flex: 1, backgroundColor: "#FFF" }}
+                behavior={Platform.OS === "ios" ? "padding" : "height"} keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}>
                 <Text style={{
                     alignSelf: 'flex-start',
                     height: 40,
@@ -91,7 +93,7 @@ export const EmailCheck: React.FC = () => {
                     </Text>
                 </View>
 
-                <View style={{ alignSelf: 'center', marginTop: 12 }}>
+                <View style={{ marginTop: 12 }}>
                     <PWResetEmailInput
                         label='이메일'
                         inputValue={passwordResetInfo.email}
@@ -101,7 +103,7 @@ export const EmailCheck: React.FC = () => {
                         }}
                     />
                 </View>
-                <View style={{ marginTop: 20, alignSelf: 'center' }}>
+                <View style={{ marginTop: 20, marginHorizontal: 48 }}>
                     {isVerifed &&
                         <InputBaseComponent
                             ref={verificationCodeRef}

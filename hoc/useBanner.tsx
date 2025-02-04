@@ -15,7 +15,7 @@ export const useFetchBanners = () => {
 
         try {
 
-            const bannerData = await fetch(`${process.env.BASE_URL}/banners/on-post`,
+            const bannerData = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/banners/on-post`,
                 {
                     signal
                 }

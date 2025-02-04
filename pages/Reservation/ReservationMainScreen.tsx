@@ -56,7 +56,7 @@ const BlankCardComponent: React.FC<{ nextReservationTime: string }> = ({ nextRes
     const navigation = useNavigation<ResevationMainScreenNav>();
 
     return (
-        <View style={[{ marginVertical: 8, height: 200, borderWidth: 1, backgroundColor: '#FFF', borderColor: Color['grey200'], borderRadius: 10, marginHorizontal: 8, width: width - 48 }]}>
+        <View style={[{ marginVertical: 8, height: 200, borderWidth: 1, backgroundColor: '#FFF', borderColor: Color['grey200'], borderRadius: 10, width: width - 48}]}>
 
             <Text numberOfLines={1} style={{ fontFamily: 'NanumSquareNeo-Bold', marginHorizontal: 64, top: 72, textAlign: 'center', fontSize: 20 }}>
                 즉시 이용 가능해요
@@ -99,7 +99,7 @@ const useSessionListSocket = (): Session[] => {
 
         const token = await getToken('token')
 
-        const socket = io(`${process.env.BASE_URL}/reservation`, {
+        const socket = io(`${process.env.EXPO_PUBLIC_BASE_URL}/reservation`, {
             transports: ['websocket'],
             reconnection: true,
             auth: { token }
@@ -324,16 +324,17 @@ const SessionCardComponent: React.FC<{ session: Session }> = ({ session }) => {
         <View>
             <View>
 
-                {isPlayed &&
-                    <View style={{ position: 'absolute', borderRadius: 10, height: '100%', width: width - 32 }}>
-                        <View style={{ position: 'absolute', borderRadius: 10, height: '100%', width: width - 32, overflow: 'hidden', backgroundColor: Color[`${color}100`] }} />
-                        <View style={{ position: 'absolute', left: 6, top: 6, borderRadius: 10, height: 204, width: width - 44, overflow: 'hidden', backgroundColor: Color[`${color}500`] }} />
-                        <BlurView experimentalBlurMethod='dimezisBlurView' intensity={6} tint='default' style={{ borderRadius: 10, height: '100%', width: width - 32, overflow: 'hidden', }} />
+                {
+                isPlayed &&
+                    <View style={{ position: 'absolute', borderRadius: 10, height: '100%', width: width }}>
+                        <View style={{ position: 'absolute', borderRadius: 10, height: '100%', left:-6, width: width - 36, overflow: 'hidden', backgroundColor: Color[`${color}100`] }} />
+                        <View style={{ position: 'absolute', left: -2, top: 6, borderRadius: 10, height: 204, width: width - 44, overflow: 'hidden', backgroundColor: Color[`${color}500`] }} />
+                        <BlurView experimentalBlurMethod='dimezisBlurView' intensity={6} tint='default' style={{ borderRadius: 10, height: '100%', width: width - 32, left:-8, overflow: 'hidden', }} />
                     </View>
                 }
 
                 {session.sessionType == 'RESERVED' ?
-                    <Pressable key={session.sessionId} style={[{ marginVertical: 8, height: 200, borderWidth: 1, backgroundColor: '#FFF', borderColor: Color['grey200'], borderRadius: 10, marginHorizontal: 8 }, { width: width - 48 }]}
+                    <Pressable key={session.sessionId} style={[{ marginVertical: 8, height: 200, borderWidth: 1, backgroundColor: '#FFF', borderColor: Color['grey200'], borderRadius: 10, }, { width: width - 48 }]}
                         onPress={() => {
                             navigation.push('Reservation', { screen: 'ReservationDetail', params: { reservationId: session.reservationId } })
                         }}>
@@ -346,6 +347,17 @@ const SessionCardComponent: React.FC<{ session: Session }> = ({ session }) => {
                             <View style={{ position: 'absolute', right: 20, top: 24, alignItems: 'flex-end' }}>
                                 <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 16, color: Color['grey700'] }}>{session.creatorName}</Text>
                                 {session.creatorNickname && <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 12, color: Color['grey400'] }}>{session.creatorNickname}</Text>}
+                            </View>
+                        }
+
+                        {session.status == 'AFTER' ?
+                            <View style={{ position: 'absolute', left: 12, bottom: 12, }} >
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 12, color: Color['grey500'], backgroundColor: Color['grey100'], borderRadius: 5, padding: 6, marginLeft: 4 }}>종료됨</Text>
+                            </View>
+                            :
+                            session.status == 'DISCARDED' &&
+                            <View style={{ position: 'absolute', left: 12, bottom: 12, }} >
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 12, color: Color['grey500'], backgroundColor: Color['grey100'], borderRadius: 5, padding: 6, marginLeft: 4 }}>종료됨</Text>
                             </View>
                         }
 
@@ -370,13 +382,17 @@ const SessionCardComponent: React.FC<{ session: Session }> = ({ session }) => {
                     :
 
                     //여기는 실시간 생성 세션
-                    <View key={session.sessionId} style={[{ marginVertical: 8, height: 200, borderWidth: 1, backgroundColor: '#FFF', borderColor: Color['grey200'], borderRadius: 10, marginHorizontal: 8 }, { width: width - 48 }]}>
+                    <View key={session.sessionId} style={[{ marginVertical: 8, height: 200, borderWidth: 1, backgroundColor: '#FFF', borderColor: Color['grey200'], borderRadius: 10 }, { width: width - 48 }]}>
                         {
                             <View style={{ position: 'absolute', right: 20, top: 24, alignItems: 'flex-end' }}>
                                 <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 16, color: Color['grey700'] }}>{session.creatorName}</Text>
                                 {session.creatorNickname && <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 12, color: Color['grey400'] }}>{session.creatorNickname}</Text>}
                             </View>
                         }
+                        {session.status == 'AFTER' &&
+                            <View style={{ position: 'absolute', left: 12, bottom: 12, }} >
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 12, color: Color['grey500'], backgroundColor: Color['grey100'], borderRadius: 5, padding: 6, marginLeft: 4 }}>종료됨</Text>
+                            </View>}
                         <Text numberOfLines={1} ellipsizeMode='tail' style={{ fontFamily: 'NanumSquareNeo-Bold', marginHorizontal: 64, top: 72, textAlign: 'center', fontSize: 20, color: isAfter ? Color['grey400'] : 'black' }}>{session.title}</Text>
                         <View style={{ position: 'absolute', right: 24, bottom: 12, alignItems: 'flex-end', gap: 4 }}>
                             <Text style={{ textAlign: 'right', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>{`${session.startTime.slice(0, -3)} ~ ${session.endTime.slice(0, -3)}`}</Text>
@@ -410,7 +426,7 @@ const SessionListCards: React.FC<{ sessionList: Session[] }> = ({ sessionList })
                             {`지금 연습실에 가면 바로 이용이 가능해요!`}</Text>
                         <View style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
                             <Pressable style={{ display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'space-between', paddingVertical: 8, paddingHorizontal: 12, marginHorizontal: 60, borderWidth: 1, borderColor: Color['grey200'], borderRadius: 25, }}
-                                onPress={() => navigation.replace('QRScan')}>
+                                onPress={() => navigation.jumpTo('QRScan')}>
                                 <Text numberOfLines={1} style={{ color: Color['grey400'], fontFamily: 'NanumSquareNeo-Regular', textAlign: 'left', fontSize: 14 }}>
                                     QR 스캔해서 사용하기
                                 </Text>
@@ -427,12 +443,11 @@ const SessionListCards: React.FC<{ sessionList: Session[] }> = ({ sessionList })
                         pagingEnabled={true}
                         showsHorizontalScrollIndicator={false}
                         keyExtractor={(item, index) => ((item?.type == 'session' && item.session.sessionType == 'RESERVED' && item.session.title || 'false') + index)}
-                        snapToInterval={width - 28}
-                        snapToAlignment="center"
+                        snapToAlignment="start"
+                        snapToInterval={width - 36}
                         decelerationRate="fast"
                         onScrollToIndexFailed={(info) => {
                             //로딩이 다 안됐는데 스크롤 입력이 들어올 경우 타임 아웃으로 로딩 시간 확보
-                            console.warn('Scroll to index failed:', info);
                             setTimeout(() => {
                                 cardViewRef.current?.scrollToIndex({
                                     index: info.index,
@@ -448,13 +463,19 @@ const SessionListCards: React.FC<{ sessionList: Session[] }> = ({ sessionList })
                                         <BlankCardComponent nextReservationTime={item.nextReservationTime} />
                                     )
                                 }
-                                return <SessionCardComponent session={item.session} />
+                                return (
+                                    <SessionCardComponent session={item.session} />
+
+                                )
                             }}
                         ListHeaderComponent={() => {
+                            return (<View style={{ width: 24 }} />)
+                        }}
+                        ItemSeparatorComponent={() => {
                             return (<View style={{ width: 12 }} />)
                         }}
                         ListFooterComponent={() => {
-                            return (<View style={{ width: 12 }} />)
+                            return (<View style={{ width: 24 }} />)
                         }}
                     />}
         </View>

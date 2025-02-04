@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": ">= 10.1.1"
+    "version": ">= 14.1.1"
   },
   "build": {
     "development": {
@@ -14,9 +14,21 @@
     },
     "production": {
       "android": {
-        "buildType": "apk"
+        "buildType": "app-bundle"
       },
       "channel": "production"
+    }
+  },
+  "submit": {
+    "preview": {
+      "android": {
+        "track": "internal"
+      }
+    },
+    "production": {
+      "android": {
+        "track": "production"
+      }
     }
   }
 }

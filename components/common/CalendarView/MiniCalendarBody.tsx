@@ -100,10 +100,10 @@ export const MiniCalendarBody: React.FC = () => {
                 daysInMonth.map((week, index) => {
                     return (
                         <>
-                            <View key={'day' + index} style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-around' }}>
+                            <View key={'weeks' + index} style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-around' }}>
                                 {
-                                    week.map((day) => {
-                                        if (day == 0) return (<View style={{ width: 32, height: 32 }} />)
+                                    week.map((day, date_index) => {
+                                        if (day == 0) return (<View key={'empty-' + index +'/'+ date_index} style={{ width: 32, height: 32 }} />)
                                         else {
                                             const dailyReservationData = dailyReservations[day];
 
@@ -111,7 +111,7 @@ export const MiniCalendarBody: React.FC = () => {
                                                 <Pressable key={`date-${day}`}
                                                     style={{ display: 'flex', height: 32, width: 32, alignItems: 'center', justifyContent: 'flex-start', backgroundColor: day == selectedDate?.getDate() ? Color['blue100'] : 'transparent', borderRadius: 5 }}
                                                     onPress={() => {
-                                                        toggleDate(day)
+                                                        !!dailyReservationData &&toggleDate(day)
                                                     }}
                                                 >
                                                     <Text style={[styles.CalendarText, !!dailyReservationData && { color: Color['grey600'] }, day == selectedDate?.getDate() && { color: Color['blue600'] }]}>{day}</Text>

@@ -1,16 +1,17 @@
 import { Dimensions, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useEffect, useMemo } from 'react'
 import { debounce } from 'lodash'
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { Color } from '@hongpung/ColorSet';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '@hongpung/nav/HomeStacks';
-import { useRecoilValue } from 'recoil';
-import { loginUserState, TodayReservation, todayReservation } from '@hongpung/recoil/authState';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { loginUserState, TodayReservation, todayReservations } from '@hongpung/recoil/authState';
 import { Icons } from '../common/Icon';
 import { BlurView } from 'expo-blur';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { NotificationIcon } from './NotificationIcon';
+import { getToken } from '@hongpung/utils/TokenHandler';
 
 const { width } = Dimensions.get('window')
 
@@ -19,30 +20,70 @@ type TodayScheduleNavParams = NativeStackNavigationProp<MainStackParamList, 'Hom
 
 const TodaySchedule: React.FC = () => {
 
-    const today = new Date();
-
-    const loginUser = useRecoilValue(loginUserState);
     const navigation = useNavigation<TodayScheduleNavParams>();
 
-    const todayReservations = useRecoilValue(todayReservation);
+    const isFocusing = useIsFocused();
+    const loginUser = useRecoilValue(loginUserState);
+
+    const [todayReservationsData, setTodayReservations] = useRecoilState(todayReservations);
+
+    const loadTodayReservations = () => {
+        const fetchReservations = async () => {
+            const controller = new AbortController();
+            const signal = controller.signal;
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            try {
+
+                const token = await getToken('token');
+
+                const todayReservations = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/reservation/today`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    signal
+                })
+
+                if (!todayReservations.ok) throw Error('오늘 예약 불러오기 실패')
+
+                const loadedReservations = await todayReservations.json() as TodayReservation[]
+
+                setTodayReservations(prev => ({ ...prev, todayReservations: [...loadedReservations] }))
+
+            } catch (e) {
+                console.error(e);
+                // navigation.dispatch(StackActions.replace('Login'))
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        }
+
+        fetchReservations();
+    }
 
     const navigateToReservation = debounce(() => {
         navigation.navigate('Reservation')
     }, 50);
 
-    console.log(todayReservations)
+    useEffect(() => {
+        if (isFocusing) {
+            const today = new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
+            if (today != todayReservationsData.date) {
+                loadTodayReservations();
+            }
+        }
+    }, [isFocusing])
 
     return (
         <View style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 16 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: 24 }}>
                 <View style={styles.textRow}>
-                    <Text style={styles.dateText}>{today.getFullYear()}년 {today.getMonth() + 1}월 {today.getDate()}일</Text>
-                    <Text style={styles.greetingText}>{loginUser?.nickname || loginUser?.name}님, {todayReservations.length > 0 ? '오늘 예약이 있어요!' : `안녕하세요!`}</Text>
+                    <Text style={styles.dateText}>{todayReservationsData.date.split('-')[0]}년 {todayReservationsData.date.split('-')[1]}월 {todayReservationsData.date.split('-')[2]}일</Text>
+                    <Text style={styles.greetingText}>{loginUser?.nickname || loginUser?.name}님, {todayReservationsData.todayReservations.length > 0 ? '오늘 예약이 있어요!' : `안녕하세요!`}</Text>
                 </View>
                 <NotificationIcon />
             </View>
             <View style={[styles.ScheduleContainer,
-            todayReservations.length > 0 ?
+            todayReservationsData.todayReservations.length > 0 ?
                 {
                     borderColor: Color['blue500'],
                     backgroundColor: Color['blue500']
@@ -56,11 +97,11 @@ const TodaySchedule: React.FC = () => {
             ]}
             >
                 {
-                    todayReservations.length > 0 ?
+                    todayReservationsData.todayReservations.length > 0 ?
                         <View style={{ display: 'flex', gap: 4 }} >{
-                            todayReservations.map((reservation, index) => {
+                            todayReservationsData.todayReservations.map((reservation, index) => {
                                 return (
-                                    < ReservationCardComponent todayReservation={reservation} />
+                                    <ReservationCardComponent key={reservation.reservationId} todayReservation={reservation} />
                                 )
                             })
                         }

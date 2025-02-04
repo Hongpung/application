@@ -2,7 +2,7 @@
   "expo": {
     "name": "HongPung",
     "slug": "HongPung",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,15 +14,16 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "This app needs access to your camera to take photos.",
-        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select photos.",
-        "NSPhotoLibraryAddUsageDescription": "This app needs access to your photo library to save photos.",
-        "NSUserTrackingUsageDescription": "This app needs access to track your activity for personalized content.",
+        "NSCameraUsageDescription": "이 앱은 사진 촬영을 위해 카메라 접근 권한이 필요합니다.",
+        "NSPhotoLibraryUsageDescription": "이 앱은 사진 선택을 위해 사진 라이브러리 접근 권한이 필요합니다.",
+        "NSPhotoLibraryAddUsageDescription": "이 앱은 사진 저장을 위해 사진 라이브러리 접근 권한이 필요합니다.",
         "UIBackgroundModes": [
           "fetch",
-          "remote-notification",
-          "background-fetch"
+          "remote-notification"
         ],
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
         "UNNotificationSettings": {
           "providesAppNotificationSettings": true
         }
@@ -30,20 +31,16 @@
       "bundleIdentifier": "com.widepants.HongPung"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
       "permissions": [
+        "INTERNET",
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE",
         "NOTIFICATIONS"
       ],
+      "versionCode": 4,
+      "usesCleartextTraffic": true,
       "package": "com.widepants.HongPung"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
     },
     "fonts": {
       "NanumSquareNeo-Bold": "./assets/fonts/NanumSquareNeoOTF-Bd.otf",
@@ -59,14 +56,16 @@
         {
           "android": {
             "newArchEnabled": true,
-            "usesCleartextTraffic": true
+            "kotlinVersion": "1.9.0",
+            "gradlePluginVersion": "8.1.2"
           },
           "ios": {
             "newArchEnabled": true
           }
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-updates"
     ],
     "extra": {
       "eas": {
@@ -77,6 +76,9 @@
       "policy": "appVersion"
     },
     "updates": {
+      "requestHeaders": {
+        "expo-channel-name": "production"
+      },
       "url": "https://u.expo.dev/1de88024-4522-477b-99c9-b458d373a286"
     }
   }

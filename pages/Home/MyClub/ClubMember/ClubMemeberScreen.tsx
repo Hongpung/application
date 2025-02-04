@@ -16,7 +16,7 @@ const ClubMemeberScreen: React.FC<ClubMembersProps> = () => {
     const [selectedUser, selectUser] = useState<User | null>(null);
 
     const { data, loading, error } = useFetchUsingToken<User[]>(
-        `${process.env.SUB_API}/club/my-club/members`,
+        `${process.env.EXPO_PUBLIC_BASE_URL}/club/my-club/members`,
         {
             method: 'GET',
             headers: {

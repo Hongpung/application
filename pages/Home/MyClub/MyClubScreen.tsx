@@ -1,6 +1,6 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Color } from '../../../ColorSet'
+import { Color } from '@hongpung/ColorSet'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { throttle } from 'lodash';
 import { Icons } from '@hongpung/components/common/Icon';
@@ -33,7 +33,7 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
         link: string
     }
 
-    const { data, loading, error } = useFetchUsingToken<{ roleData: { role: string, member: User }[] }>(`${process.env.SUB_API}/club/my-club`)
+    const { data, loading, error } = useFetchUsingToken<{ roleData: { role: string, member: User }[] }>(`${process.env.EXPO_PUBLIC_BASE_URL}/club/my-club`)
 
     useEffect(() => {
         if (!!data) {
@@ -46,8 +46,6 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
             })
         }
     }, [data])
-    console.log(data, `${process.env.SUB_API}/club/my-club`)
-
     const manageClubMenu: subMenu[] = [{ name: '부원 관리', link: 'ClubMembers' }, { name: '악기 관리', link: 'Instruments' }, { name: '연습 기록 보기', link: 'ClubCalendar' },]
 
 
@@ -67,14 +65,17 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                             <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리</Text>
                             <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{loginUserInformation?.club}</Text>
                         </View>
-                        <View style={styles.info}>
-                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>상쇠</Text>
-                            <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{sangsoe ? `${sangsoe?.name}${!!sangsoe?.nickname ? ` (${sangsoe.nickname})` : ''}` : '공석'}</Text>
-                        </View>
+                        
                         <View style={styles.info}>
                             <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>패짱</Text>
                             <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{leader ? `${leader?.name}${!!leader?.nickname ? ` (${leader.nickname})` : ''}` : '공석'}</Text>
                         </View>
+
+                        <View style={styles.info}>
+                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>상쇠</Text>
+                            <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{sangsoe ? `${sangsoe?.name}${!!sangsoe?.nickname ? ` (${sangsoe.nickname})` : ''}` : '공석'}</Text>
+                        </View>
+
                         <View style={{ marginHorizontal: 24, flexDirection: 'row', height: 20, alignSelf: 'flex-start', alignItems: 'flex-end', justifyContent: 'flex-start', marginTop: 20, marginBottom: 16 }}>
                             <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>동아리 관리</Text>
                         </View>

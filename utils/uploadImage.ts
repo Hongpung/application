@@ -12,11 +12,8 @@ export default async function uploadImage(imageFile: File, toUse: string): Promi
         const formData = new FormData();
         formData.append('image', imageFile, `${imageFile.name}-${(new Date).toISOString()}`);
         formData.append('path', toUse);
-
-        console.log(formData);
-        console.log(`${process.env.SUB_API}/upload-s3/image`)
         
-        const uploadConfirm = await fetch(`${process.env.SUB_API}/upload-s3/image`, 
+        const uploadConfirm = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/upload-s3/image`, 
             {
             method: 'POST',
             headers: {
@@ -29,8 +26,7 @@ export default async function uploadImage(imageFile: File, toUse: string): Promi
         if (!uploadConfirm.ok) throw Error();
 
         const { uploadUrl, imageUrl } = await uploadConfirm.json();
-        console.log(uploadUrl,imageUrl)
-
+        
         const uploadResponse = await fetch(uploadUrl, {
             method: 'PUT',
             headers: {

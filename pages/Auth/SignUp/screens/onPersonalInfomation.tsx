@@ -128,14 +128,14 @@ const usePersonalInformation = () => {
 
     const [isLoading, setLoading] = useState(false);
 
-    const SignUp = async () => {
+    const SignUp = useCallback(async () => {
         const controller = new AbortController();
         const signal = controller.signal;
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10초 타임아웃
         setLoading(true);
 
         try {
-            const response = await fetch(`${process.env.SUB_API}/auth/signup`, {
+            const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/auth/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -177,7 +177,7 @@ const usePersonalInformation = () => {
             setLoading(false)
         }
 
-    };
+    },[signUpInfo])
 
     return { isLoading, SignUp }
 }
@@ -190,7 +190,7 @@ const NoNicknameAlretModal: React.FC<{ visible: boolean, onClose: () => void, on
                 <Text style={alertStyle.Header}>패명 없음</Text>
                 <Text style={alertStyle.Script}>{`패명이 존재 하지 않는게 맞나요?`}</Text>
                 <View style={{ position: 'absolute', flexDirection: 'row', justifyContent: 'space-around', marginHorizontal: 8, width: width - 56 - 16, bottom: 16 }}>
-                    <ShortButton color='red' innerText='취소' isFilled={true} onPress={onClose} />
+                    <ShortButton color='blue' innerText='아니오' isFilled={false} onPress={onClose} />
                     <ShortButton color='blue' innerText='네' isFilled={true} onPress={onSignUp} />
                 </View>
             </Pressable>
@@ -343,13 +343,13 @@ export default PersonalInformationCheck;
 const alertStyle = StyleSheet.create({
     Header: {
         fontFamily: 'NanumSquareNeo-Bold',
-        fontSize: 22,
+        fontSize: 18,
         left: 20,
         top: 20
     },
     Script: {
         fontFamily: 'NanumSquareNeo-Regular',
-        fontSize: 16,
+        fontSize: 14,
         left: 24,
         top: 52,
         lineHeight: 22,

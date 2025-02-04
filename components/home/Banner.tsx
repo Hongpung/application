@@ -1,16 +1,19 @@
 import { NativeSyntheticEvent, Pressable, StyleSheet, Text, View, Image, Linking } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
+import { useRecoilValue } from 'recoil';
+
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import PagerView from 'react-native-pager-view';
-import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/specs/PagerViewNativeComponent';
+import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/PagerViewNativeComponent';
+
 import { Icons } from '@hongpung/components/common/Icon';
 import { Color } from '@hongpung/ColorSet';
-import { useNavigation } from '@react-navigation/native';
-
-import { MainStackParamList } from '@hongpung/nav/HomeStacks';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { useRecoilValue } from 'recoil';
 import { bannersState } from '@hongpung/recoil/bannerState';
+import { MainStackParamList } from '@hongpung/nav/HomeStacks';
+
 
 export interface BannerFetchData {
     bannerId: string
@@ -65,7 +68,9 @@ const Banner: React.FC<{ withIndicator?: boolean }> = ({ withIndicator = true })
             <View style={{
                 flex: 1,
             }}>
-                <View style={{ flex: 1, backgroundColor: Color['grey300'] }} />
+                <View style={{ flex: 1, backgroundColor: Color['grey300'] }} >
+                    <Text>상태:{banners.state} 값:{banners.value ?'정상 값' : '널 들어옴'}</Text>
+                </View>
             </View>
         </View >
     )

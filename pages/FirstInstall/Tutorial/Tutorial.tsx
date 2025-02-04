@@ -1,18 +1,24 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, Image } from 'react-native'
 import React, { useRef, useState } from 'react'
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
+
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useNavigation } from '@react-navigation/native';
+import PagerView from 'react-native-pager-view';
+
 import ShortButton from '@hongpung/components/buttons/ShortButton';
 import LongButton from '@hongpung/components/buttons/LongButton';
 import { Color } from '@hongpung/ColorSet';
-import { TutorialEx } from '@hongpung/ExplainSet';
 import { RootStackParamList } from '@hongpung/pageTypes';
-import PagerView from 'react-native-pager-view';
 
-type TutorialProps = NativeStackScreenProps<RootStackParamList, "Tutorial">;
 
-const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
-    const [pageNum, setPageNum] = useState(0);
+type TutorialProp = NativeStackNavigationProp<RootStackParamList, "Tutorial">;
+
+const TutorialScreen: React.FC = () => {
+
+    const navigation = useNavigation<TutorialProp>();
+
     const Pages = ["0", "1", "2"]
+    const [pageNum, setPageNum] = useState(0);
     const photo = 'phptoUrl'//나중에 추가할것
 
     const pagerRef = useRef<PagerView>(null);//러페런스 추가
@@ -22,6 +28,7 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
             pagerRef.current.setPage(pageNum + 1);
         }
     };
+
     const SkipHandler = () => {
         navigation.replace('Permission')
     }
@@ -29,37 +36,41 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
     return (
         // 배경용
         <View style={styles.basicBackground}>
-            <PagerView style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center'
-            }} initialPage={0}
+            <PagerView
+                style={{ flex: 1 }}
+                initialPage={0}
+                orientation="horizontal"
+                removeClippedSubviews={true}
+                scrollEnabled
+                ref={pagerRef}
                 onPageScroll={(e) => { const { position, offset } = e.nativeEvent; setPageNum(position); }}
-                ref={pagerRef}>
-                <View style={{
-                    flex: 1,
-                    alignItems: 'center',
-                }}
-                    key={Pages[0]}>
-                    <View style={[styles.TutorialPicture, { backgroundColor: "#dddddd" }]}>
-                        {/* <Image source={require('사진 경로')}/> */}
-                        {/* 나중에 위 코드로 바꿔서 넣으면 됨 */}
-                        <Text>
-                            사진 1
-                        </Text>
-                    </View>
-                    <Text style={styles.TutorialDescript}>
-                        {TutorialEx[Pages[0]]}
-                    </Text>
+            >
+                <View key="page-1" style={{ alignItems: 'center', backgroundColor: '#FFF', gap: 12, paddingVertical: 24 }}>
+
+                    <Image
+                        source={require('@hongpung/assets/images/tutorial/Tutorial-1.png')}
+                        style={{ resizeMode: 'contain', width: 320, height: '100%' }} width={320} height={680} />
                 </View>
-                <View style={{
+
+                <View key="page-2" style={{ alignItems: 'center', backgroundColor: '#FFF', gap: 12, paddingVertical: 24 }}>
+
+                    <Image
+                        source={require('@hongpung/assets/images/tutorial/Tutorial-2.png')}
+                        style={{ resizeMode: 'contain', width: 320, height: '100%'  }} width={320} height={680} />
+                </View>
+
+                <View key="page-3" style={{ alignItems: 'center', backgroundColor: '#FFF', gap: 12, paddingVertical: 24 }}>
+
+                    <Image
+                        source={require('@hongpung/assets/images/tutorial/Tutorial-3.png')}
+                        style={{ resizeMode: 'contain',width: 320, height: '100%'  }} width={320} height={680} />
+                </View>
+                {/* <View style={{
                     flex: 1,
                     alignItems: 'center',
                 }}
                     key={Pages[1]}>
                     <View style={[styles.TutorialPicture, { backgroundColor: "#dddddd" }]}>
-                        {/* <Image source={require('사진 경로')}/> */}
-                        {/* 나중에 위 코드로 바꿔서 넣으면 됨 */}
                         <Text>
                             사진 2
                         </Text>
@@ -68,14 +79,15 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
                         {TutorialEx[Pages[1]]}
                     </Text>
                 </View>
-                <View style={{
-                    flex: 1,
-                    alignItems: 'center',
-                }}
+                <View
+                    style={{
+                        flex: 1,
+                        width: '100%',
+                        alignItems: 'center',
+                    }}
                     key={Pages[2]}>
                     <View style={[styles.TutorialPicture, { backgroundColor: "#dddddd" }]}>
-                        {/* <Image source={require('사진 경로')}/> */}
-                        {/* 나중에 위 코드로 바꿔서 넣으면 됨 */}
+
                         <Text>
                             사진 3
                         </Text>
@@ -83,13 +95,19 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
                     <Text style={styles.TutorialDescript}>
                         {TutorialEx[Pages[2]]}
                     </Text>
-                </View>
+                </View> */}
             </PagerView>
-            <View style={{
-                alignItems: 'center',
-                height: 230
-            }}><View style={styles.idicatorBackGround}>
-                    {/* indicator */}
+            <View
+                style={{
+                    alignItems: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    gap: 24,
+                    paddingBottom: 12
+                }}
+            >
+                <View style={styles.idicatorBackGround}>
                     <View style={pageNum == 0 ? styles.indicatorSeleted : styles.indicator}>
                     </View>
                     <View style={pageNum == 1 ? styles.indicatorSeleted : styles.indicator}>
@@ -98,7 +116,7 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
                     </View>
                 </View>
                 <View style={styles.CTA}>
-                    {pageNum < 2 ? (
+                    {pageNum < 2 ?
                         <>
                             <ShortButton
                                 innerText={'건너뛰기'}
@@ -113,8 +131,8 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
                                 onPress={goToPage}
                             />
                         </>
-                    ) : (
-                        <View style={{ flexGrow: 1 }}>
+                        :
+                        <View style={{ width: '100%' }}>
                             <LongButton
                                 innerText={'이해했어요'}
                                 isAble={true}
@@ -122,7 +140,7 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
                                 onPress={SkipHandler}
                             />
                         </View>
-                    )}
+                    }
                 </View>
             </View>
 
@@ -133,31 +151,23 @@ const Tutorial: React.FC<TutorialProps> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     basicBackground: {
-        flexDirection: 'column',
-        justifyContent: 'center',
         flex: 1,
+        // paddingVertical: 32,
         backgroundColor: '#fff',
     },
     TutorialPicture: {
-        marginTop: 120,
-        width: 300,
-        height: 300,
-        overflow: "hidden"
+        width: '100%',
+        flex: 1
     },
     TutorialDescript: {
         fontFamily: "NanumSquareNeo-ExtraBold",
-        marginTop: 40,
         fontSize: 16,
         fontWeight: 600,
-        width: 300,
         color: Color['blue500'],
         textAlign: 'center',
-        height: 56
     },
     idicatorBackGround: {
-        width: 48,
-        bottom: 180,
-        position: 'absolute',
+        gap: 12,
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center'
@@ -175,14 +185,11 @@ const styles = StyleSheet.create({
         borderRadius: 25,
     },
     CTA: {
-        position: 'absolute',
         flexDirection: 'row',
-        bottom: 72,
         paddingHorizontal: 32,
         width: '100%',
         justifyContent: 'space-around',
-        flex: 1,
     }
 })
 
-export default Tutorial;
+export default TutorialScreen;

@@ -65,7 +65,7 @@ const PictureCheckScreen: React.FC<PictureCheckProps> = ({ navigation, route }) 
 
                 formData.append('path', 'end-session'); // 업로드 경로
 
-                const pictureUpload = await fetch(`${process.env.SUB_API}/upload-s3/images`, {
+                const pictureUpload = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/upload-s3/images`, {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
@@ -89,7 +89,7 @@ const PictureCheckScreen: React.FC<PictureCheckProps> = ({ navigation, route }) 
                 const imageUrls = uploadUrls.map(url => (url.imageUrl))
                 console.log(imageUrls)
 
-                const response = await fetch(`${process.env.SUB_API}/session/end`, {
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/session/end`, {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가

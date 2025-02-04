@@ -8,6 +8,9 @@ import { CheckOutStackParamList } from '@hongpung/nav/HomeStacks';
 import { useNavigation } from '@react-navigation/native';
 import { useRecoilValue } from 'recoil';
 import { onUseSession } from '@hongpung/recoil/sessionState';
+import LottieView from 'lottie-react-native';
+import Dehumidifier from '@hongpung/assets/lotties/Dehumidifier.json'
+import Trash from '@hongpung/assets/lotties/Trash.json';
 
 
 type PictureCheckNavProp = NativeStackNavigationProp<CheckOutStackParamList, 'PictureCheck'>
@@ -15,7 +18,7 @@ type PictureCheckNavProp = NativeStackNavigationProp<CheckOutStackParamList, 'Pi
 const CheckOutDescriptScreen: React.FC = () => {
 
     const navigation = useNavigation<PictureCheckNavProp>();
-    const [pageNum, setPageNum] = useState(1);
+    const [pageNum, setPageNum] = useState(0);
     const Pages = ["0", "1", "2"]
     const photo = 'phptoUrl'//나중에 추가할것
     const sessionState = useRecoilValue(onUseSession)
@@ -28,92 +31,160 @@ const CheckOutDescriptScreen: React.FC = () => {
         }
     };
 
-    return (
-        // 배경용
-        <View style={styles.basicBackground}>
-            <Text style={{
-                textAlign: 'center', top: 164,
-                fontFamily: "NanumSquareNeo-Bold",
-                fontSize: 20,
-            }}>연습실 정리 안내</Text>
-            <PagerView
-                style={{
-                    flex: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}
-                initialPage={0}
-                onPageScroll={(e) => { const { position, offset } = e.nativeEvent; 
-                setPageNum(position); }}
-                ref={pagerRef}>
-                {
-                    <View style={{
-                        flex: 1,
-                        alignItems: 'center',
-                    }}
-                        key={Pages[0]}>
-                        <View style={[styles.CheckOutPicture, { backgroundColor: "#dddddd" }]}>
-                            {/* <Image source={require('사진 경로')}/> */}
-                            {/* 나중에 위 코드로 바꿔서 넣으면 됨 */}
-                            <Text>
-                                사진 1
+    if (!sessionState)
+        return null;
+
+    if (
+        sessionState.borrowInstruments && sessionState.borrowInstruments.length > 0
+    )
+        return (
+            // 배경용
+            <View style={styles.basicBackground}>
+                <View style={{ flex: 1, flexDirection: 'column', display: 'flex', justifyContent: 'center', gap: 24, paddingTop: 160 }}>
+
+                    <Text style={{
+                        textAlign: 'center',
+                        fontFamily: "NanumSquareNeo-Bold",
+                        fontSize: 20,
+                    }}>연습실 정리 안내</Text>
+                    <PagerView
+                        style={{
+                            flex: 1,
+                            alignItems: 'center'
+                        }}
+                        initialPage={0}
+                        onPageScroll={(e) => {
+                            const { position, offset } = e.nativeEvent;
+                            setPageNum(position);
+                        }}
+                        ref={pagerRef}>
+
+                        <View style={{
+                            flex: 1,
+                            alignItems: 'center',
+                        }}
+                            key={Pages[0]}>
+                            <View style={[styles.CheckOutPicture,]}>
+                                <LottieView source={require('@hongpung/assets/lotties/Instrument.json')} style={{ width: '100%', height: '100%' }} autoPlay speed={1} />
+                            </View>
+                            <Text style={styles.CheckOutDescript}>
+                                {`사용한 ${sessionState?.borrowInstruments}개의 악기들을\n제자리에 돌려놓고 찍어주세요`}
                             </Text>
                         </View>
-                        <Text style={styles.CheckOutDescript}>
-                            {`사용한 ${sessionState?.borrowInstruments}개의 악기들을\n제자리에 돌려놓고 찍어주세요`}
-                        </Text>
-                    </View>}
-                <View style={{
-                    flex: 1,
-                    alignItems: 'center',
-                }}
-                    key={Pages[1]}>
-                    <View style={[styles.CheckOutPicture, { backgroundColor: "#dddddd" }]}>
-                        {/* <Image source={require('사진 경로')}/> */}
-                        {/* 나중에 위 코드로 바꿔서 넣으면 됨 */}
-                        <Text>
-                            사진 2
-                        </Text>
-                    </View>
-                    <Text style={styles.CheckOutDescript}>
-                        {`바닥을 정리하고 섭취한 음료들을\n버리고 연습실을 찍어주세요`}
-                    </Text>
+                        <View style={{
+                            alignItems: 'center',
+                        }}
+                            key={Pages[1]}>
+                            <View style={[styles.CheckOutPicture,]}>
+                                <LottieView source={Trash} style={{ width: '100%', height: '100%' }} autoPlay speed={1.6} />
+                            </View>
+                            <Text style={styles.CheckOutDescript}>
+                                {`바닥을 정리하고 섭취한 음료들을\n버리고 연습실을 찍어주세요`}
+                            </Text>
+                        </View>
+                        <View style={{
+                            alignItems: 'center',
+                        }}
+                            key={Pages[2]}>
+                            <View style={[styles.CheckOutPicture]}>
+                                <LottieView source={Dehumidifier} style={{ width: '100%', height: '100%' }} autoPlay speed={1.6} />
+                            </View>
+                            <Text style={styles.CheckOutDescript}>
+                                {`제습기를 비우고 다시 틀어주세요\n이 세가지 사진을 보여주세요`}
+                            </Text>
+                        </View>
+                    </PagerView>
                 </View>
                 <View style={{
-                    flex: 1,
-                    alignItems: 'center',
-                }}
-                    key={Pages[2]}>
-                    <View style={[styles.CheckOutPicture, { backgroundColor: "#dddddd" }]}>
-                        {/* <Image source={require('사진 경로')}/> */}
-                        {/* 나중에 위 코드로 바꿔서 넣으면 됨 */}
-                        <Text>
-                            사진 3
-                        </Text>
+                    display: 'flex',
+                    gap: 24,
+                    paddingVertical: 12,
+                    alignItems: 'center'
+                }}>
+                    <View style={styles.idicatorBackGround}>
+                        {/* indicator */}
+                        <View style={pageNum == 0 ? styles.indicatorSeleted : styles.indicator}>
+                        </View>
+                        <View style={pageNum == 1 ? styles.indicatorSeleted : styles.indicator}>
+                        </View>
+                        <View style={pageNum == 2 ? styles.indicatorSeleted : styles.indicator}>
+                        </View>
                     </View>
-                    <Text style={styles.CheckOutDescript}>
-                        {`제습기를 비우고 다시 틀어주세요\n이 세가지 사진을 보여주세요`}
+                    <View style={styles.CTA}>
+                        <LongButton color='blue' isAble={true} innerText={pageNum < 2 ? '다음' : '촬영하기'} onPress={() => { if (pageNum == 2) navigation.navigate('CheckOutCamera'); else goToPage(); }} />
+                    </View>
+                </View>
+
+            </View>
+        )
+    else {
+        return (
+            // 배경용
+            <View style={styles.basicBackground}>
+                <View style={{ flex: 1, flexDirection: 'column', display: 'flex', justifyContent: 'center', gap: 24, paddingTop: 160 }}>
+                    <Text style={{
+                        textAlign: 'center',
+                        fontFamily: "NanumSquareNeo-Bold",
+                        fontSize: 20,
+                    }}>
+                        연습실 정리 안내
                     </Text>
+                    <PagerView
+                        style={{
+                            flex: 1
+                        }}
+                        initialPage={0}
+                        onPageScroll={(e) => {
+                            const { position, offset } = e.nativeEvent;
+                            setPageNum(position);
+                        }}
+
+                        ref={pagerRef}>
+                        <View style={{
+                            alignItems: 'center'
+                        }}
+                            key={Pages[0]}>
+                            <View style={[styles.CheckOutPicture,]}>
+                                <LottieView source={Trash} style={{ width: '100%', height: '100%' }} autoPlay speed={1.6} />
+                            </View>
+                            <Text style={styles.CheckOutDescript}>
+                                {`바닥을 정리하고 섭취한 음료들을\n버리고 연습실을 찍어주세요`}
+                            </Text>
+                        </View>
+                        <View style={{
+                            flex: 1,
+                            alignItems: 'center',
+                        }}
+                            key={Pages[1]}>
+                            <View style={[styles.CheckOutPicture]}>
+                                <LottieView source={Dehumidifier} style={{ width: '100%', height: '100%'  }} autoPlay speed={0.8} />
+                            </View>
+                            <Text style={styles.CheckOutDescript}>
+                                {`제습기를 비우고 다시 틀어주세요\n이 두 가지 사진을 보여주세요`}
+                            </Text>
+                        </View>
+                    </PagerView>
                 </View>
-            </PagerView>
-            <View style={{
-                alignItems: 'center'
-            }}><View style={styles.idicatorBackGround}>
-                    {/* indicator */}
-                    <View style={pageNum == 0 ? styles.indicatorSeleted : styles.indicator}>
+                <View style={{
+                    display: 'flex',
+                    gap: 24,
+                    paddingVertical: 12,
+                    alignItems: 'center'
+                }}>
+                    <View style={styles.idicatorBackGround}>
+                        {/* indicator */}
+                        <View style={pageNum == 0 ? styles.indicatorSeleted : styles.indicator}>
+                        </View>
+                        <View style={pageNum == 1 ? styles.indicatorSeleted : styles.indicator}>
+                        </View>
                     </View>
-                    <View style={pageNum == 1 ? styles.indicatorSeleted : styles.indicator}>
+                    <View style={styles.CTA}>
+                        <LongButton color='blue' isAble={true} innerText={pageNum < 1 ? '다음' : '촬영하기'} onPress={() => { if (pageNum == 1) navigation.navigate('CheckOutCamera'); else goToPage(); }} />
                     </View>
-                    <View style={pageNum == 2 ? styles.indicatorSeleted : styles.indicator}>
-                    </View>
-                </View>
-                <View style={styles.CTA}>
-                    <LongButton color='blue' isAble={true} innerText={pageNum < 2 ? '다음' : '촬영하기'} onPress={() => { if (pageNum == 2) navigation.navigate('CheckOutCamera'); else goToPage(); }} />
                 </View>
             </View>
-
-        </View>
-    )
+        )
+    }
 }
 
 
@@ -125,25 +196,19 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     CheckOutPicture: {
-        marginTop: 220,
-        width: 200,
-        height: 200,
-        overflow: "hidden"
+        width: 400,
+        height: 300,
     },
     CheckOutDescript: {
         fontFamily: "NanumSquareNeo-Bold",
-        marginTop: 24,
         fontSize: 20,
-        width: 300,
         color: Color['grey700'],
         textAlign: 'center',
     },
     idicatorBackGround: {
-        width: 48,
-        bottom: 120,
-        position: 'absolute',
+        gap: 8,
         flexDirection: 'row',
-        justifyContent: 'space-around',
+        justifyContent: 'center',
         alignItems: 'center'
     },
     indicator: {
@@ -159,8 +224,6 @@ const styles = StyleSheet.create({
         borderRadius: 25,
     },
     CTA: {
-        position: 'absolute',
-        bottom: 8,
         justifyContent: 'space-between',
         width: '100%',
         paddingHorizontal: 12

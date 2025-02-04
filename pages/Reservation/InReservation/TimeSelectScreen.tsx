@@ -160,7 +160,7 @@ const TimeSelectScreen: React.FC = () => {
 
 
     const { data, loading, error } = useFetchUsingToken<ExistReservation[]>(
-        reservation.date ? `${process.env.SUB_API}/reservation/daily/occupied?date=${reservation.date.toISOString().split('T')[0]}` : null,
+        reservation.date ? `${process.env.EXPO_PUBLIC_BASE_URL}/reservation/daily/occupied?date=${reservation.date.toISOString().split('T')[0]}` : null,
         {
         }, 2000, [reservation.date]
     )

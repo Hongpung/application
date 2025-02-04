@@ -3,12 +3,16 @@ import { Color } from '@hongpung/ColorSet';
 import { View, TouchableOpacity, Text, Pressable } from 'react-native';
 import Toast, { BaseToastProps } from 'react-native-toast-message';
 
+
+
 export const toastConfig = {
-  notification: ({ text1, text2, ...rest }: BaseToastProps) => (//success시 알림 모양
-    <TouchableOpacity style={{ width: '100%', }}>
-      <View
-        style={{
-          backgroundColor: '#FFF',
+  notification: ({ text1: title, text2: content, ...rest }: BaseToastProps) => (//success시 알림 모양
+    <View style={{
+      width: '100%'
+    }}>
+      <Pressable
+        style={(state) => ({
+          backgroundColor: state.pressed ? '#DDD' : '#FFF',
           paddingVertical: 16,
           borderRadius: 12,
           paddingHorizontal: 12,
@@ -22,24 +26,25 @@ export const toastConfig = {
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center'
-        }}
+        })}
         {...rest}
       >
         <Icons name='notifications' size={36} color={Color['blue500']} />
         <View style={{
           flexDirection: 'column',
+          flex: 1,
           gap: 4
         }}>
           <Text style={{ color: '#000', fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'left', width: '100%' }}>
-            {text1}
+            {title}
           </Text>
-          <Text style={{ color: Color['grey400'], lineHeight: 18, fontSize: 14, fontFamily: "NanumSquareNeo-Regular", textAlign: 'left', width: '100%' }}>
-            {text2}
+          <Text style={{ color: Color['grey400'], lineHeight: 18, fontSize: 14, fontFamily: "NanumSquareNeo-Regular", textAlign: 'left', width: '100%' }} numberOfLines={3} ellipsizeMode='tail'>
+            {content}
           </Text>
         </View>
 
-      </View>
-    </TouchableOpacity>
+      </Pressable>
+    </View>
   ),
   successHasReturn: ({ text1, text2, ...rest }: BaseToastProps) => (//success 및 되돌리기 버튼 포함
     <View style={{ width: '100%' }}>

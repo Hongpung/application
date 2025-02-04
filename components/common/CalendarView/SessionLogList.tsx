@@ -35,7 +35,7 @@ const useSessionLogList = () => {
 
     }, [sessionList, selectedDate])
 
-    return { matchedSessionList }
+    return { matchedSessionList: Object.entries(matchedSessionList) }
 }
 
 const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
@@ -46,12 +46,16 @@ export const SessionLogList: React.FC<{ onPress: (session: BreifSession) => void
 
     return (
         <View style={{ flex: 1 }}>
-            <ScrollView bounces={false} contentContainerStyle={{}}>
-                {Object.entries(matchedSessionList).map(([dateKey, session]) => {
+            {matchedSessionList.length == 0 &&
+                <View style={{ flex: 1, width, alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'], fontSize: 18 }}>참여한 일정이 없습니다.</Text>
+                </View>}
+            <ScrollView bounces={false}>
+                {matchedSessionList.map(([dateKey, session]) => {
                     const date = new Date(dateKey);
 
                     if (!session) return (
-                        <View key={dateKey} style={{height:200}}>
+                        <View key={dateKey} style={{ height: 200 }}>
                             {/* 날짜 출력 */}
                             <Text style={{ marginVertical: 4, marginHorizontal: 28, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey500'], fontSize: 14 }}>
                                 {date.getFullYear()}.{date.getMonth() + 1}.{date.getDate()}({daysOfWeek[date.getDay()]})

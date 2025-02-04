@@ -9,6 +9,7 @@ import PracticeInfoScreen from "@hongpung/pages/share/ClubPracticeInfoScreen";
 import ChangeMyInfoScreen from "@hongpung/pages/MyPage/ChangeMyInfoScreen";
 import MyPracticeInfoScreen from "@hongpung/pages/share/MyPracticeInfoScreen";
 import ChangePasswordScreen from "@hongpung/pages/MyPage/ChangePassword.screen";
+import WithdrawalAuthScreen from "@hongpung/pages/MyPage/WithdrawalAuthScreen";
 
 
 export type MyPageParamList = {
@@ -20,6 +21,7 @@ export type MyPageParamList = {
     MyPracticeInfo: { sessionId: number }
     ChangePassword: undefined
     ChangeMyInfo: undefined
+    WithdrawalAuth:undefined
 }
 
 const MyPageStack = createNativeStackNavigator<MyPageParamList>();
@@ -42,7 +44,7 @@ const MyPageStacks = () => {
                 options={{
                     headerShown: true,
                     animation: 'none',
-                    header: () => <Header leftButton='arrow-back' HeaderName='내 일정' />
+                    header: () => <Header leftButton='arrow-back' HeaderName='다가오는 일정' />
                 }}
             />
             {/* <MyPageStack.Screen
@@ -71,6 +73,7 @@ const MyPageStacks = () => {
                     header: () => <Header leftButton='arrow-back' HeaderName='내 활동' />
                 }}
             />
+
             <MyPageStack.Screen
                 name='ChangePassword'
                 component={ChangePasswordScreen}
@@ -85,7 +88,16 @@ const MyPageStacks = () => {
                 component={ChangeMyInfoScreen}
                 options={{
                     headerShown: true,
-                    header: () => <Header leftButton='arrow-back' HeaderName='내 활동' />
+                    header: () => <Header leftButton='arrow-back' HeaderName='내 정보 수정' />
+                }}
+            />
+
+            <MyPageStack.Screen
+                name='WithdrawalAuth'
+                component={WithdrawalAuthScreen}
+                options={{
+                    headerShown: true,
+                    header: () => <Header leftButton='close' HeaderName='회원 탈퇴' />
                 }}
             />
 

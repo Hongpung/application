@@ -1,14 +1,19 @@
-import { StyleSheet, Text, View, Alert, Linking, AppState } from 'react-native'
+import { StyleSheet, Text, View, Alert, Linking, AppState, Modal, ActivityIndicator } from 'react-native'
 import * as Notifications from 'expo-notifications';
 import React, { useEffect, useState } from 'react'
 import { Color } from '@hongpung/ColorSet';
 import CustomSwitch from '@hongpung/components/common/CustomSwitch';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNotificationSetting } from '@hongpung/hoc/useNotification';
 
 const NotificationSettingScreen: React.FC = () => {
 
+
+    const { turnOffNotification, turnOnNotification } = useNotificationSetting();
     const [isEnabled, setIsEnabled] = useState(false);
+    const [isLoading, setLoading] = useState(true)
+
     const [appState, setAppState] = useState(AppState.currentState);
 
     const handleAppStateChange = (nextAppState: AppState["currentState"]) => {
@@ -30,6 +35,24 @@ const NotificationSettingScreen: React.FC = () => {
         };
     }, [appState]);
 
+    useEffect(() => {
+
+        const loadSettion = async () => {
+            const pushOption = await AsyncStorage.getItem('receive-push');
+            if (pushOption === 'true') setIsEnabled(true)
+            setLoading(false)
+        }
+
+        loadSettion();
+
+        return () => {
+            if (isEnabled)
+                turnOnNotification();
+            else
+                turnOffNotification()
+
+        }
+    }, [])
 
     const toggleNotification = async () => {
         const { status } = await Notifications.requestPermissionsAsync();
@@ -63,6 +86,11 @@ const NotificationSettingScreen: React.FC = () => {
     return (
         <GestureHandlerRootView>
             <View>
+                <Modal visible={isLoading} transparent>
+                    <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center' }}>
+                        <ActivityIndicator color={'white'} size={'large'} />
+                    </View>
+                </Modal>
                 <View style={{ height: 24 }} />
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 36, justifyContent: 'space-between' }}>
                     <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'], fontSize: 16 }}>푸시 알림</Text>

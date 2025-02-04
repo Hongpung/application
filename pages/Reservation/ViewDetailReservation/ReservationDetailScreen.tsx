@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Text, TextInput, View, Image, ActivityIndicator, Dimensions } from 'react-native'
+import { Pressable, ScrollView, Text, TextInput, View, Image, ActivityIndicator, Dimensions, Alert } from 'react-native'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
 import LongButton from '@hongpung/components/buttons/LongButton'
@@ -14,7 +14,6 @@ import { instrumentTypes } from '@hongpung/UserType'
 
 const { width } = Dimensions.get('window')
 
-
 type ReservationDetailProps = NativeStackScreenProps<ReservationStackParamList, 'ReservationDetail'>
 
 const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation, route }) => {
@@ -23,10 +22,11 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
 
     const loginUser = useRecoilValue(loginUserState)
 
-
     const daysOfWeek = useMemo(() => ['일', '월', '화', '수', '목', '금', '토'], [])
-    const [reservation, setReservation] = useState<Reservation | null>(null)
+
+    const [reservation, setReservation] = useState<Reservation | undefined | null>(undefined)
     const [isLoading, setLoading] = useState(false);
+
     const isEditible = () => {
         if (reservation) {
             const utcTime = new Date();
@@ -37,7 +37,6 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
         return false;
     }
 
-    console.log(reservation?.creatorId, loginUser?.memberId)
     useEffect(() => {
         const load = async () => {
             const controller = new AbortController();
@@ -47,7 +46,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                 setLoading(true);
                 const token = await getToken('token');
                 if (!token) throw Error('token is not valid')
-                const response = await fetch(`${process.env.SUB_API}/reservation/${reservationId}`,
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/reservation/${reservationId}`,
                     {
                         method: 'GET',
                         headers: {
@@ -66,8 +65,13 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                 console.log(parsedReservation)
                 setReservation(parsedReservation)
             } catch (e) {
-                console.error(e);
-                navigation.goBack()
+                setReservation(null);
+                (navigation.goBack()) 
+                Alert.alert(
+                    '삭제된 예약',
+                    '삭제된 예약입니다.',
+                    [{ text: '확인', style: 'default'}]
+                )
             } finally {
                 setLoading(false);
                 clearTimeout(timeoutId);
@@ -86,7 +90,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                 setLoading(true);
                 const token = await getToken('token');
                 if (!token) throw Error('token is not valid')
-                const response = await fetch(`${process.env.SUB_API}/reservation/${reservationId}`,
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/reservation/${reservationId}`,
                     {
                         method: 'DELETE',
                         headers: {
@@ -128,7 +132,7 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
                 setLoading(true);
                 const token = await getToken('token');
                 if (!token) throw Error('token is not valid')
-                const response = await fetch(`${process.env.SUB_API}/reservation/${reservationId}/leave`,
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/reservation/${reservationId}/leave`,
                     {
                         method: 'POST',
                         headers: {
@@ -177,7 +181,12 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
         return `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1)}.${selectedDate.getDate()}(${daysOfWeek[selectedDate.getDay()]})`
     }, [])
 
-    if (isLoading || reservation == null)
+    if (reservation == null)
+        return (
+            <View style={{ flex: 1, backgroundColor: '#FFFF' }} />
+        )
+
+    if (isLoading || reservation == undefined)
         return (
             <View style={{ backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
                 <ActivityIndicator color={Color['blue500']} size={'large'} />
@@ -212,14 +221,14 @@ const ReservationDetailScreen: React.FC<ReservationDetailProps> = ({ navigation,
 
                 <View style={{ height: 28 }} />
 
-                <View style={{ marginHorizontal: 24, flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ marginHorizontal: 24, flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey500'] }}>예약자</Text>
                     <Text style={{ marginHorizontal: 12, paddingVertical: 4, fontSize: 16, textAlign: 'right' }}>{`${reservation?.userName}${!!reservation?.userNickname ? ` (${reservation.userNickname})` : ''}`}</Text>
                 </View>
 
                 <View style={{ height: 24 }} />
 
-                <View style={{ marginHorizontal: 24, flex: 1, flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ marginHorizontal: 24, flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey500'] }}>예약명</Text>
                     <Text style={{ marginHorizontal: 12, paddingVertical: 4, fontSize: 16, textAlign: 'right' }}>{reservation.reservationName}</Text>
                 </View>

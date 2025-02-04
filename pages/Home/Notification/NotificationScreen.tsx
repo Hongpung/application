@@ -10,7 +10,10 @@ import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/Reanim
 import { getToken } from '@hongpung/utils/TokenHandler';
 import { StackActions, useNavigation } from '@react-navigation/native';
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MainStackParamList } from '@hongpung/nav/HomeStacks';
 
+type HomeNavProps = NativeStackNavigationProp<MainStackParamList, 'Home'>
 
 enum NotificationType {
     Notification = '공지사항',
@@ -79,6 +82,7 @@ const calculateTimeDifference = (date1: Date) => {
 
 const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }) => {
 
+    const navigation = useNavigation<HomeNavProps>();
 
     const dragX = useSharedValue<number>(0);
 
@@ -136,20 +140,33 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
             overshootRight={false}
         >
             <Animated.View style={[styles.NotificationCard, animatedStyle]}>
-                <Animated.View style={{ margin: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                    <Animated.View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                        {/* <View><Text style={{ fontSize: 16 }}>{getIcon(notification.data)}</Text></View> */}
-                        <Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'] }}>{notification.data.title}</Text>
-                    </Animated.View>
-                    <Text style={{ fontSize: 12, height: 14, fontFamily: "NanumSquareNeo-Regular", color: Color['grey300'] }} >
-                        {calculateTimeDifference(new Date(notification.timestamp))}
-                    </Text>
-                </Animated.View>
-                <View style={{ marginHorizontal: 24, justifyContent: 'center', height: 60 }}>
-                    <Text style={{ textAlignVertical: 'center', color: Color['grey600'], fontFamily: "NanumSquareNeo-Regular", fontSize: 14 }}>
-                        {notification.data.body}
-                    </Text>
-                </View>
+                <Pressable onPress={() => {
+                    console.log(notification.data.data)
+                    if (notification.data.data?.reservationId) {
+                        const { reservationId } = notification.data.data;
+                        navigation.goBack();
+                        navigation.push('Reservation', { screen: 'ReservationDetail', params: { reservationId } })
+                    }
+                    if (notification.data.data?.noticeId) {
+                        const { noticeId } = notification.data.data;
+                        navigation.push('NoticeStack', { screen: 'NoticeDetail', params: { noticeId } })
+                    }
+                }}>
+                    <View style={{ margin: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            {/* <View><Text style={{ fontSize: 16 }}>{getIcon(notification.data)}</Text></View> */}
+                            <Text style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'] }}>{notification.data.title}</Text>
+                        </View>
+                        <Text style={{ fontSize: 12, height: 14, fontFamily: "NanumSquareNeo-Regular", color: Color['grey300'] }} >
+                            {calculateTimeDifference(new Date(notification.timestamp))}
+                        </Text>
+                    </View>
+                    <View style={{ marginHorizontal: 24, justifyContent: 'center', height: 60 }}>
+                        <Text style={{ textAlignVertical: 'center', color: notification.isRead ? Color['grey300'] : Color['grey600'], fontFamily: "NanumSquareNeo-Regular", fontSize: 14 }}>
+                            {notification.data.body}
+                        </Text>
+                    </View>
+                </Pressable>
             </Animated.View>
         </Swipeable>
     )
@@ -174,7 +191,7 @@ const NotificationScreen: React.FC = () => {
                 const token = await getToken('token');
                 if (!token) { throw Error('invalid Token'); }
 
-                const response = await fetch(`${process.env.BASE_URL}/notification/delete/${id}`, {
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/notification/delete/${id}`, {
                     method: 'DELETE',
                     headers: { Authorization: `Bearer ${token}`, }
                 })
@@ -211,7 +228,7 @@ const NotificationScreen: React.FC = () => {
                 const token = await getToken('token');
                 if (!token) { throw Error('invalid Token'); }
 
-                const response = await fetch(`${process.env.BASE_URL}/notification/delete/all`, {
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/notification/delete/all`, {
                     method: 'DELETE',
                     headers: { Authorization: `Bearer ${token}`, }
                 })
@@ -242,7 +259,7 @@ const NotificationScreen: React.FC = () => {
 
     };
 
-    const { data: notificationData, loading, error } = useFetchUsingToken<NotificationDTO[]>(`${process.env.SUB_API}/notification/my`);
+    const { data: notificationData, loading, error } = useFetchUsingToken<NotificationDTO[]>(`${process.env.EXPO_PUBLIC_BASE_URL}/notification/my`);
 
 
     useEffect(() => {
@@ -260,7 +277,7 @@ const NotificationScreen: React.FC = () => {
                 try {
                     const token = await getToken('token');
 
-                    const response = await fetch(`${process.env.BASE_URL}/notification/read`,
+                    const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/notification/read`,
                         {
                             method: 'POST',
                             headers: {
@@ -302,7 +319,7 @@ const NotificationScreen: React.FC = () => {
                                     <>
                                         {
                                             lastReadNotificationId == notification.notificationId &&
-                                            <View style={{ backgroundColor: 'transparent', marginVertical: 4, marginHorizontal: 36, flexDirection: 'row', alignItems: 'center' }}>
+                                            <View key={'latest-line'} style={{ backgroundColor: 'transparent', marginVertical: 4, marginHorizontal: 36, flexDirection: 'row', alignItems: 'center' }}>
                                                 <View style={{ height: 0, borderWidth: 0.6, flex: 1, marginRight: 8, borderColor: Color['grey200'] }} />
                                                 <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey300'] }}>이전 알림</Text>
                                                 <View style={{ height: 0, borderWidth: 0.6, flex: 1, marginLeft: 8, borderColor: Color['grey200'] }} />

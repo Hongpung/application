@@ -27,7 +27,6 @@ const useFetchUsingToken = <T>(url: string | null, options: UseFetchOptions = {}
 
         if (!token) { throw Error('invalid Token'); }
 
-        console.log('fetching...')
         const response = await fetch(url, {
           ...options,
           headers: {

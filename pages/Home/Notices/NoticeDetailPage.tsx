@@ -19,7 +19,7 @@ type NoticeDetailProps = NativeStackScreenProps<NoticeStackParamList, 'NoticeDet
 const NoticeDetailPage: React.FC<NoticeDetailProps> = ({ route }) => {
 
     const { noticeId } = route.params;
-    const { data, loading } = useFetchUsingToken<Notice>(`${process.env.SUB_API}/notice/${noticeId}`)
+    const { data, loading } = useFetchUsingToken<Notice>(`${process.env.EXPO_PUBLIC_BASE_URL}/notice/${noticeId}`)
 
     if (loading)
         return (

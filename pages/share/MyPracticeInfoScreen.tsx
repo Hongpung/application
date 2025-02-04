@@ -1,5 +1,5 @@
 import { FlatList, ScrollView, StyleSheet, Text, View, Image, Modal, Pressable, Dimensions, TouchableWithoutFeedback, KeyboardAvoidingView } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
 
 
@@ -10,10 +10,11 @@ import { User } from '@hongpung/UserType'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 
 import { MyPageParamList } from '@hongpung/nav/MyPageStack'
-import { AttendanceStatus, Session } from '../Home/MyPage/MyPractices/MyPracticesScreen'
+import { AttendanceStatus, Session } from '@hongpung/pages/MyPage/MyPractices/MyPracticesScreen'
 
 
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
+import ProfileMiniCard from '@hongpung/components/cards/ProfileMiniCard'
 
 const { width, height } = Dimensions.get('window')
 
@@ -25,14 +26,27 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
     const aspectRatio = 3 / 4;
     const [selectedImage, selectImage] = useState<string | null>(null)
     const [modalState, setModalState] = useState<'Images' | 'AttendanceList' | 'None'>('None')
-    const { data, loading, error } = useFetchUsingToken<Session>(`${process.env.BASE_URL}/session-log/specific/${sessionId}`)
+    const { data, loading, error } = useFetchUsingToken<Session>(`${process.env.EXPO_PUBLIC_BASE_URL}/session-log/specific/${sessionId}`)
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
 
-    console.log(data)
+    const [attendanceList, setAttendanceList] = useState<Record<string, User[]>>({})
+
+    useEffect(() => {
+        if (!data) return;
+        const sortedList: Record<string, User[]> = {}
+        data?.attendanceList.forEach(attendaceData => {
+            if (!sortedList[attendaceData.status]) {
+                sortedList[attendaceData.status] = []
+            }
+            sortedList[attendaceData.status].push(attendaceData.member)
+        })
+        setAttendanceList(sortedList)
+    }, [data])
+
+
     if (!data) return (
         <View>
-
         </View>
     )
     return (
@@ -48,7 +62,7 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                     }
                 </Pressable>
             </Modal>
-            <AttendanceModal attendanceList={data.attendanceList} visible={modalState == 'AttendanceList'} onClose={() => setModalState('None')} />
+            <AttendanceModal attendanceList={attendanceList} visible={modalState == 'AttendanceList'} onClose={() => setModalState('None')} />
             <ScrollView contentContainerStyle={{ backgroundColor: '#FFF' }}>
                 <View style={{ height: 12 }} />
                 <View style={{ marginHorizontal: 24, height: 80, borderWidth: 1, borderRadius: 10, borderColor: Color['grey200'] }}>
@@ -194,7 +208,7 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 24,
                             color: Color['blue500']
-                        }}>{data?.attendanceList.filter(attendannceData => attendannceData.status == '출석' || attendannceData.status == '참가').length}</Text>
+                        }}>{attendanceList['출석'] ? attendanceList['출석'].length : '-'}</Text>
                     </View>
 
                     <View style={{ alignItems: 'center', justifyContent: 'space-between', height: 56, width: 64 }}>
@@ -207,7 +221,7 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 24,
                             color: Color['red500']
-                        }}>{data?.attendanceList.filter(attendannceData => attendannceData.status == '지각').length}</Text>
+                        }}>{attendanceList['지각'] ? attendanceList['지각'].length : '-'}</Text>
                     </View>
 
                     <View style={{ alignItems: 'center', justifyContent: 'space-between', height: 56, width: 64 }}>
@@ -220,7 +234,7 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
                             fontFamily: 'NanumSquareNeo-Bold',
                             fontSize: 24,
                             color: Color['grey400']
-                        }}>{data?.attendanceList.filter(attendannceData => attendannceData.status == '결석').length}</Text>
+                        }}>{attendanceList['결석'] ? attendanceList['결석'].length : '-'}</Text>
                     </View>
                 </View>
 
@@ -285,42 +299,62 @@ const MyPracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
 
 
 
-const AttendanceModal: React.FC<{ attendanceList: AttendanceStatus[], visible: boolean, onClose: () => void }> = ({ attendanceList, visible, onClose }) => {
+const AttendanceModal: React.FC<{ attendanceList: Record<string, User[]>, visible: boolean, onClose: () => void }> = ({ attendanceList, visible, onClose }) => {
 
     return (
         <Modal visible={visible} transparent={true}>
-            <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
-                <TouchableWithoutFeedback onPress={onClose}>
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
-                        <Pressable
-                            style={{
-                                height: 360,
-                                width: '100%',
-                                marginHorizontal: 24,
-                                paddingVertical: 16,
-                                paddingHorizontal: 12,
-                                borderRadius: 25,
-                                backgroundColor: 'white',
-                            }}
-                            onPress={(e) => e.stopPropagation()}
-                        >
-                            <FlatList
-                                data={[...attendanceList]}
-                                contentContainerStyle={{ flexDirection: 'column', gap: 24 }}
-                                alwaysBounceVertical={false}
-                                renderItem={({ item: { member, status } }) => (
-                                    <View style={{ marginHorizontal:8, backgroundColor:'#DDDDDD', paddingVertical:24, paddingHorizontal:8 }}>
-                                        <Text>
-                                            {member.name}{status}
-                                        </Text>
-                                    </View>
-                                )}
-                                keyboardShouldPersistTaps="handled"
-                            />
-                        </Pressable>
-                    </View>
-                </TouchableWithoutFeedback>
-            </KeyboardAvoidingView>
+            <Pressable style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}
+                onPress={onClose}>
+                <Pressable
+                    style={{
+                        width: '90%',
+                        height: 360,
+                        marginHorizontal: 24,
+                        paddingVertical: 16,
+                        paddingHorizontal: 12,
+                        borderRadius: 25,
+                        backgroundColor: 'white',
+                    }}
+                    onPress={(e) => e.stopPropagation()}
+                >
+                    {Object.entries(attendanceList).map(([status, members]) => {
+                        return (
+                            <View style={{ gap: 16 }}>
+                                <Text style={{
+                                    paddingHorizontal: 8,
+                                    fontFamily: 'NanumSquareNeo-Regular',
+                                    fontSize: 18,
+                                    color: Color['grey600']
+                                }}>{status}</Text>
+                                <View style={{ gap: 12 }}>
+                                    {members.map(member => (
+                                        <ProfileMiniCard
+                                            view='inReserveView'
+                                            user={member}
+                                            isPicked={false}
+                                            onPick={() => { }}
+                                        />
+                                    ))}
+                                </View>
+                            </View>
+                        )
+                    })}
+                    {/* <FlatList
+                        data={[...attendanceList, ...attendanceList, ...attendanceList]}
+                        contentContainerStyle={{ flexDirection: 'column', gap: 12 }}
+                        alwaysBounceVertical={false}
+                        renderItem={({ item: { member, status } }) => (
+                            <>
+                                <Text style={{ position: 'absolute', zIndex: 1, right: 20, top: 16, paddingHorizontal: 4, paddingVertical: 4, backgroundColor: Color['blue100'], color: Color['blue500'], borderRadius: 4 }}>
+                                    {status}
+                                </Text>
+
+                            </>
+                        )}
+                        keyboardShouldPersistTaps="handled"
+                    /> */}
+                </Pressable>
+            </Pressable>
         </Modal>
 
     )

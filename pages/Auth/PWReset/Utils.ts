@@ -16,8 +16,8 @@ export const verifyingEmail = async (email: string, code: string) => {
 
     try {
 
-        console.log(`${process.env.SUB_API}/verification/verify/password`, JSON.stringify({ email, code }))
-        const response = await fetch(`${process.env.SUB_API}/verification/verify/password`, {
+        console.log(`${process.env.EXPO_PUBLIC_BASE_URL}/verification/verify/password`, JSON.stringify({ email, code }))
+        const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/verification/verify/password`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ export const changePassword = async (newPassword: string) => {
     try {
         const token = await getToken('PWtoken')
         console.log(token, JSON.stringify({ newPassword }))
-        const response = await fetch(`${process.env.SUB_API}/auth/resetPW`, {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/auth/resetPW`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

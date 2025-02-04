@@ -1,11 +1,10 @@
 import { Platform, View, SafeAreaView as SafeView, ViewStyle, StyleProp, Text, ImageBackground, Modal, StyleSheet } from 'react-native';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import * as SplashScreen from 'expo-splash-screen';
-import * as Notifications from 'expo-notifications';
 
 import Toast from 'react-native-toast-message';
 import { RecoilRoot } from 'recoil';
@@ -42,31 +41,15 @@ const SafeZone: React.FC<{ children: any, style: StyleProp<ViewStyle> }> = ({ ch
 
 const App: React.FC = () => {
 
-  useEffect(() => {
-
-    const subcription = Notifications.addNotificationReceivedListener(notification => {
-      Toast.show({
-        type: 'notification',
-        text1: notification.request.content.title || 'fail',
-        text2: notification.request.content.body || 'fail',
-        position: 'top',
-        topOffset: 56,
-        visibilityTime: 2000
-      });
-    });
-
-    return () => {
-      subcription.remove();
-    };
-
-  }, [])
-
   return (
     <RecoilRoot>
       <AppLoader />
     </RecoilRoot>
   )
 }
+
+if (Platform.OS == 'android')
+  SplashScreen.preventAutoHideAsync();
 
 const AppLoader: React.FC = () => {
 
@@ -79,6 +62,7 @@ const AppLoader: React.FC = () => {
     if (banners.state === 'FAILED') return '배너 로딩 실패';
     return '배너 로딩중';
   };
+
 
   if (!fontLoaded || !firstScreen || banners.state != 'LOADED') {
     return (

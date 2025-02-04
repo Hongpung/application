@@ -13,7 +13,7 @@ export const NotificationIcon = () => {
     const isFocusing = useIsFocused()
     const navigation = useNavigation<HomeNavProps>()
 
-    const { data: isNotRead } = useFetchUsingToken<{ status: boolean }>(`${process.env.SUB_API}/notification/notRead`, {}, 5000, [isFocusing])
+    const { data: isNotRead } = useFetchUsingToken<{ status: boolean }>(`${process.env.EXPO_PUBLIC_BASE_URL}/notification/notRead`, {}, 5000, [isFocusing])
 
     return (
         <Pressable

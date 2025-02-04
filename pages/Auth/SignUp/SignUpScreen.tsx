@@ -7,30 +7,33 @@ import { SignUpProvider, useSignUp } from '@hongpung/pages/Auth/SignUp/context/S
 import EmailCheck from './screens/onEmailCheck';
 import PasswordCheck from './screens/onPasswordCheck';
 import PersonalInformationCheck from './screens/onPersonalInfomation';
+import { AgreeTerm } from './screens/onAgreeTerm';
 
 type SignUpProps = NativeStackScreenProps<RootStackParamList, "SignUp">;
 
 export const SignUp: React.FC = () => {
-    return (
-      <SignUpProvider>
-        <SignUpScreen />
-      </SignUpProvider>
-    )
-  
-  }
+  return (
+    <SignUpProvider>
+      <SignUpScreen />
+    </SignUpProvider>
+  )
+
+}
 
 const SignUpScreen: React.FC = () => {
 
-    const { onStep } = useSignUp();
+  const { onStep } = useSignUp();
 
-    switch (onStep) {
-        case '이메일 인증':
-            return (<EmailCheck />)
-        case '비밀번호 설정':
-            return (<PasswordCheck />)
-        case '개인 정보 입력':
-            return (<PersonalInformationCheck />)
-    }
+  switch (onStep) {
+    case '약관 동의':
+      return (<AgreeTerm />)
+    case '이메일 인증':
+      return (<EmailCheck />)
+    case '비밀번호 설정':
+      return (<PasswordCheck />)
+    case '개인 정보 입력':
+      return (<PersonalInformationCheck />)
+  }
 }
 
 export default SignUpScreen

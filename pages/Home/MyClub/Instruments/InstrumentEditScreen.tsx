@@ -111,7 +111,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
 
                 if (!token) throw Error('invalid Token');
 
-                const response = await fetch(`${process.env.BASE_URL}/instrument/${instrument.instrumentId}`, {
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/instrument/${instrument.instrumentId}`, {
                     method: 'DELETE',
                     headers: {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
@@ -165,7 +165,7 @@ const InstrumentEditScreen: React.FC<{ navigation: any, route: any }> = ({ navig
                 }
 
                 console.log(submitForm);
-                const response = await fetch(`${process.env.BASE_URL}/instrument/${instrument.instrumentId}`, {
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/instrument/${instrument.instrumentId}`, {
                     method: 'PATCH',
                     headers: {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가

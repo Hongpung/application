@@ -4,7 +4,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Color } from '@hongpung/ColorSet';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { Icons } from '@hongpung/components/common/Icon';
-import { loginUserState, TodayReservation, todayReservation } from '@hongpung/recoil/authState';
+import { loginUserState, TodayReservation, todayReservations } from '@hongpung/recoil/authState';
 import { useRecoilValue } from 'recoil';
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native';
 import { MyPageParamList } from '@hongpung/nav/MyPageStack';
@@ -41,7 +41,7 @@ const MySchedulesScreen: React.FC = () => {
     const [skip, setSkip] = useState(0);
     const [reservationList, setReservationList] = useState<TodayReservation[]>([]);
     const { data: loadReservations } =
-        useFetchUsingToken<TodayReservation[]>(`${process.env.BASE_URL}/reservation/my-schedule?skip=${skip}`, {}, 5000, [skip]);
+        useFetchUsingToken<TodayReservation[]>(`${process.env.EXPO_PUBLIC_BASE_URL}/reservation/my-schedule?skip=${skip}`, {}, 5000, [skip]);
 
 
     const seperateReservations = (reservations: TodayReservation[]) => {

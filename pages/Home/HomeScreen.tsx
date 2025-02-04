@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Pressable, Modal, FlatList, Animated, NativeSyntheticEvent, AppStateStatus, AppState } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Modal, Animated, AppStateStatus, AppState } from 'react-native';
 import { Color } from '@hongpung/ColorSet'
 
 import { debounce } from 'lodash';
 import { useAuth } from '@hongpung/hoc/useAuth';
 import { Icons } from '@hongpung/components/common/Icon';
+import * as Notifications from 'expo-notifications'
 
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useOnReserve, loginUserState } from '@hongpung/recoil/authState';
 import NoticePartition from '@hongpung/components/home/Notice';
 import Banner from '@hongpung/components/home/Banner';
@@ -16,13 +17,11 @@ import { MainStackParamList } from '@hongpung/nav/HomeStacks';
 import { StackActions, useIsFocused, useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { io } from 'socket.io-client';
-import { RealtimeSession, ReservationSession } from '../Reservation/SessionTypes';
+
 import LongButton from '@hongpung/components/buttons/LongButton';
 import { onUseSession } from '@hongpung/recoil/sessionState';
 import { getToken } from '@hongpung/utils/TokenHandler';
-import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
-import { NotificationIcon } from '@hongpung/components/home/NotificationIcon';
-import { ProfileIcon } from '@hongpung/components/home/ProfileIcon';
+
 import { ClubBanner } from '@hongpung/components/home/ClubBanner';
 
 
@@ -31,6 +30,7 @@ type HomeNavProps = NativeStackNavigationProp<MainStackParamList, 'Home'>
 const HomeScreen: React.FC = () => {
 
     const isFocusing = useIsFocused()
+    const navigation = useNavigation<HomeNavProps>()
 
     const { initAppFetchUser } = useAuth();
     const loginUser = useRecoilValue(loginUserState);
@@ -71,6 +71,37 @@ const HomeScreen: React.FC = () => {
         }
     }, [])
 
+    useEffect(() => {
+
+        const subcription = Notifications.addNotificationReceivedListener(notification => {
+            Toast.show({
+                type: 'notification',
+                text1: notification.request.content.title || 'fail',
+                text2: notification.request.content.body || 'fail',
+                onPress: () => {
+                    if (notification.request.content.data.reservationId) {
+                        const { reservationId } = notification.request.content.data;
+                        navigation.push('Reservation', { screen: 'ReservationDetail', params: { reservationId } })
+                        Toast.hide();
+                    }
+                    if (notification.request.content.data.noticeId) {
+                        const { noticeId } = notification.request.content.data;
+                        navigation.push('NoticeStack', { screen: 'NoticeDetail', params: { noticeId } })
+                        Toast.hide();
+                    }
+                },
+                position: 'top',
+                topOffset: 56,
+                visibilityTime: 2000
+            });
+        });
+
+        return () => {
+            subcription.remove();
+        };
+
+    }, [])
+
     return (
         <View style={{ flex: 1 }}>
             <ScrollView
@@ -94,7 +125,7 @@ const HomeScreen: React.FC = () => {
                 </View>
 
                 {/* 배너 부분*/}
-                <View style={{ marginHorizontal: 24 , marginTop: 32}}>
+                <View style={{ marginHorizontal: 24, marginTop: 32 }}>
                     <Banner />
                 </View>
 
@@ -230,13 +261,27 @@ const HomeScreen: React.FC = () => {
 
 
                 {/* 푸터 */}
-                <View style={[styles.footer, { flexDirection: 'row', justifyContent: 'center', borderTopLeftRadius: 28, borderTopRightRadius: 28 }]}>
-                    <Text style={{ height: 20, textAlign: 'center', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'], marginTop: 24 }}>
-                        개인정보 처리 방침
-                    </Text>
-                    {/* <Text style={{ height:20, textAlign: 'center', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, borderBottomWidth: 1, color: Color['grey400'], marginTop: 24 }}>
-                        이용 약관
-                    </Text> */}
+                <View style={[styles.footer, { flexDirection: 'column', gap: 16, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingVertical: 24 }]}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 48 }}>
+                        <Pressable style={{ flex: 1 }} onPress={() => navigation.push("WebView", { url: 'https://storage.hongpung.com/terms/%EC%84%9C%EB%B9%84%EC%8A%A4+%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80.html', title: '서비스 이용약관' })}>
+                            <Text style={{ textAlign: 'center', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>
+                                이용 약관
+                            </Text>
+                        </Pressable>
+                        <Pressable style={{ flex: 1 }} onPress={() => navigation.push("WebView", { url: 'https://storage.hongpung.com/terms/%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4+%EC%B2%98%EB%A6%AC%EB%B0%A9%EC%B9%A8.html', title: '개인정보 처리 방침' })}>
+                            <Text style={{ textAlign: 'center', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>
+                                개인정보 처리 방침
+                            </Text>
+                        </Pressable>
+                    </View>
+                    <View style={{ gap: 6 }}>
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>기타 문의</Text>
+                        <View style={{ gap: 4 }}>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>대표자: 강윤호 (산틀 18)</Text>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>전화번호: 010-5034-2854</Text>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>이메일: ajtwoddl1236@naver.com</Text>
+                        </View>
+                    </View>
                 </View>
                 {isUsed && <View style={{ height: 24 }} />}
             </ScrollView>
@@ -310,7 +355,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         overflow: 'hidden'
     },
-    footer: { paddingHorizontal: 24, height: 184, marginTop: 12, paddingBottom: 96, backgroundColor: Color['grey200'] }
+    footer: { paddingHorizontal: 24, marginTop: 12, paddingBottom: 96, backgroundColor: Color['grey200'] }
 });
 
 export default HomeScreen;
@@ -366,7 +411,7 @@ const BottomOnUser: React.FC<{ toggleBottomSheet: () => void, isSlideUp: boolean
             }
             const token = await getToken('token')
             console.log(token)
-            const socket = io(`${process.env.SUB_API}/roomsession`, {
+            const socket = io(`${process.env.EXPO_PUBLIC_BASE_URL}/roomsession`, {
                 transports: ['websocket'],
                 auth: { token },
                 reconnection: true,

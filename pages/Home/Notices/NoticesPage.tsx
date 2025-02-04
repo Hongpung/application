@@ -18,7 +18,7 @@ const NoticesPage: React.FC = () => {
 
     const navigation = useNavigation<NoticeDetailNav>();
     const today = new Date().toISOString().split('T')[0]
-    const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.SUB_API}/notice`)
+    const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.EXPO_PUBLIC_BASE_URL}/notice`)
 
     return (
         <View style={{ display: 'flex', flex: 1, backgroundColor: Color['grey100'], flexDirection: 'column', paddingTop: 24, paddingBottom: 16 }}>

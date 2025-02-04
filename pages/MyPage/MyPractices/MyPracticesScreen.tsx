@@ -36,7 +36,7 @@ export type BreifSession = Omit<Session, 'returnImageUrl' | 'extendCount' | 'att
 const MyPracticesScreen: React.FC = () => {
 
     const navigation = useNavigation<MyPracticesNavProps>();
-    const myPracticeUrl = `${process.env.SUB_API}/session-log`
+    const myPracticeUrl = `${process.env.EXPO_PUBLIC_BASE_URL}/session-log`
 
     return (
         <MiniCalendar fetchUrl={myPracticeUrl}>

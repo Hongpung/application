@@ -9,7 +9,7 @@ import { User } from '@hongpung/UserType'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack'
 import useFetch from '@hongpung/hoc/useFetch'
-import { Session } from '../Home/MyPage/MyPractices/MyPracticesScreen'
+import { Session } from '@hongpung/pages/MyPage/MyPractices/MyPracticesScreen'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 
 
@@ -20,8 +20,8 @@ const PracticeInfoScreen: React.FC<PracticeProps> = ({ route }) => {
     const { reservationId } = route.params;
 
     console.log(reservationId)
-    const { data: reservationData } = useFetchUsingToken<ReservationDTO>(`${process.env.SUB_API}/reservation/${reservationId}`)
-    const { data, loading, error } = useFetchUsingToken<Session>(`${process.env.SUB_API}/session-log/specific/reservation/${reservationId}`)
+    const { data: reservationData } = useFetchUsingToken<ReservationDTO>(`${process.env.EXPO_PUBLIC_BASE_URL}/reservation/${reservationId}`)
+    const { data, loading, error } = useFetchUsingToken<Session>(`${process.env.EXPO_PUBLIC_BASE_URL}/session-log/specific/reservation/${reservationId}`)
 
     console.log(data)
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];

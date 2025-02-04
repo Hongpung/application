@@ -23,7 +23,7 @@ type CombinedNavigationProp = CompositeNavigationProp<
 const NoticePartition: React.FC = () => {
 
     const navigation = useNavigation<CombinedNavigationProp>();
-    const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.SUB_API}/notice`)
+    const { data, error, loading } = useFetchUsingToken<BriefNotice[]>(`${process.env.EXPO_BASE_URL}/notice`)
 
     if (loading)
         return (<>

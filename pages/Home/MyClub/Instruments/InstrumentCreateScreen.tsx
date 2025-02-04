@@ -121,7 +121,7 @@ const InstrumentEditScreen: React.FC = () => {
 
 
                 console.log('신규 악기 생성 수행중', submitForm)
-                const response = await fetch(`${process.env.SUB_API}/instrument/create`, {
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/instrument/create`, {
                     method: 'POST',
                     headers: {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가

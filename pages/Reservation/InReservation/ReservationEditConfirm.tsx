@@ -59,7 +59,7 @@ const ReservationEditConfirmScreen: React.FC = () => {
 
                 console.log(sendFormat)
                 const response = await fetch(
-                    `${process.env.SUB_API}/reservation/${preReservation.reservationId}`
+                    `${process.env.EXPO_PUBLIC_BASE_URL}/reservation/${preReservation.reservationId}`
                     , {
                         method: 'PATCH',
                         headers: {
@@ -74,45 +74,16 @@ const ReservationEditConfirmScreen: React.FC = () => {
                     console.log(response.status + response.statusText)
                     throw new Error('Network response was not ok');
                 }
-                const result: any = await response.json();
 
-                const utilToken = await getToken('utilToken');
-                const notificationResponse = await fetch(`${process.env.SUB_API}/notification/send`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${utilToken}`,
-                    },
-                    body: JSON.stringify(
-                        {
-                            to: [...reservation.participators.map((user) => { if (user.memberId! != loginUser?.memberId) return user.memberId })],
-                            title: '예약이 변경되었습니다',
-                            text: `예약명: ${result.message}`
-                        }
-                    )
-                })
+                Toast.show({
+                    type: 'success',
+                    text1: '예약을 변경하고 알림을 전송했어요',
+                    position: 'bottom',
+                    bottomOffset: 60,
+                    visibilityTime: 3000
+                });
 
-                if (!notificationResponse.ok) {
-                    Toast.show({
-                        type: 'success',
-                        text1: '알림 전송에는 실패했어요',
-                        position: 'bottom',
-                        bottomOffset: 60,
-                        visibilityTime: 3000
-                    });
-                } else {
-                    Toast.show({
-                        type: 'success',
-                        text1: '예약을 변경하고 알림을 전송했어요',
-                        position: 'bottom',
-                        bottomOffset: 60,
-                        visibilityTime: 3000
-                    });
-                }
-
-
-                if (result != null)
-                    navigation.navigate('ReservationDetail', { reservationId: reservation.reservationId! })
+                navigation.navigate('ReservationDetail', { reservationId: reservation.reservationId! })
             }
             catch (e) {
                 console.error(e)

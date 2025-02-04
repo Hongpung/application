@@ -54,9 +54,9 @@ const ReservationConfirmScreen: React.FC = () => {
             try {
                 const token = await getToken('token');
 
-                console.log(sendFormat, `${process.env.SUB_API}/reservation`)
+                console.log(sendFormat, `${process.env.EXPO_PUBLIC_BASE_URL}/reservation`)
                 const response = await fetch(
-                    `${process.env.SUB_API}/reservation`
+                    `${process.env.EXPO_PUBLIC_BASE_URL}/reservation`
                     , {
                         method: 'POST',
                         headers: {

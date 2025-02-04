@@ -10,20 +10,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ReservationStackParamList } from '@hongpung/nav/ReservationStack';
 
 const { width } = Dimensions.get(`window`)
-interface briefReservation {
-    reservationId: number;              // 예약 ID
-    creatorName: string;                // 생성자 이름
-    creatorNickname?: string;
-    date: string;                       // 예약 날짜 (YYYY-MM-DD 형식)
-    reservationType: string;                       // 예약 유형
-    startTime: string;                  // 시작 시간 (HH:MM:SS 형식)
-    endTime: string;                    // 종료 시간 (HH:MM:SS 형식)
-    title: string;                    // 예약 메시지
-    participationAvailable: boolean;    // 참여 가능 여부
-    participators: number[]
-    lastmodified: string;               // 마지막 수정 시간 (ISO 8601 형식)
-}
-interface dateReservation {
+
+interface DailyReservation {
     amountOfParticipators: number;
     reservationId: number;
     creatorName: string;
@@ -54,8 +42,8 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
     useEffect(() => { if (date != null) setDate(new Date(date)) }, [])
     useEffect(() => { TimesRef.current?.scrollTo({ y: 0, animated: false }) }, [selectedDate])
 
-    const { data, loading, error } = useFetchUsingToken<dateReservation[]>(
-        `${process.env.SUB_API}/reservation/daily?date=${selectedDate.toISOString().split('T')[0]}`,
+    const { data, loading, error } = useFetchUsingToken<DailyReservation[]>(
+        `${process.env.EXPO_PUBLIC_BASE_URL}/reservation/daily?date=${selectedDate.toISOString().split('T')[0]}`,
         {
         }, 2000, [selectedDate, isFocusing]
     )
@@ -76,7 +64,7 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
     //     );
     // }
 
-    const renderWeekOfDate = useCallback((selectedDate: Date) => {
+    const calculateWeekOfDate = useCallback((selectedDate: Date) => {
         const day = selectedDate.getDay() == 0 ? 7 : selectedDate.getDay();
         const week = [];
         const startDate = new Date(selectedDate);
@@ -86,12 +74,7 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
             const currentDate = new Date(startDate);
             currentDate.setDate(startDate.getDate() + i);
             week.push(
-                <Pressable key={`${currentDate}`}
-                    style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] }]}
-                    onPress={() => setDate(currentDate)}
-                >
-                    <Text style={[styles.Date, selectedDate.getDate() == currentDate.getDate() && { color: Color['blue600'] }, selectedDate.getMonth() != currentDate.getMonth() && { color: Color['grey300'] }, today >= currentDate && { color: Color['grey300'] }]}>{currentDate.getDate()}</Text>
-                </Pressable>
+                currentDate
             )
         }
         return week;
@@ -178,7 +161,14 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
                         <Icons size={24} name={'chevron-back'} color={Color['blue500']} />
                     </Pressable>
                     <View style={{ height: 32, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 264, marginHorizontal: 8 }}>
-                        {renderWeekOfDate(selectedDate)}
+                        {calculateWeekOfDate(selectedDate).map(currentDate => (
+                            <Pressable key={`${currentDate}`}
+                                style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] }]}
+                                onPress={() => setDate(currentDate)}
+                            >
+                                <Text style={[styles.Date, selectedDate.getDate() == currentDate.getDate() && { color: Color['blue600'] }, selectedDate.getMonth() != currentDate.getMonth() && { color: Color['grey300'] }, today >= currentDate && { color: Color['grey300'] }]}>{currentDate.getDate()}</Text>
+                            </Pressable>
+                        ))}
                     </View>
                     <Pressable style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, width: 32, }} onPress={nextWeek} >
                         <Icons size={24} name={'chevron-forward'} color={Color['blue500']} />
@@ -211,7 +201,7 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
                     const reserveHeight = 40 * (Timegap / 30);
                     const color = reservation.reservationType == 'REGULAR' ? Color['blue500'] : reservation.participationAvailable ? Color['green500'] : Color['red500'];
                     return (
-                        <Pressable key={reservation.reservationId} style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36, overflow: 'hidden' }}
+                        <Pressable key={'rid'+reservation.reservationId} style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36, overflow: 'hidden' }}
                             onPress={() => { navigation.navigate('ReservationDetail', { reservationId: reservation.reservationId }) }}>
                             <Text numberOfLines={1} style={{ position: 'absolute', width: width / 2, top: Timegap > 30 ? 16 : 8, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>{reservation.title}</Text>
 

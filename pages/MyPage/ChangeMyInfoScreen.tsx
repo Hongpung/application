@@ -119,7 +119,7 @@ const ChangeMyInfoScreen: React.FC = () => {
 
                 console.log('유저 정보 업데이트중', submitForm)
 
-                const response = await fetch(`${process.env.SUB_API}/member/my-status`, {
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/member/my-status`, {
                     method: 'PATCH',
                     headers: {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
@@ -178,7 +178,7 @@ const ChangeMyInfoScreen: React.FC = () => {
                                 height: 160,
                                 overflow: 'hidden'
                             }}>
-                                <Pressable style={{ position: 'absolute', bottom: 0, width: 120, paddingVertical: 12, backgroundColor: Color['blue200'], zIndex: 2 }}
+                                <Pressable style={{ position: 'absolute', bottom: 0, width: 120, paddingVertical: 12, backgroundColor: Color['grey300'], zIndex: 2 }}
                                     onPress={pickImageFromAlbum}>
                                     <Text style={{ color: '#FFF', fontFamily: "NanumSquareNeo-Bold", fontSize: 16, textAlign: 'center' }}>사진 변경</Text>
                                 </Pressable>

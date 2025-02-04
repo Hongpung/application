@@ -16,7 +16,7 @@ const BorrowInstrumentSelectScreen: React.FC = () => {
     const navigation = useNavigation();
 
     const { data, loading, error } = useFetchUsingToken<InstrumentWithOutBorrowHistory[]>(
-        `${process.env.SUB_API}/instrument/borrow-list`, {}, 5000, []
+        `${process.env.EXPO_PUBLIC_BASE_URL}/instrument/borrow-list`, {}, 5000, []
     )
     const { reservation, setBorrowInstruments } = useReservation();
 

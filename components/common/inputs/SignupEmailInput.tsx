@@ -39,7 +39,7 @@ const isRegisteredEmail = async (email: string, callbackFn?: () => void) => {
     let result = false;
 
     try {
-        const response = await fetch(`${process.env.SUB_API}/auth/check-email`, {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/auth/check-email`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -86,7 +86,7 @@ const sendVerificationCode = async (email: string) => {
     let result = 500;
 
     try {
-        const response = await fetch(`${process.env.SUB_API}/verification/send/id`, {
+        const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/verification/send/id`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -14,6 +14,7 @@ import { StackActions, useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { debounce } from "lodash";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Keyboard } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import Toast from "react-native-toast-message";
 
@@ -184,7 +185,7 @@ export const useLoginForm = () => {
 
     //tryLogin은 로그인을 시도하는 함수
     const tryLogin = useCallback(async () => {
-
+        Keyboard.dismiss();
         if (formData.email.length == 0) {
             setFormValidation(prev => ({ ...prev, email: { state: 'ERROR', errorText: '이메일을 입력해주세요.' } }))
             emailRef.current?.focus();
@@ -232,7 +233,7 @@ export const useLoginForm = () => {
     //onLogin은 로그인을 시도하는 함수를 디바운스 처리한 함수
     const onLogin = debounce(tryLogin, 500, { leading: true, trailing: false })
 
-    
+
     return {
         formData,
         onChangeFormData,

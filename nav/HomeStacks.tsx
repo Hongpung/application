@@ -7,26 +7,28 @@ import Header from '@hongpung/components/common/Header';
 //screens
 import NotificationScreen from '@hongpung/pages/Home/Notification/NotificationScreen';
 import UsingManageScreen from '@hongpung/pages/Home/UsingManageScreen';
-import ChatMediaViewerScreen from '@hongpung/_unused/Chat/ChatMediaViewerScreen';
+// import ChatMediaViewerScreen from '@hongpung/_unused/Chat/ChatMediaViewerScreen';
 import CheckInScreen from '@hongpung/pages/QRScan/CheckInScreen';
 import CheckOutScreen from '@hongpung/pages/QRScan/CheckOutScreen';
 import CheckOutDescriptScreen from '@hongpung/pages/QRScan/CheckOutDescriptScreen';
 import CheckOutCameraScreen from '@hongpung/pages/QRScan/CheckOutCameraScreen';
 import PictureCheckScreen from '@hongpung/pages/QRScan/PictureCheckScreen';
 import CheckOutEndScreen from '@hongpung/pages/QRScan/CheckOutEndScreen';
-import ChatScreen from '@hongpung/_unused/Chat/ChatScreen';
+// import ChatScreen from '@hongpung/_unused/Chat/ChatScreen';
 
 //nav
 import BottomTab from './BottomNav';
 import MyClubStacks, { MyClubStackStackParamList } from './MyClubStack';
 import ReservationStacks, { ReservationStackParamList } from './ReservationStack';
 import MyPageStacks, { MyPageParamList } from './MyPageStack';
-import ExtraActivitiesStacks from './ExtraActivitiesStack';
+// import ExtraActivitiesStacks from './ExtraActivitiesStack';
 import BannersScreen from '@hongpung/pages/Home/Banners/BannersScreen';
 import NoticesPage from '@hongpung/pages/Home/Notices/NoticesPage';
 import NoticeDetailPage from '@hongpung/pages/Home/Notices/NoticeDetailPage';
 
 import { View } from 'react-native';
+import WebView from 'react-native-webview';
+import { WebViewScreen } from '@hongpung/pages/share/WebViewScreen';
 
 export type ScreenParams<StackParamList> = {
     [K in keyof StackParamList]: StackParamList[K] extends undefined
@@ -36,9 +38,9 @@ export type ScreenParams<StackParamList> = {
 
 export type MainStackParamList = {
     Home: undefined;
-
+    WebView: { url: string, title?: string };
     QRScan: undefined;
-    
+
     BottomTab: undefined;
 
     Notification: undefined; // Home은 파라미터가 없음
@@ -53,7 +55,7 @@ export type MainStackParamList = {
     CheckOut: undefined
 
     NoticeStack?: ScreenParams<NoticeStackParamList>;
-    ChatRoomStack?: ScreenParams<ChatStackParamList>;
+    // ChatRoomStack?: ScreenParams<ChatStackParamList>;
 
     ExtraActivities: undefined
 };
@@ -65,6 +67,11 @@ const MainStacks = () => {
         <MainStack.Navigator initialRouteName="BottomTab" screenOptions={{ headerShown: false, animationDuration: 50, animation: 'slide_from_right' }}>
 
             <MainStack.Screen name="BottomTab" component={BottomTab} />
+
+            <MainStack.Screen
+                name="WebView"
+                component={WebViewScreen}
+            />
 
             <MainStack.Screen
                 name="Notification"
@@ -137,13 +144,13 @@ const MainStacks = () => {
                 }}
             />
 
-            <MainStack.Screen
+            {/* <MainStack.Screen
                 name="ChatRoomStack"
                 component={ChatStacks}
                 options={{
                     animation: 'none',
                 }}
-            />
+            /> */}
 
             <MainStack.Screen
                 name='CheckOut'
@@ -153,10 +160,10 @@ const MainStacks = () => {
                 }}
             />
 
-            <MainStack.Screen
+            {/* <MainStack.Screen
                 name='ExtraActivities'
                 component={ExtraActivitiesStacks}
-            />
+            /> */}
 
 
         </MainStack.Navigator>
@@ -196,34 +203,34 @@ const NoticeStacks = () => {
     )
 }
 
-export type ChatStackParamList = {
-    ChatRoom: { roomId: number, roomName: string };
-    ChatViewer: { images: { user: string, id: string, uri: string, originHeight: number, originWidth: number }[], selectedImgId: string }
-};
+// export type ChatStackParamList = {
+//     ChatRoom: { roomId: number, roomName: string };
+//     ChatViewer: { images: { user: string, id: string, uri: string, originHeight: number, originWidth: number }[], selectedImgId: string }
+// };
 
-const ChatStack = createNativeStackNavigator<ChatStackParamList>();
+// const ChatStack = createNativeStackNavigator<ChatStackParamList>();
 
-const ChatStacks = () => {
-    return (
-        <ChatStack.Navigator screenOptions={{ headerShown: false, animationDuration: 50, animation: 'slide_from_right' }}>
-            <ChatStack.Screen
-                name="ChatRoom"
-                component={ChatScreen}
-                options={{
-                    animation: 'none',
-                }}
-            />
+// const ChatStacks = () => {
+//     return (
+//         <ChatStack.Navigator screenOptions={{ headerShown: false, animationDuration: 50, animation: 'slide_from_right' }}>
+//             {/* <ChatStack.Screen
+//                 name="ChatRoom"
+//                 component={ChatScreen}
+//                 options={{
+//                     animation: 'none',
+//                 }}
+//             /> */}
 
-            <ChatStack.Screen
-                name='ChatViewer'
-                component={ChatMediaViewerScreen}
-                options={{
-                    animationDuration: 100,
-                }}
-            />
-        </ChatStack.Navigator>
-    )
-}
+//             <ChatStack.Screen
+//                 name='ChatViewer'
+//                 component={ChatMediaViewerScreen}
+//                 options={{
+//                     animationDuration: 100,
+//                 }}
+//             />
+//         </ChatStack.Navigator>
+//     )
+// }
 
 
 export type CheckOutStackParamList = {

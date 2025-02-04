@@ -87,7 +87,7 @@ export const ChangePasswordScreen: React.FC = () => {
             const token = await getToken('token')
             console.log(token, JSON.stringify({ currentPassword, newPassword }))
 
-            const response = await fetch(`${process.env.SUB_API}/auth/changePW`, {
+            const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/auth/changePW`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

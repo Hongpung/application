@@ -13,6 +13,7 @@ import { Icons } from '@hongpung/components/common/Icon'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
 import { getToken } from '@hongpung/utils/TokenHandler'
 import CustomSwitch from '@hongpung/components/common/CustomSwitch'
+import LottieView from 'lottie-react-native'
 
 type CheckPossible =
     {
@@ -32,10 +33,11 @@ const TimetoDate = (time: string): Date => {
 
     return new Date(today + 'T' + time + 'Z')
 }
+type CheckinNavProp = NativeStackNavigationProp<MainStackParamList,"CheckIn">;
 
 const CheckInScreen: React.FC = () => {
 
-    const navigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
+    const navigation = useNavigation<CheckinNavProp>();
 
     const loginUser = useRecoilValue(loginUserState)
     const setRoomSocket = useSetRecoilState(useOnReserve); // 쓰기 전용
@@ -43,7 +45,7 @@ const CheckInScreen: React.FC = () => {
     const [checkinStatus, setStatus] = useState<'create' | 'attend' | 'start' | 'late' | null>(null);
     const [participationAvailable, setParticipationAvailable] = useState(false)
 
-    const { data: sessionData, loading, error } = useFetchUsingToken<CheckPossible>(`${process.env.SUB_API}/check-in/check-possible`,)
+    const { data: sessionData, loading, error } = useFetchUsingToken<CheckPossible>(`${process.env.EXPO_PUBLIC_BASE_URL}/check-in/check-possible`,)
 
     console.log(sessionData)
     useEffect(() => { navigation.setOptions({ animation: 'none' }); }, [])
@@ -56,7 +58,7 @@ const CheckInScreen: React.FC = () => {
                 const token = await getToken('token')
                 if (!token) throw Error('Invalid Token')
 
-                const response = await fetch(`${process.env.BASE_URL}/check-in/start`,
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/check-in/start`,
                     {
 
                         method: 'POST',
@@ -64,7 +66,7 @@ const CheckInScreen: React.FC = () => {
                             Authorization: `Bearer ${token}`,
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({participationAvailable})
+                        body: JSON.stringify({ participationAvailable })
                     }
                 )
                 if (!response.ok) throw Error('session 입장에 실패했습니다.')
@@ -98,7 +100,7 @@ const CheckInScreen: React.FC = () => {
                 if (!loginUser) throw Error('유저 정보가 없습니다.')
                 const token = await getToken('token')
                 if (!token) throw Error('Invalid Token')
-                const response = await fetch(`${process.env.SUB_API}/check-in/attend`,
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/check-in/attend`,
                     {
                         method: 'POST',
                         headers: {
@@ -243,11 +245,20 @@ const CheckInScreen: React.FC = () => {
                 {
                     isCheckin ?
                         checkinStatus == 'late' ?
-                            <View style={{
-                                width: 180, height: 180, borderRadius: 5, borderWidth: 1, borderColor: Color['red500'], marginVertical: 24, overflow: 'hidden', alignSelf: 'center', backgroundColor: Color['red200']
-                            }}></View> : <View style={{
-                                width: 180, height: 180, borderRadius: 5, borderWidth: 1, borderColor: Color['blue500'], marginVertical: 24, overflow: 'hidden', alignSelf: 'center', backgroundColor: Color['blue200']
-                            }}></View>
+                            <View
+                                style={{
+                                    width: 400, height: 300, marginVertical: 24, overflow: 'hidden', alignSelf: 'center',
+                                }}
+                            >
+                                <LottieView source={require('@hongpung/assets/lotties/YellowCard.json')} style={{ width: '100%', height: '100%' }} autoPlay speed={0.8} />
+                            </View> :
+                            <View
+                                style={{
+                                    width: 400, height: 300, marginVertical: 24, overflow: 'hidden', alignSelf: 'center',
+                                }}
+                            >
+                                <LottieView source={require('@hongpung/assets/lotties/ThunbsUp.json')} style={{width:'100%', height:'100%'}} autoPlay loop={false} speed={1.4} />
+                            </View>
                         : !!sessionData?.session ?
                             sessionData.session.sessionType == 'RESERVED' ?
                                 <View style={{
@@ -366,7 +377,7 @@ const CheckInScreen: React.FC = () => {
                                 fontSize: 20,
                                 color: Color['grey700'], textAlign: 'center'
                             }}>{`시작하시겠어요?`}</Text>
-                            <View style={{marginTop:64, flexDirection: 'row', gap: 12, justifyContent: 'center', alignItems: 'center' }}>
+                            <View style={{ marginTop: 64, flexDirection: 'row', gap: 12, justifyContent: 'center', alignItems: 'center' }}>
                                 <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: participationAvailable ? Color['green500'] : Color['red500'] }}>{participationAvailable ? '열린 연습' : '참여 불가'}</Text>
                                 <CustomSwitch onChange={setParticipationAvailable} value={participationAvailable} />
                             </View>

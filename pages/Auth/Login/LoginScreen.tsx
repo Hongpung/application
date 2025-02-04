@@ -24,19 +24,18 @@ const LoginScreen: React.FC<LoginProps> = ({ navigation }) => {
             <KeyboardAvoidingView style={{ flex: 1, backgroundColor: "#FFF" }} behavior='padding' >
                 <View style={{ flex: 1, backgroundColor: "#FFF" }}>
 
-                    {/* 로고 들어가는 부분 */}
-                    <View style={{
-                        height: 130,
-                        width: 240,
-                        marginVertical: 36,
-                        alignSelf: 'center',
-                        alignItems: 'center',
-                        justifyContent: 'center'
+                    <Text style={{
+                        alignSelf: 'flex-start',
+                        paddingHorizontal:40,
+                        paddingTop:52,
+                        paddingBottom:28,
+                        marginTop: 28,
+                        fontSize: 24,
+                        lineHeight: 26,
+                        fontFamily: "NanumSquareNeo-Bold",
                     }}>
-                        <Text style={{ fontSize: 42, fontFamily: 'NanumSquareNeo-ExtraBold', color: Color['blue400'], textAlign: 'center' }}>{`홍 풍`}</Text>
-                        <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['blue400'], textAlign: 'center' }}>({`임시로고`})</Text>
-                    </View>
-
+                        로그인
+                    </Text>
 
 
                     <LoginForm />

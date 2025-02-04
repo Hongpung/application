@@ -69,7 +69,7 @@ const UsingManageScreen: React.FC = () => {
             try {
                 const token = await getToken('token')
 
-                const response = await fetch(`${process.env.SUB_API}/session/extend`, {
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/session/extend`, {
                     method: 'POST', 
                     headers: {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가

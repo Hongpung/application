@@ -73,7 +73,7 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
                 setLoading(true);
                 const token = await getToken('token');
                 if (!token) throw Error('token is not valid')
-                const response = await fetch(`${process.env.SUB_API}/reservation/${reservationId}`,
+                const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/reservation/${reservationId}`,
                     {
                         method: 'GET',
                         headers: {

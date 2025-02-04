@@ -9,15 +9,13 @@ const useMiniCalendarHeader = () => {
     const { setDate, calendarMonth, setMonth } = useCalendar()
 
     const incrementMonth = () => {
-        const newDate = new Date(calendarMonth);
-        newDate.setMonth(calendarMonth.getMonth() + 1);
+        const newDate = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
         setMonth(newDate);
         setDate(null);
     };
 
     const decrementMonth = () => {
-        const newDate = new Date(calendarMonth);
-        newDate.setMonth(calendarMonth.getMonth() - 1);
+        const newDate = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
         setMonth(newDate);
         setDate(null);
     };
@@ -25,7 +23,7 @@ const useMiniCalendarHeader = () => {
     return { calendarMonth, incrementMonth, decrementMonth };
 }
 
-export const MiniCalendarHeader:React.FC = () => {
+export const MiniCalendarHeader: React.FC = () => {
 
     const { calendarMonth, incrementMonth, decrementMonth } = useMiniCalendarHeader();
 

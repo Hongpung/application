@@ -10,7 +10,7 @@ export interface SignUpInfo {
     name: string
     nickname: string | null
 };
-type step = "이메일 인증" | "비밀번호 설정" | "개인 정보 입력";
+type step = | "약관 동의" | "이메일 인증" | "비밀번호 설정" | "개인 정보 입력";
 
 interface SignUpContextProps {
     signUpInfo: SignUpInfo;
@@ -36,7 +36,7 @@ const SignUpProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
         name: '',
         nickname: null
     });
-    const [onStep, setStep] = useState<step>('이메일 인증')
+    const [onStep, setStep] = useState<step>('약관 동의')
 
     const setEmail = (email: string) => { setSignUpInfo(prev => ({ ...prev, email })) }
     const setClub = (club: Club) => { setSignUpInfo(prev => ({ ...prev, club })) }

@@ -78,7 +78,7 @@ const ClubInstrumentsScreen: React.FC = () => {
     // const [instruments, setInstruments] = useState<InstrumentWithOutBorrowHistory[]>([])
 
     const { data: instruments, loading, error } = useFetchUsingToken<InstrumentWithOutBorrowHistory[]>(
-        `${process.env.BASE_URL}/club/my-club/instruments`,
+        `${process.env.EXPO_PUBLIC_BASE_URL}/club/my-club/instruments`,
         {
             method: 'GET',
             headers: {

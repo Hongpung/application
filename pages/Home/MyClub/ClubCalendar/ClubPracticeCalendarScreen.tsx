@@ -12,8 +12,8 @@ type ClubMembersProps = NativeStackNavigationProp<MyClubStackStackParamList, 'Cl
 const ClubPracticeCalendarScreen: React.FC = () => {
 
     const navigation = useNavigation<ClubMembersProps>();
-    const myPracticeUrl = `${process.env.SUB_API}/session-log/club`
-    // `${process.env.BASE_URL}/reservation/year-month-member?year=${calendarMonth.getFullYear()}&month=${Number(calendarMonth.getMonth()) + 1}&memberId=${userInfo?.memberId!}`,
+    const myPracticeUrl = `${process.env.EXPO_PUBLIC_BASE_URL}/session-log/club`
+    // `${process.env.EXPO_PUBLIC_BASE_URL}/reservation/year-month-member?year=${calendarMonth.getFullYear()}&month=${Number(calendarMonth.getMonth()) + 1}&memberId=${userInfo?.memberId!}`,
 
     return (
         <MiniCalendar fetchUrl={myPracticeUrl}>

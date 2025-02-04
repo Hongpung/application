@@ -22,7 +22,7 @@ const MyPageScreen: React.FC = () => {
         name: string,
         link: keyof MyPageParamList
     }
-    const myActivities: subMenu[] = useMemo(() => [{ name: '내 일정', link: 'MySchedules' }, { name: '내 활동', link: 'MyPractices' },], [])
+    const myActivities: subMenu[] = useMemo(() => [{ name: '다가오는 일정', link: 'MySchedules' }, { name: '내 활동', link: 'MyPractices' },], [])
     const Settings: subMenu[] = useMemo(() => [
         { name: '알림 설정', link: 'NotificationSetting' },
         { name: '로그인 설정', link: 'LoginSetting' },
@@ -89,7 +89,8 @@ const MyPageScreen: React.FC = () => {
                     onPress={() => { navigation.push('MyPage', { screen: 'ChangePassword' }) }}>
                     <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'], textAlign: 'center' }}>비밀 번호 수정</Text>
                 </Pressable>
-                <Pressable style={{ paddingBottom: 1, borderBottomWidth: 1, borderBottomColor: Color['grey300'], alignItems: 'center' }}>
+                <Pressable style={{ paddingBottom: 1, borderBottomWidth: 1, borderBottomColor: Color['grey300'], alignItems: 'center' }}
+                    onPress={() => { navigation.push('MyPage', { screen: 'WithdrawalAuth' }) }}>
                     <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'], textAlign: 'center' }}>회원탈퇴를 원하시나요?</Text>
                 </Pressable>
             </View>

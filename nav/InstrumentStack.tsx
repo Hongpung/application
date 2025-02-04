@@ -1,4 +1,3 @@
-import { InstrumentProvider, useInstrument } from "@hongpung/context/InstrumentContext";
 import ClubInstrumentsScreen from "@hongpung/pages/Home/MyClub/Instruments/ClubInstrumentsScreen";
 import InstrumentEditScreen from "@hongpung/pages/Home/MyClub/Instruments/InstrumentEditScreen";
 import InstrumentSpecificScreen from "@hongpung/pages/Home/MyClub/Instruments/InstrumentSpecificScreen";
@@ -31,8 +30,8 @@ const InstrumentStacks = () => {
                     headerShown: true,
                     animation: 'none',
                     header: ({ navigation }) => {
-                        if (userInfo?.role == '패원')
-                            return (<Header leftButton='arrow-back' HeaderName='악기 관리'/>)
+                        if (userInfo?.role.length == 0)
+                            return (<Header leftButton='arrow-back' HeaderName='악기 관리' />)
                         else
                             return (<Header leftButton='arrow-back' HeaderName='악기 관리' RightButton='추가' RightAction={() => navigation.navigate('InstrumentCreate')} />)
                     }

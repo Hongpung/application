@@ -1,25 +1,29 @@
 import { useRecoilState, useSetRecoilState } from 'recoil';
-import { loginUserState, todayReservation, useOnReserve } from '@hongpung/recoil/authState';
+import { loginUserState, TodayReservation, todayReservations, useOnReserve } from '@hongpung/recoil/authState';
 import { User } from '@hongpung/UserType';
 import { deleteToken, getToken, saveToken } from '@hongpung/utils/TokenHandler';
-import * as Notifications from 'expo-notifications';
-import { registerForPushNotificationsAsync } from '@hongpung/utils/NotificationToken';
+
 import { StackActions, useNavigation } from '@react-navigation/native';
+import { useNotificationSetting } from './useNotification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const useAuth = () => {
   const [loginUser, setLoginUser] = useRecoilState(loginUserState);
   const setOnSession = useSetRecoilState(useOnReserve);
-  const setTodayReservation = useSetRecoilState(todayReservation);
+  const setTodayReservation = useSetRecoilState(todayReservations);
   const controller = new AbortController();
   const signal = controller.signal;
 
+  const { turnOffNotification, turnOnNotification } = useNotificationSetting();
+
   const initAppFetchUser = async () => {
+
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
       const token = await getToken('token');
 
       if (token) {
-        const loadUser = await fetch(`${process.env.SUB_API}/member/my-status`,
+        const loadUser = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/member/my-status`,
           {
             method: 'GET',
             headers: {
@@ -33,31 +37,15 @@ export const useAuth = () => {
 
         if (!userStatus) throw Error('유저 정보가 비어 있음')
 
-        const { status } = await Notifications.requestPermissionsAsync();
-
-        const sendFormat: { pushEnable: boolean, notificationToken: null | string } = { pushEnable: (status === 'granted'), notificationToken: null }
-
-        if (status === 'granted') {
-          const Ntoken = await registerForPushNotificationsAsync()
-          sendFormat.notificationToken = Ntoken;
-        }
 
         setLoginUser(userStatus);
 
-        const fetchFCM = await fetch(`${process.env.BASE_URL}/member/NToken`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': `application/json`,
-            },
-            body: JSON.stringify(sendFormat)
-          }
-        )
+        const pushOption = await AsyncStorage.getItem('receive-push');
 
-        if (!fetchFCM.ok) throw Error('토큰 생성 실패')
+        if (pushOption === 'true')
+          turnOnNotification();
 
-        const useSession = await fetch(`${process.env.BASE_URL}/session/is-checkin`, {
+        const useSession = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/session/is-checkin`, {
           headers: {
             'Authorization': `Bearer ${token}`
           },
@@ -72,7 +60,7 @@ export const useAuth = () => {
           setOnSession(true)
         }
 
-        const todayReservations = await fetch(`${process.env.BASE_URL}/reservation/today`, {
+        const todayReservations = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/reservation/today`, {
           headers: {
             'Authorization': `Bearer ${token}`
           },
@@ -80,10 +68,10 @@ export const useAuth = () => {
 
         if (!todayReservations.ok) throw Error('오늘 예약 불러오기 실패')
 
-        const loadedReservations = await todayReservations.json()
+        const loadedReservations = await todayReservations.json() as TodayReservation[]
 
         if (!!loadedReservations) {
-          setTodayReservation(loadedReservations)
+          setTodayReservation(prev => ({ ...prev, todayReservations: [...loadedReservations] }))
         }
 
       }
@@ -102,7 +90,7 @@ export const useAuth = () => {
       const token = await getToken('token');
 
       if (token) {
-        const loadUser = await fetch(`${process.env.BASE_URL}/member/status`,
+        const loadUser = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/member/status`,
           {
             method: 'GET',
             headers: {
@@ -130,7 +118,7 @@ export const useAuth = () => {
       const loginData = { email, password };
 
       console.log(JSON.stringify(loginData))
-      const response = await fetch(`${process.env.BASE_URL}/auth/login`, {
+      const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData),
@@ -165,18 +153,8 @@ export const useAuth = () => {
   const logout = async () => {
     try {
       if (!loginUser) console.log('유저 정보가 없음')
-      const token = await getToken('token');
 
-      const fetchFCM = await fetch(`${process.env.BASE_URL}/member/NToken`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': `application/json`,
-          }
-        }
-      )
-      if (!fetchFCM.ok) throw Error('failed to delete Expo Token')
+      turnOffNotification();
 
       await deleteToken('token');
 
