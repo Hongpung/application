@@ -62,7 +62,7 @@ const ProfileMiniCard: React.FC<MiniCardType> = ({ user, view, isPicked, onPick 
                 </View>
             </View>
             <View style={{ position: 'absolute', flexDirection: 'row', left: 104, bottom: 16, alignItems: 'center', justifyContent: 'flex-start' }}>
-                {user.role && user.role.map(role => <RoleTag role={role} />)}
+                {user.role && user.role.map(role => <RoleTag key={role + user.memberId} role={role} />)}
             </View>
             <View style={{ position: 'absolute', width: 56, height: 56, borderRadius: 200, overflow: 'hidden', borderWidth: loading ? 1 : 0, borderColor: Color['grey500'], justifyContent: 'center', alignItems: 'center', right: 16, top: 24 }}>
                 {/* {user.badge &&

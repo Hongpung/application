@@ -22,13 +22,16 @@ type InputProps = {
     keyboardType?: KeyboardTypeOptions
     color?: "red" | "blue" | "green";
     maxLength?: number
+    requireMark?: boolean
 }
 
-export const InputBaseComponent = forwardRef<TextInput, InputProps>(({ label, isEncryption = false, color = "blue", isEditible = true, isRequired = true, inputValue, setInputValue, keyboardType = 'default', maxLength = undefined, validationCondition, onBlur, onFocus }, ref) => {
+export const InputBaseComponent = forwardRef<TextInput, InputProps>(({ label, isEncryption = false, color = "blue", isEditible = true, isRequired = true, requireMark = false, inputValue, setInputValue, keyboardType = 'default', maxLength = undefined, validationCondition, onBlur, onFocus }, ref) => {
+    
     // 암호화 상태일때 보이는지 안보이는지 판별
     const [isVisible, setIsVisible] = useState(!isEncryption);
 
     const labelAnimation = useRef(new Animated.Value(0)).current; // 애니메이션 초기 값
+    
     //언더라인 색상 - 기본은 파란색
     const underlineColor = Color[color + "500"];
 
@@ -55,12 +58,12 @@ export const InputBaseComponent = forwardRef<TextInput, InputProps>(({ label, is
         <View style={[styles.inputGroup]}>
             <Animated.Text style={[styles.labelText, labelStyle]}>
                 {label}
-                {isRequired && <Text style={{ color: 'red' }}>*</Text>}
+                {requireMark && <Text style={{ color: 'red' }}>*</Text>}
             </Animated.Text>
             <TextInput
                 key={label}
                 ref={ref}
-                style={[styles.InputBox]}
+                style={[styles.InputBox, { borderBottomColor: validationCondition?.state != 'ERROR' ? underlineColor : Color["red500"] }]}
                 placeholder={`${josa(label, '을/를')} 입력하세요` + `${!isRequired ? ' (없으면 빈칸)' : ``}`}
                 value={inputValue}
                 onChangeText={setInputValue}
@@ -73,7 +76,6 @@ export const InputBaseComponent = forwardRef<TextInput, InputProps>(({ label, is
                 returnKeyType='done'
                 multiline={false}
             />
-            <View style={[styles.underline, { borderBottomColor: validationCondition?.state != 'ERROR' ? underlineColor : Color["red500"] }]} />
             {isEncryption &&
                 <Pressable
                     style={[styles.VisibleBtn]}
@@ -81,7 +83,7 @@ export const InputBaseComponent = forwardRef<TextInput, InputProps>(({ label, is
                     <Icons name={isVisible ? 'eye-outline' : 'eye-off-outline'}></Icons>
                 </Pressable>
             }
-            {validationCondition?.state == 'ERROR' && <Text style={styles.errorText}>{validationCondition?.errorText}</Text>}
+            {validationCondition?.state == 'ERROR' && validationCondition.errorText.length > 0 && <Text style={styles.errorText}>{validationCondition?.errorText}</Text>}
         </View>
     );
 });
@@ -89,32 +91,28 @@ export const InputBaseComponent = forwardRef<TextInput, InputProps>(({ label, is
 const styles = StyleSheet.create({
     inputGroup: {
         width: '100%',
-        height:'auto'
-    },
-    underline: {
-        borderBottomWidth: 1,
-        marginTop: 1,
+        height: 'auto',
     },
     InputBox: {
         color: Color['grey800'],
         fontSize: 16,
-        height: 36,
         fontFamily: 'NanumSquareNeo-Regular',
-        paddingTop: 8,
-        marginLeft: 8,
-        placeholderTextColor: Color['grey500']
+        paddingHorizontal: 4,
+        paddingVertical: 8,
+        placeholderTextColor: Color['grey500'],
+        borderBottomWidth: 1
     },
     labelText: {
         color: Color['grey800'],
         fontSize: 10,
         fontFamily: 'NanumSquareNeo-Bold',
-        height: 12
+        height: 20
     },
     errorText: {
         color: Color['red500'],
         fontFamily: 'NanumSquareNeo-Bold',
-        marginTop: 8,
-        marginLeft: 10,
+        paddingTop: 8,
+        paddingHorizontal: 4,
         fontSize: 12
     },
     VisibleBtn: {

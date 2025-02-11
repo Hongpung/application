@@ -112,10 +112,10 @@ export const useAuth = () => {
     }
   };
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string, autoLogin: boolean = false): Promise<boolean> => {
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     try {
-      const loginData = { email, password };
+      const loginData = { email, password, autoLogin };
 
       console.log(JSON.stringify(loginData))
       const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/auth/login`, {
@@ -127,8 +127,10 @@ export const useAuth = () => {
 
       if (!response.ok) {
         const { message } = await response.json();
-        throw new Error('Network response was not ok: ' + message);
+
+        throw new Error(message);
       }
+
 
       const result = await response.json();
 
@@ -141,8 +143,11 @@ export const useAuth = () => {
         // Recoil 상태 업데이트
         return true;
       }
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      if (error instanceof Error)
+        throw error;
+      else
+        return false;
     } finally {
       clearTimeout(timeoutId);
     }

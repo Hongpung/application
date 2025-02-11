@@ -26,6 +26,7 @@ interface DailyReservation {
 
 type reservationType = 'COMMON' | 'REGULAR' | 'EXTERNAL'
 
+const times = ['AM10', 'AM11', 'PM12', 'PM01', 'PM02', 'PM03', 'PM04', 'PM05', 'PM06', 'PM07', 'PM08', 'PM09', 'PM10']
 type DailyReserveProps = NativeStackScreenProps<ReservationStackParamList, 'DailyReserveList'>
 
 const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, route }) => {
@@ -37,7 +38,6 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
     const [selectedDate, setDate] = useState(new Date(date.split('T')[0]))
 
     const TimesRef = useRef<any>(null)
-    const times = ['AM10', 'AM11', 'PM12', 'PM01', 'PM02', 'PM03', 'PM04', 'PM05', 'PM06', 'PM07', 'PM08', 'PM09', 'PM10']
 
     useEffect(() => { if (date != null) setDate(new Date(date)) }, [])
     useEffect(() => { TimesRef.current?.scrollTo({ y: 0, animated: false }) }, [selectedDate])
@@ -132,9 +132,10 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
                     </Pressable>
                 </View>
                 {today <= selectedDate &&
-                    <Pressable onPress={() => {
-                        navigation.navigate('ReservationStack', { screen: 'inReservation', params: { date: selectedDate.toISOString().split('T')[0], reservationId: null } });
-                    }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}>
+                    <Pressable
+                        onPress={() => {
+                            navigation.navigate('ReservationStack', { screen: 'inReservation', params: { date: selectedDate.toISOString().split('T')[0], reservationId: null } });
+                        }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}>
                         <Text style={{
                             fontFamily: "NanumSquareNeo-Bold", color: Color['blue500'],
                             fontSize: 18,
@@ -144,23 +145,23 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
                     </Pressable>
                 }
             </View>
-            <View style={{ height: 60, marginHorizontal: 32, width: width - 64, alignItems: 'center' }}>
-                <View style={{ height: 4 }} />
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 264 }}>
-                    <Text style={styles.DayText}>월</Text>
-                    <Text style={styles.DayText}>화</Text>
-                    <Text style={styles.DayText}>수</Text>
-                    <Text style={styles.DayText}>목</Text>
-                    <Text style={styles.DayText}>금</Text>
-                    <Text style={styles.DayText}>토</Text>
-                    <Text style={styles.DayText}>일</Text>
+            <View style={{ height: 60, marginHorizontal: 32, alignItems: 'center' }}>
+                <View style={{ paddingVertical: 4 }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                        <Text style={styles.DayText}>월</Text>
+                        <Text style={styles.DayText}>화</Text>
+                        <Text style={styles.DayText}>수</Text>
+                        <Text style={styles.DayText}>목</Text>
+                        <Text style={styles.DayText}>금</Text>
+                        <Text style={styles.DayText}>토</Text>
+                        <Text style={styles.DayText}>일</Text>
+                    </View>
                 </View>
-                <View style={{ height: 4 }} />
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <Pressable style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, width: 32, }} onPress={prevWeek} >
                         <Icons size={24} name={'chevron-back'} color={Color['blue500']} />
                     </Pressable>
-                    <View style={{ height: 32, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 264, marginHorizontal: 8 }}>
+                    <View style={{ height: 32, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginHorizontal: 8 }}>
                         {calculateWeekOfDate(selectedDate).map(currentDate => (
                             <Pressable key={`${currentDate}`}
                                 style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] }]}
@@ -199,18 +200,23 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
                     const Timegap = endHour * 60 - startHour * 60 + endMinnute - startMinnute
                     const reserveTop = 12 + (Number(startHour) - 10) * 80 + (startMinnute > 0 ? 40 : 0);
                     const reserveHeight = 40 * (Timegap / 30);
-                    const color = reservation.reservationType == 'REGULAR' ? Color['blue500'] : reservation.participationAvailable ? Color['green500'] : Color['red500'];
+                    const color = reservation.reservationType === 'EXTERNAL' ? Color['grey500'] : reservation.reservationType == 'REGULAR' ? Color['blue500'] : reservation.participationAvailable ? Color['green500'] : Color['red500'];
                     return (
-                        <Pressable key={'rid'+reservation.reservationId} style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36, overflow: 'hidden' }}
+                        <Pressable key={'rid' + reservation.reservationId} style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36, overflow: 'hidden' }}
                             onPress={() => { navigation.navigate('ReservationDetail', { reservationId: reservation.reservationId }) }}>
                             <Text numberOfLines={1} style={{ position: 'absolute', width: width / 2, top: Timegap > 30 ? 16 : 8, left: 16, fontSize: 18, fontFamily: 'NanumSquareNeo-Bold' }}>{reservation.title}</Text>
 
                             {Timegap > 30 &&
                                 <View style={{ position: 'absolute', bottom: 12, flexDirection: 'row', width: '100%', paddingHorizontal: 12, gap: 4, alignItems: 'center', justifyContent: 'space-between' }}>
-                                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                        <Icons size={24} name={'people'} color={Color['grey300']} />
-                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>{reservation.amountOfParticipators}</Text>
-                                    </View>
+                                    {reservation.reservationType === 'EXTERNAL' ?
+                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], paddingHorizontal:4}}>
+                                            외부 예약
+                                        </Text>
+                                        :
+                                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                            <Icons size={24} name={'people'} color={Color['grey300']} />
+                                            <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], }}>{reservation.amountOfParticipators}</Text>
+                                        </View>}
 
                                     {Timegap > 60 && <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                                         <Icons size={24} name={'time-outline'} color={Color['grey300']} />

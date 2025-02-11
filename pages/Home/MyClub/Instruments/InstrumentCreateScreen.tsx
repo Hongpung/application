@@ -1,7 +1,7 @@
 import { StyleSheet, TextInput, Text, View, ScrollView, Image, Modal, Pressable, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Keyboard, TextInputChangeEventData, NativeSyntheticEvent, FlatList, Alert, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { Color } from '../../../../ColorSet';
-import { Instrument, InstrumentCreateDTO,  InstrumentType, instrumentTypes } from '../../../../UserType';
+import { Instrument, InstrumentCreateDTO, InstrumentType, instrumentTypes } from '../../../../UserType';
 import LongButton from '../../../../components/buttons/LongButton';
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';
@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ClubInstrumentStackParamList } from '@hongpung/nav/InstrumentStack';
 import * as ImagePicker from 'expo-image-picker';
+import { Selector } from '@hongpung/components/common/Selector';
 
 const showCreateCompleteToast = () => {
     Toast.show({
@@ -95,7 +96,7 @@ const InstrumentEditScreen: React.FC = () => {
 
     const SubmitHandler = () => {
         const createInstrument = async () => {
-            
+
             console.log(`신규 생성`)
             const controller = new AbortController();
             const signal = controller.signal;
@@ -163,60 +164,52 @@ const InstrumentEditScreen: React.FC = () => {
                             <ActivityIndicator size={'large'} color={'white'}></ActivityIndicator>
                         </View>
                     </Modal>
-                    <ScrollView contentContainerStyle={{ alignItems: 'center', flex: 1 }}>
+                    <ScrollView contentContainerStyle={{ alignItems: 'center', flex: 1 }} bounces={false}>
                         <View style={{ height: 12 }} />
                         <Pressable style={styles.imageContainer}
                             onPress={() => {
                                 pickImageFromAlbum();
                             }}>
-                            {selectedImageUri ? <Image
-                                source={{ uri: selectedImageUri }}
-                                style={styles.image}
-                            /> :
-                                <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />
+                            {selectedImageUri ?
+                                <Image
+                                    source={{ uri: selectedImageUri }}
+                                    style={styles.image}
+                                />
+                                :
+                                <View style={[styles.image, { backgroundColor: Color['grey200'], alignItems: 'center', justifyContent: 'center', gap: 16 }]} >
+                                    <Icons name='add' size={64} color={Color['grey400']}></Icons>
+                                    <Text style={{ fontFamily: "NanumSquareNeo-Bold", fontSize: 14, color: Color['grey400'] }}>이미지를 추가할 수 있어요</Text>
+                                </View>
                             }
                         </Pressable>
                         <View style={{ height: 28 }} />
-                        <View style={styles.Row}>
-                            <Text style={styles.RowLeft}>{`악기 이름`}</Text>
-                            <TextInput value={instrument.name} onChangeText={chageName} style={[styles.RowRight, { borderBottomWidth: 0.5, paddingBottom: 4 }]} />
 
-                        </View>
+                        <View style={{ flexDirection: 'column', gap: 12, paddingVertical: 24 }}>
 
-                        <View style={{ height: 14 }} />
+                            <View style={styles.Row}>
+                                <Text style={styles.RowLeft}>{`악기 이름`}</Text>
+                                <TextInput value={instrument.name} onChangeText={chageName} style={[styles.RowRight, { borderBottomWidth: 0.5, paddingBottom: 4 }]} />
 
-                        <View style={[styles.Row, { zIndex: -1 }]}>
-                            <Text style={styles.RowLeft}>{`악기 타입`}</Text>
-                            <Pressable style={{ position: 'relative', zIndex: 0 }}
-                                onPress={() => { Keyboard.dismiss(); setSelectTypeVisible(true); }}>
-                                <Text style={styles.RowRight}>{instrument.instrumentType}</Text>
-                                {
-                                    onSelectType && <View style={{
-                                        position: 'absolute', top: 0, right: 0, zIndex: 2, width: 120, backgroundColor: '#FFF', alignItems: 'flex-start', paddingHorizontal: 16, borderRadius: 5, shadowColor: Color['grey700'],
-                                        shadowOffset: { width: -2, height: 2 }, // 그림자 오프셋 (x, y)
-                                        shadowOpacity: 0.1,         // 그림자 투명도 (0에서 1)
-                                        shadowRadius: 5,          // 그림자 반경
-                                        elevation: 5,
-                                        height: 180,
-                                    }}>
-                                        <ScrollView
-                                            contentContainerStyle={{ alignItems: 'flex-start' }}
-                                            showsVerticalScrollIndicator={false}
-                                        >{instrumentTypes.map((item) => {
-                                            return (
-                                                <Pressable
-                                                    key={item + 'seletor'}
-                                                    style={{ paddingVertical: 4, marginVertical: 4, width: 120 - 32, alignItems: 'center', justifyContent: 'space-between', flexDirection: 'row-reverse' }}
-                                                    onPress={() => { setInstrument({ ...instrument, instrumentType: item }); setSelectTypeVisible(false); }}>
-                                                    <Text style={[{ fontFamily: "NanumSquareNeo-Regular", fontSize: 16, color: instrument.instrumentType == item ? Color['green600'] : Color['grey400'] }]}>{item}</Text>
-                                                    {instrument.instrumentType == item && <Icons name='checkmark' color={Color['green500']} size={24} />}
-                                                </Pressable>
-                                            )
-                                        })}</ScrollView>
-                                    </View>
-                                }
-                            </Pressable>
+                            </View>
 
+
+                            <View style={[styles.Row, { zIndex: 1 }]}>
+                                <Text style={styles.RowLeft}>{`악기 타입`}</Text>
+                                <Selector
+                                    label='악기 종류'
+                                    setVisible={setSelectTypeVisible}
+                                    onChange={(value) => setInstrument(prev => ({ ...prev, instrumentType: value as InstrumentType }))}
+                                    options={instrumentTypes}
+                                    trigger={Pressable}
+                                    visible={onSelectType}
+                                    value={instrument.instrumentType}
+                                    color='blue'
+                                    align='right'
+                                >
+                                    <Text style={[styles.RowRight, { width: 120 }]}>{instrument.instrumentType}</Text>
+                                </Selector>
+
+                            </View>
                         </View>
 
                     </ScrollView >

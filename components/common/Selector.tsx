@@ -24,7 +24,7 @@ interface SelectorLabelProps {
     onPress?: () => void
 }
 
-const SelectorLabel: React.FC<SelectorLabelProps> = ({ label, value, isErrored, errorText, onPress, children }) => {
+const ClubSelectorLabel: React.FC<SelectorLabelProps> = ({ label, value, isErrored, errorText, onPress, children }) => {
     const labelAnimation = useRef(new Animated.Value(value ? 1 : 0)).current; // 초기 값 설정
     const labelStyle = {
         fontSize: labelAnimation.interpolate({
@@ -47,10 +47,10 @@ const SelectorLabel: React.FC<SelectorLabelProps> = ({ label, value, isErrored, 
 
     return (
         <Pressable style={{ width: '100%' }} onPress={onPress}>
-            <Animated.Text style={[styles.labelText, labelStyle]}>
+            {label.length > 0 && <Animated.Text style={[styles.labelText, labelStyle]}>
                 {label}
                 <Text style={{ color: 'red' }}>*</Text>
-            </Animated.Text>
+            </Animated.Text>}
 
             <View style={[styles.inputBox]}>
                 <Text style={[styles.inputText, !value && styles.placeholderText]}>
@@ -72,11 +72,13 @@ interface SelectProps {
     setVisible: (newValue: boolean) => void;
     trigger: React.ElementType;
     options: string[];
-    color?: 'blue' | 'green'
     children: React.ReactNode
+
+    color?: 'blue' | 'green'
+    align?: 'left' | 'right'
 }
 
-const Selector: React.FC<SelectProps> = ({ label, trigger, visible, setVisible, value, onChange, options, color = 'blue', children }) => {
+export const Selector: React.FC<SelectProps> = ({ label, trigger, visible, setVisible, value, onChange, options, children, color = 'blue', align = 'left' }) => {
     return (
         <Dropdown label={label} value={value} onChange={onChange} visible={visible} setVisible={setVisible}>
             <Dropdown.Trigger as={trigger} >
@@ -84,7 +86,7 @@ const Selector: React.FC<SelectProps> = ({ label, trigger, visible, setVisible, 
             </Dropdown.Trigger>
             <Dropdown.Menu>
                 {options.map((option) => (
-                    <Dropdown.Item key={option} optionValue={option} color={color} />
+                    <Dropdown.Item key={option} optionValue={option} color={color} align={align} />
                 ))}
             </Dropdown.Menu>
         </Dropdown>
@@ -120,7 +122,7 @@ export const ClubSelector: React.FC<ClubSelectorProps> = ({
                 trigger={Pressable}
                 color="green"
             >
-                <SelectorLabel
+                <ClubSelectorLabel
                     label={label}
                     value={value}
                     isErrored={isErrored}
@@ -128,7 +130,7 @@ export const ClubSelector: React.FC<ClubSelectorProps> = ({
                     onPress={() => setDropDownVisible(!dropDownVisible)}
                 >
                     {value || label}
-                </SelectorLabel>
+                </ClubSelectorLabel>
             </Selector>
         </View>
     );

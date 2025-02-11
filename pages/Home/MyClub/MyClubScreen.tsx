@@ -13,6 +13,11 @@ import { loginUserState } from '@hongpung/recoil/authState';
 
 type MyClubProps = NativeStackScreenProps<MyClubStackStackParamList, 'MyClubHome'>;
 
+interface SubMenu {
+    name: string,
+    link: string
+}
+
 const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
 
     const animation = useRef<LottieView>(null);
@@ -28,10 +33,7 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                 { leading: true, trailing: false }),
         [navigation]
     );
-    interface subMenu {
-        name: string,
-        link: string
-    }
+    
 
     const { data, loading, error } = useFetchUsingToken<{ roleData: { role: string, member: User }[] }>(`${process.env.EXPO_PUBLIC_BASE_URL}/club/my-club`)
 
@@ -46,7 +48,7 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
             })
         }
     }, [data])
-    const manageClubMenu: subMenu[] = [{ name: '부원 관리', link: 'ClubMembers' }, { name: '악기 관리', link: 'Instruments' }, { name: '연습 기록 보기', link: 'ClubCalendar' },]
+    const clubMenus: SubMenu[] = [{ name: '부원 관리', link: 'ClubMembers' }, { name: '악기 관리', link: 'Instruments' }, { name: '연습 기록 보기', link: 'ClubCalendar' },]
 
 
     return (
@@ -80,7 +82,7 @@ const MyClubScreen: React.FC<MyClubProps> = ({ navigation }) => {
                             <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>동아리 관리</Text>
                         </View>
 
-                        {manageClubMenu.map((subMenu: subMenu, index: number) => {
+                        {clubMenus.map((subMenu: SubMenu, index: number) => {
                             return (<Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => { throttledNavigation(subMenu.link) }}>
                                 <Text style={styles.subMenuTitle}>{subMenu.name}</Text>
                                 <Icons size={20} name='chevron-forward' color={Color['grey400']} />

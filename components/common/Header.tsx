@@ -9,7 +9,7 @@ import { Icons } from './Icon';
 interface HeaderProps {
     leftButton: ComponentProps<typeof Ionicons>['name'] | null
     HeaderName?: string
-    RightButton?: string
+    RightButton?: string | React.ReactNode
     RightAction?: () => void
     addLeftAction?: () => void
     LeftAction?: () => void
@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ leftButton, HeaderName, RightButton, Ri
             </Pressable>
             <Text style={styles.Title}>{HeaderName}</Text>
             {RightButton && <Pressable onPress={RightAction} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}>
-                <Text style={styles.Text}>{RightButton}</Text>
+                {!!RightButton && typeof RightButton == 'string' ? <Text style={styles.Text}>{RightButton}</Text> : RightButton}
             </Pressable>}
         </View>
     );

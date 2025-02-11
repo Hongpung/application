@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator, Modal, Pressable, Dimensions } from 'react-native'
+import { StyleSheet, Text, View, ScrollView, Image, ActivityIndicator, Modal, Pressable, Dimensions, Alert } from 'react-native'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useIsFocused } from '@react-navigation/native';
 
@@ -20,8 +20,6 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
 
     const { instrumentId } = route?.params;
 
-    const daysOfWeek = useMemo(() => ['일', '월', '화', '수', '목', '금', '토'], [])
-
     const [imageModalVsible, setImageModalVsible] = useState(false);
     const [aspectRatio, setAspectRatio] = useState<number | null>(null);
     const loginUser = useRecoilValue(loginUserState)
@@ -31,7 +29,7 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
         , {}, 5000, [instrumentId, isFocusing]
     )
 
-    console.log(loginUser?.role.length, loginUser?.club, data)
+    console.log(loginUser?.role.length, loginUser?.club, data, loading)
 
     useEffect(() => {
         if (!!data?.imageUrl) {
@@ -44,20 +42,48 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
     }, [data])
 
     if (loading)
-        return (<View style={{ flex: 1, backgroundColor: `#FFF` }}>
-            <ActivityIndicator size={'large'} color={Color['blue500']} />
-        </View>)
+        return (
+            <View style={{ flex: 1, backgroundColor: `#FFF`, justifyContent: 'center' }}>
+                <ActivityIndicator size={'large'} color={Color['blue500']} />
+            </View>
+        )
 
-    if (!data)
-        return (<View><Text>Error:Can't find the instrument</Text></View>)
+    if (error) {
+        Alert.alert('오류', '악기 정보를 찾을 수 없습니다.')
+        navigation.goBack();
+        return (<View><Text>오류:악기 정보를 찾을 수 없습니다.</Text></View>)
+    }
+
+    if (data == null) {
+        return (
+            <View style={{ flex: 1, backgroundColor: `#FFF`, justifyContent: 'center' }}>
+                <ActivityIndicator size={'large'} color={Color['blue500']} />
+            </View>)
+    }
+
     return (
         <View style={{ flex: 1, backgroundColor: `#FFF` }}>
-            {loginUser?.club == data.club && loginUser?.role.length != 0 ? <Header
-                leftButton='close'
-                HeaderName='악기 상세'
-                RightButton={'수정'}
-                RightAction={() => navigation.push('InstrumentEdit', { instrumentInform: JSON.stringify(data) })}
-            />
+
+            <Modal visible={imageModalVsible} transparent={true}>
+                <Pressable onPress={() => setImageModalVsible(false)}
+                    style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
+                    {data.imageUrl ?
+                        <Image
+                            source={{ uri: data.imageUrl }}
+                            style={[styles.image, { width: width - 36, height: (width - 36) / aspectRatio!, borderRadius: 15 }]}
+                        />
+                        :
+                        <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />
+                    }
+                </Pressable>
+            </Modal>
+            {loginUser?.club == data.club && loginUser?.role.length != 0 ?
+                <Header
+                    leftButton='close'
+                    HeaderName='악기 상세'
+                    RightButton={'수정'}
+                    RightAction={() => navigation.push('InstrumentEdit', { instrumentInform: JSON.stringify(data) })}
+                />
                 :
                 <Header
                     leftButton='close'
@@ -81,73 +107,76 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
                         />
                     }
                 </Pressable>
-                <View style={{ height: 28 }} />
-                <Modal visible={imageModalVsible} transparent={true}>
-                    <Pressable onPress={() => setImageModalVsible(false)}
-                        style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.7)' }}>
-                        {data.imageUrl ?
-                            <Image
-                                source={{ uri: data.imageUrl }}
-                                style={[styles.image, { width: width - 36, height: (width - 36) / aspectRatio!, borderRadius: 15 }]}
-                            />
-                            :
-                            <View style={[styles.image, { backgroundColor: Color['grey200'] }]} />
-                        }
-                    </Pressable>
-                </Modal>
-                <View style={styles.Row}>
 
-                    <Text style={styles.RowLeft}>{`악기 이름`}</Text>
-                    <Text style={styles.RowRight}>{data.name}</Text>
+                <View style={{ flexDirection: 'column', gap: 12, paddingVertical: 24 }}>
+                    <View style={styles.Row}>
 
-                </View>
-                <View style={{ height: 14 }} />
+                        <Text style={styles.RowLeft}>{`악기 이름`}</Text>
+                        <Text style={styles.RowRight}>{data.name}</Text>
 
-                <View style={styles.Row}>
+                    </View>
 
-                    <Text style={styles.RowLeft}>{`악기 타입`}</Text>
-                    <Text style={styles.RowRight}>{data.instrumentType}</Text>
+                    <View style={styles.Row}>
 
+                        <Text style={styles.RowLeft}>{`악기 타입`}</Text>
+                        <Text style={styles.RowRight}>{data.instrumentType}</Text>
+
+                    </View>
+
+                    <View style={[styles.Row]}>
+                        <Text style={styles.RowLeft}>{`대여 상태`}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <Text style={{ fontFamily: "NanumSquareNeo-Bold", fontSize: 16, color: data.borrowAvailable ? Color['blue400'] : Color['red400'] }}>{data.borrowAvailable ? '대여 가능' : '대여 불가'}</Text>
+                        </View>
+                    </View>
                 </View>
 
                 <View style={{ height: 20 }} />
+
                 <View style={{ alignSelf: 'flex-start', paddingHorizontal: 28 }}>
                     <View>
                         <Text style={{ fontSize: 18, fontFamily: "NanumSquareNeo-Bold", }}>대여 내역</Text>
                     </View>
                 </View>
                 <View style={{ paddingVertical: 6 }}>
-                    {data!.borrowHistory.length > 0 ? data!.borrowHistory.map(borrowHistory =>
-                    (<View key={borrowHistory.borrowerName + borrowHistory.borrowDate} style={{ width: 320, height: 76, borderRadius: 5, borderWidth: 1, borderColor: Color['grey200'], marginVertical: 6 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'flex-end', position: 'absolute', left: 14, top: 12 }}>
-                            <Text style={{
-                                fontSize: 16,
-                                fontFamily: "NanumSquareNeo-Regular",
-                                color: Color['grey700'],
-                                marginRight: 2
-                            }}>{borrowHistory.borrowerName}</Text>
-                            {borrowHistory?.borrowerNickname && <Text style={{
-                                fontSize: 14,
-                                fontFamily: "NanumSquareNeo-Regular",
-                                color: Color['grey400']
-                            }}>{borrowHistory.borrowerNickname}</Text>}
-                        </View>
-                        <View style={{ position: 'absolute', left: 14, bottom: 12 }}>
-                            <Text style={{
-                                fontSize: 16,
-                                fontFamily: "NanumSquareNeo-Regular",
-                                color: Color['grey400']
-                            }}>{borrowHistory.borrowerName}</Text>
-                        </View>
-                        <View style={{ position: 'absolute', right: 12, bottom: 12 }}>
-                            <Text style={{
-                                textAlign: 'right',
-                                fontSize: 14,
-                                fontFamily: "NanumSquareNeo-Regular",
-                                color: Color['grey400']
-                            }}>{borrowHistory.borrowDate}</Text>
-                        </View>
-                    </View>)) :
+                    {data!.borrowHistory.length > 0 ?
+
+                        data!.borrowHistory.map(borrowHistory =>
+                        (<View
+                            key={borrowHistory.borrowerName + borrowHistory.borrowDate}
+                            style={{ width: 320, height: 76, borderRadius: 5, borderWidth: 1, borderColor: Color['grey200'], marginVertical: 6 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'flex-end', position: 'absolute', left: 14, top: 12 }}>
+                                <Text style={{
+                                    fontSize: 16,
+                                    fontFamily: "NanumSquareNeo-Regular",
+                                    color: Color['grey700'],
+                                    marginRight: 2
+                                }}>{borrowHistory.borrowerName}</Text>
+                                {borrowHistory?.borrowerNickname && <Text style={{
+                                    fontSize: 14,
+                                    fontFamily: "NanumSquareNeo-Regular",
+                                    color: Color['grey400']
+                                }}>{borrowHistory.borrowerNickname}</Text>}
+                            </View>
+                            <View style={{ position: 'absolute', left: 14, bottom: 12 }}>
+                                <Text style={{
+                                    fontSize: 16,
+                                    fontFamily: "NanumSquareNeo-Regular",
+                                    color: Color['grey400']
+                                }}>{borrowHistory.borrowerName}</Text>
+                            </View>
+                            <View style={{ position: 'absolute', right: 12, bottom: 12 }}>
+                                <Text style={{
+                                    textAlign: 'right',
+                                    fontSize: 14,
+                                    fontFamily: "NanumSquareNeo-Regular",
+                                    color: Color['grey400']
+                                }}>{borrowHistory.borrowDate}</Text>
+                            </View>
+                        </View>))
+
+                        :
+
                         <View style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingVertical: 32 }}>
                             <Text style={{
                                 textAlign: 'right',
@@ -158,7 +187,6 @@ const InstrumentSpecificScreen: React.FC<InstrumentSpecificProps> = ({ navigatio
                         </View>
                     }
                 </View>
-                <View style={{ height: 18 }} />
             </ScrollView>
         </View>
     )

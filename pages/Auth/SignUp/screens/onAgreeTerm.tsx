@@ -16,8 +16,8 @@ export const AgreeTerm: React.FC = () => {
 
     const { setStep } = useSignUp();
 
-    const [serviceTerm, setServiceTerm] = useState(true)
-    const [personalTerm, setPersonalTerm] = useState(true)
+    const [serviceTerm, setServiceTerm] = useState(false)
+    const [personalTerm, setPersonalTerm] = useState(false)
 
     const selectAllAccept = () => {
         if (serviceTerm && personalTerm) {
@@ -51,21 +51,21 @@ export const AgreeTerm: React.FC = () => {
                 </View>
 
                 <View style={{ paddingVertical: 24, gap: 16 }}>
-                    <Pressable style={{ marginHorizontal: 36, paddingHorizontal: 12, paddingVertical: 16, backgroundColor: Color['green200'], borderRadius: 4, flexDirection: 'row', gap: 8, alignItems: 'center' }}
+                    <Pressable style={{ marginHorizontal: 36, paddingHorizontal: 12, paddingVertical: 16, backgroundColor: Color['green100'], borderRadius: 4, flexDirection: 'row', gap: 8, alignItems: 'center' }}
                         onPress={selectAllAccept}>
-                        <View style={{ borderRadius: 5, width: 20, height: 20, borderWidth: 1, backgroundColor: serviceTerm && personalTerm ? Color['green500'] : 'white', borderColor: serviceTerm && personalTerm ? Color['green500'] : Color['grey400'], alignItems: 'center', justifyContent: 'center' }}>
+                        <View style={{ borderRadius: 5, width: 20, height: 20, borderWidth: 1, backgroundColor: serviceTerm && personalTerm ? Color['green400'] : 'white', borderColor: serviceTerm && personalTerm ? Color['green400'] : Color['grey400'], alignItems: 'center', justifyContent: 'center' }}>
                             {serviceTerm && personalTerm && <Icons color={'white'} name='checkmark-outline' size={16} />}
                         </View>
                         <Text style={[serviceTerm && personalTerm ?
                             { fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }
                             :
                             { fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], },
-                        { fontSize: 16 }]}>모든 약관에 동의합니다.</Text>
+                        { fontSize: 14 }]}>모든 약관에 동의합니다.</Text>
                     </Pressable>
                     <View style={{ gap: 12 }}>
                         <Pressable style={{ marginHorizontal: 36, paddingHorizontal: 12, paddingVertical: 12, flexDirection: 'row', gap: 8, alignItems: 'center' }}
                             onPress={() => setServiceTerm(prev => !prev)}>
-                            <View style={{ borderRadius: 5, width: 20, height: 20, borderWidth: 1, backgroundColor: serviceTerm ? Color['green500'] : 'white', borderColor: serviceTerm && personalTerm ? Color['green500'] : Color['grey400'], alignItems: 'center', justifyContent: 'center' }}>
+                            <View style={{ borderRadius: 5, width: 20, height: 20, borderWidth: 1, backgroundColor: serviceTerm ? Color['green400'] : 'white', borderColor: serviceTerm && personalTerm ? Color['green400'] : Color['grey400'], alignItems: 'center', justifyContent: 'center' }}>
                                 {serviceTerm && <Icons color={'white'} name='checkmark-outline' size={16} />}
                             </View>
                             <View style={{ justifyContent: 'space-between', flex: 1, alignItems: 'center', flexDirection: 'row' }}>
@@ -73,7 +73,7 @@ export const AgreeTerm: React.FC = () => {
                                     { fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }
                                     :
                                     { fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], },
-                                { fontSize: 16 }]}>서비스 이용 약관에 동의합니다.</Text>
+                                { fontSize: 14 }]}>서비스 이용 약관에 동의합니다.</Text>
                                 <Pressable style={{ flex: 1, alignItems: 'flex-end', justifyContent: 'center' }} onPress={() => navigation.push("WebView", { url: 'https://storage.hongpung.com/terms/%EC%84%9C%EB%B9%84%EC%8A%A4+%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80.html', title: '서비스 이용약관' })}>
                                     <Icons name='chevron-forward-outline' size={20} color={Color['grey300']} />
                                 </Pressable>
@@ -81,7 +81,7 @@ export const AgreeTerm: React.FC = () => {
                         </Pressable>
                         <Pressable style={{ marginHorizontal: 36, paddingHorizontal: 12, paddingVertical: 12, flexDirection: 'row', gap: 8, alignItems: 'center' }}
                             onPress={() => setPersonalTerm(prev => !prev)}>
-                            <View style={{ borderRadius: 5, width: 20, height: 20, borderWidth: 1, backgroundColor: personalTerm ? Color['green500'] : 'white', borderColor: serviceTerm && personalTerm ? Color['green500'] : Color['grey400'], alignItems: 'center', justifyContent: 'center' }}>
+                            <View style={{ borderRadius: 5, width: 20, height: 20, borderWidth: 1, backgroundColor: personalTerm ? Color['green400'] : 'white', borderColor: serviceTerm && personalTerm ? Color['green400'] : Color['grey400'], alignItems: 'center', justifyContent: 'center' }}>
                                 {personalTerm && <Icons color={'white'} name='checkmark-outline' size={16} />}
                             </View>
                             <View style={{ justifyContent: 'space-between', flex: 1, alignItems: 'center', flexDirection: 'row' }}>
@@ -89,7 +89,7 @@ export const AgreeTerm: React.FC = () => {
                                     { fontFamily: 'NanumSquareNeo-Bold', color: Color['grey700'] }
                                     :
                                     { fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], },
-                                { fontSize: 16 }]}>개인정보 처리 방침에 동의합니다.</Text>
+                                { fontSize: 14 }]}>개인정보 처리 방침에 동의합니다.</Text>
                                 <Pressable style={{ flex: 1, alignItems: 'flex-end', justifyContent: 'center' }} onPress={() => navigation.push("WebView", { url: 'https://storage.hongpung.com/terms/%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4+%EC%B2%98%EB%A6%AC%EB%B0%A9%EC%B9%A8.html', title: '개인정보 처리 방침' })}>
                                     <Icons name='chevron-forward-outline' size={20} color={Color['grey300']} />
                                 </Pressable>
@@ -102,7 +102,7 @@ export const AgreeTerm: React.FC = () => {
             <View>
                 <LongButton
                     isAble={serviceTerm && personalTerm}
-                    color='blue'
+                    color='green'
                     onPress={() => setStep('이메일 인증')}
                     innerText='다음'
                 />

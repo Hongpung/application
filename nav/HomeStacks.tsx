@@ -9,7 +9,7 @@ import NotificationScreen from '@hongpung/pages/Home/Notification/NotificationSc
 import UsingManageScreen from '@hongpung/pages/Home/UsingManageScreen';
 // import ChatMediaViewerScreen from '@hongpung/_unused/Chat/ChatMediaViewerScreen';
 import CheckInScreen from '@hongpung/pages/QRScan/CheckInScreen';
-import CheckOutScreen from '@hongpung/pages/QRScan/CheckOutScreen';
+import CheckOutScreen, { CheckOutContainer } from '@hongpung/pages/QRScan/CheckOutScreen';
 import CheckOutDescriptScreen from '@hongpung/pages/QRScan/CheckOutDescriptScreen';
 import CheckOutCameraScreen from '@hongpung/pages/QRScan/CheckOutCameraScreen';
 import PictureCheckScreen from '@hongpung/pages/QRScan/PictureCheckScreen';
@@ -71,6 +71,7 @@ const MainStacks = () => {
             <MainStack.Screen
                 name="WebView"
                 component={WebViewScreen}
+                options={{ animation: 'none' }}
             />
 
             <MainStack.Screen
@@ -154,7 +155,7 @@ const MainStacks = () => {
 
             <MainStack.Screen
                 name='CheckOut'
-                component={CheckOutStacks}
+                component={CheckOutContainer}
                 options={{
                     animation: 'none',
                 }}

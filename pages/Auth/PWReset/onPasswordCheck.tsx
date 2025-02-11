@@ -8,6 +8,7 @@ import { useNavigation } from "@react-navigation/native";
 import { deleteToken } from "@hongpung/utils/TokenHandler";
 import Toast from "react-native-toast-message";
 import { InputBaseComponent } from "@hongpung/components/common/inputs/InputBaseComponent";
+import { TextInput } from "react-native-gesture-handler";
 
 type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
 
@@ -50,18 +51,20 @@ export const PasswordCheck: React.FC = () => {
 
     const navigation = useNavigation();
 
-    const { password, setPassword, passwordValidation, setPasswordValidation, validatePassword } = usePasswordInput()
-    const { confirmPassword, setConfirmPassword, confirmPasswordValidation, setConfirmPasswordValidation, validateConfirmPassword } = useConfirmPasswordInput();
+    const { password, setPassword, passwordValidation, validatePassword } = usePasswordInput()
+    const { confirmPassword, setConfirmPassword, confirmPasswordValidation, validateConfirmPassword } = useConfirmPasswordInput();
 
-    const passwordRef = useRef<any | null>(null);
-    const confirmPasswordRef = useRef<any | null>(null);
+    const passwordRef = useRef<TextInput | null>(null);
+    const confirmPasswordRef = useRef<TextInput | null>(null);
 
     useEffect(() => {
         return () => {
-            // 비동기 함수를 클린업 함수 내에서 호출
-            const deleteAsyncToken = async () => {
 
+            // 클린업 함수에서 토큰 초기화
+            const deleteAsyncToken = async () => {
+                await deleteToken('PWtoken')
             };
+
             deleteAsyncToken();
         };
     }, [])

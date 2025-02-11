@@ -307,9 +307,9 @@ const AttendanceModal: React.FC<{ attendanceList: Record<string, User[]>, visibl
                 onPress={onClose}>
                 <Pressable
                     style={{
-                        width: '90%',
                         height: 360,
-                        marginHorizontal: 24,
+                        width: width-32,
+                        marginHorizontal: 16,
                         paddingVertical: 16,
                         paddingHorizontal: 12,
                         borderRadius: 25,
@@ -317,28 +317,30 @@ const AttendanceModal: React.FC<{ attendanceList: Record<string, User[]>, visibl
                     }}
                     onPress={(e) => e.stopPropagation()}
                 >
-                    {Object.entries(attendanceList).map(([status, members]) => {
-                        return (
-                            <View style={{ gap: 16 }}>
-                                <Text style={{
-                                    paddingHorizontal: 8,
-                                    fontFamily: 'NanumSquareNeo-Regular',
-                                    fontSize: 18,
-                                    color: Color['grey600']
-                                }}>{status}</Text>
-                                <View style={{ gap: 12 }}>
-                                    {members.map(member => (
-                                        <ProfileMiniCard
-                                            view='inReserveView'
-                                            user={member}
-                                            isPicked={false}
-                                            onPick={() => { }}
-                                        />
-                                    ))}
+                    <ScrollView contentContainerStyle={{ width: '100%', paddingVertical:12 }}>
+                        {Object.entries(attendanceList).map(([status, members]) => {
+                            return (
+                                <View style={{ gap: 16 }}>
+                                    <Text style={{
+                                        paddingHorizontal: 8,
+                                        fontFamily: 'NanumSquareNeo-Regular',
+                                        fontSize: 18,
+                                        color: Color['grey600']
+                                    }}>{status}</Text>
+                                    <View style={{ gap: 12 }}>
+                                        {members.map(member => (
+                                            <ProfileMiniCard
+                                                view='inReserveView'
+                                                user={member}
+                                                isPicked={false}
+                                                onPick={() => { }}
+                                            />
+                                        ))}
+                                    </View>
                                 </View>
-                            </View>
-                        )
-                    })}
+                            )
+                        })}
+                    </ScrollView>
                     {/* <FlatList
                         data={[...attendanceList, ...attendanceList, ...attendanceList]}
                         contentContainerStyle={{ flexDirection: 'column', gap: 12 }}

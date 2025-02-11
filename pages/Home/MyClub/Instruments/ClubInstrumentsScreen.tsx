@@ -75,8 +75,7 @@ const InstrumentsList: React.FC<{ instrumentsList: InstrumentWithOutBorrowHistor
 const ClubInstrumentsScreen: React.FC = () => {
 
     const isFocusing = useIsFocused();
-    // const [instruments, setInstruments] = useState<InstrumentWithOutBorrowHistory[]>([])
-
+    
     const { data: instruments, loading, error } = useFetchUsingToken<InstrumentWithOutBorrowHistory[]>(
         `${process.env.EXPO_PUBLIC_BASE_URL}/club/my-club/instruments`,
         {

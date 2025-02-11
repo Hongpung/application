@@ -23,6 +23,7 @@ export const RootStacks: React.FC<{ startDomain: "Login" | "Tutorial" | "HomeSta
             <RootStack.Screen
                 name="WebView"
                 component={WebViewScreen}
+                options={{ animation: 'none' }}
             />
         </RootStack.Navigator>
     )

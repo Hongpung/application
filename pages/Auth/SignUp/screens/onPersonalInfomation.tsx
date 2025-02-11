@@ -271,6 +271,7 @@ export const PersonalInformationCheck: React.FC = () => {
                                 <InputBaseComponent
                                     ref={enrollmentNumberRef}
                                     label='학번'
+                                    requireMark={true}
                                     inputValue={enrollmentNumber ?? ''}
                                     setInputValue={setEnrollmentNumber}
                                     color={'green'}
@@ -289,6 +290,7 @@ export const PersonalInformationCheck: React.FC = () => {
                                 label='이름(본명)'
                                 color={'green'}
                                 inputValue={name}
+                                requireMark={true}
                                 setInputValue={setName}
                                 validationCondition={nameValidation}
                                 onBlur={() => validateName(name)}

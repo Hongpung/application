@@ -51,6 +51,7 @@ export const LoginForm: React.FC = () => {
                     onBlur={onBlurValidateAllInput}
                 />
             </View>
+            
             <View style={{
                 display:'flex',
                 paddingHorizontal: 48, 

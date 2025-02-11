@@ -13,7 +13,6 @@ const ClubPracticeCalendarScreen: React.FC = () => {
 
     const navigation = useNavigation<ClubMembersProps>();
     const myPracticeUrl = `${process.env.EXPO_PUBLIC_BASE_URL}/session-log/club`
-    // `${process.env.EXPO_PUBLIC_BASE_URL}/reservation/year-month-member?year=${calendarMonth.getFullYear()}&month=${Number(calendarMonth.getMonth()) + 1}&memberId=${userInfo?.memberId!}`,
 
     return (
         <MiniCalendar fetchUrl={myPracticeUrl}>
@@ -25,43 +24,3 @@ const ClubPracticeCalendarScreen: React.FC = () => {
 }
 
 export default ClubPracticeCalendarScreen
-
-const styles = StyleSheet.create({
-    MonthRow: {
-        height: 24,
-        marginHorizontal: 32,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-start'
-    },
-    MonthNumber: {
-        width: 56,
-        textAlign: 'center',
-        fontSize: 20,
-        marginHorizontal: 4,
-        fontFamily: 'NanumSquareNeo-Bold',
-        color: Color['grey700']
-    },
-    MonthBtn: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 28,
-        height: 28,
-    },
-    DayText: {
-        width: 28,
-        textAlign: 'center',
-        fontSize: 16,
-        fontFamily: 'NanumSquareNeo-Bold',
-        color: Color['grey500'],
-    },
-    CalendarText: {
-        width: 28,
-        textAlign: 'center',
-        fontSize: 16,
-        fontFamily: 'NanumSquareNeo-Bold',
-        color: Color['grey300'],
-        marginVertical: 2,
-    }
-})

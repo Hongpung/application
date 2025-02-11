@@ -40,13 +40,13 @@ const ClubMemeberScreen: React.FC<ClubMembersProps> = () => {
             <ScrollView contentContainerStyle={{
                 backgroundColor: '#fff',
             }}>
-                {users && <View style={{ flex: 1 }}>
-                    {users.map((member) => (
+                <View style={{ flex: 1 }}>
+                    {users?.map((member) => (
                         <View key={member.name} style={{ marginVertical: 8, marginHorizontal: 24 }}>
                             <ProfileMiniCard user={member} isPicked={false} onPick={user => { selectUser(user); }} view={'inClubView'} />
                         </View>
                     ))}
-                </View>}
+                </View>
             </ScrollView>
             <UserModal selectedUser={selectedUser} selectUser={selectUser} />
         </View>

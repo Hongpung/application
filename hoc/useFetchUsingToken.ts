@@ -37,7 +37,7 @@ const useFetchUsingToken = <T>(url: string | null, options: UseFetchOptions = {}
         })
 
         if (!response.ok) {
-          console.log(response.status + response.statusText)
+          // console.log(response.status + response.statusText)
           throw new Error('Network response was not ok');
         }
         const result: T = await response.json() as T;

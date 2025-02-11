@@ -1,5 +1,5 @@
 import { ActivityIndicator, Modal, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { Children, useEffect, useState } from 'react'
 import { Color } from '../../ColorSet'
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg'
 import LongButton from '../../components/buttons/LongButton'
@@ -10,16 +10,23 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 import { onUseSession } from '@hongpung/recoil/sessionState'
 import { josa } from 'es-hangul'
 import { Icons } from '@hongpung/components/common/Icon'
+import { CheckOutProvider, useCheckOut } from './context/useCheckOutContext'
+import { useNavigation } from '@react-navigation/native'
+import CheckOutDescriptScreen from './CheckOutDescriptScreen'
+import CheckOutCameraScreen from './CheckOutCameraScreen'
+import PictureCheckScreen from './PictureCheckScreen'
+import CheckOutEndScreen from './CheckOutEndScreen'
 
-const CheckOutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const CheckOutScreen: React.FC = () => {
 
-    const [isLoading, setLoading] = useState(false);
+    const navigation = useNavigation();
+    const { usingSession, setStep } = useCheckOut();
     const [isAgree, setAgree] = useState(false);
-    const sessionData = useRecoilValue(onUseSession)
     const loginUser = useRecoilValue(loginUserState)
 
     useEffect(() => { navigation.setOptions({ animation: 'none' }); }, [])
-    if (!loginUser || !sessionData)
+
+    if (!loginUser || !usingSession)
         return (
             <View>
                 <Modal visible={true} transparent>
@@ -84,23 +91,23 @@ const CheckOutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         <Rect width="100%" height="100%" fill="url(#grad)" />
                     </Svg>
                     <View style={{ position: 'absolute', flexDirection: 'row', left: 18, top: 18 }}>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['green500'] }}>{sessionData.creatorId != loginUser.memberId ? `참가하는 일정 ` : `참가하는 일정 `} </Text>
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['green500'] }}>{usingSession.creatorId != loginUser.memberId ? `참가하는 일정 ` : `내가 만든 일정 `} </Text>
                         <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 14, color: Color['grey800'] }}>|</Text>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{sessionData.date}</Text>
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{usingSession.date}</Text>
                     </View>
                     <View style={{ position: 'absolute', width: 208, top: 62, left: 56 }}>
                         <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, textAlign: 'center', }} numberOfLines={1} ellipsizeMode='tail' >
-                            {sessionData.title}
+                            {usingSession.title}
                         </Text>
                     </View>
                     <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 50 }}>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{sessionData.startTime.slice(0, -3)}~{sessionData.endTime.slice(0, -3)}</Text>
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{usingSession.startTime.slice(0, -3)}~{usingSession.endTime.slice(0, -3)}</Text>
                     </View>
                     <View style={{ position: 'absolute', right: 20, flexDirection: 'row', bottom: 20, height: 24, alignItems: 'center' }}>
-                        {sessionData.sessionType == 'RESERVED' ?
+                        {usingSession.sessionType == 'RESERVED' ?
                             <>
                                 <Icons name='people' color={Color['grey400']} size={24} />
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{sessionData.participatorIds!.length}</Text></> :
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>{usingSession.participatorIds!.length}</Text></> :
                             <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, marginLeft: 4, color: Color['grey400'] }}>실시간 예약</Text>
                         }
                     </View>
@@ -111,7 +118,7 @@ const CheckOutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         fontSize: 22,
                         color: Color['blue500'], textAlign: 'center', marginBottom: 4
                     }}>
-                        {sessionData.title}
+                        {usingSession.title}
                     </Text>
                     <Text style={{
                         fontFamily: 'NanumSquareNeo-Bold',
@@ -129,8 +136,7 @@ const CheckOutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                         ></CheckboxComponent>
                     </View>
                     <LongButton color='red' innerText={`네, 종료할래요`} isAble={isAgree} onPress={() => {
-                        // endSession()
-                        navigation.push('CheckOutDescript')
+                        setStep('Description')
                     }} />
                 </View>
             </View>
@@ -141,3 +147,31 @@ const CheckOutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 export default CheckOutScreen
 
 const styles = StyleSheet.create({})
+
+
+export const CheckOutContainer: React.FC = () => {
+    return (
+        <CheckOutProvider>
+            <CheckOutScreen2 />
+        </CheckOutProvider>
+    )
+}
+
+const CheckOutScreen2: React.FC = () => {
+
+    const { onStep } = useCheckOut();
+
+    switch (onStep) {
+        case 'CheckOutConfirm':
+            return (<CheckOutScreen />)
+        case 'Description':
+            return (<CheckOutDescriptScreen />)
+        case 'Camera':
+            return (<CheckOutCameraScreen />)
+        case 'CheckPicture':
+            return (<PictureCheckScreen />)
+        case 'CheckOutComplete':
+            return (<CheckOutEndScreen/>)
+
+    }
+}

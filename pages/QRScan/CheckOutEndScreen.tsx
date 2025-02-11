@@ -5,17 +5,17 @@ import LongButton from '../../components/buttons/LongButton'
 import LottieView from 'lottie-react-native'
 
 import Clab from '@hongpung/assets/lotties/Clab.json';
+import { StackActions, useNavigation } from '@react-navigation/native'
+import { useCheckOut } from './context/useCheckOutContext'
 
-const CheckOutEndScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-    const [isLoading, setLoading] = useState(false);
+const CheckOutEndScreen: React.FC = () => {
+
+    const navigation = useNavigation();
+
+    const { isLoading } = useCheckOut();
 
     useEffect(() => { navigation.setOptions({ animation: 'none' }); }, [])
 
-    useEffect(() => {
-
-        setTimeout(() => setLoading(false), 1000)
-
-    }, [])
 
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
@@ -45,7 +45,7 @@ const CheckOutEndScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
                         </View>
                         <View style={{ width: '100%', paddingVertical: 12 }}>
-                            <LongButton color='blue' innerText={`종료하기`} isAble={true} onPress={() => { navigation.navigate('Home') }} />
+                            <LongButton color='blue' innerText={`종료하기`} isAble={true} onPress={() => { navigation.dispatch(StackActions.replace('HomeStack')) }} />
                         </View>
                     </>
             }

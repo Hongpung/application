@@ -1,7 +1,7 @@
 import { ActivityIndicator, FlatList, Keyboard, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableWithoutFeedback, View } from 'react-native'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Color } from '../../../ColorSet'
-import { Club, clubs, User } from '../../../UserType'
+import { Club, clubIds, clubs, User } from '../../../UserType'
 import ProfileMiniCard from '../../../components/cards/ProfileMiniCard'
 import { useReservation } from '../context/ReservationContext'
 import LongButton from '../../../components/buttons/LongButton'
@@ -13,6 +13,7 @@ import { InReservationStackParamList } from '@hongpung/nav/ReservationStack'
 import { useNavigation } from '@react-navigation/native'
 import ShortButton from '@hongpung/components/buttons/ShortButton'
 import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
+import { debounce } from 'lodash'
 
 
 type ParticipantsSelectNavProps = NativeStackNavigationProp<InReservationStackParamList, 'ParticipantsSelect'>
@@ -24,13 +25,17 @@ const ParticipantsSelectScreen: React.FC = () => {
         return Number(currentYear.slice(-2))
     }, []);
 
+    const searchInputRef = useRef<TextInput | null>(null)
+
     const navigation = useNavigation<ParticipantsSelectNavProps>();
     const { reservation, setParticipants } = useReservation();
 
     const [prevUserPicked, setPrevUserPick] = useState<User[]>([])
-    const [findOptions, setFindOptions] = useState<{ club: Club[], enrollmentNumberRange: { startNumber?: string, endNumber?: string } }>({ club: [], enrollmentNumberRange: {} })
+
+    const [findOptions, setFindOptions] = useState<{ club: Club[], enrollmentNumberRange: { startNumber?: string, endNumber?: string }, username: string }>({ username: '', club: [], enrollmentNumberRange: {} })
 
     const [optionsSelectState, setOptionSelectState] = useState(false)
+    const [searchBarVisible, setSearchBarVisible] = useState(false)
 
     // const [originList, setOrigin] = useState<User[]>([])
     const [fiteredUsers, fiterUser] = useState<User[]>([])
@@ -47,10 +52,19 @@ const ParticipantsSelectScreen: React.FC = () => {
     const parsedUrl = useMemo<string>(() => {
         const queryParams = new URLSearchParams();
 
+        if (findOptions.username.length > 0) {
+            queryParams.append('username', findOptions.username);
+        }
         // clubId 배열을 쿼리 스트링에 추가
         if (findOptions.club.length > 0) {
             findOptions.club.forEach(club => {
-                queryParams.append('clubId', clubs.indexOf(club).toString()); // club.id가 문자열이 아닐 경우 변환
+                queryParams.append('clubId', clubIds[club]!.toString()); // club.id가 문자열이 아닐 경우 변환
+            });
+        }
+
+        if (findOptions.club.length > 0) {
+            findOptions.club.forEach(club => {
+                queryParams.append('clubId', clubIds[club]!.toString()); // club.id가 문자열이 아닐 경우 변환
             });
         }
 
@@ -76,6 +90,10 @@ const ParticipantsSelectScreen: React.FC = () => {
         = useFetchUsingToken<User[]>(parsedUrl, {}, 5000, [findOptions]);
 
     useEffect(() => {
+        searchInputRef.current?.focus()
+    }, [searchBarVisible])
+
+    useEffect(() => {
         if (!!originList) {
             const newUsers = [...originList];
 
@@ -88,6 +106,8 @@ const ParticipantsSelectScreen: React.FC = () => {
             fiterUser(newUsers);
         }
     }, [descendingOrder, originList]);
+
+    const debounceKeyword = debounce((value) => setFindOptions(prev => ({ ...prev, username: value })), 800)
 
     if (isLoading)
         return (
@@ -102,7 +122,14 @@ const ParticipantsSelectScreen: React.FC = () => {
     return (
 
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
-            <Header leftButton='close' HeaderName='인원 선택' addLeftAction={() => setParticipants(prevUserPicked)} />
+            <Header leftButton='close' HeaderName='인원 선택' addLeftAction={() => setParticipants(prevUserPicked)}
+                RightButton={
+                    <Icons size={28} name={'search'} color={Color['grey400']} />
+                }
+                RightAction={() => {
+                    setSearchBarVisible(true)
+                }}
+            />
             {
                 <>
                     <Modal visible={optionsSelectState} transparent>
@@ -130,7 +157,9 @@ const ParticipantsSelectScreen: React.FC = () => {
                                                 const isSelectedClub = selectedClubs.includes(club);
 
                                                 return (
-                                                    <Pressable style={[fiterBar.box, isSelectedClub && { borderColor: Color['blue500'], backgroundColor: Color['blue100'] }]}
+                                                    <Pressable
+                                                        key={club}
+                                                        style={[fiterBar.box, isSelectedClub && { borderColor: Color['blue500'], backgroundColor: Color['blue100'] }]}
                                                         onPress={() => {
 
                                                             if (!isSelectedClub && selectedClubs.length == 3) {
@@ -230,13 +259,13 @@ const ParticipantsSelectScreen: React.FC = () => {
                                         </View>
 
                                     </View>
-                                    <View style={{ paddingHorizontal: 16, justifyContent: 'space-between', paddingTop: 8, flexDirection: 'row' }}>
+                                    <View style={{ paddingHorizontal: 16, justifyContent: 'center', gap: 16, paddingTop: 8, flexDirection: 'row' }}>
                                         <ShortButton
                                             color='blue'
                                             isFilled={false}
                                             innerText={`초기화 적용`}
                                             onPress={() => {
-                                                setFindOptions({ club: [], enrollmentNumberRange: {} })
+                                                setFindOptions(prev => ({ ...prev, club: [], enrollmentNumberRange: {} }))
                                                 setClubsOption([])
                                                 setEnrollmentNumberRange({})
                                                 setOptionSelectState(false)
@@ -247,7 +276,7 @@ const ParticipantsSelectScreen: React.FC = () => {
                                             isFilled
                                             innerText={`옵션 적용`}
                                             onPress={() => {
-                                                setFindOptions({ club: selectedClubs, enrollmentNumberRange: selectedEnrollmentNumberRange })
+                                                setFindOptions(prev => ({ ...prev, club: selectedClubs, enrollmentNumberRange: selectedEnrollmentNumberRange }))
                                                 setOptionSelectState(false)
                                             }}
                                         />
@@ -259,6 +288,23 @@ const ParticipantsSelectScreen: React.FC = () => {
                     </Modal>
 
                     <View style={{ zIndex: 5, position: 'relative' }}>
+                        {searchBarVisible &&
+                            <View style={{ backgroundColor: Color['grey100'], paddingHorizontal: 24, paddingVertical: 8 }}>
+                                <View style={{ backgroundColor: '#fff', borderRadius: 10, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                    <TextInput
+                                        ref={searchInputRef}
+                                        onChangeText={value => { debounceKeyword(value); }}
+                                        style={{ paddingHorizontal: 12, fontSize: 16, height: 32, flex: 1 }}
+                                    >
+                                    </TextInput>
+                                    <Pressable style={{ height: 36, width: 36, display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                                        onPress={() => { setSearchBarVisible(false); setFindOptions(prev => ({ ...prev, username: '' })) }}>
+                                        <Icons size={24} name={'close-circle'} color={Color['grey300']} />
+                                    </Pressable>
+                                </View>
+
+                            </View>
+                        }
                         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ height: 32, marginTop: 8, marginHorizontal: 24, gap: 8, alignItems: 'flex-start', paddingHorizontal: 4 }}>
                             <Pressable style={[fiterBar.box, { flexDirection: 'row', alignItems: 'center', gap: 2 }]}
                                 onPress={() => { setDescendingOrder(!descendingOrder); }}>
@@ -324,7 +370,7 @@ const ParticipantsSelectScreen: React.FC = () => {
                     {reservation.participators.length > 0 && <View style={{ paddingTop: 12, width: '100%' }}>
                         <View style={{ paddingHorizontal: 28, }}>
                             <Text style={{
-                                paddingHorizontal:4,
+                                paddingHorizontal: 4,
                                 fontFamily: 'NanumSquareNeo-Regular',
                             }}>선택한 인원</Text>
                         </View>

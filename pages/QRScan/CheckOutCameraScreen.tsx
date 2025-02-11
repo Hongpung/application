@@ -5,15 +5,15 @@ import Header from '@hongpung/components/common/Header';
 import { useRecoilValue } from 'recoil';
 import { onUseSession } from '@hongpung/recoil/sessionState';
 import { useIsFocused } from '@react-navigation/native';
+import { useCheckOut } from './context/useCheckOutContext';
 
-const CheckOutCameraScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+const CheckOutCameraScreen: React.FC = () => {
 
     const isFocusing = useIsFocused()
-    const sessionData = useRecoilValue(onUseSession)
+    const { usingSession, setStep, setPhotos, photos } = useCheckOut();
     const [permission, requestPermission] = useCameraPermissions();
-    const [photos, setPhotos] = useState<{ uri: string, originHeight: number, originWidth: number }[]>([]);
     const [cameraRef, setCameraRef] = useState<CameraView | null>(null);
-    const shootingCount = (sessionData?.borrowInstruments?.length || 0) + 2;
+    const shootingCount = (usingSession?.borrowInstruments?.length || 0) + 2;
 
     useEffect(() => {
         if (photos.length > 0)
@@ -22,13 +22,13 @@ const CheckOutCameraScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
 
     useEffect(() => {
         if (photos.length == shootingCount)
-            navigation.navigate('PictureCheck', { photos: photos });
+            setStep('CheckPicture')
     }, [photos])
 
     const takePictureHandler = async () => {
         if (!cameraRef) return;
 
-        let photo = await cameraRef.takePictureAsync({ quality: 0.5, imageType: 'jpg'});
+        let photo = await cameraRef.takePictureAsync({ quality: 0.5, imageType: 'jpg' });
 
         if (photo) {
             console.log(photo.uri + 'ss')

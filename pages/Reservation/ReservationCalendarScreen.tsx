@@ -9,6 +9,8 @@ import useFetchUsingToken from "@hongpung/hoc/useFetchUsingToken";
 import { Icons } from "@hongpung/components/common/Icon";
 import { ReservationStackParamList } from "@hongpung/nav/ReservationStack";
 
+type ReservationType = 'COMMON' | 'REGULAR' | 'EXTERNAL'
+
 export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Date }> = ({ onClickDate, calendarDate }) => {
 
     const [calendarMonth, setMonth] = useState(calendarDate ?? new Date())
@@ -34,7 +36,8 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
         }, 2000, [calendarMonth, isFocusing]
     );
 
-    const colorDefine = ({ reservationType, participationAvailable }: { reservationType?: string, participationAvailable: boolean }) => {
+    const colorDefine = ({ reservationType, participationAvailable }: { reservationType?: ReservationType, participationAvailable: boolean }) => {
+        if (reservationType === 'EXTERNAL') return 'grey'
         if (reservationType === 'REGULAR') return 'blue';
         if (participationAvailable) return 'green';//
         return 'red';
@@ -195,20 +198,22 @@ const ReservationCalendarScreen: React.FC<ReserveCalendarProps> = ({ navigation,
 
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
-            <View style={{ position: 'absolute', right: 32, top: 30 }}>
+            <View style={{ position: 'absolute', right: 32, top: 28, gap:6 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View style={{ backgroundColor: Color['blue500'], height: 4, width: 20, borderRadius: 5, marginRight: 8 }} />
                     <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>정규 일정</Text>
                 </View>
-                <View style={{ height: 4 }} />
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View style={{ backgroundColor: Color['red500'], height: 4, width: 20, borderRadius: 5, marginRight: 8 }} />
                     <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>참여 불가</Text>
                 </View>
-                <View style={{ height: 4 }} />
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View style={{ backgroundColor: Color['green500'], height: 4, width: 20, borderRadius: 5, marginRight: 8 }} />
                     <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>참여 가능</Text>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ backgroundColor: Color['grey500'], height: 4, width: 20, borderRadius: 5, marginRight: 8 }} />
+                    <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>외부 예약</Text>
                 </View>
             </View>
             <View style={{ marginTop: 88, flex: 1 }}>

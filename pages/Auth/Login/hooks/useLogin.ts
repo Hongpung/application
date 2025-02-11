@@ -55,35 +55,39 @@ export const useLoginForm = () => {
     //options는 로그인 옵션을 담는 상태관리 변수
     const [options, setOptions] = useState({ autoLogin: false, saveID: false })
 
-    //loadLoginSetting은 로그인 옵션을 로드하고 사전 정보를 입력하는 함수
-    const loadLoginSetting = useCallback(async () => {
-        try {
-            const loadedAutoLogin = await AsyncStorage.getItem('autoLogin')//오토 로그인 로두
-            setOptions(prev => ({ ...prev, autoLogin: loadedAutoLogin != null }));
 
-            if (loadedAutoLogin == null) {
+    //페이지 로드전에 로그인 옵션을 로드하고 사전 정보를 입력
+    useLayoutEffect(() => {
+
+        //loadLoginSetting은 로그인 옵션을 로드하고 사전 정보를 입력하는 함수
+
+        const loadLoginSetting = async () => {
+            try {
+
+                await AsyncStorage.removeItem('autoLogin')
+
                 const loadedSaveID = await AsyncStorage.getItem('saveID')//아이디 세이브인지 확인
-                setOptions(prev => ({ ...prev, saveID: loadedSaveID != null }));
 
                 if (loadedSaveID) {
-                    const loadedEmail = await AsyncStorage.getItem('Email') || '';
+
+                    const loadedEmail = await AsyncStorage.getItem('Email');
+
+                    if (!loadedEmail) {
+                        setOptions(prev => ({ ...prev, saveID: false }));
+                        return;
+                    }
+
+                    setOptions(prev => ({ ...prev, saveID: true }));
                     setFormData(prev => ({ ...prev, email: loadedEmail }))
                 }
 
                 return;
-            }
-            else {
-                const loadedEmail = await AsyncStorage.getItem('Email') || '';
-                setFormData(prev => ({ ...prev, email: loadedEmail }))
 
-                return;
-            }
-        } catch (e) { console.error(e) }
-    }, [])
+            } catch (e) { console.error(e) }
+        };
 
-    //페이지 로드전에 로그인 옵션을 로드하고 사전 정보를 입력
-    useLayoutEffect(() => {
         loadLoginSetting()
+
     }, [])
 
 
@@ -114,9 +118,9 @@ export const useLoginForm = () => {
         }))
     };
 
-
     const validateEmail = useCallback(() => {
         const emailFormRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        console.log('called email validate')
         if (emailFormRegex.test(formData.email)) {
             setFormValidation(prev => ({ ...prev, email: { state: 'VALID' } }))
             return;
@@ -128,11 +132,12 @@ export const useLoginForm = () => {
 
     const validatePassword = useCallback(() => {
         const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;
+        console.log('called Password validate', regex.test(formData.password))
         if (regex.test(formData.password)) {
-            setFormValidation(prev => ({ ...prev, passwordValidtion: { state: 'VALID' } }))
+            setFormValidation(prev => ({ ...prev, password: { state: 'VALID' } }))
             return;
         }
-        setFormValidation(prev => ({ ...prev, passwordValidtion: { state: 'ERROR', errorText: '비밀번호는 8~12자 입니다.' } }))
+        setFormValidation(prev => ({ ...prev, password: { state: 'ERROR', errorText: '비밀번호는 8~12자 입니다.' } }))
 
     }, [formData.password])
 
@@ -140,11 +145,14 @@ export const useLoginForm = () => {
     //onBlurValidateAllInput은 모든 input에 대해 유효성 검사를 하는 함수
     //이 함수는 onBlur 이벤트가 발생할 때 실행됨
     const onBlurValidateAllInput = useCallback(() => {
-        if (formValidation.password.state != 'BEFORE')
+        if (formValidation.password.state != 'BEFORE') {
             validatePassword();
+        }
 
-        if (formValidation.email.state != 'BEFORE')
+        if (formValidation.email.state != 'BEFORE') {
             validateEmail();
+        }
+
     }, [formData, formValidation])
 
 
@@ -161,12 +169,11 @@ export const useLoginForm = () => {
                 visibilityTime: 3000
             });
         } else if (saveID) {
-            const storedAutoLogin = await AsyncStorage.getItem('autoLogin');
-            if (storedAutoLogin) {
-                await AsyncStorage.removeItem('autoLogin');
-            }
+
+            await AsyncStorage.removeItem('autoLogin');
             await AsyncStorage.setItem('saveID', 'true');
             await AsyncStorage.setItem('Email', email);
+
             Toast.show({
                 type: 'success',
                 text1: '아이디를 저장했어요',
@@ -174,12 +181,12 @@ export const useLoginForm = () => {
                 bottomOffset: 60,
                 visibilityTime: 3000
             });
-        } else {
-            const storedSaveID = await AsyncStorage.getItem('saveID');
-            if (storedSaveID) {
 
-                await AsyncStorage.removeItem('saveID');
-            }
+        } else {
+
+            await AsyncStorage.removeItem('saveID');
+            await AsyncStorage.removeItem('Email');
+
         }
     }, []);
 
@@ -208,24 +215,36 @@ export const useLoginForm = () => {
 
         try {
             const { email, password } = formData;
-            const loginResult = await login(email, password);
-
-            if (!loginResult) throw Error('로그인 정보 불일치')
 
             const { autoLogin, saveID } = options;
 
+            const loginResult = await login(email, password, autoLogin);
+
+            if (!loginResult) throw Error('로그인 정보 불일치')
+
             saveLoginOptions({ email, autoLogin, saveID })
 
+            console.log('logined')
             navigation.dispatch(StackActions.replace('HomeStack'))
 
         } catch (e: unknown) {
 
             if (e instanceof Error) {
-                if (e.message == '로그인 정보 불일치') {
+                if ((e.message == 'Check Email Or Password!') || (e.message == '로그인 정보 불일치')) {
                     setFormValidation({ email: { state: 'ERROR', errorText: '' }, password: { state: 'ERROR', errorText: '비밀번호가 틀리거나 가입되지 않은 이메일이에요.' } });
                 }
+                if (e.message == "You're not accepted") {
+
+                    Toast.show({
+                        type: 'fail',
+                        text1: '가입이 진행중인 계정입니다\n(승낙시 확인 메일이 발송돼요)',
+                        position: 'bottom',
+                        bottomOffset: 60,
+                        visibilityTime: 3000
+                    });
+                }
             }
-            else console.error(e)
+            // else console.error(e)
         }
 
     }, [formData, formValidation, options])

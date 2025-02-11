@@ -118,7 +118,7 @@ export const ChangePasswordScreen: React.FC = () => {
             const chageResult = await changePassword({ currentPassword, newPassword })
             Toast.show({
                 type: 'success',
-                text1: '비밀번호가 변경 되었어요!\n다시 로그인해주세요',
+                text1: '비밀번호가 변경 되었어요!\n다음 로그인부터 적용돼요',
                 position: 'bottom',
                 bottomOffset: 60,
                 visibilityTime: 3000

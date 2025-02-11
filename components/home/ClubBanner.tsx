@@ -5,7 +5,6 @@ import { Color } from "@hongpung/ColorSet";
 import { MainStackParamList } from "@hongpung/nav/HomeStacks";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
-import ClubBannerBG from "@hongpung/assets/images/CLUB_BANNER.svg";
 
 type HomeNavProps = NativeStackNavigationProp<MainStackParamList, 'Home'>
 
@@ -35,15 +34,15 @@ export const ClubBanner = () => {
             </Text>
             <Image source={require('../../assets/images/ClubBanner.png')} style={{ position: 'absolute', top: 0, right:0, zIndex:-1}} />
             {/* <ClubBannerBG style={{ position: 'absolute', top: 0, width: '100%', opacity: 0.85 }} /> */}
-            <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between',zIndex:5 }}>
-                <Text style={{
+            <View style={{ flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'flex-end',zIndex:5 }}>
+                {/* <Text style={{
                     alignSelf: 'flex-end',
                     fontSize: 14,
                     fontFamily: 'NanumSquareNeo-Bold',
                     color: Color['grey400']
                 }}>
                     다음 일정 | {`2021.09.01`}
-                </Text>
+                </Text> */}
 
                 <Text style={{
                     fontSize: 16,

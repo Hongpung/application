@@ -24,7 +24,7 @@ const DropdownMenu: FC<DropdownMenuProps> = ({ children }) => {
             maxHeight: 160,
             borderRadius: 10
         }}>
-            <ScrollView>
+            <ScrollView bounces={false} showsVerticalScrollIndicator={false}>
                 {children}
             </ScrollView>
         </View>

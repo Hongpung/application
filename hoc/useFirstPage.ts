@@ -11,10 +11,11 @@ export const useFirstPage = () => {
         if (!launchFlag) setFirstScreen("Tutorial")
         else {
             const autoLogin = await AsyncStorage.getItem('autoLogin');
-            if (autoLogin) {
+            console.log(`autoLogin` + autoLogin)
+            if (!!autoLogin) {
 
                 const token = await getToken('token');
-                
+
                 if (token) {
                     setFirstScreen('HomeStack')
                     Toast.show({
@@ -39,7 +40,7 @@ export const useFirstPage = () => {
             }
             else setFirstScreen('Login');
         }
-    },[])
+    }, [])
 
     return { firstScreen, defineFirstScreen }
 }

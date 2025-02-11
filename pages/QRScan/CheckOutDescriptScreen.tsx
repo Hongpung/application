@@ -11,6 +11,7 @@ import { onUseSession } from '@hongpung/recoil/sessionState';
 import LottieView from 'lottie-react-native';
 import Dehumidifier from '@hongpung/assets/lotties/Dehumidifier.json'
 import Trash from '@hongpung/assets/lotties/Trash.json';
+import { useCheckOut } from './context/useCheckOutContext';
 
 
 type PictureCheckNavProp = NativeStackNavigationProp<CheckOutStackParamList, 'PictureCheck'>
@@ -18,10 +19,10 @@ type PictureCheckNavProp = NativeStackNavigationProp<CheckOutStackParamList, 'Pi
 const CheckOutDescriptScreen: React.FC = () => {
 
     const navigation = useNavigation<PictureCheckNavProp>();
+    const { usingSession, setStep } = useCheckOut();
     const [pageNum, setPageNum] = useState(0);
     const Pages = ["0", "1", "2"]
     const photo = 'phptoUrl'//나중에 추가할것
-    const sessionState = useRecoilValue(onUseSession)
     const pagerRef = useRef<PagerView>(null);//러페런스 추가
 
     // 페이지 이동 함수
@@ -31,11 +32,11 @@ const CheckOutDescriptScreen: React.FC = () => {
         }
     };
 
-    if (!sessionState)
+    if (!usingSession)
         return null;
 
     if (
-        sessionState.borrowInstruments && sessionState.borrowInstruments.length > 0
+        usingSession.borrowInstruments && usingSession.borrowInstruments.length > 0
     )
         return (
             // 배경용
@@ -68,7 +69,7 @@ const CheckOutDescriptScreen: React.FC = () => {
                                 <LottieView source={require('@hongpung/assets/lotties/Instrument.json')} style={{ width: '100%', height: '100%' }} autoPlay speed={1} />
                             </View>
                             <Text style={styles.CheckOutDescript}>
-                                {`사용한 ${sessionState?.borrowInstruments}개의 악기들을\n제자리에 돌려놓고 찍어주세요`}
+                                {`사용한 ${usingSession?.borrowInstruments}개의 악기들을\n제자리에 돌려놓고 찍어주세요`}
                             </Text>
                         </View>
                         <View style={{
@@ -111,7 +112,7 @@ const CheckOutDescriptScreen: React.FC = () => {
                         </View>
                     </View>
                     <View style={styles.CTA}>
-                        <LongButton color='blue' isAble={true} innerText={pageNum < 2 ? '다음' : '촬영하기'} onPress={() => { if (pageNum == 2) navigation.navigate('CheckOutCamera'); else goToPage(); }} />
+                        <LongButton color='blue' isAble={true} innerText={pageNum < 2 ? '다음' : '촬영하기'} onPress={() => { if (pageNum == 2) setStep('Camera'); else goToPage(); }} />
                     </View>
                 </View>
 
@@ -157,7 +158,7 @@ const CheckOutDescriptScreen: React.FC = () => {
                         }}
                             key={Pages[1]}>
                             <View style={[styles.CheckOutPicture]}>
-                                <LottieView source={Dehumidifier} style={{ width: '100%', height: '100%'  }} autoPlay speed={0.8} />
+                                <LottieView source={Dehumidifier} style={{ width: '100%', height: '100%' }} autoPlay speed={0.8} />
                             </View>
                             <Text style={styles.CheckOutDescript}>
                                 {`제습기를 비우고 다시 틀어주세요\n이 두 가지 사진을 보여주세요`}
@@ -179,7 +180,7 @@ const CheckOutDescriptScreen: React.FC = () => {
                         </View>
                     </View>
                     <View style={styles.CTA}>
-                        <LongButton color='blue' isAble={true} innerText={pageNum < 1 ? '다음' : '촬영하기'} onPress={() => { if (pageNum == 1) navigation.navigate('CheckOutCamera'); else goToPage(); }} />
+                        <LongButton color='blue' isAble={true} innerText={pageNum < 1 ? '다음' : '촬영하기'} onPress={() => { if (pageNum == 1) setStep('Camera'); else goToPage(); }} />
                     </View>
                 </View>
             </View>

@@ -7,6 +7,7 @@ export interface Reservation {
     date?: Date
     Time: { startTime: string, endTime: string }
     reservationName: string
+    reservationType: reservationType
     isRegular: boolean
     isParticipatible: boolean
     participators: User[]
@@ -35,7 +36,7 @@ export function areReservationsEqual(r1: Reservation, r2: Reservation): boolean 
  * Date 객체와 배열도 지원합니다.
  */
 function deepEqual(obj1: any, obj2: any): boolean {
-    
+
     if (obj1 === obj2) return true; // 값이 같으면 true 반환
     if (typeof obj1 !== typeof obj2) return false; // 타입이 다르면 false
     if (typeof obj1 !== 'object' || obj1 === null || obj2 === null) return false; // 객체가 아니거나 null인 경우
@@ -206,6 +207,7 @@ export function parseToReservation(reservationDTO: ReservationDTO): Reservation 
         creatorId: reservationDTO.creatorId,
         userName: reservationDTO.creatorName,
         userNickname: reservationDTO.creatorNickname,
+        reservationType: reservationDTO.reservationType,
         date: new Date(reservationDTO.date), // `YYYY-MM-DD` 형식을 `Date` 객체로 변환
         Time: {
             startTime: `TIME_${startHour}${startMinnute}`,  // `HH:MM:SS`를 분 단위 숫자로 변환
