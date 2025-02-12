@@ -138,130 +138,8 @@ const HomeScreen: React.FC = () => {
                     <NoticePartition />
                 </View>
 
-                {/* 일정 홍보 */}
-
-                {/* <View style={{ marginTop: 32 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
-                        <Text style={{
-                            fontSize: 18,
-                            fontFamily: 'NanumSquareNeo-Bold',
-                            height: 20
-                        }}>
-                            인원을 모으는 중인 활동
-                        </Text>
-
-                        <Pressable style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text style={{
-                                fontSize: 14,
-                                fontFamily: 'NanumSquareNeo-Light',
-                                height: 16
-                            }}>
-                                더 알아보기
-                            </Text>
-                            <Icons name='chevron-forward-outline' color={Color['grey400']} size={18}></Icons>
-                        </Pressable>
-                    </View>
-
-                    <ScrollView style={{ height: 126, }} horizontal showsHorizontalScrollIndicator={false}>
-                        <View style={{ flex: 1, flexDirection: 'row' }}>
-                            <View style={{ marginLeft: 18 }} />
-                            {
-                                Array(18).fill(null).map((_, index) => (
-                                    <View
-                                        key={index}
-                                        style={{ height: 126, width: 136, borderColor: Color['grey100'], borderRadius: 10, marginHorizontal: 6, borderWidth: 1 }}
-                                    >
-                                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'], fontSize: 14, marginHorizontal: 8, marginTop: 12 }} numberOfLines={2} ellipsizeMode='tail'>인인 활동입니다</Text>
-                                        <View style={{ marginHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 4, bottom: 32, position: 'absolute' }}>
-                                            <View style={{ width: 24, height: 24 }}>
-                                                <Icons name='people' color={Color['grey200']} size={24}></Icons>
-                                            </View>
-                                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], fontSize: 14 }}>{`24`}</Text>
-                                        </View>
-                                        <View style={{ marginHorizontal: 6, flexDirection: 'row', bottom: 12, position: 'absolute' }}>
-                                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], fontSize: 12 }}>{`#술모임`}</Text>
-                                            <View style={{ width: 4 }} />
-                                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], fontSize: 12 }}>{`#술모임`}</Text>
-                                        </View>
-                                    </View>
-                                ))
-                            }
-                            <View
-                                key={'last'}
-                                style={{ height: 126, width: 82, borderRadius: 10, marginHorizontal: 6, justifyContent: 'center', alignItems: 'center' }}
-                            >
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 16, marginBottom: 8 }}>더보기</Text>
-                                <Icons name='arrow-forward-circle' color={Color['grey300']}></Icons>
-                            </View>
-                        </View>
-                        <View style={{ marginRight: 18 }} />
-                    </ScrollView>
-                </View> */}
-
-
-
-                {/* 공연 홍보 */}
-
-                {/* <View style={{ marginTop: 32 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', height: 20, alignItems: 'flex-end', marginHorizontal: 28, marginBottom: 16 }}>
-                        <Text style={{
-                            fontSize: 18,
-                            fontFamily: 'NanumSquareNeo-Bold',
-                            height: 20
-                        }}>
-                            공연 홍보
-                        </Text>
-                        <Pressable style={{ flexDirection: 'row', alignItems: 'center' }}>
-                            <Text style={{
-                                fontSize: 14,
-                                fontFamily: 'NanumSquareNeo-Light',
-                                height: 16
-                            }}>
-                                더 알아보기
-                            </Text>
-                            <Icons name='chevron-forward-outline' color={Color['grey400']} size={18}></Icons>
-                        </Pressable>
-                    </View>
-
-                    <ScrollView style={{ height: 208, }} horizontal showsHorizontalScrollIndicator={false}>
-                        <View style={{ flex: 1, flexDirection: 'row', }}>
-                            <View style={{ marginLeft: 18 }} />
-                            {
-                                Array(6).fill(null).map((_, index) => (
-                                    <View
-                                        key={index}
-                                        style={{ height: 208, width: 136, borderColor: Color['grey100'], borderRadius: 10, marginHorizontal: 6, overflow: 'hidden', borderWidth: 1 }}
-                                    >
-                                        <View style={{ height: 148, backgroundColor: Color['blue100'] }} />
-                                        <Text style={{ marginHorizontal: 8, marginTop: 8, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 14 }}>산틀-산데렐라</Text>
-                                        <View style={{ marginHorizontal: 10, flexDirection: 'row', alignItems: 'center', gap: 4, bottom: 4, position: 'absolute' }}>
-                                            <View style={{ width: 20, height: 20 }} >
-                                                <Icons name='people' color={Color['red200']} size={20}></Icons>
-                                            </View>
-                                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', color: Color['red400'], fontSize: 12 }}>{`24`}</Text>
-                                        </View>
-                                    </View>
-                                ))
-                            }
-
-                            <View
-                                key={'last'}
-                                style={{ height: 208, width: 82, borderRadius: 10, marginHorizontal: 6, justifyContent: 'center', alignItems: 'center' }}
-                            >
-                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: Color['grey400'], fontSize: 16, marginBottom: 8 }}>더보기</Text>
-                                <Icons name='arrow-forward-circle' color={Color['grey300']}></Icons>
-                            </View>
-                            <View style={{ marginRight: 18 }} />
-                        </View>
-                    </ScrollView>
-                </View> */}
-
-
-
-
-
                 {/* 푸터 */}
-                <View style={[styles.footer, { flexDirection: 'column', gap: 16, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingVertical: 24 }]}>
+                <View style={[styles.footer, { flexDirection: 'column', gap: 28, borderTopLeftRadius: 28, borderTopRightRadius: 28, paddingVertical: 24 }]}>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 48 }}>
                         <Pressable style={{ flex: 1 }} onPress={() => navigation.push("WebView", { url: 'https://storage.hongpung.com/terms/%EC%84%9C%EB%B9%84%EC%8A%A4+%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80.html', title: '서비스 이용약관' })}>
                             <Text style={{ textAlign: 'center', fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>
@@ -275,11 +153,11 @@ const HomeScreen: React.FC = () => {
                         </Pressable>
                     </View>
                     <View style={{ gap: 6 }}>
-                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>기타 문의</Text>
+                        <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 12, color: Color['grey400'] }}>기타 문의</Text>
                         <View style={{ gap: 4 }}>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>대표자: 강윤호 (산틀 18)</Text>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>전화번호: 010-5034-2854</Text>
-                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 14, color: Color['grey400'] }}>이메일: ajtwoddl1236@naver.com</Text>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 12, color: Color['grey400'] }}>대표자: 강윤호 (산틀 18)</Text>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 12, color: Color['grey400'] }}>전화번호: 010-5034-2854</Text>
+                            <Text style={{ fontFamily: 'NanumSquareNeo-Regular', fontSize: 12, color: Color['grey400'] }}>이메일: ajtwoddl1236@naver.com</Text>
                         </View>
                     </View>
                 </View>

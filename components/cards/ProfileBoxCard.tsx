@@ -13,7 +13,6 @@ interface ProfileBoxProps {
 const ProfileBoxCard: React.FC<ProfileBoxProps> = ({ user }) => {
 
     const RoleTextRender = () => {
-        console.log(user)
         if (user?.role && user?.role.length > 0) {
             return user.role.map((roleName, index) =>
             (<>

@@ -148,13 +148,13 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
             <View style={{ height: 60, marginHorizontal: 32, alignItems: 'center' }}>
                 <View style={{ paddingVertical: 4 }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-                        <Text style={styles.DayText}>월</Text>
-                        <Text style={styles.DayText}>화</Text>
-                        <Text style={styles.DayText}>수</Text>
-                        <Text style={styles.DayText}>목</Text>
-                        <Text style={styles.DayText}>금</Text>
-                        <Text style={styles.DayText}>토</Text>
-                        <Text style={styles.DayText}>일</Text>
+                        <Text key={'mon'} style={styles.DayText}>월</Text>
+                        <Text key={'tue'} style={styles.DayText}>화</Text>
+                        <Text key={'wed'} style={styles.DayText}>수</Text>
+                        <Text key={'thu'} style={styles.DayText}>목</Text>
+                        <Text key={'fri'} style={styles.DayText}>금</Text>
+                        <Text key={'sat'} style={styles.DayText}>토</Text>
+                        <Text key={'sun'} style={styles.DayText}>일</Text>
                     </View>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -189,7 +189,8 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
                             {index < times.length - 1 &&
                                 <View key={time + 'under'} style={{ height: 56, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <View style={{ height: 0, borderWidth: 1, borderStyle: 'dotted', borderColor: Color[`grey100`], width: (width - 48) }} />
-                                </View>}
+                                </View>
+                            }
                         </>)
                 })}
 
@@ -200,7 +201,7 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
                     const Timegap = endHour * 60 - startHour * 60 + endMinnute - startMinnute
                     const reserveTop = 12 + (Number(startHour) - 10) * 80 + (startMinnute > 0 ? 40 : 0);
                     const reserveHeight = 40 * (Timegap / 30);
-                    const color = reservation.reservationType === 'EXTERNAL' ? Color['grey500'] : reservation.reservationType == 'REGULAR' ? Color['blue500'] : reservation.participationAvailable ? Color['green500'] : Color['red500'];
+                    const color = reservation.reservationType === 'EXTERNAL' ? Color['grey300'] : reservation.reservationType == 'REGULAR' ? Color['blue500'] : reservation.participationAvailable ? Color['green500'] : Color['red500'];
                     return (
                         <Pressable key={'rid' + reservation.reservationId} style={{ position: 'absolute', top: reserveTop, width: width - 72, height: reserveHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36, overflow: 'hidden' }}
                             onPress={() => { navigation.navigate('ReservationDetail', { reservationId: reservation.reservationId }) }}>
@@ -209,7 +210,7 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
                             {Timegap > 30 &&
                                 <View style={{ position: 'absolute', bottom: 12, flexDirection: 'row', width: '100%', paddingHorizontal: 12, gap: 4, alignItems: 'center', justifyContent: 'space-between' }}>
                                     {reservation.reservationType === 'EXTERNAL' ?
-                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], paddingHorizontal:4}}>
+                                        <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'], paddingHorizontal: 4 }}>
                                             외부 예약
                                         </Text>
                                         :
@@ -226,7 +227,8 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
                                 </View>
                             }
                             {reservation.reservationType == 'REGULAR' ?
-                                Timegap > 30 && <View style={{ position: 'absolute', top: -4, right: 8, }} >
+                                Timegap > 30 && 
+                                <View style={{ position: 'absolute', top: -4, right: 8, }} >
                                     <Icons size={48} name={'bookmark-sharp'} color={Color['blue500']} />
                                 </View>
                                 :

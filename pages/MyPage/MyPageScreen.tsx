@@ -1,85 +1,85 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useMemo, useState } from 'react'
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import React, { useMemo } from 'react'
 import { Color } from '@hongpung/ColorSet'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ProfileBoxCard from "@hongpung/components/cards/ProfileBoxCard";
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { StackActions, useNavigation } from '@react-navigation/native';
 import { Icons } from '@hongpung/components/common/Icon';
 import { MyPageParamList } from '@hongpung/nav/MyPageStack';
-import { useAuth } from '@hongpung/hoc/useAuth';
 import { MainStackParamList, ScreenParams } from '@hongpung/nav/HomeStacks';
+import { useRecoilValue } from 'recoil';
+import { loginUserState } from '@hongpung/recoil/authState';
 
 
 type MyPageProps = NativeStackNavigationProp<MainStackParamList, 'BottomTab'>;
 
 const MyPageScreen: React.FC = () => {
 
-    const isFocusing = useIsFocused()
     const navigation = useNavigation<MyPageProps>();
 
-    const { loadUserState, loginUser } = useAuth()
+    const loginUser = useRecoilValue(loginUserState)
     type subMenu = {
         name: string,
         link: keyof MyPageParamList
     }
+
     const myActivities: subMenu[] = useMemo(() => [{ name: '다가오는 일정', link: 'MySchedules' }, { name: '내 활동', link: 'MyPractices' },], [])
-    const Settings: subMenu[] = useMemo(() => [
+
+    const settings: subMenu[] = useMemo(() => [
         { name: '알림 설정', link: 'NotificationSetting' },
         { name: '로그인 설정', link: 'LoginSetting' },
         // { name: '암호 잠금', link: '' }, { name: '앱 설정', link: '' }, //추후 설정
     ], [])
 
-    const [isLoading, setLoading] = useState(true);
-
-    useEffect(() => {
-        loadUserState()
-        const checkUser = async () => {
-            try {
-                setLoading(false)
-                console.log(loginUser, 'fetch', isLoading)
-
-            }
-            catch (e) {
-                console.error(e)
-            }
-        }
-        checkUser();
-    }, [isFocusing])
-
-
-    // if (isLoading)
-    //     return (
-    //         <View style={styles.container}>
-    //             <ActivityIndicator size={'large'} color={'#fff'} />
-    //         </View>
-    //     )
-    if (!loginUser) return (<View></View>)
+    if (!loginUser) {
+        Alert.alert('오류', '로그인 정보가 존재하지 않습니다.\n다시 로그인 해주세요.')
+        navigation.dispatch(StackActions.replace('Login'))
+        return (<View></View>)
+    }
 
     return (
-        <ScrollView style={styles.container}>
-            <ProfileBoxCard
-                user={{
-                    ...loginUser
-                }}
-            />
-            <View style={{ flexDirection: 'row', height: 20, justifyContent: 'flex-start', marginTop: 20, marginBottom: 16, marginHorizontal: 24 }}>
-                <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>활동 내역</Text>
+        <ScrollView bounces={false}>
+            <View style={{ backgroundColor: '#FFF', flexDirection: 'column', gap: 20, paddingTop: 12, paddingBottom: 24 }}>
+                <View>
+                    <ProfileBoxCard
+                        user={{
+                            ...loginUser
+                        }}
+                    />
+                </View>
+
+                <View style={{ gap: 16 }}>
+                    <View style={{ flexDirection: 'row', height: 20, justifyContent: 'flex-start', marginHorizontal: 24 }}>
+                        <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>활동 내역</Text>
+                    </View>
+                    <View style={{ gap: 4 }}>
+                        {myActivities.map((subMenu, index) => {
+                            return (
+                                <Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => { navigation.push('MyPage', { screen: subMenu.link } as ScreenParams<MyPageParamList>) }}>
+                                    <Text style={styles.subMenuTitle}>{subMenu.name}</Text>
+                                    <Icons size={20} name='chevron-forward' color={Color['grey400']} />
+                                </Pressable>)
+                        })}
+                    </View>
+                </View>
+
+                <View style={{ gap: 16 }}>
+                    <View style={{ flexDirection: 'row', height: 20, justifyContent: 'flex-start', marginHorizontal: 24 }}>
+                        <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>내 설정</Text>
+                    </View>
+                    <View style={{ gap: 4 }}>
+                        {settings.map((subMenu, index) => {
+                            return (
+                                <Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => { navigation.push('MyPage', { screen: subMenu.link } as ScreenParams<MyPageParamList>) }}>
+                                    <Text style={styles.subMenuTitle}>{subMenu.name}</Text>
+                                    <Icons size={20} name='chevron-forward' color={Color['grey400']} />
+                                </Pressable>)
+                        })}
+                    </View>
+                </View>
             </View>
-            {myActivities.map((subMenu: subMenu, index: number) => {
-                return (<Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => { navigation.push('MyPage', { screen: subMenu.link } as ScreenParams<MyPageParamList>) }}>
-                    <Text style={styles.subMenuTitle}>{subMenu.name}</Text>
-                    <Icons size={20} name='chevron-forward' color={Color['grey400']} />
-                </Pressable>)
-            })}
-            <View style={{ flexDirection: 'row', height: 20, justifyContent: 'flex-start', marginTop: 20, marginBottom: 16, marginHorizontal: 24 }}>
-                <Text style={{ fontSize: 18, color: Color['grey700'], fontFamily: "NanumSquareNeo-Bold", textAlign: 'left' }}>내 설정</Text>
-            </View>
-            {Settings.map((subMenu: subMenu, index: number) => {
-                return (<Pressable key={subMenu.name + index} style={styles.subMenu} onPress={() => { navigation.push('MyPage', { screen: subMenu.link } as ScreenParams<MyPageParamList>) }}>
-                    <Text style={styles.subMenuTitle}>{subMenu.name}</Text>
-                    <Icons size={20} name='chevron-forward' color={Color['grey400']} />
-                </Pressable>)
-            })}
+
+
             <View style={styles.footer}>
                 <Pressable style={{ paddingBottom: 1, borderBottomWidth: 1, borderBottomColor: Color['grey300'], alignItems: 'center' }}
                     onPress={() => { navigation.push('MyPage', { screen: 'ChangeMyInfo' }) }}>
@@ -101,18 +101,6 @@ const MyPageScreen: React.FC = () => {
 export default MyPageScreen
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        position: 'relative',
-        backgroundColor: 'white',
-    },
-    ProfileContainer: {
-        flex: 1,
-        height: 292,
-        borderRadius: 15,
-        backgroundColor: 'white',
-        width: 352,
-    },
     ProfilePhoto: {
         width: 90,
         height: 120,
@@ -125,24 +113,16 @@ const styles = StyleSheet.create({
         height: 28,
         backgroundColor: Color['grey200']
     },
-    Badge: {
-        width: 80,
-        height: 80,
-        borderRadius: 100,
-    },
     footer: {
-        flex: 1,
         display: 'flex',
         flexDirection: 'column',
         gap: 20,
-        backgroundColor: Color['grey100'],
+        backgroundColor: Color['grey200'],
         alignItems: 'center',
-        height: 200,
         paddingTop: 32,
-        marginTop: 32
+        paddingBottom: 84
     },
     info: {
-        width: 300,
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginVertical: 12,
@@ -151,7 +131,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 40,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginVertical: 4,
         paddingVertical: 8,
     },
     subMenuTitle: {

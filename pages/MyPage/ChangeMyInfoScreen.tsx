@@ -26,6 +26,19 @@ const showApplyCompleteToast = () => {
 
 type ChangeMyInfoNav = NativeStackNavigationProp<MyPageParamList, 'ChangeMyInfo'>
 
+const RoleText: React.FC<{ user: User }> = ({ user }) => {
+    if (user?.role && user?.role.length > 0) {
+        return user.role.map((roleName, index) =>
+        (<>
+            <Text
+                key={roleName}
+                style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'right', color: roleName == '상쇠' ? Color['red500'] : Color['blue500'] }}>{roleName}</Text>
+            {index != user.role.length - 1 && <Text>, </Text>}
+        </>))
+    }
+    return <Text>동아리원</Text>
+}
+
 const ChangeMyInfoScreen: React.FC = () => {
     const navigation = useNavigation<ChangeMyInfoNav>()
     const [isLoading, setLoading] = useState(false);
@@ -37,13 +50,6 @@ const ChangeMyInfoScreen: React.FC = () => {
 
     const [selectedImage, setImageFile] = useState<File | null>(null);
     const [selectedImageUri, setImageUri] = useState<string | null>(null);
-
-
-    const RoleTextRender = () => {
-        if (userData?.role && userData?.role.length > 0) { return [...userData.role] }
-
-        return ["동아리원"]
-    }
 
     const pickImageFromAlbum = async () => {
         // 권한 요청
@@ -201,63 +207,70 @@ const ChangeMyInfoScreen: React.FC = () => {
                                 borderColor: Color['grey300'],
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center'
+                                justifyContent: 'center',
+                                gap: 16
                             }}
                                 onPress={pickImageFromAlbum}>
                                 <Icons name="add" size={48} color={Color['grey300']}></Icons>
+                                <Text style={{ fontFamily: "NanumSquareNeo-Regular", fontSize: 13, color: Color['grey400'] }}>프로필 이미지 추가</Text>
                             </Pressable>}
                     </View>
                     <View style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                        <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 28, justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>이름</Text>
-                            <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{userData.name}</Text>
-                        </View>
-                        <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 28, justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text>
-                            <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{`${userData.club == '신명화랑' ? '신명화랑' : userData.club}` + `(${userData.enrollmentNumber})`}</Text>
-                        </View>
-                        <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 28, justifyContent: 'space-between' }}>
-                            <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>역할</Text>
-                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: 2 }}>
-                                {Array.from(RoleTextRender()).map(role => (
-                                    <Text key={role} style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Bold", textAlign: 'right', color: role == 'SANGSOE' ? Color['red500'] : Color['blue500'], }}>{role}</Text>
-                                ))}
+                        <View style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+                            <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 28, justifyContent: 'space-between' }}>
+                                <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>이름</Text>
+                                <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{userData.name}</Text>
                             </View>
+                            <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 28, justifyContent: 'space-between' }}>
+                                <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>동아리(학번)</Text>
+                                <Text style={{ fontSize: 16, color: Color['grey700'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'right' }}>{`${userData.club == '신명화랑' ? '신명화랑' : userData.club}` + `(${userData.enrollmentNumber})`}</Text>
+                            </View>
+                            <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 28, justifyContent: 'space-between' }}>
+                                <Text style={{ fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left' }}>역할</Text>
+                                <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', gap: 2 }}>
+                                    <RoleText user={userData} />
+                                </View>
+                            </View>
+                        </View>
 
-
-                        </View>
-                        <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 28, justifyContent: 'space-between' }}>
-                            <Text style={{
-                                fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left'
-                            }}>
-                                패명
-                            </Text>
-                            <TextInput
-                                value={nickname}
-                                onChangeText={setNickname}
-                                style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", textAlign: 'right', width: 160, borderBottomWidth: 0.5, paddingVertical: 2, paddingHorizontal: 2 }} />
-                        </View>
-                        <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 28, justifyContent: 'space-between' }}>
-                            <Text style={{
-                                fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left'
-                            }}>
-                                인스타 주소
-                            </Text>
-                            <TextInput
-                                value={instagramUrl}
-                                onChangeText={setInstagramUrl}
-                                style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", textAlign: 'right', width: 160, borderBottomWidth: 0.5, paddingVertical: 2, paddingHorizontal: 2 }} />
-                        </View>
-                        <View style={{ display: 'flex', flexDirection: 'row', marginHorizontal: 28, justifyContent: 'space-between' }}>
-                            <Text style={{
-                                fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left'
-                            }}>
-                                블로그 주소
-                            </Text>
-                            <TextInput
-                                value={blogUrl}
-                                onChangeText={setBlogUrl}
-                                style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", textAlign: 'right', width: 160, borderBottomWidth: 0.5, paddingVertical: 2, paddingHorizontal: 2 }} />
+                        <View style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingVertical: 16, marginHorizontal: 12, paddingHorizontal: 16, backgroundColor: Color['grey100'], borderRadius: 20 }}>
+                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 }}>
+                                <Text style={{
+                                    fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left'
+                                }}>
+                                    패명
+                                </Text>
+                                <TextInput
+                                    value={nickname}
+                                    onChangeText={setNickname}
+                                    placeholder="패명"
+                                    style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", textAlign: 'right', width: 160, borderBottomColor: Color['grey300'], borderBottomWidth: 0.5, padding: 4 }} />
+                            </View>
+                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 }}>
+                                <Text style={{
+                                    fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left'
+                                }}>
+                                    인스타 ID
+                                </Text>
+                                <TextInput
+                                    value={instagramUrl}
+                                    onChangeText={setInstagramUrl}
+                                    placeholder="인스타 ID"
+                                    style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", textAlign: 'right', borderBottomColor: Color['grey300'], width: 160, borderBottomWidth: 0.5, padding: 4 }} />
+                            </View>
+                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 }}>
+                                <Text style={{
+                                    fontSize: 16, color: Color['grey400'], fontFamily: "NanumSquareNeo-Regular", textAlign: 'left'
+                                }}>
+                                    블로그 (네이버 ID)
+                                </Text>
+                                <TextInput
+                                    value={blogUrl}
+                                    onChangeText={setBlogUrl}
+                                    placeholder="네이버 ID"
+                                    style={{ fontSize: 16, fontFamily: "NanumSquareNeo-Regular", textAlign: 'right', width: 160, borderBottomColor: Color['grey300'], borderBottomWidth: 0.5, padding: 4 }} />
+                            </View>
                         </View>
                     </View>
                 </View>

@@ -40,12 +40,10 @@ export const CalendarProvider: React.FC<{ fetchUrl: string, children: React.Reac
         if (participationAvailable) return 'green';//
         return 'red';
     };
-    console.log(sessionDatas)
 
     useEffect(() => {
 
         if (!!sessionDatas) {
-            console.log('changed:' + JSON.stringify(sessionDatas))
 
             const dailyReservationBucket: { [key: number]: { color: string }[] } = {};
             const sessionListBucket: { [key: string]: (BreifSession & { color: string })[] } = {};
@@ -62,7 +60,7 @@ export const CalendarProvider: React.FC<{ fetchUrl: string, children: React.Reac
 
                 } else {
 
-                    dailyReservationBucket[sessionDate] = [...dailyReservationBucket[sessionDate], { ...session, color: colorDefine(session) }];
+                    dailyReservationBucket[sessionDate] = [...dailyReservationBucket[sessionDate], { color: colorDefine(session) }];
 
                 }
 

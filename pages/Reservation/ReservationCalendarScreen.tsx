@@ -11,6 +11,15 @@ import { ReservationStackParamList } from "@hongpung/nav/ReservationStack";
 
 type ReservationType = 'COMMON' | 'REGULAR' | 'EXTERNAL'
 
+interface MonthlyReservation {
+
+    date: string;
+    participationAvailable: boolean;
+    reservationId: number;
+    reservationType: ReservationType;
+
+}
+
 export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDate?: Date }> = ({ onClickDate, calendarDate }) => {
 
     const [calendarMonth, setMonth] = useState(calendarDate ?? new Date())
@@ -26,7 +35,7 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
     }, [])
 
     // 토큰을 불러온 후 useFetch 실행
-    const { data, loading, error } = useFetchUsingToken<any[]>(
+    const { data, loading, error } = useFetchUsingToken<MonthlyReservation[]>(
         `${process.env.EXPO_PUBLIC_BASE_URL}/reservation/month-calendar?year=${calendarMonth.getFullYear()}&month=${calendarMonth.getMonth() + 1}`,
         {
             method: 'GET',
@@ -42,9 +51,11 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
         if (participationAvailable) return 'green';//
         return 'red';
     };
+
+
     useEffect(() => {
         if (data) {
-            const reservedDates: { [key: number]: any[] } = [];
+            const reservedDates: { [key: number]: { color: string }[] } = [];
             data.map((reserve) => {
                 const reserveDate = new Date(reserve.date).getDate();
                 if (!reservedDates[reserveDate]) reservedDates[reserveDate] = [{ color: colorDefine(reserve) }];
@@ -130,13 +141,13 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
             <View style={{ height: 32 }} />
             <View>
                 <View style={{ flexDirection: 'row', marginHorizontal: 32, justifyContent: 'space-around' }}>
-                    <Text style={styles.DayText}>월</Text>
-                    <Text style={styles.DayText}>화</Text>
-                    <Text style={styles.DayText}>수</Text>
-                    <Text style={styles.DayText}>목</Text>
-                    <Text style={styles.DayText}>금</Text>
-                    <Text style={styles.DayText}>토</Text>
-                    <Text style={styles.DayText}>일</Text>
+                    <Text key={'mon'} style={styles.DayText}>월</Text>
+                    <Text key={'tue'} style={styles.DayText}>화</Text>
+                    <Text key={'wed'} style={styles.DayText}>수</Text>
+                    <Text key={'thu'} style={styles.DayText}>목</Text>
+                    <Text key={'fri'} style={styles.DayText}>금</Text>
+                    <Text key={'sat'} style={styles.DayText}>토</Text>
+                    <Text key={'sun'} style={styles.DayText}>일</Text>
                 </View>
                 <View style={{ height: 20 }} />
                 {daysInMonth.map((week, index) => {
@@ -156,7 +167,7 @@ export const Calendar: React.FC<{ onClickDate: (date: Date) => void, calendarDat
                                             <View style={{ marginHorizontal: 2, height: 16, flexDirection: 'column-reverse', marginTop: 4 }}>
                                                 {reservedDates[day] && reservedDates[day].slice(0, 3).map((obj, index) => {
 
-                                                    const color = obj.color + '500';
+                                                    const color = obj.color == 'grey' ? obj.color + '300' : obj.color + '500';
 
                                                     return (
                                                         <View key={calendarMonth.getMonth() + day + index} style={{ height: 4, backgroundColor: Color[color], width: 28, borderRadius: 5, marginTop: 2 }} />
@@ -198,7 +209,7 @@ const ReservationCalendarScreen: React.FC<ReserveCalendarProps> = ({ navigation,
 
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
-            <View style={{ position: 'absolute', right: 32, top: 28, gap:6 }}>
+            <View style={{ position: 'absolute', right: 32, top: 28, gap: 6 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <View style={{ backgroundColor: Color['blue500'], height: 4, width: 20, borderRadius: 5, marginRight: 8 }} />
                     <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>정규 일정</Text>
@@ -212,7 +223,7 @@ const ReservationCalendarScreen: React.FC<ReserveCalendarProps> = ({ navigation,
                     <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>참여 가능</Text>
                 </View>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={{ backgroundColor: Color['grey500'], height: 4, width: 20, borderRadius: 5, marginRight: 8 }} />
+                    <View style={{ backgroundColor: Color['grey300'], height: 4, width: 20, borderRadius: 5, marginRight: 8 }} />
                     <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>외부 예약</Text>
                 </View>
             </View>
