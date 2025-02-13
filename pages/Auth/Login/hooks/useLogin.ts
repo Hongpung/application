@@ -228,8 +228,10 @@ export const useLoginForm = () => {
             navigation.dispatch(StackActions.replace('HomeStack'))
 
         } catch (e: unknown) {
-
+            
             if (e instanceof Error) {
+                console.log(e)
+
                 if ((e.message == 'Check Email Or Password!') || (e.message == '로그인 정보 불일치')) {
                     setFormValidation({ email: { state: 'ERROR', errorText: '' }, password: { state: 'ERROR', errorText: '비밀번호가 틀리거나 가입되지 않은 이메일이에요.' } });
                 }

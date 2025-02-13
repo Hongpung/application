@@ -51,7 +51,7 @@ const BorrowInstrumentSelectScreen: React.FC = () => {
 
     return (
         <View style={{ flex: 1, backgroundColor: '#FFF' }}>
-            <Header leftButton='close' HeaderName='대여 악기 선택'/>
+            <Header leftButton='close' HeaderName='대여 악기 선택' />
             <ScrollView contentContainerStyle={{ flex: 1, backgroundColor: '#FFF' }}>
                 {data && data?.length == 0 ?
                     <View >
@@ -177,7 +177,6 @@ const InstrumentsList: React.FC<{ instrumentsList: InstrumentWithOutBorrowHistor
                                 </Pressable>
                                 {isOpen(type) &&
                                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', paddingHorizontal: 8, rowGap: 16, paddingVertical: 12 }}>
-
                                         {
                                             instruments.map((instrument, index) => {
                                                 return (

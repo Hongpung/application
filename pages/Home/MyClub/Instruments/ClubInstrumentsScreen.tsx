@@ -42,11 +42,12 @@ const InstrumentsList: React.FC<{ instrumentsList: InstrumentWithOutBorrowHistor
 
                     return (
                         <View key={type}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, width: '100%', paddingHorizontal: 8 }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', paddingVertical: 12, width: '100%', paddingHorizontal: 8 }}>
                                 <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, color: Color['grey500'] }}>
                                     {type}
                                 </Text>
                             </View>
+
                             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', paddingHorizontal: 8, rowGap: 16, paddingVertical: 12 }}>
 
                                 {
@@ -75,7 +76,7 @@ const InstrumentsList: React.FC<{ instrumentsList: InstrumentWithOutBorrowHistor
 const ClubInstrumentsScreen: React.FC = () => {
 
     const isFocusing = useIsFocused();
-    
+
     const { data: instruments, loading, error } = useFetchUsingToken<InstrumentWithOutBorrowHistory[]>(
         `${process.env.EXPO_PUBLIC_BASE_URL}/club/my-club/instruments`,
         {
@@ -94,7 +95,7 @@ const ClubInstrumentsScreen: React.FC = () => {
             <ScrollView contentContainerStyle={{
                 backgroundColor: '#fff',
             }}
-            bounces={false}
+                bounces={false}
             >
                 {instruments && <InstrumentsList instrumentsList={instruments} />}
             </ScrollView>

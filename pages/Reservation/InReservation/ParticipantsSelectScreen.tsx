@@ -374,7 +374,7 @@ const ParticipantsSelectScreen: React.FC = () => {
                                 fontFamily: 'NanumSquareNeo-Regular',
                             }}>선택한 인원</Text>
                         </View>
-                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 28, paddingVertical: 12 }}>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 28, paddingVertical: 12, gap:4 }}>
                             {reservation.participators.map(participator => (
                                 <View style={[{
                                     paddingVertical: 4,

@@ -47,7 +47,6 @@ const LoginSettingScreen: React.FC = () => {
                 const prevAutoLogin = await AsyncStorage.getItem('autoLogin') || null
                 setAutoLogin(!!prevAutoLogin || false);
             } catch (e) {
-                console.error(e)
                 setAutoLogin(false)
             }
         }

@@ -136,7 +136,7 @@ const TimeSelectScreen: React.FC = () => {
 
     useEffect(() => {
         {
-            const { startTime, endTime } = reservation.Time;
+            const { startTime, endTime } = reservation.time;
             if (startTime.length > 0 && endTime.length > 0) {
                 const startIdx = times.indexOf(startTime);
                 const endIdx = times.indexOf(endTime);
@@ -270,7 +270,7 @@ const TimeSelectScreen: React.FC = () => {
         reservationSetDate(nextDay);
     }
 
-    if (!reservation.date || !reservation.Time || !data)
+    if (!reservation.date || !reservation.time || !data)
         return (
             <View></View>
         )

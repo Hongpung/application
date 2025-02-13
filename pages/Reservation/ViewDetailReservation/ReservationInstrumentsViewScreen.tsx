@@ -16,46 +16,59 @@ const BorrowInstrumentsList: React.FC<{ instrumentList: InstrumentWithOutBorrowH
 
     const navigation = useNavigation<InstrumentNavParams>();
 
-    const renderInstruments = () => {
-        const rows = [];
-        let cnt = instrumentOrder(instrumentList[0]?.instrumentType) - 1;
-        for (let i = 0; i < instrumentList.length;) {
-            let sliceCnt = 2;
-            if (instrumentList[i].instrumentType != instrumentList[i + 1]?.instrumentType) sliceCnt = 1;
-            const group = instrumentList.slice(i, i + sliceCnt);
-            if (cnt < instrumentOrder(group[0].instrumentType)) {
-                rows.push(
-                    <View key={group[0].instrumentType + 'header'} style={{ marginTop: 16, marginBottom: 16, flexDirection: 'row', alignItems: 'center' }}>
-                        <View style={{ width: 24, height: 24, backgroundColor: Color['grey400'] }} />
-                        <Text style={{ fontSize: 18, color: Color['grey400'], marginLeft: 8 }}>
-                            {group[0].instrumentType}
-                        </Text>
-                    </View>
-                )
-                cnt++;
-            }
+    const orderInstruments = () => {
+        const instrumnentMappedByType: Record<string, InstrumentWithOutBorrowHistory[]> = {
+            "꽹과리": [],
+            "징": [],
+            "장구": [],
+            "북": [],
+            "소고": [],
+            "기타": []
+        };
 
-            rows.push(
-                <View key={i} style={{ height: 168, width: 324, flexDirection: 'row', justifyContent: 'space-between', marginVertical: 4, }}>
-                    {group.map((instrument, index) => (
-                        <InstrumentCard
-                            key={instrument.name + index}
-                            instrument={instrument}
-                            view="inBorrow"
-                            onClickInstrument={(instrument) => { navigation.navigate('MyClub',{screen:'Instruments', params:{ screen: 'InstrumentSpecific', params: { instrumentId: instrument.instrumentId } }}); }}
-                        />
-                    ))}
-                    {group.length % 2 == 1 && <View style={{ height: 168, width: 154 }} />}
-                </View>
-            );
-            i += sliceCnt;
-        }
-        return rows;
+        instrumentList.forEach((instrument) => {
+            if (instrumnentMappedByType[instrument.instrumentType] == undefined)
+                instrumnentMappedByType[instrument.instrumentType] = [];
+            instrumnentMappedByType[instrument.instrumentType].push(instrument);
+        });
+
+        return instrumnentMappedByType;
     };
 
     return (
-        <View style={{ flex: 1 }}>
-            {instrumentList && renderInstruments()}
+        <View style={{ flex: 1, marginHorizontal: 24 }}>
+            {
+                Object.entries(orderInstruments()).map(([type, instruments]) => {
+                    if (instruments.length == 0) return null;
+
+                    return (
+                        <View key={type}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center', paddingVertical: 12, width: '100%', paddingHorizontal: 8 }}>
+                                <Text style={{ fontFamily: 'NanumSquareNeo-Bold', fontSize: 18, color: Color['grey500'] }}>
+                                    {type}
+                                </Text>
+                            </View>
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', paddingHorizontal: 8, rowGap: 16, paddingVertical: 12 }}>
+
+                                {
+                                    instruments.map((instrument, index) => {
+                                        return (
+                                            <InstrumentCard
+                                                key={instrument.name + index}
+                                                instrument={instrument}
+                                                view="inBorrow"
+                                                onClickInstrument={(instrument) => { navigation.navigate('MyClub', { screen: 'Instruments', params: { screen: 'InstrumentSpecific', params: { instrumentId: instrument.instrumentId } } }); }}
+                                            />
+                                        )
+                                    })
+                                }
+
+                            </View>
+
+                        </View>
+                    )
+                })
+            }
         </View>
     )
 }
@@ -81,7 +94,6 @@ const ReservationInstrumentsViewScreen: React.FC<ReservationInstrumentsViewProps
         }}>
             <ScrollView contentContainerStyle={{
                 flexGrow: 1,
-                alignItems: 'center',
                 backgroundColor: '#fff',
             }}>
                 {instrumentList && <BorrowInstrumentsList instrumentList={instrumentList} />}

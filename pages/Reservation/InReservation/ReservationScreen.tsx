@@ -53,8 +53,8 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
     }, [])
 
     const TimeGapText = useMemo(() => {
-        const endTime = Number(reservation.Time.endTime.toString().slice(5, 7)) * 60 + Number(reservation.Time.endTime.toString().slice(7));
-        const startTime = Number(reservation.Time.startTime.toString().slice(5, 7)) * 60 + Number(reservation.Time.startTime.toString().slice(7));
+        const endTime = Number(reservation.time.endTime.toString().slice(5, 7)) * 60 + Number(reservation.time.endTime.toString().slice(7));
+        const startTime = Number(reservation.time.startTime.toString().slice(5, 7)) * 60 + Number(reservation.time.startTime.toString().slice(7));
 
         const timeGap = endTime - startTime;
 
@@ -62,7 +62,7 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
         const minnuteGap = timeGap % 60;
 
         return `${hourGap >= 1 ? `${Math.floor(hourGap)}시간` : ''}${minnuteGap > 0 && hourGap >= 1 ? `\n` : ''}${minnuteGap > 0 ? `${minnuteGap}분` : ''}`
-    }, [reservation.Time])
+    }, [reservation.time])
 
     useEffect(() => {
         const load = async () => {
@@ -130,13 +130,13 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
                         </View>}
                         <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', color: Color['grey700'] }}>{reservation.date && DateString(new Date(reservation.date))}</Text>
                     </View>
-                    {reservation.Time.startTime && reservation.Time.endTime ?
+                    {reservation.time.startTime && reservation.time.endTime ?
                         <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center', justifyContent: 'space-evenly' }}>
-                            <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'] }}>{`${reservation.Time.startTime.toString().slice(5, 7)}:${reservation.Time.startTime.toString().slice(7)}`}</Text>
+                            <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'] }}>{`${reservation.time.startTime.toString().slice(5, 7)}:${reservation.time.startTime.toString().slice(7)}`}</Text>
                             <View style={{ width: 64, paddingVertical: 8, alignItems: 'center', backgroundColor: '#FFF', borderRadius: 5 }}>
                                 <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Light', textAlign: 'center', color: Color['grey700'] }}>{TimeGapText}</Text>
                             </View>
-                            <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'] }}>{`${reservation.Time.endTime.toString().slice(5, 7)}:${reservation.Time.endTime.toString().slice(7)}`}</Text>
+                            <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey700'] }}>{`${reservation.time.endTime.toString().slice(5, 7)}:${reservation.time.endTime.toString().slice(7)}`}</Text>
                         </View> :
                         reservation?.date ?
                             <View style={{ flexDirection: 'row', marginTop: 20, alignItems: 'center', justifyContent: 'space-evenly' }}>
@@ -330,7 +330,7 @@ const ReservationScreen: React.FC<inReservationProps> = ({ navigation, route }) 
                         };
                         if (areReservationsEqual(reservation, preReservation)) showAlert("기존 예약과 동일합니다.");
                         else {
-                            if (reservation.Time.startTime == '') { showAlert("예약 시간이 지정되지 않았습니다.") }
+                            if (reservation.time.startTime == '') { showAlert("예약 시간이 지정되지 않았습니다.") }
                             else {
                                 if (reservationId) navigation.navigate('ReservationEditConfirm')
                                 else navigation.navigate('ReservationConfirm')

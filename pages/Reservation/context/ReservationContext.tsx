@@ -7,7 +7,7 @@ interface ReservationContextProps {
     setPreReservation: (reservation: Reservation) => void;
     reservation: Reservation;
     setReservation: (reservation: Reservation) => void;
-    setDate: (date: Date) => void;
+    setDate: (date: Date | null) => void;
     setTime: (startTime: string, endTime: string) => void;
     setName: (name: string) => void;
     setIsRegular: (isRegular: boolean) => void;
@@ -22,31 +22,31 @@ const ReservationContext = createContext<ReservationContextProps | undefined>(un
 const ReservationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
     const [reservation, setReservation] = useState<Reservation>({
-        userEmail: '',
-        userName: '',
-        Time: { startTime: '', endTime: '' },
-        reservationName: '',
-        isRegular: false,   
-        isParticipatible: true,
-        participators: [],
         borrowInstruments: [],
-        hasToWait: false
+        isParticipatible: false,
+        participators: [],
+        reservationName: '',
+        time: { startTime: '', endTime: '' },
+        reservationType: 'EXTERNAL'
     });
 
     const [preReservation, setPreReservation] = useState<Reservation>({
-        userEmail: '',
-        userName: '',
-        Time: { startTime: '', endTime: '' },
-        reservationName: '',
-        isRegular: false,
-        isParticipatible: true,
-        participators: [],
         borrowInstruments: [],
-        hasToWait: false
+        isParticipatible: false,
+        participators: [],
+        reservationName: '',
+        time: { startTime: '', endTime: '' },
+        reservationType: 'EXTERNAL'
     });
-    
-    const setDate = (date: Date) => { if (date > new Date()) setReservation(prev => ({ ...prev, date })); }
-    const setTime = (startTime: string, endTime: string) => setReservation(prev => ({ ...prev, Time: { startTime, endTime } }));
+
+    const setDate = (date: Date | null) => {
+        if (!date) {
+            setReservation(prev => ({ ...prev, date: undefined }));
+            return;
+        }
+        if (date > new Date()) setReservation(prev => ({ ...prev, date }));
+    }
+    const setTime = (startTime: string, endTime: string) => setReservation(prev => ({ ...prev, time: { startTime, endTime } }));
     const setName = (name: string) => setReservation(prev => ({ ...prev, reservationName: name }));
     const setIsRegular = (isRegular: boolean) => setReservation(prev => ({ ...prev, isRegular }));
     const setIsParticipatible = (isParticipatible: boolean) => setReservation(prev => ({ ...prev, isParticipatible }));

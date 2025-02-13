@@ -131,7 +131,7 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
                         <Icons size={24} name={'caret-forward'} color={Color['grey300']} />
                     </Pressable>
                 </View>
-                {today <= selectedDate &&
+                {(selectedDate > new Date(today.getTime() + 13 * 60 * 60 * 1000)) &&
                     <Pressable
                         onPress={() => {
                             navigation.navigate('ReservationStack', { screen: 'inReservation', params: { date: selectedDate.toISOString().split('T')[0], reservationId: null } });
@@ -167,7 +167,7 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
                                 style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == currentDate.getDate() && { backgroundColor: Color['blue100'] }]}
                                 onPress={() => setDate(currentDate)}
                             >
-                                <Text style={[styles.Date, selectedDate.getDate() == currentDate.getDate() && { color: Color['blue600'] }, selectedDate.getMonth() != currentDate.getMonth() && { color: Color['grey300'] }, today >= currentDate && { color: Color['grey300'] }]}>{currentDate.getDate()}</Text>
+                                <Text style={[styles.Date, selectedDate.getDate() == currentDate.getDate() && { color: Color['blue600'] }, (currentDate <= new Date(today.getTime() + 13 * 60 * 60 * 1000)) && { color: Color['grey300'] }]}>{currentDate.getDate()}</Text>
                             </Pressable>
                         ))}
                     </View>
@@ -227,7 +227,7 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
                                 </View>
                             }
                             {reservation.reservationType == 'REGULAR' ?
-                                Timegap > 30 && 
+                                Timegap > 30 &&
                                 <View style={{ position: 'absolute', top: -4, right: 8, }} >
                                     <Icons size={48} name={'bookmark-sharp'} color={Color['blue500']} />
                                 </View>
@@ -243,8 +243,8 @@ const DailyReservationListScreen: React.FC<DailyReserveProps> = ({ navigation, r
             </ScrollView>
 
             <Modal visible={loading} transparent>
-                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.8)' }}>
-                    <ActivityIndicator size={'large'} color={'#FFF'} />
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center',}}>
+                    <ActivityIndicator size={'large'} color={Color['blue500']} />
                 </View>
             </Modal>
             <View style={{ height: 20 }} />

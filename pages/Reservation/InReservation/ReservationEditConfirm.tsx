@@ -1,4 +1,4 @@
-import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Alert, Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useState } from 'react'
 import LongButton from '@hongpung/components/buttons/LongButton'
 import { Color } from '@hongpung/ColorSet'
@@ -24,7 +24,7 @@ type ReservationEditConfirmNavProp = CompositeNavigationProp<
 const ReservationEditConfirmScreen: React.FC = () => {
 
     const navigation = useNavigation<ReservationEditConfirmNavProp>();
-    const { reservation, preReservation } = useReservation();
+    const { reservation, preReservation, setTime, setDate } = useReservation();
 
     const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
     const [isAgree, setAgree] = useState(false);
@@ -39,10 +39,9 @@ const ReservationEditConfirmScreen: React.FC = () => {
 
     const preReservationDTO = parseToReservationForm(preReservation);
     const newReservationDTO = parseToReservationForm(reservation);
-    console.log(difference)
+
     const ConfirmHandler = () => {
         const editReservation = async () => {
-            console.log(difference)
 
             if (difference?.title && difference?.title.length == 0) {
                 difference.title = `${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`
@@ -54,10 +53,10 @@ const ReservationEditConfirmScreen: React.FC = () => {
             const signal = controller.signal;
             const timeoutId = setTimeout(() => controller.abort(), 5000);
 
+            console.log('sendFormat:'+sendFormat)
             try {
                 const token = await getToken('token');
 
-                console.log(sendFormat)
                 const response = await fetch(
                     `${process.env.EXPO_PUBLIC_BASE_URL}/reservation/${preReservation.reservationId}`
                     , {
@@ -72,7 +71,44 @@ const ReservationEditConfirmScreen: React.FC = () => {
 
                 if (!response.ok) {
                     console.log(response.status + response.statusText)
-                    throw new Error('Network response was not ok');
+
+                    if (response.status == 409) {
+                        Alert.alert('오류', '이 시간에 다른 예약이 생겼어요\n다시 선택해주세요.', [{
+                            text: 'OK',
+                            onPress: () => {
+                                navigation.goBack();
+
+                                setTime('', '')
+                            }
+                        }])
+                        return;
+                    }
+
+                    if (response.status == 403) {
+                        const { message } = await response.json();
+                        if (message == '수정은 전날 22:00까지 가능합니다.')
+                            Alert.alert('오류', '예약의 수정이 불가능한 시간이예요.\n(예약일 전일 22:00까지 가능)', [{
+                                text: 'OK',
+                                onPress: () => {
+                                    navigation.goBack();
+                                    navigation.goBack();
+                                }
+                            }])
+                        else {
+                            Alert.alert('오류', '해당 날짜의 예약이 불가능한 시간이예요.\n(예약일 전일 22:00까지 가능)', [{
+                                text: 'OK',
+                                onPress: () => {
+                                    navigation.goBack()
+                                    // { type: 'pop', payload: { count: 2 } }
+
+                                    setTime('', '')
+                                    setDate(null)
+                                }
+                            }])
+                        }
+                        return;
+                    }
+                    throw new Error('Network response was not ok', { cause: { status: response.status, statusText: response.statusText } });
                 }
 
                 Toast.show({

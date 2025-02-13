@@ -3,20 +3,16 @@ import { User, InstrumentWithOutBorrowHistory } from '@hongpung/UserType'
 export type reservationType = "REGULAR" | "COMMON" | "EXTERNAL"
 
 export interface Reservation {
-    reservationId?: number
     date?: Date
-    Time: { startTime: string, endTime: string }
+    time: { startTime: string, endTime: string }
+    reservationId?: number
     reservationName: string
-    reservationType: reservationType
-    isRegular: boolean
+    reservationType: Omit<reservationType, 'EXTERNAL'>
     isParticipatible: boolean
+    creatorId?: number
+    lastmodified?: Date
     participators: User[]
     borrowInstruments: InstrumentWithOutBorrowHistory[]
-    hasToWait: boolean
-    creatorId?: number
-    userName: string
-    userNickname?: string
-    lastmodified?: Date
     [key: string]: any
 };
 
@@ -91,7 +87,7 @@ export function findReservationDifferences(preReservation: Reservation, newReser
         const newValue = (newResevationForm as any)[key];
 
         if (!deepEqual(oldValue, newValue)) {
-            if (key as keyof ReservationSubmitForm == 'participaterIds') {
+            if (key as keyof ReservationSubmitForm == 'participatorIds') {
                 console.log(oldValue, newValue)
                 const added = newValue.filter((item: number) => !oldValue.includes(item));
                 const removed = oldValue.filter((item: number) => !newValue.includes(item));
@@ -162,8 +158,8 @@ export const parseToReservationDetail = (reservation: Reservation, user: User): 
         email: user.email,  // Reservation 타입에는 없는 필드
         date: reservation.date!.toISOString().split("T")[0],  // `Date` 객체를 `YYYY-MM-DD` 형식으로 변환
         type: reservation.isRegular ? "REGULAR" : "COMMON",  // 예약 유형 변환
-        startTime: reservation.Time.startTime,  // Enum -> HH:MM:SS 변환
-        endTime: reservation.Time.endTime,      // Enum -> HH:MM:SS 변환
+        startTime: reservation.time.startTime,  // Enum -> HH:MM:SS 변환
+        endTime: reservation.time.endTime,      // Enum -> HH:MM:SS 변환
         title: reservation.reservationName,  // 필요시 채워야 함
         participationAvailable: reservation.isParticipatible,
         lastmodified: new Date().toISOString(),  // 현재 시각을 ISO 형식으로 설정
@@ -179,8 +175,8 @@ export const parseToReservationDetail = (reservation: Reservation, user: User): 
  * @returns ReservationSubmitForm 객체
  */
 export const parseToReservationForm = (reservation: Reservation): ReservationSubmitForm => {
-    const startTime = reservation.Time.startTime.slice(-4, -2) + ':' + reservation.Time.startTime.slice(-2);
-    const endTime = reservation.Time.endTime.slice(-4, -2) + ':' + reservation.Time.endTime.slice(-2);
+    const startTime = reservation.time.startTime.slice(-4, -2) + ':' + reservation.time.startTime.slice(-2);
+    const endTime = reservation.time.endTime.slice(-4, -2) + ':' + reservation.time.endTime.slice(-2);
     return {
         date: reservation.date!.toISOString().split("T")[0],  // `Date` 객체를 `YYYY-MM-DD` 형식으로 변환
         reservationType: reservation.isRegular ? "REGULAR" : "COMMON",  // 예약 유형 변환
@@ -209,7 +205,7 @@ export function parseToReservation(reservationDTO: ReservationDTO): Reservation 
         userNickname: reservationDTO.creatorNickname,
         reservationType: reservationDTO.reservationType,
         date: new Date(reservationDTO.date), // `YYYY-MM-DD` 형식을 `Date` 객체로 변환
-        Time: {
+        time: {
             startTime: `TIME_${startHour}${startMinnute}`,  // `HH:MM:SS`를 분 단위 숫자로 변환
             endTime: `TIME_${endHour}${endMinnute}`,
         },
@@ -217,7 +213,7 @@ export function parseToReservation(reservationDTO: ReservationDTO): Reservation 
         isRegular: reservationDTO.type === "정규연습",  // `type`에 따라 정기 예약 여부 판단
         isParticipatible: reservationDTO.participationAvailable,  // 참여 가능 여부 매핑
         participators: reservationDTO.participators?.filter(user => user.memberId != reservationDTO.creatorId) ?? [],  // creator를 제외하고 매핑
-        borrowInstruments: reservationDTO?.borrowedInstruments ?? [],  // 사용 중인 악기 정보는 기본적으로 빈 배열로 설정 (필요시 추가)
+        borrowInstruments: reservationDTO?.borrowInstruments ?? [],  // 사용 중인 악기 정보는 기본적으로 빈 배열로 설정 (필요시 추가)
         hasToWait: false,  // 대기 여부는 기본적으로 false로 설정 (필요시 추가 로직)
         lastmodified: new Date(reservationDTO.lastmodified)
     };

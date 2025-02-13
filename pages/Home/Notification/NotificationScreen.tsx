@@ -1,5 +1,5 @@
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 import { Color } from '../../../ColorSet';
 import Animated, { interpolate, SharedValue, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
@@ -84,11 +84,7 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
 
     const navigation = useNavigation<HomeNavProps>();
 
-    const dragX = useSharedValue<number>(0);
-
-    const animatedStyle = useAnimatedStyle(() => ({
-        opacity: dragX.value < -20 ? 0.2 : 1,
-    }));
+    const [isSwiped, setIsSwiped] = useState(false); // Swipeable 상태 관리
 
     const renderRightActions = (progress: SharedValue<number>, dragXParam: SharedValue<number>, swipeable: SwipeableMethods) => {
         const rightActionAnimatedStyle = useAnimatedStyle(() => {
@@ -136,19 +132,24 @@ const NotificationCard: React.FC<NotificationCard> = ({ notification, onDelete }
         <Swipeable
             renderRightActions={renderRightActions}
             rightThreshold={40} // 오른쪽 스와이프 임계값
-            friction={2} // 스와이프 감도 조절
+            friction={1.5} // 스와이프 감도 조절
             overshootRight={false}
+            onSwipeableWillClose={() => setIsSwiped(false)} 
+            onSwipeableOpenStartDrag={() => setIsSwiped(true)}
         >
-            <Animated.View style={[styles.NotificationCard, animatedStyle]}>
+            <Animated.View style={[styles.NotificationCard]}>
                 <Pressable onPress={() => {
-                    console.log(notification.data.data)
-                    if (notification.data.data?.reservationId) {
+
+                    if (isSwiped) return;
+                    
+                    else if (notification.data.data?.reservationId) {
                         const { reservationId } = notification.data.data;
                         navigation.goBack();
                         navigation.push('Reservation', { screen: 'ReservationDetail', params: { reservationId } })
                     }
-                    if (notification.data.data?.noticeId) {
+                    else if (notification.data.data?.noticeId) {
                         const { noticeId } = notification.data.data;
+                        navigation.goBack();
                         navigation.push('NoticeStack', { screen: 'NoticeDetail', params: { noticeId } })
                     }
                 }}>
@@ -310,7 +311,10 @@ const NotificationScreen: React.FC = () => {
                     Notifications.length > 0 ?
                         <>
                             <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginHorizontal: 28, marginVertical: 8 }}>
-                                <Pressable onPress={handleDeleteAll}>
+                                <Pressable onPress={() => {
+                                    Alert.alert('확인', '알림을 모두 삭제할까요?', [{ text: '닫기' }, { text: '삭제', onPress: handleDeleteAll }])
+
+                                }}>
                                     <Text style={{ fontFamily: "NanumSquareNeo-Regular", color: Color['grey400'], fontSize: 16 }}>전체 삭제</Text>
                                 </Pressable>
                             </View>

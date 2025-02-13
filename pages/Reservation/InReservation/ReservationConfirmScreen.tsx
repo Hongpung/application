@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useState } from 'react'
 import LongButton from '../../../components/buttons/LongButton'
 import { Color } from '../../../ColorSet'
@@ -11,7 +11,7 @@ import { parseToReservationForm, ReservationSubmitForm } from '../ReservationInt
 import { Icons } from '@hongpung/components/common/Icon'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { InReservationStackParamList, ReservationStackParamList } from '@hongpung/nav/ReservationStack'
-import { CompositeNavigationProp, useNavigation } from '@react-navigation/native'
+import { CompositeNavigationProp, StackActions, useNavigation } from '@react-navigation/native'
 import Toast from 'react-native-toast-message'
 import { instrumentTypes } from '@hongpung/UserType'
 
@@ -33,12 +33,11 @@ const ReservationConfirmScreen: React.FC = () => {
         return `${selectedDate.getFullYear()}.${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}.${selectedDate.getDate().toString().padStart(2, '0')}(${daysOfWeek[selectedDate.getDay()]})`;
     }, [])
 
-    const { reservation, setTime } = useReservation();
+    const { reservation, setTime, setDate } = useReservation();
 
     const ConfirmHandler = () => {
         const createReservation = async () => {
 
-            console.log('onclicked')
             const data = parseToReservationForm(reservation) as ReservationSubmitForm
 
             if (data.title.length == 0) {
@@ -54,7 +53,6 @@ const ReservationConfirmScreen: React.FC = () => {
             try {
                 const token = await getToken('token');
 
-                console.log(sendFormat, `${process.env.EXPO_PUBLIC_BASE_URL}/reservation`)
                 const response = await fetch(
                     `${process.env.EXPO_PUBLIC_BASE_URL}/reservation`
                     , {
@@ -69,12 +67,33 @@ const ReservationConfirmScreen: React.FC = () => {
 
                 if (!response.ok) {
                     console.log(response.status + response.statusText)
+
                     if (response.status == 409) {
-                        alert('이 시간에 다른 예약이 생겼어요\n다시 선택해주세요.')
-                        navigation.goBack();
-                        setTime('', '')
+                        Alert.alert('오류', '이 시간에 다른 예약이 생겼어요\n다시 선택해주세요.', [{
+                            text: 'OK',
+                            onPress: () => {
+                                navigation.goBack();
+
+                                setTime('', '')
+                            }
+                        }])
+                        return;
                     }
-                    throw new Error('Network response was not ok');
+
+                    if (response.status == 403) {
+                        Alert.alert('오류', '해당 날짜의 예약이 불가능한 시간이예요.\n(예약일 전일 22:00까지 가능)', [{
+                            text: 'OK',
+                            onPress: () => {
+                                navigation.goBack()
+                                // { type: 'pop', payload: { count: 2 } }
+
+                                setTime('', '')
+                                setDate(null)
+                            }
+                        }])
+                        return;
+                    }
+                    throw new Error('Network response was not ok', { cause: { status: response.status, statusText: response.statusText } });
                 }
                 const result: any = await response.json();
 
@@ -92,7 +111,8 @@ const ReservationConfirmScreen: React.FC = () => {
                     navigation.navigate('DailyReserveList', { date: reservation.date!.toISOString() })
             }
             catch (e) {
-                console.error(e)
+                if (e instanceof Error)
+                    Alert.alert('오류', '알 수 없는 오류가 발생하였습니다.\n다시 시도해주세요.')
             } finally {
                 clearTimeout(timeoutId);
             }
@@ -122,11 +142,11 @@ const ReservationConfirmScreen: React.FC = () => {
             <View style={{ borderRadius: 15, marginHorizontal: 16, paddingHorizontal: 16, paddingVertical: 4, backgroundColor: '#FFF' }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
                     <Text style={styles.leftText}>예약 일자</Text>
-                    <Text style={styles.rightText}>{DateString(reservation.date!)}</Text>
+                    <Text style={styles.rightText}>{reservation.date ? DateString(reservation.date) : ''}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
                     <Text style={styles.leftText}>예약 시간</Text>
-                    <Text style={styles.rightText}>{`${reservation.Time.startTime.toString().slice(5, 7)}:${reservation.Time.startTime.toString().slice(7)} ~ ${reservation.Time.endTime.toString().slice(5, 7)}:${reservation.Time.endTime.toString().slice(7)}`}</Text>
+                    <Text style={styles.rightText}>{`${reservation.time.startTime.toString().slice(5, 7)}:${reservation.time.startTime.toString().slice(7)} ~ ${reservation.time.endTime.toString().slice(5, 7)}:${reservation.time.endTime.toString().slice(7)}`}</Text>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginVertical: 14 }}>
                     <Text style={styles.leftText}>예약자</Text>

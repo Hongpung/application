@@ -157,7 +157,7 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      if (!loginUser) console.log('유저 정보가 없음')
+      if (!loginUser) throw Error('유저 정보가 없음')
 
       turnOffNotification();
 

@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 import { Color } from '@hongpung/ColorSet'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ProfileBoxCard from "@hongpung/components/cards/ProfileBoxCard";
-import { StackActions, useNavigation } from '@react-navigation/native';
+import { StackActions, useIsFocused, useNavigation } from '@react-navigation/native';
 import { Icons } from '@hongpung/components/common/Icon';
 import { MyPageParamList } from '@hongpung/nav/MyPageStack';
 import { MainStackParamList, ScreenParams } from '@hongpung/nav/HomeStacks';
@@ -15,6 +15,7 @@ type MyPageProps = NativeStackNavigationProp<MainStackParamList, 'BottomTab'>;
 
 const MyPageScreen: React.FC = () => {
 
+    const isFocusing = useIsFocused()
     const navigation = useNavigation<MyPageProps>();
 
     const loginUser = useRecoilValue(loginUserState)
@@ -31,9 +32,13 @@ const MyPageScreen: React.FC = () => {
         // { name: '암호 잠금', link: '' }, { name: '앱 설정', link: '' }, //추후 설정
     ], [])
 
-    if (!loginUser) {
+    if (!loginUser && isFocusing) {
         Alert.alert('오류', '로그인 정보가 존재하지 않습니다.\n다시 로그인 해주세요.')
         navigation.dispatch(StackActions.replace('Login'))
+        return (<View></View>)
+    }
+
+    if (!loginUser) {
         return (<View></View>)
     }
 

@@ -53,7 +53,7 @@ const QRScanScreen: React.FC = () => {
         const openUrl = async () => {
             try {
 
-                if (!url.startsWith('https://m.site')) throw Error('invalid Url')
+                if (!url.startsWith('https://hongpung.com')) throw Error('invalid Url')
 
                 Alert.alert(
                     'QR코드 인식 완료',

@@ -44,10 +44,11 @@ export const EmailCheck: React.FC = () => {
     const verificationCodeRef = useRef<any | null>(null)
 
     const verifyingEmailButton = debounce(async () => {
-        if (verificationCodeRef.current?.validate()) {
+        if (verificationCodeValidation.state=='VALID') {
             try {
                 setLoading(true);
                 console.log(passwordResetInfo.email, verificationCode)
+
                 const verified = await verifyingEmail(passwordResetInfo.email, verificationCode);
 
                 if (verified == 201) {

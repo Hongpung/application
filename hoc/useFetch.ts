@@ -1,5 +1,3 @@
-import { getToken } from '@hongpung/utils/TokenHandler';
-import { StackActions, useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
 import { UseFetchOptions, UseFetchResult } from '@hongpung/hoc/types/FetchTypes';
 
