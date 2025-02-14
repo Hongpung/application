@@ -4,13 +4,13 @@ import { StyleSheet, Text, View, Button, Pressable, Linking, Dimensions, Modal, 
 import { CameraType, CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 import QRScanBackDrop from '@hongpung/assets/images/QR_SCAN_BACKDROP.svg';
 import { Color } from '@hongpung/ColorSet';
-import LongButton from '@hongpung/components/buttons/LongButton';
+import LongButton from '@hongpung/src/common/components/buttons/LongButton';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { BlurView } from 'expo-blur';
 import { MainStackParamList } from '@hongpung/nav/HomeStacks';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { debounce } from 'lodash';
-import { Icons } from '@hongpung/components/common/Icon';
+import { Icons } from '@hongpung/src/common/components/Icons/Icon';
 
 
 type QRScanNavProps = NativeStackNavigationProp<MainStackParamList, 'QRScan'>;

@@ -1,4 +1,4 @@
-import useFetchUsingToken from "@hongpung/hoc/useFetchUsingToken";
+import useFetchUsingToken from "@hongpung/src/common/hooks/useFetchUsingToken";
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { BreifSession } from "@hongpung/pages/MyPage/MyPractices/MyPracticesScreen";

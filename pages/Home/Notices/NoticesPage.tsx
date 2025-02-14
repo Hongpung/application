@@ -1,6 +1,6 @@
 import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
+import useFetchUsingToken from '@hongpung/src/common/hooks/useFetchUsingToken'
 import { Color } from '@hongpung/ColorSet'
 import { NoticeStackParamList } from '@hongpung/nav/HomeStacks'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'

@@ -1,5 +1,5 @@
 import { Color } from "@hongpung/ColorSet";
-import { Icons } from "@hongpung/components/common/Icon";
+import { Icons } from "@hongpung/src/common/components/Icons/Icon";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useCalendar } from "./useCalendar.context";
 

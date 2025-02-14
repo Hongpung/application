@@ -3,12 +3,12 @@ import { View, Text, Image, TextInput, KeyboardAvoidingView, TouchableWithoutFee
 import Toast from "react-native-toast-message";
 import { useRecoilState } from "recoil"
 import * as ImagePicker from 'expo-image-picker';
-import { getToken } from "@hongpung/utils/TokenHandler";
+import { getToken } from "@hongpung/src/common/utils/TokenHandler";
 import uploadImage from "@hongpung/utils/uploadImage";
 import { useNavigation } from "@react-navigation/native";
 import { Color } from "@hongpung/ColorSet";
-import LongButton from "@hongpung/components/buttons/LongButton";
-import { Icons } from "@hongpung/components/common/Icon";
+import LongButton from "@hongpung/src/common/components/buttons/LongButton";
+import { Icons } from "@hongpung/src/common/components/Icons/Icon";
 import { loginUserState } from "@hongpung/recoil/authState"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MyPageParamList } from "@hongpung/nav/MyPageStack";

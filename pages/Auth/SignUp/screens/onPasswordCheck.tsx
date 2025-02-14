@@ -2,9 +2,9 @@ import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Vie
 import { useSignUp } from "../context/SignUpContext";
 
 import { useCallback, useRef, useState } from "react";
-import LongButton from "@hongpung/components/buttons/LongButton";
+import LongButton from "@hongpung/src/common/components/buttons/LongButton";
 import { Color } from "@hongpung/ColorSet";
-import { InputBaseComponent } from "@hongpung/components/common/inputs/InputBaseComponent";
+import { InputBaseComponent } from "@hongpung/src/common/components/inputs/InputBaseComponent";
 
 type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
 

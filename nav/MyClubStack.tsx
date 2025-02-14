@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import InstrumentStacks, { ClubInstrumentStackParamList } from "./InstrumentStack";
 import { ScreenParams } from "./HomeStacks";
 
-import Header from '@hongpung/components/common/Header';
+import Header from "@hongpung/src/common/components/header/Header";
 
 import MyClubScreen from "@hongpung/pages/Home/MyClub/MyClubScreen";
 

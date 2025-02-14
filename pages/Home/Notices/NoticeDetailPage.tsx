@@ -1,6 +1,6 @@
 import { ActivityIndicator, Text, View } from 'react-native'
 import React from 'react'
-import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
+import useFetchUsingToken from '@hongpung/src/common/hooks/useFetchUsingToken'
 import { Color } from '@hongpung/ColorSet'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { NoticeStackParamList } from '@hongpung/nav/HomeStacks'

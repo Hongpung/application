@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, Re
 import { View, Text, StyleSheet, TextInput, Animated, Pressable, KeyboardTypeOptions, Dimensions } from 'react-native';
 import { Color } from '@hongpung/ColorSet';
 import { josa } from 'es-hangul';
-import { Icons } from '@hongpung/components/common/Icon';
+import { Icons } from '@hongpung/src/common/components/Icons/Icon';
 
 // 입력 상태 입력전, 입력 중, 입력 완료, 오류
 // 오류 판별은 외부에 일임해야함

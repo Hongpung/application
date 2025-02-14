@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Modal, Pressable, Text, View } from 'react-native'
-import LongButton from '@hongpung/components/buttons/LongButton'
+import LongButton from '@hongpung/src/common/components/buttons/LongButton'
 
 type AlertModalType = React.FC<{
     title: string

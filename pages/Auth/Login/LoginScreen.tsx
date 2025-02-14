@@ -5,9 +5,9 @@ import { debounce } from 'lodash'
 
 import { RootStackParamList } from '@hongpung/pageTypes'
 import { Color } from '@hongpung/ColorSet'
-import LongButton from '@hongpung/components/buttons/LongButton'
+import LongButton from '@hongpung/src/common/components/buttons/LongButton'
 import { LoginForm } from './components/LoginForm'
-import { AlertModal } from '@hongpung/components/AlertModal/AlertModal'
+import { AlertModal } from '@hongpung/src/common/components/alert-modal/AlertModal'
 
 type LoginProps = NativeStackScreenProps<RootStackParamList, "Login">;
 

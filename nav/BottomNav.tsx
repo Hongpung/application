@@ -1,11 +1,11 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import React from 'react';
-import Header from '../components/common/Header';
+import Header from "@hongpung/src/common/components/header/Header";
 import HomeScreen from '../pages/Home/HomeScreen';
 import QRScanScreen from '../pages/QRScan/QRScanScreen';
 import ReservationMainScreen from '../pages/Reservation/ReservationMainScreen';
 import { Color } from '../ColorSet';
-import { Icons } from '@hongpung/components/common/Icon';
+import { Icons } from '@hongpung/src/common/components/Icons/Icon';
 import MyPageScreen from '@hongpung/pages/MyPage/MyPageScreen';
 import MyPageStacks from './MyPageStack';
 

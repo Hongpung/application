@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Animated, Pressable, Text, View, StyleSheet } from "react-native";
-import { Icons } from "./Icon";
+import { Icons } from "../../src/common/components/Icons/Icon";
 import { Color } from "@hongpung/ColorSet";
 import Dropdown from "../dropdown";
 

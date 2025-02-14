@@ -1,4 +1,5 @@
-import Header from "@hongpung/components/common/Header";
+
+import Header from "@hongpung/src/common/components/header/Header";
 import { MainStackParamList } from "@hongpung/nav/HomeStacks";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { View } from "react-native";

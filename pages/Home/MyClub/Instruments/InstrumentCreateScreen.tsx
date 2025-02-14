@@ -2,18 +2,18 @@ import { StyleSheet, TextInput, Text, View, ScrollView, Image, Modal, Pressable,
 import React, { useState } from 'react'
 import { Color } from '../../../../ColorSet';
 import { Instrument, InstrumentCreateDTO, InstrumentType, instrumentTypes } from '../../../../UserType';
-import LongButton from '../../../../components/buttons/LongButton';
+import LongButton from '../../../../src/common/components/buttons/LongButton';
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';
-import { Icons } from '@hongpung/components/common/Icon';
-import { getToken } from '@hongpung/utils/TokenHandler';
+import { Icons } from '@hongpung/src/common/components/Icons/Icon';
+import { getToken } from '@hongpung/src/common/utils/TokenHandler';
 import Toast from 'react-native-toast-message';
 import uploadImages from '@hongpung/utils/uploadImage';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ClubInstrumentStackParamList } from '@hongpung/nav/InstrumentStack';
 import * as ImagePicker from 'expo-image-picker';
-import { Selector } from '@hongpung/components/common/Selector';
+import { DropDown } from '@hongpung/src/common/components/selector/Selector';
 
 const showCreateCompleteToast = () => {
     Toast.show({
@@ -195,7 +195,7 @@ const InstrumentEditScreen: React.FC = () => {
 
                             <View style={[styles.Row, { zIndex: 1 }]}>
                                 <Text style={styles.RowLeft}>{`악기 타입`}</Text>
-                                <Selector
+                                <DropDown
                                     label='악기 종류'
                                     setVisible={setSelectTypeVisible}
                                     onChange={(value) => setInstrument(prev => ({ ...prev, instrumentType: value as InstrumentType }))}
@@ -207,7 +207,7 @@ const InstrumentEditScreen: React.FC = () => {
                                     align='right'
                                 >
                                     <Text style={[styles.RowRight, { width: 120 }]}>{instrument.instrumentType}</Text>
-                                </Selector>
+                                </DropDown>
 
                             </View>
                         </View>

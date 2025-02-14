@@ -1,6 +1,6 @@
 import { StyleSheet, Text, Pressable } from 'react-native'
 import React from 'react';
-import { Color } from '../../ColorSet';
+import { Color } from '../../../../ColorSet';
 
 type ShortButtonProps = {
     innerText: string,

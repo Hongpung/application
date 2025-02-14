@@ -3,13 +3,13 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Color } from '@hongpung/ColorSet';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
-import { Icons } from '@hongpung/components/common/Icon';
+import { Icons } from '@hongpung/src/common/components/Icons/Icon';
 import { loginUserState, TodayReservation, todayReservations } from '@hongpung/recoil/authState';
 import { useRecoilValue } from 'recoil';
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native';
 import { MyPageParamList } from '@hongpung/nav/MyPageStack';
 import { MainStackParamList } from '@hongpung/nav/HomeStacks';
-import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
+import useFetchUsingToken from '@hongpung/src/common/hooks/useFetchUsingToken';
 import { ReservationCardComponent } from '@hongpung/components/home/TodaySchedule';
 import { debounce } from 'lodash';
 

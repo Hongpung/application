@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Alert, Linking, AppState, Modal, ActivityIndica
 import * as Notifications from 'expo-notifications';
 import React, { useEffect, useState } from 'react'
 import { Color } from '@hongpung/ColorSet';
-import CustomSwitch from '@hongpung/components/common/CustomSwitch';
+import CustomSwitch from '@hongpung/src/common/components/switch/CustomSwitch';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNotificationSetting } from '@hongpung/hoc/useNotification';

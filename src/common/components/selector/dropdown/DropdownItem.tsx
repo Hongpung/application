@@ -3,7 +3,7 @@ import React from 'react';
 import { useDropdown } from './Dropdown.context';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Color } from '@hongpung/ColorSet';
-import { Icons } from '@hongpung/components/common/Icon';
+import { Icons } from '@hongpung/src/common/components/Icons/Icon';
 
 interface DropdownItemProps {
     optionValue: string

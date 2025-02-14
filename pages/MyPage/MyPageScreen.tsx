@@ -4,7 +4,7 @@ import { Color } from '@hongpung/ColorSet'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ProfileBoxCard from "@hongpung/components/cards/ProfileBoxCard";
 import { StackActions, useIsFocused, useNavigation } from '@react-navigation/native';
-import { Icons } from '@hongpung/components/common/Icon';
+import { Icons } from '@hongpung/src/common/components/Icons/Icon';
 import { MyPageParamList } from '@hongpung/nav/MyPageStack';
 import { MainStackParamList, ScreenParams } from '@hongpung/nav/HomeStacks';
 import { useRecoilValue } from 'recoil';

@@ -9,7 +9,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import Toast from 'react-native-toast-message';
 import { RecoilRoot } from 'recoil';
 
-import { toastConfig } from './utils/toast.config';
+import { toastConfig } from './src/common/utils/toast.config';
 import { useAppLoad } from './hoc/useAppLoad';
 import { RootStacks } from './nav/RootStack';
 import { Color } from './ColorSet';

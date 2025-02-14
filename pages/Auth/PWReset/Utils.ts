@@ -1,4 +1,4 @@
-import { deleteToken, getToken, saveToken } from "@hongpung/utils/TokenHandler";
+import { deleteToken, getToken, saveToken } from "@hongpung/src/common/utils/TokenHandler";
 
 export const vaildatePassword = (password: string) => {
     const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;

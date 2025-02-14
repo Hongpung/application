@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { UseFetchOptions, UseFetchResult } from '@hongpung/hoc/types/FetchTypes';
+import { UseFetchOptions, UseFetchResult } from '@hongpung/src/common/hooks/types/FetchTypes';
 
 
 const useFetch = <T>(url: string | null, options: UseFetchOptions = {}, timeout: number = 5000, dependencies: any[] = []): UseFetchResult<T> => {

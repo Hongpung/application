@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React, { useState } from 'react'
-import { Color } from '../../ColorSet';
+import { Color } from '../../../../ColorSet';
 
 
 interface CheckBoxProps {

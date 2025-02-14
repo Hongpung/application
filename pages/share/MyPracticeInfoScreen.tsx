@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
 
 
-import LongButton from '@hongpung/components/buttons/LongButton'
-import { Icons } from '@hongpung/components/common/Icon'
+import LongButton from '@hongpung/src/common/components/buttons/LongButton'
+import { Icons } from '@hongpung/src/common/components/Icons/Icon'
 
 import { User } from '@hongpung/UserType'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -13,7 +13,7 @@ import { MyPageParamList } from '@hongpung/nav/MyPageStack'
 import { AttendanceStatus, Session } from '@hongpung/pages/MyPage/MyPractices/MyPracticesScreen'
 
 
-import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken'
+import useFetchUsingToken from '@hongpung/src/common/hooks/useFetchUsingToken'
 import ProfileMiniCard from '@hongpung/components/cards/ProfileMiniCard'
 
 const { width, height } = Dimensions.get('window')

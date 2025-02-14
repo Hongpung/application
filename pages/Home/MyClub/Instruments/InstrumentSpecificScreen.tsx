@@ -4,7 +4,7 @@ import { useIsFocused } from '@react-navigation/native';
 
 import { Color } from '@hongpung/ColorSet';
 import { Instrument } from '@hongpung/UserType';
-import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
+import useFetchUsingToken from '@hongpung/src/common/hooks/useFetchUsingToken';
 import Header from '@hongpung/components/common/Header';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ClubInstrumentStackParamList } from '@hongpung/nav/InstrumentStack';

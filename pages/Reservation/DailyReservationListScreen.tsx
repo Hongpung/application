@@ -2,9 +2,9 @@ import { ActivityIndicator, Dimensions, Modal, Pressable, ScrollView, StyleSheet
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useIsFocused } from '@react-navigation/native';
 
-import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
+import useFetchUsingToken from '@hongpung/src/common/hooks/useFetchUsingToken';
 import { Color } from '@hongpung/ColorSet';
-import { Icons } from '@hongpung/components/common/Icon';
+import { Icons } from '@hongpung/src/common/components/Icons/Icon';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ReservationStackParamList } from '@hongpung/nav/ReservationStack';

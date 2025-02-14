@@ -2,7 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 
-import Header from '@hongpung/components/common/Header';
+import Header from "@hongpung/src/common/components/header/Header";
 
 //screens
 import NotificationScreen from '@hongpung/pages/Home/Notification/NotificationScreen';

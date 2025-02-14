@@ -12,6 +12,7 @@
     "noEmit": true,
     "paths": {
       "@hongpung/*": ["./*"],
+      "@src/*":["./src/*"]
     }
   },
   "include": [

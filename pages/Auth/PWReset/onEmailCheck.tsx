@@ -1,13 +1,13 @@
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View, Text, Modal, ActivityIndicator } from "react-native"
 import { usePasswordReset } from "./context/PWResetContext"
 import { useCallback, useRef, useState } from "react";
-import LongButton from "@hongpung/components/buttons/LongButton";
+import LongButton from "@hongpung/src/common/components/buttons/LongButton";
 
 import { Color } from "@hongpung/ColorSet";
 import { verifyingEmail } from "./Utils";
 import { showEmailVirificationCompleteToast, showExpiredCodeToast, showProblemToast, showUncorrectCodeToast } from "./toasts/sign-up-toast";
-import PWResetEmailInput from "@hongpung/components/common/inputs/PWResetEmailInput";
-import { InputBaseComponent } from "@hongpung/components/common/inputs/InputBaseComponent";
+import PWResetEmailInput from "@hongpung/src/common/components/inputs/PWResetEmailInput";
+import { InputBaseComponent } from "@hongpung/src/common/components/inputs/InputBaseComponent";
 import { debounce } from "lodash";
 
 

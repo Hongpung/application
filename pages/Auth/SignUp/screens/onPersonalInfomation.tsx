@@ -5,12 +5,12 @@ import { Club, clubIds, clubs } from "@hongpung/UserType";
 import { useRef, useState } from "react";
 import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, TouchableWithoutFeedback, View, Text, Pressable, ScrollView, Modal, ActivityIndicator, Dimensions, TextInput } from "react-native";
 import { useSignUp } from "../context/SignUpContext";
-import LongButton from "@hongpung/components/buttons/LongButton";
-import ShortButton from "@hongpung/components/buttons/ShortButton";
+import LongButton from "@hongpung/src/common/components/buttons/LongButton";
+import ShortButton from "@hongpung/src/common/components/buttons/ShortButton";
 import { showSignUpCompleteToast } from "../toasts/sign-up-toast";
 import { useNavigation } from "@react-navigation/native";
-import { InputBaseComponent } from '@hongpung/components/common/inputs/InputBaseComponent';
-import { ClubSelector } from '@hongpung/components/common/Selector';
+import { InputBaseComponent } from '@hongpung/src/common/components/inputs/InputBaseComponent';
+import { ClubSelector } from '@hongpung/src/common/components/selector/Selector';
 
 const { width } = Dimensions.get('window');
 type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }

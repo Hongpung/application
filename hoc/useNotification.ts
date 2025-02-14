@@ -1,5 +1,5 @@
 import { registerForPushNotificationsAsync } from "@hongpung/utils/NotificationToken";
-import { getToken } from "@hongpung/utils/TokenHandler";
+import { getToken } from "@hongpung/src/common/utils/TokenHandler";
 import * as Notifications from 'expo-notifications';
 
 export const useNotificationSetting = () => {

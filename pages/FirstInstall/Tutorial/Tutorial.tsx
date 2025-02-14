@@ -5,8 +5,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from '@react-navigation/native';
 import PagerView from 'react-native-pager-view';
 
-import ShortButton from '@hongpung/components/buttons/ShortButton';
-import LongButton from '@hongpung/components/buttons/LongButton';
+import ShortButton from '@hongpung/src/common/components/buttons/ShortButton';
+import LongButton from '@hongpung/src/common/components/buttons/LongButton';
 import { Color } from '@hongpung/ColorSet';
 import { RootStackParamList } from '@hongpung/pageTypes';
 

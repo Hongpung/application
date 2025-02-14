@@ -1,13 +1,13 @@
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View, Text, Modal, ActivityIndicator } from "react-native"
 import { useSignUp } from "../context/SignUpContext"
 import { useCallback, useRef, useState } from "react";
-import LongButton from "@hongpung/components/buttons/LongButton";
-import SignUpEmailInput from "@hongpung/components/common/inputs/SignupEmailInput";
+import LongButton from "@hongpung/src/common/components/buttons/LongButton";
+import SignUpEmailInput from "@hongpung/src/common/components/inputs/SignupEmailInput";
 import { Color } from "@hongpung/ColorSet";
 import { verifyingEmail } from "../Utils";
 import { showEmailVirificationCompleteToast, showExpiredCodeToast, showProblemToast, showUncorrectCodeToast } from "../toasts/sign-up-toast";
 import { debounce } from "lodash";
-import { InputBaseComponent } from "@hongpung/components/common/inputs/InputBaseComponent";
+import { InputBaseComponent } from "@hongpung/src/common/components/inputs/InputBaseComponent";
 
 type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
 

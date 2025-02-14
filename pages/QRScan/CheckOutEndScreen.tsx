@@ -1,7 +1,7 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Color } from '../../ColorSet'
-import LongButton from '../../components/buttons/LongButton'
+import LongButton from '../../src/common/components/buttons/LongButton'
 import LottieView from 'lottie-react-native'
 
 import Clab from '@hongpung/assets/lotties/Clab.json';

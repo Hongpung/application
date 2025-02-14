@@ -1,6 +1,6 @@
 import { Animated, View, StyleSheet, Pressable } from 'react-native'
 import React, { useCallback, useRef, useState } from 'react'
-import { Color } from '../../ColorSet'
+import { Color } from '../../../../ColorSet'
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 /**

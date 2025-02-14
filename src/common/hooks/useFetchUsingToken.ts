@@ -1,7 +1,7 @@
-import { getToken } from '@hongpung/utils/TokenHandler';
+import { getToken } from '@hongpung/src/common/utils/TokenHandler';
 import { StackActions, useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
-import { UseFetchOptions, UseFetchResult } from '@hongpung/hoc/types/FetchTypes';
+import { UseFetchOptions, UseFetchResult } from '@hongpung/src/common/hooks/types/FetchTypes';
 
 
 const useFetchUsingToken = <T>(url: string | null, options: UseFetchOptions = {}, timeout: number = 5000, dependencies: any[] = []): UseFetchResult<T> => {

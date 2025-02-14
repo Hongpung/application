@@ -4,13 +4,13 @@ import { Color } from '@hongpung/ColorSet'
 
 import { debounce } from 'lodash';
 import { useAuth } from '@hongpung/hoc/useAuth';
-import { Icons } from '@hongpung/components/common/Icon';
+import { Icons } from '@hongpung/src/common/components/Icons/Icon';
 import * as Notifications from 'expo-notifications'
 
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useOnReserve, loginUserState } from '@hongpung/recoil/authState';
 import NoticePartition from '@hongpung/components/home/Notice';
-import Banner from '@hongpung/components/home/Banner';
+import Banner from '@src/features/banner/ui/Banner';
 import TodaySchedule from '@hongpung/components/home/TodaySchedule';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '@hongpung/nav/HomeStacks';
@@ -18,9 +18,9 @@ import { StackActions, useIsFocused, useNavigation } from '@react-navigation/nat
 import Toast from 'react-native-toast-message';
 import { io } from 'socket.io-client';
 
-import LongButton from '@hongpung/components/buttons/LongButton';
+import LongButton from '@hongpung/src/common/components/buttons/LongButton';
 import { onUseSession } from '@hongpung/recoil/sessionState';
-import { getToken } from '@hongpung/utils/TokenHandler';
+import { getToken } from '@hongpung/src/common/utils/TokenHandler';
 
 import { ClubBanner } from '@hongpung/components/home/ClubBanner';
 

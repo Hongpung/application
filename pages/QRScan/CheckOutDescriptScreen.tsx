@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useRef, useState } from 'react'
-import LongButton from '@hongpung/components/buttons/LongButton';
+import LongButton from '@hongpung/src/common/components/buttons/LongButton';
 import { Color } from '@hongpung/ColorSet';
 import PagerView from 'react-native-pager-view';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';

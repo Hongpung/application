@@ -3,9 +3,9 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { throttle } from 'lodash';
-import { Icons } from '@hongpung/components/common/Icon';
+import { Icons } from '@hongpung/src/common/components/Icons/Icon';
 import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack';
-import useFetchUsingToken from '@hongpung/hoc/useFetchUsingToken';
+import useFetchUsingToken from '@hongpung/src/common/hooks/useFetchUsingToken';
 import { User } from '@hongpung/UserType';
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';

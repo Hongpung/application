@@ -1,8 +1,8 @@
 import { View } from "react-native"
 import { useLoginForm } from "../hooks/useLogin"
-import { InputBaseComponent } from "@hongpung/components/common/inputs/InputBaseComponent"
-import CheckboxComponent from "@hongpung/components/checkboxs/CheckboxComponent"
-import LongButton from "@hongpung/components/buttons/LongButton"
+import { InputBaseComponent } from "@hongpung/src/common/components/inputs/InputBaseComponent"
+import CheckboxComponent from "@hongpung/src/common/components/checkboxs/CheckboxComponent"
+import LongButton from "@hongpung/src/common/components/buttons/LongButton"
 
 export const LoginForm: React.FC = () => {
 

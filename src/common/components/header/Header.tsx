@@ -2,9 +2,9 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React, { ComponentProps } from 'react'
 import { useNavigation } from "@react-navigation/native";
-import { Color } from '../../ColorSet';
+import { Color } from '@hongpung/ColorSet';
 import { Ionicons } from '@expo/vector-icons';
-import { Icons } from './Icon';
+import { Icons } from '@src/common/components/Icons/Icon';
 
 interface HeaderProps {
     leftButton: ComponentProps<typeof Ionicons>['name'] | null

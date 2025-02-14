@@ -1,7 +1,7 @@
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { Color } from '@hongpung/ColorSet'
-import LongButton from '@hongpung/components/buttons/LongButton';
+import LongButton from '@hongpung/src/common/components/buttons/LongButton';
 import { RootStackParamList } from '@hongpung/pageTypes';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -10,7 +10,7 @@ import { Camera } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Icons } from '@hongpung/components/common/Icon';
+import { Icons } from '@hongpung/src/common/components/Icons/Icon';
 import { useNavigation } from '@react-navigation/native';
 
 type PermissionProp = NativeStackNavigationProp<RootStackParamList, "Permission">;

@@ -12,7 +12,7 @@ interface DropdownProps {
     children: React.ReactNode;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ label, value, visible, onChange, setVisible, children }) => {
+const DropdownContainer: React.FC<DropdownProps> = ({ label, value, visible, onChange, setVisible, children }) => {
     return (
         <DropdownProvider value={value} visible={visible} setVisible={setVisible} setValue={onChange}>
             <View>
@@ -22,4 +22,4 @@ const Dropdown: React.FC<DropdownProps> = ({ label, value, visible, onChange, se
     );
 };
 
-export default Dropdown;
+export default DropdownContainer;

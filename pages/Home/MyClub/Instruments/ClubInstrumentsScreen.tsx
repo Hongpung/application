@@ -5,7 +5,7 @@ import { useIsFocused, useNavigation } from "@react-navigation/native"
 import InstrumentCard from "@hongpung/components/cards/InstrumentCard"
 import { InstrumentWithOutBorrowHistory, instrumentOrder } from "@hongpung/UserType"
 import { Color } from "@hongpung/ColorSet"
-import useFetchUsingToken from "@hongpung/hoc/useFetchUsingToken"
+import useFetchUsingToken from "@hongpung/src/common/hooks/useFetchUsingToken"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { ClubInstrumentStackParamList } from "@hongpung/nav/InstrumentStack"
 

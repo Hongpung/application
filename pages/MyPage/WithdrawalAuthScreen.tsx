@@ -1,11 +1,11 @@
 import { Keyboard, KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import React, { useCallback, useRef, useState } from 'react'
 import { Color } from '@hongpung/ColorSet';
-import { InputBaseComponent } from '@hongpung/components/common/inputs/InputBaseComponent';
-import LongButton from '@hongpung/components/buttons/LongButton';
+import { InputBaseComponent } from '@hongpung/src/common/components/inputs/InputBaseComponent';
+import LongButton from '@hongpung/src/common/components/buttons/LongButton';
 import { TextInput } from 'react-native-gesture-handler';
-import ShortButton from '@hongpung/components/buttons/ShortButton';
-import { deleteToken, getToken } from '@hongpung/utils/TokenHandler';
+import ShortButton from '@hongpung/src/common/components/buttons/ShortButton';
+import { deleteToken, getToken } from '@hongpung/src/common/utils/TokenHandler';
 import Toast from 'react-native-toast-message';
 import { loginUserState } from '@hongpung/recoil/authState';
 import { useRecoilState } from 'recoil';

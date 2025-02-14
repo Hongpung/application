@@ -1,13 +1,13 @@
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View, Text } from "react-native";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import LongButton from "@hongpung/components/buttons/LongButton";
+import LongButton from "@hongpung/src/common/components/buttons/LongButton";
 import { Color } from "@hongpung/ColorSet";
 import { changePassword } from "./Utils";
 import { useNavigation } from "@react-navigation/native";
-import { deleteToken } from "@hongpung/utils/TokenHandler";
+import { deleteToken } from "@hongpung/src/common/utils/TokenHandler";
 import Toast from "react-native-toast-message";
-import { InputBaseComponent } from "@hongpung/components/common/inputs/InputBaseComponent";
+import { InputBaseComponent } from "@hongpung/src/common/components/inputs/InputBaseComponent";
 import { TextInput } from "react-native-gesture-handler";
 
 type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }

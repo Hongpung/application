@@ -3,14 +3,14 @@ import React, { useEffect, useState } from 'react'
 
 import ImageViewer from 'react-native-image-zoom-viewer';
 import { Color } from '../../ColorSet';
-import Header from '@hongpung/components/common/Header';
+import Header from "@hongpung/src/common/components/header/Header";
 import { loginUserState, useOnReserve } from '@hongpung/recoil/authState';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { onUseSession } from '@hongpung/recoil/sessionState';
 import { StackActions, useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CheckOutStackParamList } from '@hongpung/nav/HomeStacks';
-import { getToken } from '@hongpung/utils/TokenHandler';
+import { getToken } from '@hongpung/src/common/utils/TokenHandler';
 import { useCheckOut } from './context/useCheckOutContext';
 
 const { width } = Dimensions.get('window');

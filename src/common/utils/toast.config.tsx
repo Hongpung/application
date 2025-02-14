@@ -1,4 +1,4 @@
-import { Icons } from '@hongpung/components/common/Icon';
+import { Icons } from '@hongpung/src/common/components/Icons/Icon';
 import { Color } from '@hongpung/ColorSet';
 import { View, TouchableOpacity, Text, Pressable } from 'react-native';
 import Toast, { BaseToastProps } from 'react-native-toast-message';
