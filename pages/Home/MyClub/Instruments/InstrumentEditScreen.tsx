@@ -2,15 +2,15 @@ import { StyleSheet, TextInput, Text, View, ScrollView, Image, Modal, Pressable,
 import React, { useState } from 'react'
 import { Color } from '../../../../ColorSet';
 import { Instrument, InstrumentCreateDTO, InstrumentEditDTO, InstrumentType, instrumentTypes } from '../../../../UserType';
-import LongButton from '../../../../src/common/components/buttons/LongButton';
+import LongButton from '../../../../src/common/components/buttons/long-button';
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';
-import { Icons } from '@hongpung/src/common/components/Icons/Icon';
-import { getToken } from '@hongpung/src/common/utils/TokenHandler';
+import { Icons } from '@hongpung/src/common/components/icons/Icon';
+import { getToken } from '@hongpung/src/common/lib/TokenHandler';
 import Toast from 'react-native-toast-message';
 import uploadImage from '@hongpung/utils/uploadImage';
 import * as ImagePicker from 'expo-image-picker';
-import CustomSwitch from '@hongpung/src/common/components/switch/CustomSwitch';
+import CustomSwitch from '@hongpung/src/common/components/switch/switch';
 import { DropDown } from '@hongpung/src/common/components/selector/Selector';
 import { head } from 'lodash';
 

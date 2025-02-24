@@ -1,7 +1,7 @@
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { loginUserState, TodayReservation, todayReservations, useOnReserve } from '@hongpung/recoil/authState';
 import { User } from '@hongpung/UserType';
-import { deleteToken, getToken, saveToken } from '@hongpung/src/common/utils/TokenHandler';
+import { deleteToken, getToken, saveToken } from '@hongpung/src/common/lib/TokenHandler';
 
 import { StackActions, useNavigation } from '@react-navigation/native';
 import { useNotificationSetting } from './useNotification';

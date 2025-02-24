@@ -2,11 +2,11 @@ import { StyleSheet, TextInput, Text, View, ScrollView, Image, Modal, Pressable,
 import React, { useState } from 'react'
 import { Color } from '../../../../ColorSet';
 import { Instrument, InstrumentCreateDTO, InstrumentType, instrumentTypes } from '../../../../UserType';
-import LongButton from '../../../../src/common/components/buttons/LongButton';
+import LongButton from '../../../../src/common/components/buttons/long-button';
 import { useRecoilValue } from 'recoil';
 import { loginUserState } from '@hongpung/recoil/authState';
-import { Icons } from '@hongpung/src/common/components/Icons/Icon';
-import { getToken } from '@hongpung/src/common/utils/TokenHandler';
+import { Icons } from '@hongpung/src/common/components/icons/Icon';
+import { getToken } from '@hongpung/src/common/lib/TokenHandler';
 import Toast from 'react-native-toast-message';
 import uploadImages from '@hongpung/utils/uploadImage';
 import { useNavigation } from '@react-navigation/native';

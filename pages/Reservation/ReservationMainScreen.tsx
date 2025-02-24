@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BlurView } from 'expo-blur';
 
 import { Color } from '@hongpung/ColorSet'
-import { Icons } from '@hongpung/src/common/components/Icons/Icon';
+import { Icons } from '@hongpung/src/common/components/icons/Icon';
 
 import { CompositeNavigationProp, useIsFocused, useNavigation } from '@react-navigation/native';
 import { io } from 'socket.io-client';
@@ -13,7 +13,7 @@ import { BottomTabParamList } from '@hongpung/nav/BottomNav';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '@hongpung/nav/HomeStacks';
 import { RealtimeSession, ReservationSession } from './SessionTypes';
-import { getToken } from '@hongpung/src/common/utils/TokenHandler';
+import { getToken } from '@hongpung/src/common/lib/TokenHandler';
 
 const { width, height } = Dimensions.get('window');
 

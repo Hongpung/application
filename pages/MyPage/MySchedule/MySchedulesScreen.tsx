@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Color } from '@hongpung/ColorSet';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
-import { Icons } from '@hongpung/src/common/components/Icons/Icon';
+import { Icons } from '@hongpung/src/common/components/icons/Icon';
 import { loginUserState, TodayReservation, todayReservations } from '@hongpung/recoil/authState';
 import { useRecoilValue } from 'recoil';
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native';

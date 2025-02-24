@@ -7,11 +7,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { MainStackParamList } from '@hongpung/nav/HomeStacks';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { loginUserState, TodayReservation, todayReservations } from '@hongpung/recoil/authState';
-import { Icons } from '../../src/common/components/Icons/Icon';
+import { Icons } from '../../src/common/components/icons/Icon';
 import { BlurView } from 'expo-blur';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { NotificationIcon } from './NotificationIcon';
-import { getToken } from '@hongpung/src/common/utils/TokenHandler';
+import { getToken } from '@hongpung/src/common/lib/TokenHandler';
 
 const { width } = Dimensions.get('window')
 

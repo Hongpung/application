@@ -2,11 +2,11 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { useSignUp } from '@hongpung/pages/Auth/SignUp/context/SignUpContext';
 import { Color } from '@hongpung/ColorSet';
-import { Icons } from '@hongpung/src/common/components/Icons/Icon';
+import { Icons } from '@hongpung/src/common/components/icons/Icon';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@hongpung/pageTypes';
 import { useNavigation } from '@react-navigation/native';
-import LongButton from '@hongpung/src/common/components/buttons/LongButton';
+import LongButton from '@hongpung/src/common/components/buttons/long-button';
 
 type SginUpNavProp = NativeStackNavigationProp<RootStackParamList, "SignUp">;
 

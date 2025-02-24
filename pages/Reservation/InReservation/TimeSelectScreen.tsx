@@ -1,11 +1,11 @@
 import { ActivityIndicator, Dimensions, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Color } from '@hongpung/ColorSet';
-import LongButton from '@hongpung/src/common/components/buttons/LongButton';
+import LongButton from '@hongpung/src/common/components/buttons/long-button';
 import { useReservation } from '@hongpung/pages/Reservation/context/ReservationContext';
-import ShortButton from '@hongpung/src/common/components/buttons/ShortButton';
+import ShortButton from '@hongpung/src/common/components/buttons/short-button';
 import useFetchUsingToken from '@hongpung/src/common/hooks/useFetchUsingToken';
-import { Icons } from '@hongpung/src/common/components/Icons/Icon';
+import { Icons } from '@hongpung/src/common/components/icons/Icon';
 import { InReservationStackParamList } from '@hongpung/nav/ReservationStack';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';

@@ -1,6 +1,6 @@
 import { View, Text, Pressable } from "react-native"
 import { Color } from "@hongpung/ColorSet"
-import { Icons } from "@hongpung/src/common/components/Icons/Icon"
+import { Icons } from "@hongpung/src/common/components/icons/Icon"
 import { useMemo } from "react"
 import { BreifSession } from "@hongpung/pages/Home/MyPage/MyPractices/MyPracticesScreen"
 

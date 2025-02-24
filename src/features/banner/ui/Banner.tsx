@@ -1,20 +1,18 @@
-import { NativeSyntheticEvent, Pressable, StyleSheet, Text, View, Image, Linking } from 'react-native'
+import { NativeSyntheticEvent, StyleSheet, Text, View, Image } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useRecoilValue } from 'recoil';
 import { bannersState } from '@src/entities/banner';
 
-import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import PagerView from 'react-native-pager-view';
 import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/specs/PagerViewNativeComponent';
 
-import { Icons } from '@hongpung/src/common/components/Icons/Icon';
 import { Color } from '@hongpung/ColorSet';
 import { MainStackParamList } from '@hongpung/nav/HomeStacks';
-import BannerItem from './BannerItem';
-import BannerIndicator from './BannerIndicater';
+import BannerItem from './banner-item';
+import BannerIndicator from './banner-indicator';
 
 
 type BannerNavParams = NativeStackNavigationProp<MainStackParamList, 'Home'>
@@ -28,7 +26,7 @@ const BlankBanner: React.FC = () => {
             </View>
             <View style={{ position: 'absolute', bottom: 30, left: 22 }}>
                 <Text style={{ fontFamily: 'NanumSquareNeo-Bold', color: '#FFF', fontSize: 12 }}>
-                    {`의장에게 배너 등록을 요청할 수 있어요!\n비용은 없습니다!`}
+                    {`의장에게 배너 등록을 요청할 수 있어요!\n별도의 비용은 없습니다.`}
                 </Text>
             </View>
         </View>
@@ -39,7 +37,7 @@ const Banner: React.FC<{ withIndicator?: boolean }> = ({ withIndicator = true })
 
     const banners = useRecoilValue(bannersState);
 
-    const [bannerNum, setBannerNum] = useState(0);
+    const [bannerCount, setBannerCount] = useState(0);
 
     const pagerRef = useRef<PagerView>(null);//러페런스 추가
 
@@ -49,28 +47,28 @@ const Banner: React.FC<{ withIndicator?: boolean }> = ({ withIndicator = true })
         const { position } = e.nativeEvent;
 
         if (position === 0) {
-            setBannerNum(banners.value!.length - 1);
+            setBannerCount(banners.value!.length - 1);
             setTimeout(() => {
                 pagerRef.current?.setPageWithoutAnimation(banners.value!.length);
             }, 200)
         } else if (position === banners.value!.length + 1) {
-            setBannerNum(0);
+            setBannerCount(0);
             setTimeout(() => {
                 pagerRef.current?.setPageWithoutAnimation(1);
             }, 200)
         } else {
-            setBannerNum(position - 1)
+            setBannerCount(position - 1)
         }
     }, [banners])
 
     useEffect(() => {
         const interval = setInterval(() => {
-            const nextPage = (bannerNum + 1 + 1);//+1은 보정치 (맨앞에 중첩 배너 있음) +1 은 증가치
+            const nextPage = (bannerCount + 1 + 1);//+1은 보정치 (맨앞에 중첩 배너 있음) +1 은 증가치
             pagerRef.current?.setPage(nextPage);
         }, 5000); // 5초 간격
 
         return () => clearInterval(interval); // 컴포넌트 언마운트 시 타이머 정리
-    }, [bannerNum, bannerMass]);
+    }, [bannerCount, bannerMass]);
 
     if (banners.status != 'LOADED' || !banners.value || !bannerMass) return (
         <View style={styles.bannerContainer}>
@@ -114,7 +112,9 @@ const Banner: React.FC<{ withIndicator?: boolean }> = ({ withIndicator = true })
                                     </View>
 
                                     {banners.value.map((banner, index) => (
-                                        <BannerItem key={`${banner.bannerId}-${index}`} banner={banner} />
+                                        <BannerItem
+                                            onBannerPress={()=>}
+                                            key={`${banner.bannerId}-${index}`} banner={banner} />
                                     ))}
 
                                     <View style={{ flex: 1 }}>
@@ -125,7 +125,7 @@ const Banner: React.FC<{ withIndicator?: boolean }> = ({ withIndicator = true })
 
                                 </PagerView>
                                 {withIndicator &&
-                                    <BannerIndicator bannerIdx={bannerNum} bannerMass={bannerMass} />}
+                                    <BannerIndicator bannerIdx={bannerCount} bannerMass={bannerMass} />}
                             </>
                             :
                             <BannerItem key={`${banners.value[0].bannerId}-1`} banner={banners.value[0]} />

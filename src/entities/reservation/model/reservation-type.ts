@@ -1,0 +1,1 @@
+export type ReservationType = "REGULAR" | "COMMON" | "EXTERNAL"

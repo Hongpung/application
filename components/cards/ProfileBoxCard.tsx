@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, Pressable, Linking } from "react-native"
 
 import { Color } from "@hongpung/ColorSet"
 import { User } from "@hongpung/UserType"
-import { Icons } from "@hongpung/src/common/components/Icons/Icon"
+import { Icons } from "@hongpung/src/common/components/icons/Icon"
 
 
 interface ProfileBoxProps {

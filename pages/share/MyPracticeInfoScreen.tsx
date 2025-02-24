@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
 
 
-import LongButton from '@hongpung/src/common/components/buttons/LongButton'
-import { Icons } from '@hongpung/src/common/components/Icons/Icon'
+import LongButton from '@hongpung/src/common/components/buttons/long-button'
+import { Icons } from '@hongpung/src/common/components/icons/Icon'
 
 import { User } from '@hongpung/UserType'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'

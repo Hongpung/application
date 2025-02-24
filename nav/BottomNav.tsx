@@ -5,7 +5,7 @@ import HomeScreen from '../pages/Home/HomeScreen';
 import QRScanScreen from '../pages/QRScan/QRScanScreen';
 import ReservationMainScreen from '../pages/Reservation/ReservationMainScreen';
 import { Color } from '../ColorSet';
-import { Icons } from '@hongpung/src/common/components/Icons/Icon';
+import { Icons } from '@hongpung/src/common/components/icons/Icon';
 import MyPageScreen from '@hongpung/pages/MyPage/MyPageScreen';
 import MyPageStacks from './MyPageStack';
 

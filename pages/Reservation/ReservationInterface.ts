@@ -77,7 +77,7 @@ function deepEqual(obj1: any, obj2: any): boolean {
  * console.log(differences);
  * ```
  */
-export function findReservationDifferences(preReservation: Reservation, newReservation: Reservation): Partial<ReservationSubmitForm | any> {
+export function findReservationDifferences(preReservation: Reservation, newReservation: Reservation): Partial<ReservationSubmitForm> {
     const differences: Partial<ReservationSubmitForm | any> = {};
     const preResevationForm = parseToReservationForm(preReservation)
     const newResevationForm = parseToReservationForm(newReservation)

@@ -7,7 +7,7 @@ import Animated, { interpolate, SharedValue, useAnimatedStyle, useSharedValue } 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Swipeable, { SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable'
 
-import { getToken } from '@hongpung/src/common/utils/TokenHandler';
+import { getToken } from '@hongpung/src/common/lib/TokenHandler';
 import { StackActions, useNavigation } from '@react-navigation/native';
 import useFetchUsingToken from '@hongpung/src/common/hooks/useFetchUsingToken';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';

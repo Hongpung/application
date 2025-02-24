@@ -1,0 +1,39 @@
+import { useRef } from "react";
+import { ScrollView, View, Text } from "react-native"
+
+import { Color,TimeLineArray } from '@hongpung/src/common'
+
+type TimeLineProps = {
+    children: React.ReactNode
+}
+/**
+ *   AM 10~ PM10까지의 타임 라인(눈금 표시)
+ */
+export const TimeLine: React.FC<TimeLineProps> = ({ children }) => {
+
+    const TimesRef = useRef<ScrollView | null>(null)
+
+    return (
+        <ScrollView ref={TimesRef}>
+
+            {TimeLineArray.map((time, index) => {
+                return (
+                    <>
+                        <View key={time} style={{ flexDirection: 'row', paddingHorizontal: 24, alignItems: 'center', height: 24 }}>
+                            <View style={{ height: 1, backgroundColor: Color['grey200'], overflow: 'visible' }} />
+                            <Text style={{ alignSelf: 'center', fontSize: 16, width: 56, textAlign: 'center', color: Color[`grey300`], fontFamily: 'NanumSquareNeo-Regular' }}>{time}</Text>
+                            <View style={{ height: 1, backgroundColor: Color['grey200'], overflow: 'visible' }} />
+                        </View>
+                        {index < TimeLineArray.length - 1 &&
+                            <View key={time + 'under'} style={{ height: 56, display: 'flex', paddingHorizontal: 36, alignItems: 'center', justifyContent: 'center' }}>
+                                <View style={{ height: 0, borderWidth: 1, borderStyle: 'dotted', borderColor: Color[`grey100`] }} />
+                            </View>
+                        }
+                    </>)
+            })}
+
+            {children}
+
+        </ScrollView>
+    )
+}

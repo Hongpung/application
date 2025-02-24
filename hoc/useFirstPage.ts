@@ -1,4 +1,4 @@
-import { getToken } from "@hongpung/src/common/utils/TokenHandler";
+import { getToken } from "@hongpung/src/common/lib/TokenHandler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useCallback, useState } from "react";
 import Toast from "react-native-toast-message";

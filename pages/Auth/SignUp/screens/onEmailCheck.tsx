@@ -1,7 +1,7 @@
 import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, View, Text, Modal, ActivityIndicator } from "react-native"
 import { useSignUp } from "../context/SignUpContext"
 import { useCallback, useRef, useState } from "react";
-import LongButton from "@hongpung/src/common/components/buttons/LongButton";
+import LongButton from "@hongpung/src/common/components/buttons/long-button";
 import SignUpEmailInput from "@hongpung/src/common/components/inputs/SignupEmailInput";
 import { Color } from "@hongpung/ColorSet";
 import { verifyingEmail } from "../Utils";

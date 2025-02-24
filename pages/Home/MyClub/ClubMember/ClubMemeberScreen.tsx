@@ -5,7 +5,7 @@ import ProfileBoxCard from "../../../../components/cards/ProfileBoxCard";
 import { User } from "../../../../UserType";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import useFetchUsingToken from "@hongpung/src/common/hooks/useFetchUsingToken";
-import { Icons } from "@hongpung/src/common/components/Icons/Icon";
+import { Icons } from "@hongpung/src/common/components/icons/Icon";
 import { MyClubStackStackParamList } from "@hongpung/nav/MyClubStack";
 
 type ClubMembersProps = NativeStackScreenProps<MyClubStackStackParamList, 'ClubMembers'>

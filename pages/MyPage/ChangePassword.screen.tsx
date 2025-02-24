@@ -2,10 +2,10 @@ import { Keyboard, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Vie
 
 import { InputBaseComponent } from "@hongpung/src/common/components/inputs/InputBaseComponent";
 import { useCallback, useEffect, useRef, useState } from "react";
-import LongButton from "@hongpung/src/common/components/buttons/LongButton";
+import LongButton from "@hongpung/src/common/components/buttons/long-button";
 import { Color } from "@hongpung/ColorSet";
 import { useNavigation } from "@react-navigation/native";
-import { deleteToken, getToken } from "@hongpung/src/common/utils/TokenHandler";
+import { deleteToken, getToken } from "@hongpung/src/common/lib/TokenHandler";
 import Toast from "react-native-toast-message";
 
 type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }

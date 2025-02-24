@@ -4,7 +4,7 @@ import { useIsFocused } from '@react-navigation/native';
 
 import useFetchUsingToken from '@hongpung/src/common/hooks/useFetchUsingToken';
 import { Color } from '@hongpung/ColorSet';
-import { Icons } from '@hongpung/src/common/components/Icons/Icon';
+import { Icons } from '@hongpung/src/common/components/icons/Icon';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ReservationStackParamList } from '@hongpung/nav/ReservationStack';

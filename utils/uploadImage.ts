@@ -1,4 +1,4 @@
-import { getToken } from "../src/common/utils/TokenHandler";
+import { getToken } from "../src/common/lib/TokenHandler";
 
 export default async function uploadImage(imageFile: File, toUse: string): Promise<{ imageUrl: string } | null> {
     

@@ -10,7 +10,7 @@ import { onUseSession } from '@hongpung/recoil/sessionState';
 import { StackActions, useNavigation } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CheckOutStackParamList } from '@hongpung/nav/HomeStacks';
-import { getToken } from '@hongpung/src/common/utils/TokenHandler';
+import { getToken } from '@hongpung/src/common/lib/TokenHandler';
 import { useCheckOut } from './context/useCheckOutContext';
 
 const { width } = Dimensions.get('window');

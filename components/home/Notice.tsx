@@ -2,7 +2,7 @@ import { ActivityIndicator, TouchableOpacity, Text, View, Pressable } from 'reac
 import React from 'react'
 import useFetchUsingToken from '@hongpung/src/common/hooks/useFetchUsingToken'
 import { Color } from '@hongpung/ColorSet'
-import { Icons } from '../../src/common/components/Icons/Icon'
+import { Icons } from '../../src/common/components/icons/Icon'
 import { CompositeNavigationProp, useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { MainStackParamList, NoticeStackParamList } from '@hongpung/nav/HomeStacks'

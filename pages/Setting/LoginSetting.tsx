@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Color } from '@hongpung/ColorSet';
-import CustomSwitch from '@hongpung/src/common/components/switch/CustomSwitch';
+import CustomSwitch from '@hongpung/src/common/components/switch/switch';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import LongButton from '@hongpung/src/common/components/buttons/LongButton';
+import LongButton from '@hongpung/src/common/components/buttons/long-button';
 import { StackActions, useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { useAuth } from '@hongpung/hoc/useAuth';

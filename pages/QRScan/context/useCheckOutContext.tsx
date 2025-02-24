@@ -1,7 +1,7 @@
 import { RealtimeSession, ReservationSession } from "@hongpung/pages/Reservation/SessionTypes";
 import { useOnReserve } from "@hongpung/recoil/authState";
 import { onUseSession } from "@hongpung/recoil/sessionState";
-import { getToken } from "@hongpung/src/common/utils/TokenHandler";
+import { getToken } from "@hongpung/src/common/lib/TokenHandler";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import { createContext, ReactNode, useContext, useState } from "react";
 import { Alert } from "react-native";

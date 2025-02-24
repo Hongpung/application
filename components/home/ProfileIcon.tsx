@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet } from "react-native";
-import { Icons } from "../../src/common/components/Icons/Icon";
+import { Icons } from "../../src/common/components/icons/Icon";
 import { Color } from "@hongpung/ColorSet";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "@hongpung/nav/HomeStacks";

@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Color } from '@hongpung/ColorSet'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { throttle } from 'lodash';
-import { Icons } from '@hongpung/src/common/components/Icons/Icon';
+import { Icons } from '@hongpung/src/common/components/icons/Icon';
 import { MyClubStackStackParamList } from '@hongpung/nav/MyClubStack';
 import useFetchUsingToken from '@hongpung/src/common/hooks/useFetchUsingToken';
 import { User } from '@hongpung/UserType';

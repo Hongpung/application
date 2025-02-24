@@ -6,7 +6,7 @@ import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import useFetchUsingToken from "@hongpung/src/common/hooks/useFetchUsingToken";
-import { Icons } from "@hongpung/src/common/components/Icons/Icon";
+import { Icons } from "@hongpung/src/common/components/icons/Icon";
 import { ReservationStackParamList } from "@hongpung/nav/ReservationStack";
 
 type ReservationType = 'COMMON' | 'REGULAR' | 'EXTERNAL'
