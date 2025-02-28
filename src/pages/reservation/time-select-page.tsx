@@ -1,4 +1,4 @@
-import { WeekCalendarHeader } from "@hongpung/src/common/ui/week-calendar-header/week-calendar-header"
+import { WeekCalendarHeader } from "@hongpung/src/common/ui/WeekCalendarHeader/WeekCalendarHeader"
 import { TimeSelector } from "@hongpung/src/widgets/reservation/ui/time-selector"
 import { useState } from "react"
 import { View } from "react-native"

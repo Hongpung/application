@@ -1,6 +1,8 @@
+import { EntitiesApiType } from "@hongpung/src/common";
 import { clubIds } from "../@x/club";
 
-export const userApi = {
+export const userApi: EntitiesApiType = {
+
     loadInvitableUsers: (findOptions: { username: string, club: string[], enrollmentNumberRange: { startNumber?: string, endNumber?: string } }) => {
         const queryParams = new URLSearchParams();
 
@@ -29,10 +31,20 @@ export const userApi = {
         const queryString = queryParams.toString();
 
         const url = `${process.env.EXPO_PUBLIC_BASE_URL}/member/invite-possible${queryString ? `?${queryString}` : ''}`;
-        
+
         return {
             method: 'GET',
             url
         }
+    },
+
+    loadUserSelf: {
+        method: 'GET',
+        url: `${process.env.EXPO_PUBLIC_BASE_URL}/member/status`
+    },
+
+    updateNotificationToken:{
+        method:'PATCH',
+        url:`${process.env.EXPO_PUBLIC_BASE_URL}/member/NToken`
     }
 }

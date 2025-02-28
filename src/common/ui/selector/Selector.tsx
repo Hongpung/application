@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { Animated, Pressable, Text, View, StyleSheet } from "react-native";
-import { Icons } from "../../src/common/components/Icons/Icon";
+import { Icons } from "@hongpung/src/common";
 import { Color } from "@hongpung/ColorSet";
-import Dropdown from "../dropdown";
+import Dropdown from "./dropdown";
 
 interface ClubSelectorProps {
     label: string

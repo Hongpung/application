@@ -10,8 +10,9 @@ type TimeLineProps = {
 }
 
 const { width } = Dimensions.get('window')
+
 /**
- *   AM 10~ PM10까지의 타임 라인(눈금 표시)
+ *   AM 10~ PM10까지의 시간 선택(눈금 표시)
  */
 export const TimeSelector: React.FC<TimeLineProps> = ({ date }) => {
 
@@ -35,12 +36,11 @@ export const TimeSelector: React.FC<TimeLineProps> = ({ date }) => {
         <ScrollView ref={TimesRef}>
             {Array.from({ length: 13 }, (_, index) => (index + 10)).map((time, index) => {
                 return (
-                    <View key={time + index}
-                        pointerEvents="none"
-                    >
-                        <View style={{ flexDirection: 'row', marginHorizontal: 24, alignItems: 'center', height: 24, justifyContent: 'center' }}>
-                            <View>
+                    <View key={time + index} pointerEvents="none">
 
+                        <View style={{ flexDirection: 'row', marginHorizontal: 24, alignItems: 'center', height: 24, justifyContent: 'center' }}>
+
+                            <View>
                                 <View style={[{ position: 'absolute', height: 9.2, width: 56, top: 0, }, (selectedTimeBlocks.includes(`${time - 1}:30` as TimeFormat)) ?
                                     { backgroundColor: Color['blue100'], zIndex: 2 }
                                     :

@@ -1,11 +1,12 @@
-import { loadDailyReservations, loadMonthlyReservations } from "@hongpung/src/features/reservation"
-import { method } from "lodash"
+import { EntitiesApiType } from "@hongpung/src/common"
 
 export const reservationApi = {
 
     loadReservationDetail: (reservationId: number) => ({
-        method: 'GET',
-        url: `${process.env.EXPO_PUBLIC_BASE_URL}/reservation/${reservationId}`
+        input: `${process.env.EXPO_PUBLIC_BASE_URL}/reservation/${reservationId}`,
+        init: {
+            method: 'GET',
+        }
     }),
 
     loadDailyReservations: (date: Date) => {

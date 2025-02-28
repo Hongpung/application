@@ -10,7 +10,7 @@ type WeekCalendarHeaderProps = {
 
 const { width } = Dimensions.get('window')
 
-export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selectedDate, changeDate: onDateSelect, onPressBackButton }) => {
+export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selectedDate, changeDate, onPressBackButton }) => {
 
     const today = new Date()
 
@@ -34,14 +34,14 @@ export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selected
         if (!selectedDate) return;
         const nextMonth = new Date(selectedDate);
         nextMonth.setMonth(selectedDate.getMonth() + 1);
-        onDateSelect(nextMonth);
+        changeDate(nextMonth);
     };
 
     const decrementMonth = () => {
         if (!selectedDate) return;
         const prevMonth = new Date(selectedDate);
         prevMonth.setMonth(selectedDate.getMonth() - 1);
-        onDateSelect(prevMonth);
+        changeDate(prevMonth);
     };
 
     const prevWeek = () => {
@@ -51,14 +51,14 @@ export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selected
         const today = new Date()
         if (lastDay <= today)
             lastDay.setDate(today.getDate() + 1);
-        onDateSelect(lastDay);
+        changeDate(lastDay);
     }
 
     const nextWeek = () => {
         if (!selectedDate) return;
         const nextDay = new Date(selectedDate)
         nextDay.setDate(selectedDate.getDate() + 7);
-        onDateSelect(nextDay);
+        changeDate(nextDay);
     }
 
     return (
@@ -103,22 +103,27 @@ export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selected
                     <Text style={styles.DayText}>토</Text>
                     <Text style={styles.DayText}>일</Text>
                 </View>
+                
                 <View style={{ height: 4 }} />
+
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    
                     <Pressable style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, width: 32, }} onPress={prevWeek} >
                         <Icons size={24} name={'chevron-back'} color={Color['blue500']} />
                     </Pressable>
+                    
                     <View style={{ height: 32, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 264, marginHorizontal: 8 }}>
                         {datesOfWeek.map(date => (
                             <Pressable
                                 key={`${date}`}
-                                onPress={() => { date > new Date(today.getTime() + 13 * 60 * 60 * 1000) && onDateSelect(date) }}
+                                onPress={() => { date > new Date(today.getTime() + 13 * 60 * 60 * 1000) && changeDate(date) }}
                                 style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == date.getDate() && { backgroundColor: Color['blue100'] }]}
                             >
                                 <Text style={[styles.Date, (date <= new Date(today.getTime() + 13 * 60 * 60 * 1000)) && { color: Color['grey300'] }]}>{date.getDate()}</Text>
                             </Pressable>
                         ))}
                     </View>
+
                     <Pressable style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, width: 32, }} onPress={nextWeek} >
                         <Icons size={24} name={'chevron-forward'} color={Color['blue500']} />
                     </Pressable>

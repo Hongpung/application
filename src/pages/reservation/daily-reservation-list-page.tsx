@@ -1,5 +1,5 @@
 import { TimeLine } from "@hongpung/src/widgets/reservation/ui/time-line"
-import { WeekCalendarHeader } from "@hongpung/src/common/ui/week-calendar-header/week-calendar-header"
+import { WeekCalendarHeader } from "@hongpung/src/common/ui/WeekCalendarHeader/WeekCalendarHeader"
 import { useState } from "react"
 import { View, Text } from "react-native"
 import { useDailyReservations } from "@hongpung/src/widgets/reservation/lib/use-daily-reservations"

@@ -1,5 +1,5 @@
 import { atom } from "recoil";
-import { BannerDto } from "../model/banner-dto";
+import { BannerDto } from "../api/type";
 
 type BannerFetchStatus = | {
     status: 'BEFORE' | 'PENDING' | 'FAILED',

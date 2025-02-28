@@ -1,2 +1,2 @@
-export { LongButton } from './long-button'
-export { ShortButton } from './short-button'
+export { LongButton } from './LongButton'
+export { ShortButton } from './ShortButton'
