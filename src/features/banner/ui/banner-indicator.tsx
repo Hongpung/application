@@ -1,5 +1,5 @@
 import { View, Text, Pressable } from "react-native"
-import { Icons } from "@hongpung/src/common/components/icons/Icon"
+import { Icons } from "@hongpung/src/common"
 import { Color } from "@hongpung/ColorSet"
 import { NavigationProp, useNavigation } from "@react-navigation/native"
 import { MainStackParamList } from "@hongpung/nav/HomeStacks"

@@ -1,17 +1,11 @@
 import { NativeSyntheticEvent, StyleSheet, Text, View, Image } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
-import { useRecoilValue } from 'recoil';
-import { bannersState } from '@src/entities/banner';
-
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-import PagerView from 'react-native-pager-view';
-import { OnPageSelectedEventData } from 'react-native-pager-view/lib/typescript/specs/PagerViewNativeComponent';
 
 import { Color } from '@hongpung/ColorSet';
 import { MainStackParamList } from '@hongpung/nav/HomeStacks';
-import BannerIndicator from './banner-indicator';
+
 
 
 type BannerNavParams = NativeStackNavigationProp<MainStackParamList, 'Home'>

@@ -1,14 +1,14 @@
 import React from 'react';
 import { Pressable, Image } from 'react-native';
 
-import { BannerDto } from '@hongpung/src/entities/banner';
+import { Banner } from '@hongpung/src/entities/banner'
 
-interface BannerProps {
-    banner: BannerDto;
+interface BannerItemProps {
+    banner: Banner;
     onBannerPress: (bannerUrl: string) => {}
 }
 
-const Banner: React.FC<BannerProps> = ({ banner, onBannerPress }) => {
+const BannerItem: React.FC<BannerItemProps> = ({ banner, onBannerPress }) => {
     return (
         <Pressable style={{ flex: 1 }}
             onPress={() => banner.href && onBannerPress(banner.href)}>
@@ -17,4 +17,4 @@ const Banner: React.FC<BannerProps> = ({ banner, onBannerPress }) => {
     );
 };
 
-export default Banner;
+export { BannerItem };

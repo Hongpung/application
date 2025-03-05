@@ -67,7 +67,7 @@ const useRequest = <T>({ options, ...requestParams }: RequestParams<T>) => {
         const timeoutId = setTimeout(() => controller.abort(), options?.timeout ? options.timeout : 5000);
         try {
             setLoading(true);
-            const result = await buildApi<T>({options,...requestParams});
+            const result = await buildApi<T>({ options, ...requestParams });
             setData(result);
             setError(null); // 요청 성공 시 에러 상태 초기화
         } catch (err) {
@@ -111,20 +111,25 @@ const useFetch = <T>({ url, params, transformResponse, options }: FetchParams<T>
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
+/** 메인 타입, 커플 타입 순 */
+type ValidateGeneric<R, P> = IsAny<P> extends true ? never : IsAny<R> extends true ? never : R
 
 
-// baseApi를 함수형으로 구현
 export const createBaseApi = ({ baseUrl }: ApiConfig) => {
 
     type Build = {
-        query: <R, P>(config: {
-            query: (params: P) => Omit<RequestOptions, 'method'>;
-            transformResponse?: (data: any) => R;
-        }) => (params: P) => ReturnType<typeof useFetch<R>>;
-        request: <R, P>(config: {
-            query: (params: P) => Omit<RequestOptions, 'method'> & { method: Exclude<RequestMethod, "GET"> }
-            transformResponse?: (data: any) => R;
-        }) => (params: P) => ReturnType<typeof useRequest<R>>;
+        query: <Response, Params>( // R, P에 any 비허용
+            config: {
+                query: (params: ValidateGeneric<Params, Response>) => Omit<RequestOptions, 'method'>;
+                transformResponse?: (data: any) => ValidateGeneric<Response, Params>;
+            }
+        ) => (params: ValidateGeneric<Params, Response>) => ReturnType<typeof useFetch<ValidateGeneric<Response, Params>>>,
+        request: <Response, Params>( // R, P에 any 비허용
+            config: {
+                query: (params: ValidateGeneric<Params, Response>) => Omit<RequestOptions, 'method'> & { method: Exclude<RequestMethod, 'GET'> };
+                transformResponse?: (data: any) => ValidateGeneric<Response, Params>
+            }
+        ) => (params: ValidateGeneric<Params, Response>) => ReturnType<typeof useRequest<ValidateGeneric<Response, Params>>>
     }
 
 
@@ -134,13 +139,13 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
                 query,
                 transformResponse,
             }: {
-                query: (params: P) => Omit<RequestOptions, "method">;
-                transformResponse?: (data: any) => R;
+                query: (params: ValidateGeneric<P, R>) => Omit<RequestOptions, 'method'>;
+                transformResponse?: (data: any) => IsAny<P> extends true ? never : IsAny<R> extends true ? never : R;
             }) => {
-                return (params: P) => {
+                return (params: ValidateGeneric<P, R>) => {
                     const { url, params: queryParams } = query(params);
                     const finalUrl = `${baseUrl}${url}`;
-                    return useFetch<R>({ ...queryParams, url: finalUrl, transformResponse });
+                    return useFetch<IsAny<P> extends true ? never : IsAny<R> extends true ? never : R>({ ...queryParams, url: finalUrl, transformResponse });
                 }
             },
 
@@ -148,20 +153,33 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
                 query,
                 transformResponse,
             }: {
-                query: (params: P) => Omit<RequestOptions, "method"> & { method: Exclude<RequestMethod, "GET"> }
-                transformResponse?: (data: any) => R;
+                query: (params: ValidateGeneric<P, R>) => Omit<RequestOptions, "method"> & { method: Exclude<RequestMethod, "GET"> }
+                transformResponse?: (data: any) =>  ValidateGeneric<R,P>;
             }) => {
-                return (params: P) => {
+                return (params: ValidateGeneric<P, R>) => {
                     const { url, ...QueryParams } = query(params);
                     const finalUrl = `${baseUrl}${url}`;
-                    return useRequest<R>({ ...QueryParams, url: finalUrl, transformResponse });
+                    return useRequest<ValidateGeneric<R,P>>({ ...QueryParams, url: finalUrl, transformResponse });
                 }
 
             },
         };
     }
 
-    type Endpoints = Record<string, (params: any) => (ReturnType<typeof useRequest<any>> | ReturnType<typeof useFetch<any>>)>;
+    type Endpoints = Record<string, ((params: any) => (ReturnType<typeof useRequest<any>> | ReturnType<typeof useFetch<any>>)) extends ((params: infer P) => infer Ret) ?
+        IsAny<P> extends true ?
+        (params: never) => Ret
+        :
+        Ret extends ReturnType<typeof useRequest<infer R>> ?
+        ((params: P) => (ReturnType<typeof useRequest<R>>))
+        :
+        Ret extends ReturnType<typeof useFetch<infer R>> ?
+        ((params: P) => (ReturnType<typeof useFetch<R>>))
+        :
+        never
+        :
+        never
+    >;
 
     // type RenameEndpoints<T extends Endpoints> = {
     //     [K in keyof T & string]: 
@@ -225,12 +243,11 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
 // baseApi 인스턴스 생성
 export const baseApi = createBaseApi({ baseUrl: process.env.EXPO_PUBLIC_BASE_URL });
 
-const cartApi = baseApi.addEndpoints((build) => ({
+const example = baseApi.addEndpoints((build) => ({
     endpoints: {
-        cart: build.query<object, object>({
+        wrongExample: build.query<any, any>({
             query: () => ({
-                url: 's',
-                withAuthorize: true
+                url: 's'
             })
         })
     }
