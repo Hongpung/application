@@ -1,5 +1,6 @@
 export { Icons } from './icons/Icons'
 export { LongButton, ShortButton } from './buttons'
 export { Switch } from './switch/Switch'
-export {CheckboxComponent as Checkbox} from './checkboxs/CheckboxComponent'
-export {WeekCalendarHeader} from './WeekCalendarHeader'
+export { CheckboxComponent as Checkbox } from './checkboxs/CheckboxComponent'
+export { WeekCalendarHeader } from './WeekCalendarHeader/WeekCalendarHeader'
+export { Selector } from './selector'
