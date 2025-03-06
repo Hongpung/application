@@ -1,33 +1,29 @@
-import { NativeSyntheticEvent, StyleSheet, Text, View, Image } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { Banner, bannersState } from '@hongpung/src/entities/banner'
-import { useRecoilValue } from 'recoil'
-import PagerView, { PagerViewOnPageScrollEventData } from 'react-native-pager-view'
-import { Color } from '@hongpung/src/common'
+import { NativeSyntheticEvent, StyleSheet, View, Image } from 'react-native'
 
-interface BannerSlideProps {
-    banners: Banner[]
-}
+import PagerView from 'react-native-pager-view'
 
-const BannerSlide: React.FC<{ withIndicator?: boolean }> = ({ withIndicator = true }) => {
+import { BannerItem, BlankBanner } from '@hongpung/src/entities/banner'
+import { BannerSliderProps } from './type'
 
-    const banners = useRecoilValue(bannersState);
+
+const BannerSlider: React.FC<BannerSliderProps> = ({ banners }) => {
 
     const [bannerCount, setBannerCount] = useState(0);
 
     const pagerRef = useRef<PagerView>(null);//러페런스 추가
 
-    const bannerMass = banners.value?.length;// 배너 수
+    const bannerMass = banners.length;// 배너 수
 
-    const BannerHandler = useCallback((e: NativeSyntheticEvent<PagerViewOnPageScrollEventData>) => {
+    const BannerHandler = useCallback((e: NativeSyntheticEvent<{ position: number }>) => {
         const { position } = e.nativeEvent;
 
         if (position === 0) {
-            setBannerCount(banners.value!.length - 1);
+            setBannerCount(banners.length - 1);
             setTimeout(() => {
-                pagerRef.current?.setPageWithoutAnimation(banners.value!.length);
+                pagerRef.current?.setPageWithoutAnimation(banners.length);
             }, 200)
-        } else if (position === banners.value!.length + 1) {
+        } else if (position === banners.length + 1) {
             setBannerCount(0);
             setTimeout(() => {
                 pagerRef.current?.setPageWithoutAnimation(1);
@@ -45,18 +41,6 @@ const BannerSlide: React.FC<{ withIndicator?: boolean }> = ({ withIndicator = tr
 
         return () => clearInterval(interval); // 컴포넌트 언마운트 시 타이머 정리
     }, [bannerCount, bannerMass]);
-
-    if (banners.status != 'LOADED' || !banners.value || !bannerMass) return (
-        <View style={styles.bannerContainer}>
-            <View style={{
-                flex: 1,
-            }}>
-                <View style={{ flex: 1, backgroundColor: Color['grey300'] }} >
-                    <Text>상태:{banners.status} 값:{banners.value ? '정상 값' : '널 들어옴'}</Text>
-                </View>
-            </View>
-        </View >
-    )
 
     return (
         <View style={styles.bannerContainer}>
@@ -84,33 +68,37 @@ const BannerSlide: React.FC<{ withIndicator?: boolean }> = ({ withIndicator = tr
                                     ref={pagerRef}>
 
                                     <View style={{ flex: 1, }}>
-                                        <Image src={banners.value[banners.value!.length - 1].bannerImgUrl} style={{ height: 120, width: '100%', alignItems: 'center' }} resizeMode="cover"></Image>
+                                        <Image src={banners[banners.length - 1].bannerImgUrl} style={{ height: 120, width: '100%', alignItems: 'center' }} resizeMode="cover"></Image>
                                     </View>
 
-                                    {banners.value.map((banner, index) => (
+                                    {banners.map((banner, index) => (
                                         <BannerItem
-                                            onBannerPress={() =>}
+                                            onBannerPress={(bannerHref) =>{}}
                                             key={`${banner.bannerId}-${index}`} banner={banner} />
                                     ))}
 
                                     <View style={{ flex: 1 }}>
                                         <View style={{ flex: 1, overflow: 'hidden' }}>
-                                            <Image src={banners.value[0].bannerImgUrl} style={{ height: 120, width: '100%', alignItems: 'center' }} resizeMode="cover"></Image>
+                                            <Image src={banners[0].bannerImgUrl} style={{ height: 120, width: '100%', alignItems: 'center' }} resizeMode="cover"></Image>
                                         </View>
                                     </View>
 
                                 </PagerView>
-                                {withIndicator &&
-                                    <BannerIndicator bannerIdx={bannerCount} bannerMass={bannerMass} />}
                             </>
                             :
-                            <BannerItem key={`${banners.value[0].bannerId}-1`} banner={banners.value[0]} />
+                            <BannerItem key={`${banners[0].bannerId}-1`}
+                                banner={banners[0]}
+                                onBannerPress={function (bannerUrl: string): {} {
+                                    throw new Error('Function not implemented.')
+                                }} />
                 }
             </View>
         </View >
     )
 }
 
-export { BannerSlide }
+export { BannerSlider }
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+    bannerContainer: {}
+})

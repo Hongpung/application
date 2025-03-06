@@ -5,4 +5,5 @@ export interface BannerDto {
     endDate: string //ISOTimeString
     bannerImgUrl: string
     href?: string
+    tag?:string
 }

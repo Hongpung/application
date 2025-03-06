@@ -1,17 +1,9 @@
-import { NativeSyntheticEvent, StyleSheet, Text, View, Image } from 'react-native'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Text, View } from 'react-native'
+import React from 'react'
 
 import { Color } from '@hongpung/ColorSet';
-import { MainStackParamList } from '@hongpung/nav/HomeStacks';
 
-
-
-type BannerNavParams = NativeStackNavigationProp<MainStackParamList, 'Home'>
-
-
-const BlankBanner: React.FC = () => {
+export const BlankBanner: React.FC = () => {
     return (
         <View style={{ flex: 1, backgroundColor: Color['red300'] }}>
             <View style={{ position: 'absolute', top: 30, left: 22 }}>
@@ -25,13 +17,3 @@ const BlankBanner: React.FC = () => {
         </View>
     )
 }
-
-
-
-const styles = StyleSheet.create({
-    bannerContainer: {
-        height: 120,
-        borderRadius: 10,
-        overflow: 'hidden'
-    }
-})

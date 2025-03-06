@@ -1,18 +1,22 @@
 import React from 'react';
-import { Pressable, Image } from 'react-native';
+import { Pressable } from 'react-native';
+import { Image } from 'expo-image'
 
 import { Banner } from '@hongpung/src/entities/banner'
 
 interface BannerItemProps {
     banner: Banner;
-    onBannerPress: (bannerUrl: string) => {}
+    onBannerPress: (bannerUrl: string) => void
 }
 
-const BannerItem: React.FC<BannerItemProps> = ({ banner, onBannerPress }) => {
+const BannerItem: React.FC<BannerItemProps> = (props) => {
+
+    const { banner, onBannerPress } = props
+
     return (
         <Pressable style={{ flex: 1 }}
             onPress={() => banner.href && onBannerPress(banner.href)}>
-            <Image src={banner.bannerImgUrl} style={{ height: 120, width: '100%', alignItems: 'center' }} resizeMode="cover" />
+            <Image source={banner.bannerImgUrl} style={{ height: 120, width: '100%', alignItems: 'center' }} contentFit="cover" cachePolicy="memory-disk" />
         </Pressable>
     );
 };
