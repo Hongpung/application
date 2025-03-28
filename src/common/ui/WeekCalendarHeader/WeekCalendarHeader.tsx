@@ -6,11 +6,12 @@ type WeekCalendarHeaderProps = {
     selectedDate: Date
     changeDate: (selectedDate: Date) => void
     onPressBackButton: () => void
+    rightButton?: React.ReactNode
 }
 
 const { width } = Dimensions.get('window')
 
-export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selectedDate, changeDate, onPressBackButton }) => {
+export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selectedDate, changeDate, onPressBackButton, rightButton }) => {
 
     const today = new Date()
 
@@ -91,6 +92,9 @@ export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selected
                         <Icons size={24} name={'caret-forward'} color={Color['grey300']} />
                     </Pressable>
                 </View>
+                <View style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, width: 28, height: 28 }}>
+                    {rightButton}
+                </View>
             </View>
             <View style={{ height: 60, marginHorizontal: 32, width: width - 64, alignItems: 'center' }}>
                 <View style={{ height: 4 }} />
@@ -103,15 +107,15 @@ export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selected
                     <Text style={styles.DayText}>토</Text>
                     <Text style={styles.DayText}>일</Text>
                 </View>
-                
+
                 <View style={{ height: 4 }} />
 
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    
+
                     <Pressable style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, width: 32, }} onPress={prevWeek} >
                         <Icons size={24} name={'chevron-back'} color={Color['blue500']} />
                     </Pressable>
-                    
+
                     <View style={{ height: 32, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 264, marginHorizontal: 8 }}>
                         {datesOfWeek.map(date => (
                             <Pressable
@@ -148,7 +152,7 @@ const styles = StyleSheet.create({
         fontFamily: 'NanumSquareNeo-Bold',
         borderRadius: 5,
         color: Color['grey500'],
-    }, 
+    },
     MonthRow: {
         height: 24,
         flexDirection: 'row',

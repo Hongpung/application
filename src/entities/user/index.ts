@@ -1,2 +1,3 @@
 export * from './model/user'
-export * from './api/user-api'
+export * from './api/userApi'
+export { UserStatusState } from './model/authState'

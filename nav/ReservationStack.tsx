@@ -10,7 +10,7 @@ import TimeSelectScreen from "@hongpung/pages/Reservation/InReservation/TimeSele
 import ReservationCalendarScreen from "@hongpung/pages/Reservation/ReservationCalendarScreen";
 import ReservationDetailScreen from "@hongpung/pages/Reservation/ViewDetailReservation/ReservationDetailScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Header from '@hongpung/components/common/Header';
+import Header from "@hongpung/src/common/ui/header/Header";
 import { ScreenParams } from "./HomeStacks";
 import ReservationParticipatorsViewScreen from "@hongpung/pages/Reservation/ViewDetailReservation/ReservationParticipatorsViewScreen";
 import ReservationInstrumentsViewScreen from "@hongpung/pages/Reservation/ViewDetailReservation/ReservationInstrumentsViewScreen";

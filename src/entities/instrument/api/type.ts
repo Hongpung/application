@@ -1,4 +1,4 @@
-import { Club } from "../@x/club";
+import { Club } from "@hongpung/src/entities/club/@x/instrument";
 import { InstrumentType } from "../model/type";
 
 export type InstrumentDto = {

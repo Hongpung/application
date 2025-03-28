@@ -30,7 +30,3 @@ const instrumentApi = baseApi.addEndpoints({
 })
 
 export const { useCreateInsrumentRequest, useDeleteInsrumentRequest, useEditInsrumentRequest } = instrumentApi
-
-const { request, error, loading } = useEditInsrumentRequest({ instrumentId: 1, borrowAvailable: false, instrumentType: "쇠", name: '나' })
-
-const Request = request({onSuccess:(data)=>{}})

@@ -1,0 +1,1 @@
+export { Club } from '../model/club'

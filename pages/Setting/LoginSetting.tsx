@@ -87,7 +87,7 @@ const LoginSettingScreen: React.FC = () => {
     }
 
     return (
-        <GestureHandlerRootView>
+        <View>
             <View>
                 <View style={{ height: 24 }} />
                 <View style={{ flexDirection: 'row', alignItems: 'center', marginHorizontal: 36, justifyContent: 'space-between' }}>
@@ -100,7 +100,7 @@ const LoginSettingScreen: React.FC = () => {
                 <View style={{ height: 24 }} />
                 <LongButton color='red' innerText='로그아웃' isAble={true} onPress={LogOutHandler} />
             </View>
-        </GestureHandlerRootView>
+        </View>
     );
 }
 

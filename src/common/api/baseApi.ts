@@ -5,7 +5,7 @@ export const baseApi = createBaseApi({ baseUrl: process.env.EXPO_PUBLIC_BASE_URL
 
 const example = baseApi.addEndpoints({
     endpoints: (build) => ({
-        wrongExample: build.query<string, string>({
+        wrongExample: build.fetch<string, string>({
             query: () => ({
                 url: 's'
             })
