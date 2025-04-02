@@ -5,7 +5,7 @@ const createReservationApi = baseApi.addEndpoints({
     endpoints: (build) => ({
 
         createReservation: build.request<{reservationId:number}, ReservationCreateRequestBody>({
-            query: () => {
+            query: ({...body}) => {
                 return {
                     url: `/reservation`,
                     withAuthorize: true,

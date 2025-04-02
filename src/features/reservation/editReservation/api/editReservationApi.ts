@@ -5,11 +5,12 @@ const editReservationApi = baseApi.addEndpoints({
     endpoints: (build) => ({
 
         editReservation: build.request<void, ReservationEditRequestBody>({
-            query: ({ reservationId }) => {
+            query: ({ reservationId, ...body }) => {
                 return {
                     url: `/reservation/${reservationId}`,
                     withAuthorize: true,
                     method: 'PATCH',
+                    body: body
                 }
             }
         }),

@@ -42,7 +42,7 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
 
     const navigation = useNavigation<CreateReservationNavProps>();
 
-    const { request } = useCreateReservationRequest(parseReservationCreateRequestBody(reservation as Required<ReservationForm>));
+    const { request } = useCreateReservationRequest();
 
     // setReservation을 업데이트 함수로 개선
     const setReservation = (update: Partial<ReservationForm>) => {
@@ -67,7 +67,9 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
     // 예약 생성 API 요청 함수 (더미 함수로 예시)
     const requestCreateReservation = async () => {
         try {
-            const { reservationId } = await request();
+            if (!isValidReservation) throw Error('예약을 완벽히 작성해주세요.');
+
+            const { reservationId } = await request(parseReservationCreateRequestBody(reservation));
 
             navigation.navigate('ReservationDetail', { reservationId })
             console.log("예약 생성 요청:", reservation);

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { RecoilState, useRecoilState } from "recoil";
+import { RecoilState, useRecoilState, useSetRecoilState } from "recoil";
 import { getToken } from "../lib/TokenHandler";
 
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -97,7 +97,7 @@ const useRequest = <T, P>() => {
 
 const useRequestWithRecoil = <T, P>({ recoilState }: { recoilState: RecoilState<T | null> }) => {
 
-    const [data, setData] = useRecoilState<T | null>(recoilState);
+    const setData = useSetRecoilState<T | null>(recoilState);
     const [isLoading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<Error | null>(null);
 
@@ -122,7 +122,7 @@ const useRequestWithRecoil = <T, P>({ recoilState }: { recoilState: RecoilState<
         }
     }, [recoilState]);
 
-    return { data, isLoading, error, request };
+    return { isLoading, error, request };
 };
 
 
@@ -204,7 +204,11 @@ const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 type ValidateGeneric<R, P> = IsAny<P> extends true ? never : IsAny<R> extends true ? never : R
 type Validate<T> = IsAny<T> extends true ? never : T;
 
-
+type RequestReturn<Response, Params> = {
+    isLoading: boolean;
+    error: Error | null;
+    request: (params: Validate<Params>) => Promise<Validate<Response>>;
+}
 
 type Build = {
 
@@ -223,20 +227,16 @@ type Build = {
             query: (params: Validate<Params>) => Omit<RequestOptions, "method"> & { method: Exclude<RequestMethod, "GET"> };
             transformResponse?: (data: unknown) => Validate<Response>;
         }
-    ) => () => {
-        isLoading: boolean;
-        error: Error | null;
-        request: (params: Validate<Params>) => Promise<Validate<Response>>;
-    };
+    ) => () => RequestReturn<Response, Params>;
 }
 
-type Endpoints = Record<string, ((params: any) => (ReturnType<typeof useRequest<any, any>> | ReturnType<typeof useFetch<any>>)) extends ((params: infer P) => infer Ret) ?
-    IsAny<P> extends true ?
-    (params: never) => Ret
+type Endpoints = Record<string, ((() => RequestReturn<any, any>)) extends (() => infer Ret) ?
+    Ret extends RequestReturn<infer R, infer P> ?
+    (() => (RequestReturn<R, P>))
     :
-    Ret extends ReturnType<typeof useRequest<infer R, P>> ?
-    ((params: P) => (ReturnType<typeof useRequest<R, P>>))
+    never
     :
+    Record<string, (params: any) => ReturnType<typeof useFetch<any>>> extends ((params: infer P) => infer Ret) ?
     Ret extends ReturnType<typeof useFetch<infer R>> ?
     ((params: P) => (ReturnType<typeof useFetch<R>>))
     :
@@ -248,7 +248,7 @@ type Endpoints = Record<string, ((params: any) => (ReturnType<typeof useRequest<
 
 type RenameEndpoints<T extends Record<string, any>> = {
     [K in keyof T & string]:
-    T[K] extends (params: infer P) => ReturnType<typeof useRequest<infer R, infer P>>
+    T[K] extends () => RequestReturn<infer R, infer P>
     ? { key: `use${Capitalize<K>}Request`, params: P, response: R }
     : T[K] extends (params: infer P) => ReturnType<typeof useFetch<infer R>>
     ? { key: `use${Capitalize<K>}Fetch`, params: P, response: R }
@@ -259,7 +259,7 @@ type RenameEndpointsMap<T extends Record<string, any>> = {
     K['key'] extends `use${infer Name}Fetch`
     ? (params: K['params']) => ReturnType<typeof useFetch<K['response']>>
     : K['key'] extends `use${infer Name}Request`
-    ? (params: K['params']) => ReturnType<typeof useRequest<K['response'], K['params']>>
+    ? () => RequestReturn<K['response'], K['params']>
     : never;
 };
 

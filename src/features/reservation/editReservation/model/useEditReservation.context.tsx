@@ -26,6 +26,8 @@ interface EditReservationContextProps {
 
     requestEditReservation: () => Promise<void>;
 
+    isLoading: boolean;
+    
 }
 
 const EditReservationContext = createContext<EditReservationContextProps | undefined>(undefined);
@@ -74,8 +76,8 @@ const EditReservationContextProvider = ({ prevReservation, children }: { prevRes
 
     const requestEditReservation = async () => {
         try {
-            
-            await request();
+
+            await request(getReservationEditRequestBody(prevReservation, reservation));
 
             navigation.navigate('ReservationDetail', { reservationId: prevReservation.reservationId })
 
@@ -100,6 +102,7 @@ const EditReservationContextProvider = ({ prevReservation, children }: { prevRes
                 setParticipationAvailable,
                 setReservationType,
 
+                isLoading,
                 verifyEditReservation,
                 requestEditReservation,
             }}
