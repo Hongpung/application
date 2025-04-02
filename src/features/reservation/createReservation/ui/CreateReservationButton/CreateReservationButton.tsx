@@ -1,12 +1,11 @@
 import React from 'react'
 
 import { LongButton } from '@hongpung/src/common'
-import { useRecoilValue } from 'recoil'
-import { reservationFormState } from '../../../model/reservationFormState'
+import { useCreateReservation } from '../../model/useCreateReservation.context'
 
 export const CreateReservationButton: React.FC<{ isAble: boolean, onPress: () => void }> = ({ onPress }) => {
 
-    const reservationForm = useRecoilValue(reservationFormState)
+    const reservationForm = useCreateReservation();
 
     return (
         <LongButton

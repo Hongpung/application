@@ -1,13 +1,17 @@
 import { createContext, useContext, useState } from "react";
 import { ReservationForm } from "../../model/type";
-import { parseReservationCreateRequestBody } from "../lib/parseReservationCreateRequestBody";
-import { useCreateReservationRequest } from "../api/createReservationApi";
-import { ReservationStackParamList } from "@hongpung/nav/ReservationStack";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { TimeFormat } from "@hongpung/src/common";
+import { isEqual } from "lodash";
+import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { ReservationStackParamList } from "@hongpung/nav/ReservationStack";
+import { useEditReservationRequest } from "../api/editReservationApi";
+import { getReservationEditRequestBody } from "@hongpung/src/entities/reservation";
 
-interface CreateReservationContextProps {
-    reservation: Partial<ReservationForm>;
+interface EditReservationContextProps {
+
+    reservation: ReservationForm;
 
     setDate: (date: ReservationForm['date']) => void;
     setStartTime: (time: ReservationForm['startTime']) => void;
@@ -18,31 +22,25 @@ interface CreateReservationContextProps {
     setParticipationAvailable: (participationAvailable: ReservationForm['participationAvailable']) => void;
     setReservationType: (reservationType: ReservationForm['reservationType']) => void;
 
-    isValidReservation: boolean;
-    requestCreateReservation: () => Promise<void>;
+    verifyEditReservation: () => Promise<void>;
+
+    requestEditReservation: () => Promise<void>;
+
 }
 
-const CreateReservationContext = createContext<CreateReservationContextProps | undefined>(undefined);
+const EditReservationContext = createContext<EditReservationContextProps | undefined>(undefined);
 
-type CreateReservationNavProps = NativeStackNavigationProp<ReservationStackParamList, 'ReservationStack'>
 
-const CreateReservationContextProvider = ({ children }: { children: React.ReactNode }) => {
+type EditReservationNavProps = NativeStackNavigationProp<ReservationStackParamList, 'ReservationStack'>
 
-    const [reservation, setReservationState] = useState<ReservationForm>({
-        title: "",
-        reservationType: "REGULAR",
-        participationAvailable: false,
-        borrowInstruments: [],
-        participators: [],
-    });
 
-    const isCompleteReservation = (reservation: ReservationForm): reservation is Required<ReservationForm> => {
-        return Object.values(reservation).every(value => value !== null);
-    };
+const EditReservationContextProvider = ({ prevReservation, children }: { prevReservation: ReservationForm & { reservationId: number }; children: React.ReactNode }) => {
 
-    const navigation = useNavigation<CreateReservationNavProps>();
+    const navigation = useNavigation<EditReservationNavProps>();
 
-    const { request } = useCreateReservationRequest(parseReservationCreateRequestBody(reservation as Required<ReservationForm>));
+    const [reservation, setReservationState] = useState<ReservationForm>(prevReservation);
+
+    const { request, isLoading, error } = useEditReservationRequest()
 
     // setReservation을 업데이트 함수로 개선
     const setReservation = (update: Partial<ReservationForm>) => {
@@ -62,23 +60,34 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
     const setParticipationAvailable = (participationAvailable: ReservationForm['participationAvailable']) => setReservation({ participationAvailable });
     const setReservationType = (reservationType: ReservationForm['reservationType']) => setReservation({ reservationType });
 
-    const isValidReservation = isCompleteReservation(reservation)
-
     // 예약 생성 API 요청 함수 (더미 함수로 예시)
-    const requestCreateReservation = async () => {
-        try {
-            const { reservationId } = await request();
+    const verifyEditReservation = async () => {
+        if (isEqual(prevReservation, reservation)) {
+            Alert.alert(
+                '예약 오류', // 타이틀
+                "기존 예약과 동일합니다."
+            );
+        } else {
+            navigation.navigate('ReservationStack', { screen: 'ReservationEditConfirm' })
+        }
+    };
 
-            navigation.navigate('ReservationDetail', { reservationId })
-            console.log("예약 생성 요청:", reservation);
-            // 실제 API 요청을 추가할 것
-        } catch (error) {
-            console.error("예약 생성 중 오류 발생:", error);
+    const requestEditReservation = async () => {
+        try {
+            
+            await request();
+
+            navigation.navigate('ReservationDetail', { reservationId: prevReservation.reservationId })
+
+        } catch {
+
+            Alert.alert('예약 오류', error?.message || "예약 수정 중 오류가 발생했습니다.");
+            console.error("예약 수정 중 오류 발생:", error);
         }
     };
 
     return (
-        <CreateReservationContext.Provider
+        <EditReservationContext.Provider
             value={{
                 reservation,
 
@@ -91,22 +100,22 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
                 setParticipationAvailable,
                 setReservationType,
 
-                isValidReservation,
-                requestCreateReservation,
+                verifyEditReservation,
+                requestEditReservation,
             }}
         >
             {children}
-        </CreateReservationContext.Provider>
+        </EditReservationContext.Provider>
     );
 };
 
 // Context 사용을 위한 커스텀 훅
-const useCreateReservation = () => {
-    const context = useContext(CreateReservationContext);
+const useEditReservation = () => {
+    const context = useContext(EditReservationContext);
     if (!context) {
         throw new Error("useCreateReservation must be used within a CreateReservationContextProvider");
     }
     return context;
 };
 
-export { CreateReservationContextProvider, useCreateReservation };
+export { EditReservationContextProvider, useEditReservation };

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { atom, RecoilState, selector, useRecoilState } from "recoil";
+import { RecoilState, useRecoilState } from "recoil";
 import { getToken } from "../lib/TokenHandler";
 
 type RequestMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -17,21 +17,17 @@ interface RequestOptions {
     options?: FetchOptions
 }
 
-
 type FetchParams<R> = { url: string, withAuthorize?: boolean, params?: Record<string, string | number | string[] | number[]>, transformResponse?: (data: any) => R, options?: FetchOptions }
 
-
 type RequestParams<R> =
-    | { url: string, withAuthorize?: boolean, params?: Record<string, string | number | string[] | number[]>, method: 'DELETE', transformResponse?: (data: any) => R, body?: never, options?: FetchOptions } |
-    { url: string, withAuthorize?: boolean, params?: Record<string, string | number | string[] | number[]>, method: Exclude<RequestMethod, "GET" | "DELETE">, transformResponse?: (data: any) => R, body: Record<string, any>, options?: FetchOptions }
-
+    | { url: string, withAuthorize?: boolean, params?: Record<string, string | number | string[] | number[]>, method: 'DELETE', transformResponse?: (data: any) => R, options?: FetchOptions } |
+    { url: string, withAuthorize?: boolean, params?: Record<string, string | number | string[] | number[]>, method: Exclude<RequestMethod, "GET" | "DELETE">, transformResponse?: (data: any) => R, options?: FetchOptions }
 
 type BuildOption<R> = { url: string, withAuthorize?: boolean, method: RequestMethod, params?: Record<string, string | number | string[] | number[]>, transformResponse?: (data: any) => R, body?: Record<string, any>, options?: RequestInit }
 
 interface FetchOptions extends RequestInit {
     timeout?: number;
 }
-
 
 const buildApi = async <T>({ url, params, method, body, transformResponse, withAuthorize, options }: BuildOption<T>): Promise<T> => {
 
@@ -71,24 +67,22 @@ const buildApi = async <T>({ url, params, method, body, transformResponse, withA
 };
 
 
-const useRequest = <T>({ options, transformResponse, ...requestParams }: RequestParams<T>) => {
+const useRequest = <T, P>() => {
 
     const [isLoading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const request = useCallback(async (onSuccess?: (data: T) => void) => {
+    const request = useCallback(async ({ options, transformResponse, body, ...requestParams }: RequestParams<T> & { body: P }) => {
         const controller = new AbortController();
         const signal = controller.signal;
         const timeoutId = setTimeout(() => controller.abort(), options?.timeout ? options.timeout : 5000);
         try {
             setLoading(true);
-            const result = await buildApi<T>({ options: { ...options, signal }, ...requestParams });
+            const result = await buildApi<T>({ options: { ...options, signal }, ...requestParams, body: body ?? undefined });
 
             setError(null); // 요청 성공 시 에러 상태 초기화
 
-            if (onSuccess) {
-                onSuccess(transformResponse ? transformResponse(result) : result);
-            }
+            return transformResponse ? transformResponse(result) : result;
         } catch (err) {
             setError(err as Error);
             throw err;
@@ -96,10 +90,43 @@ const useRequest = <T>({ options, transformResponse, ...requestParams }: Request
             setLoading(false);
             clearTimeout(timeoutId)
         }
-    }, [options, requestParams]);
+    }, []);
 
     return { isLoading, error, request };
 };
+
+const useRequestWithRecoil = <T, P>({ recoilState }: { recoilState: RecoilState<T | null> }) => {
+
+    const [data, setData] = useRecoilState<T | null>(recoilState);
+    const [isLoading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<Error | null>(null);
+
+    const request = useCallback(async ({ options, transformResponse, body, ...requestParams }: RequestParams<T> & { body: P }) => {
+        const controller = new AbortController();
+        const signal = controller.signal;
+        const timeoutId = setTimeout(() => controller.abort(), options?.timeout ? options.timeout : 5000);
+        try {
+            setLoading(true);
+            const result = await buildApi<T>({ options: { ...options, signal }, ...requestParams, body: body ?? undefined });
+            setData(result);
+            setError(null); // 요청 성공 시 에러 상태 초기화
+
+            return transformResponse ? transformResponse(result) : result;
+        } catch (err) {
+            setError(err as Error);
+            setData(null); // 요청 실패 시 데이터 초기화
+            throw err;
+        } finally {
+            setLoading(false);
+            clearTimeout(timeoutId)
+        }
+    }, [recoilState]);
+
+    return { data, isLoading, error, request };
+};
+
+
+
 // useFetch 커스텀 훅 (useEffect를 통한 데이터 로딩 처리)
 const useFetch = <T>({ url, params, transformResponse, options }: FetchParams<T>) => {
 
@@ -135,43 +162,12 @@ const useFetch = <T>({ url, params, transformResponse, options }: FetchParams<T>
     return { data, isLoading, error };
 };
 
-const useRequestWithRecoil = <T>({ recoilState, options, ...requestParams }: RequestParams<T> & { recoilState: RecoilState<T | null> }) => {
-
-    const [data, setData] = useRecoilState<T | null>(recoilState);
-    const [isLoading, setLoading] = useState<boolean>(false);
-    const [error, setError] = useState<Error | null>(null);
-
-    const request = useCallback(async (onSuccess?: (data: T) => void) => {
-        const controller = new AbortController();
-        const signal = controller.signal;
-        const timeoutId = setTimeout(() => controller.abort(), options?.timeout ? options.timeout : 5000);
-        try {
-            setLoading(true);
-            const result = await buildApi<T>({ options: { ...options, signal }, ...requestParams });
-            setData(result);
-            setError(null); // 요청 성공 시 에러 상태 초기화
-
-            if (onSuccess)
-                onSuccess(result)
-        } catch (err) {
-            setError(err as Error);
-            setData(null); // 요청 실패 시 데이터 초기화
-            throw err;
-        } finally {
-            setLoading(false);
-            clearTimeout(timeoutId)
-        }
-    }, [options, requestParams]);
-
-    return { data, isLoading, error, request };
-};
 // useFetch 커스텀 훅 (useEffect를 통한 데이터 로딩 처리)
 const useFetchWithRecoil = <T>({ url, params, transformResponse, options, recoilState }: FetchParams<T> & { recoilState: RecoilState<T | null> }) => {
 
     const [data, setData] = useRecoilState<T | null>(recoilState);
     const [isLoading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
-
 
     useEffect(() => {
         const fetchDataAsync = async () => {
@@ -204,33 +200,42 @@ const useFetchWithRecoil = <T>({ url, params, transformResponse, options, recoil
 
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-
 /** 메인 타입, 커플 타입 순 */
 type ValidateGeneric<R, P> = IsAny<P> extends true ? never : IsAny<R> extends true ? never : R
+type Validate<T> = IsAny<T> extends true ? never : T;
+
+
 
 type Build = {
+
     fetch: <Response, Params>( // R, P에 any 비허용
         config: {
-            recoilState?: RecoilState<ValidateGeneric<Response, Params> | null>,
-            query: (params: ValidateGeneric<Params, Response>) => Omit<RequestOptions, 'method'>;
-            transformResponse?: (data: any) => ValidateGeneric<Response, Params>;
+            recoilState?: RecoilState<Validate<Response> | null>,
+            query: (params: Validate<Params>) => Omit<RequestOptions, 'method'>;
+            transformResponse?: (data: any) => Validate<Response>;
         }
-    ) => (params: ValidateGeneric<Params, Response>) => ReturnType<typeof useFetch<ValidateGeneric<Response, Params>>>,
-    request: <Response, Params>( // R, P에 any 비허용
+    ) => (params: Validate<Params>)
+            => ReturnType<typeof useFetch<Validate<Response>>>,
+
+    request: <Response, Params>(
         config: {
-            recoilState?: RecoilState<ValidateGeneric<Response, Params> | null>,
-            query: (params: ValidateGeneric<Params, Response>) => Omit<RequestOptions, 'method'> & { method: Exclude<RequestMethod, 'GET'> };
-            transformResponse?: (data: any) => ValidateGeneric<Response, Params>
+            recoilState?: RecoilState<Validate<Response> | null>;
+            query: (params: Validate<Params>) => Omit<RequestOptions, "method"> & { method: Exclude<RequestMethod, "GET"> };
+            transformResponse?: (data: unknown) => Validate<Response>;
         }
-    ) => (userParams: ValidateGeneric<Params, Response>) => ReturnType<typeof useRequest<ValidateGeneric<Response, Params>>>
+    ) => () => {
+        isLoading: boolean;
+        error: Error | null;
+        request: (params: Validate<Params>) => Promise<Validate<Response>>;
+    };
 }
 
-type Endpoints = Record<string, ((params: any) => (ReturnType<typeof useRequest<any>> | ReturnType<typeof useFetch<any>>)) extends ((params: infer P) => infer Ret) ?
+type Endpoints = Record<string, ((params: any) => (ReturnType<typeof useRequest<any, any>> | ReturnType<typeof useFetch<any>>)) extends ((params: infer P) => infer Ret) ?
     IsAny<P> extends true ?
     (params: never) => Ret
     :
-    Ret extends ReturnType<typeof useRequest<infer R>> ?
-    ((params: P) => (ReturnType<typeof useRequest<R>>))
+    Ret extends ReturnType<typeof useRequest<infer R, P>> ?
+    ((params: P) => (ReturnType<typeof useRequest<R, P>>))
     :
     Ret extends ReturnType<typeof useFetch<infer R>> ?
     ((params: P) => (ReturnType<typeof useFetch<R>>))
@@ -243,7 +248,7 @@ type Endpoints = Record<string, ((params: any) => (ReturnType<typeof useRequest<
 
 type RenameEndpoints<T extends Record<string, any>> = {
     [K in keyof T & string]:
-    T[K] extends (params: infer P) => ReturnType<typeof useRequest<infer R>>
+    T[K] extends (params: infer P) => ReturnType<typeof useRequest<infer R, infer P>>
     ? { key: `use${Capitalize<K>}Request`, params: P, response: R }
     : T[K] extends (params: infer P) => ReturnType<typeof useFetch<infer R>>
     ? { key: `use${Capitalize<K>}Fetch`, params: P, response: R }
@@ -254,7 +259,7 @@ type RenameEndpointsMap<T extends Record<string, any>> = {
     K['key'] extends `use${infer Name}Fetch`
     ? (params: K['params']) => ReturnType<typeof useFetch<K['response']>>
     : K['key'] extends `use${infer Name}Request`
-    ? (params: K['params']) => ReturnType<typeof useRequest<K['response']>>
+    ? (params: K['params']) => ReturnType<typeof useRequest<K['response'], K['params']>>
     : never;
 };
 
@@ -271,17 +276,17 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
                 query,
                 transformResponse,
             }: {
-                recoilState?: RecoilState<ValidateGeneric<R, P> | null>,
-                query: (params: ValidateGeneric<P, R>) => Omit<RequestOptions, 'method'>;
-                transformResponse?: (data: any) => ValidateGeneric<R, P>
+                recoilState?: RecoilState<Validate<R> | null>,
+                query: (params: Validate<P>) => Omit<RequestOptions, 'method'>;
+                transformResponse?: (data: any) => Validate<R>
             }) => {
-                return (params: ValidateGeneric<P, R>) => {
+                return (params: Validate<P>) => {
                     const { url, params: queryParams } = query(params);
                     const finalUrl = `${baseUrl}${url}`;
                     if (recoilState)
-                        return useFetchWithRecoil<ValidateGeneric<R, P>>({ ...queryParams, url: finalUrl, transformResponse, recoilState });
+                        return useFetchWithRecoil<Validate<R>>({ ...queryParams, url: finalUrl, transformResponse, recoilState });
                     else
-                        return useFetch<ValidateGeneric<R, P>>({ ...queryParams, url: finalUrl, transformResponse });
+                        return useFetch<Validate<R>>({ ...queryParams, url: finalUrl, transformResponse });
                 }
             },
 
@@ -290,19 +295,22 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
                 query,
                 transformResponse,
             }: {
-                recoilState?: RecoilState<ValidateGeneric<R, P> | null>,
-                query: (params: ValidateGeneric<P, R>) => Omit<RequestOptions, "method"> & { method: Exclude<RequestMethod, "GET"> }
-                transformResponse?: (data: any) => ValidateGeneric<R, P>;
+                recoilState?: RecoilState<Validate<R> | null>,
+                query: (params: Validate<P>) => Omit<RequestOptions, "method"> & { method: Exclude<RequestMethod, "GET"> }
+                transformResponse?: (data: any) => Validate<R>;
             }) => {
-                return (userParams: ValidateGeneric<P, R>) => {
-                    const { url, ...QueryParams } = query(userParams);
-                    const finalUrl = `${baseUrl}${url}`;
-                    if (recoilState)
-                        return useRequestWithRecoil<ValidateGeneric<R, P>>({ ...QueryParams, url: finalUrl, transformResponse, recoilState });
-                    else
-                        return useRequest<ValidateGeneric<R, P>>({ ...QueryParams, url: finalUrl, transformResponse });
-                }
+                return () => { // ✅ 이제 훅 호출 시 userParams를 받지 않음
+                    const { isLoading, error, request } = recoilState
+                        ? useRequestWithRecoil<Validate<R>, Validate<P>>({ recoilState })
+                        : useRequest<Validate<R>, Validate<P>>();
 
+                    const executeRequest = async (params: Validate<P>) => { // ✅ params는 여기서 받음
+                        const { url, ...queryParams } = query(params);
+                        return request({ ...queryParams, url: `${baseUrl}${url}`, body: params, transformResponse });
+                    };
+
+                    return { isLoading, error, request: executeRequest };
+                };
             },
         };
     }

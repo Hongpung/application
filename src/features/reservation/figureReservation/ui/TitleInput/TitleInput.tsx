@@ -1,8 +1,9 @@
 import { TextInput, Text, View } from "react-native"
+
 import { useRecoilValue } from "recoil";
 
 import { Color } from "@hongpung/src/common";
-import { UserStatusState } from "@hongpung/src/entities/user";
+import { UserStatusState } from "@hongpung/src/entities/user/@x/reservation";
 
 type TitleInputProps = {
     title?: string
@@ -11,7 +12,7 @@ type TitleInputProps = {
 
 export const TitleInput: React.FC<TitleInputProps> = ({ title, setTitle }) => {
 
-    const loginUser = useRecoilValue(UserStatusState)
+    const userStatus = useRecoilValue(UserStatusState)
 
     return (
         <View>
@@ -21,7 +22,7 @@ export const TitleInput: React.FC<TitleInputProps> = ({ title, setTitle }) => {
                     <TextInput
                         style={{ marginHorizontal: 12, paddingVertical: 4, fontSize: 16 }}
                         textAlign='right'
-                        placeholder={`${loginUser?.nickname ? loginUser.nickname : loginUser?.name}의 연습`}
+                        placeholder={`${userStatus?.nickname ? userStatus.nickname : userStatus?.name}의 연습`}
                         value={title}
                         onChangeText={setTitle}
                     />

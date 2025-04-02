@@ -1,10 +1,10 @@
 import { ReservationDTO } from "@hongpung/pages/Reservation/ReservationInterface"
 import { Checkbox, LongButton } from "@hongpung/src/common"
-import { DateTimeDisplay } from "@hongpung/src/entities/reservation/ui/DateTimeSelector/DateTimeSelector"
-import { BorrowInstrumentsSelector } from "@hongpung/src/entities/reservation/ui/BorrowInstrumentsSelector/BorrowInstrumentsSelector"
-import { ParticipatorsSelector } from "@hongpung/src/entities/reservation/ui/ParticipatorsSelector/ParticipatorsSelector"
-import { ReservationTypeSelector } from "@hongpung/src/entities/reservation/ui/ReservationTimeSelector/ReservationTimeSelector"
-import { TitleInput } from "@hongpung/src/entities/reservation/ui/TitleInput/TitleInput"
+import { DateTimeViewer } from "@hongpung/src/entities/reservation/ui/DateTimeViewer/DateTimeViewer"
+import { BorrowInstrumentsSelector } from "@hongpung/src/features/reservation/figureReservation/ui/BorrowInstrumentsSelector/BorrowInstrumentsSelector"
+import { ParticipatorsSelector } from "@hongpung/src/features/reservation/figureReservation/ui/ParticipatorsSelector/ParticipatorsSelector"
+import { ReservationTypeSelector } from "@hongpung/src/entities/reservation/ui/ReservationTypeSelector/ReservationTimeSelector"
+import { TitleInput } from "@hongpung/src/features/reservation/figureReservation/ui/TitleInput/TitleInput"
 import { useState } from "react"
 import { ScrollView, View } from "react-native"
 
@@ -21,7 +21,7 @@ export const ReservationPage: React.FC = () => {
 
             <ScrollView contentContainerStyle={{ flex: 1 }}>
                 
-                <DateTimeDisplay
+                <DateTimeViewer
                     as={View}
                 />
                 

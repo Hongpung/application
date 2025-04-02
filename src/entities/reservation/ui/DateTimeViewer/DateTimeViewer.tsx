@@ -8,13 +8,7 @@ type DateTimeDisplayProps = {
     startTime?: string | null
     endTime?: string | null
     style?: StyleProp<ViewStyle> | null
-} & ({
-    onPress: () => void
-    as: typeof Pressable;
-} | {
-    onPress?: never
-    as?: typeof View
-})
+};
 
 const useDateTimeHelpers = (date?: string | null, startTime?: string | null, endTime?: string | null) => {
 
@@ -44,7 +38,7 @@ const useDateTimeHelpers = (date?: string | null, startTime?: string | null, end
     return { DateString, TimeGapText };
 };
 
-export const DateTimeDisplay: React.FC<DateTimeDisplayProps> = ({ style, ...props }) => {
+export const DateTimeViewer: React.FC<DateTimeDisplayProps> = ({ style, ...props }) => {
 
     const { date, startTime, endTime } = props
 

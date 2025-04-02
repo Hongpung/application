@@ -1,1 +1,1 @@
-export * from './ReservationForm/ReservationForm'
+export * from './figureReservation/ui/ReservationForm/ReservationForm'
