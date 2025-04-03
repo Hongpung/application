@@ -1,31 +1,29 @@
-import { View, Text, Pressable, Dimensions } from "react-native"
+import { View, Text, Pressable } from "react-native"
 
 import { Color, Icons } from "@hongpung/src/common";
 
 import { BorrowInstrumentsViewer } from "@hongpung/src/entities/reservation";
+import React from "react";
 
 
 type BorrowInstrumentSelectorProps = {
-    resetBorrowInstruments?: () => void
+    resetBorrowInstruments: () => void
     borrowInstruments: any[]
     onPress: () => void
 }
 
-const { width } = Dimensions.get('window')
-
-export const BorrowInstrumentsSelector: React.FC<BorrowInstrumentSelectorProps> = ({ onPress, resetBorrowInstruments, borrowInstruments }) => {
+const BorrowInstrumentsSelector: React.FC<BorrowInstrumentSelectorProps> = ({ onPress, resetBorrowInstruments, borrowInstruments }) => {
 
     return (
         <View>
             <View style={{ marginHorizontal: 24 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Text style={{ fontSize: 16, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey500'] }}>대여 악기</Text>
-                    {resetBorrowInstruments &&
-                        <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}
-                            onPress={resetBorrowInstruments}>
-                            <Icons name='refresh' size={16} color={Color['grey400']} />
-                            <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey300'] }}>초기화</Text>
-                        </Pressable>}
+                    <Pressable style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}
+                        onPress={resetBorrowInstruments}>
+                        <Icons name='refresh' size={16} color={Color['grey400']} />
+                        <Text style={{ fontSize: 12, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey300'] }}>초기화</Text>
+                    </Pressable>
                 </View>
 
                 <View style={{ height: 16 }} />
@@ -33,7 +31,7 @@ export const BorrowInstrumentsSelector: React.FC<BorrowInstrumentSelectorProps> 
                 <Pressable style={{ marginHorizontal: 16 }} onPress={onPress}>
 
                     {borrowInstruments.length > 0 ?
-                        <BorrowInstrumentsViewer borrowInstruments={borrowInstruments} /> 
+                        <BorrowInstrumentsViewer borrowInstruments={borrowInstruments} />
                         :
                         <View style={{ alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 8, borderRadius: 10, borderWidth: 4, height: 72, borderColor: Color['grey200'], borderStyle: 'dashed' }}>
                             <Text style={{ fontSize: 18, fontFamily: 'NanumSquareNeo-Bold', color: Color['grey300'] }}>+</Text>
@@ -45,3 +43,5 @@ export const BorrowInstrumentsSelector: React.FC<BorrowInstrumentSelectorProps> 
         </View>
     )
 }
+
+export default React.memo(BorrowInstrumentsSelector)

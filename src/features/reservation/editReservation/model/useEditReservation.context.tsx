@@ -16,18 +16,21 @@ interface EditReservationContextProps {
     setDate: (date: ReservationForm['date']) => void;
     setStartTime: (time: ReservationForm['startTime']) => void;
     setEndTime: (time: ReservationForm['endTime']) => void;
+    
     setTitle: (time: ReservationForm['title']) => void;
-    setParticipators: (participators: ReservationForm['participators']) => void;
-    setInstruments: (borrowInstruments: ReservationForm['borrowInstruments']) => void;
+    
     setParticipationAvailable: (participationAvailable: ReservationForm['participationAvailable']) => void;
     setReservationType: (reservationType: ReservationForm['reservationType']) => void;
+    
+    setParticipators: (participators: ReservationForm['participators']) => void;
+    setBorrowInstruments: (borrowInstruments: ReservationForm['borrowInstruments']) => void;
 
     verifyEditReservation: () => Promise<void>;
 
     requestEditReservation: () => Promise<void>;
 
     isLoading: boolean;
-    
+
 }
 
 const EditReservationContext = createContext<EditReservationContextProps | undefined>(undefined);
@@ -58,7 +61,7 @@ const EditReservationContextProvider = ({ prevReservation, children }: { prevRes
     const setEndTime = (endTime: ReservationForm['endTime']) => setReservation({ endTime });
     const setTitle = (title: ReservationForm['title']) => setReservation({ title });
     const setParticipators = (participators: ReservationForm['participators']) => setReservation({ participators });
-    const setInstruments = (borrowInstruments: ReservationForm['borrowInstruments']) => setReservation({ borrowInstruments });
+    const setBorrowInstruments = (borrowInstruments: ReservationForm['borrowInstruments']) => setReservation({ borrowInstruments });
     const setParticipationAvailable = (participationAvailable: ReservationForm['participationAvailable']) => setReservation({ participationAvailable });
     const setReservationType = (reservationType: ReservationForm['reservationType']) => setReservation({ reservationType });
 
@@ -76,16 +79,32 @@ const EditReservationContextProvider = ({ prevReservation, children }: { prevRes
 
     const requestEditReservation = async () => {
         try {
+            if (isEqual(prevReservation, reservation)) throw new Error("기존 예약과 동일합니다.");
 
             await request(getReservationEditRequestBody(prevReservation, reservation));
 
             navigation.navigate('ReservationDetail', { reservationId: prevReservation.reservationId })
 
-        } catch {
+        } catch (e) {
 
-            Alert.alert('예약 오류', error?.message || "예약 수정 중 오류가 발생했습니다.");
-            console.error("예약 수정 중 오류 발생:", error);
+            if (e instanceof Error) {
+
+                Alert.alert('예약 오류', e.message);
+                console.error("예약 수정 중 오류 발생:", e.message);
+
+            }
+            else if(error instanceof Error) {
+
+                Alert.alert('예약 오류', error?.message || "예약 수정 중 오류가 발생했습니다.");
+                console.error("예약 수정 중 오류 발생:", error);
+
+            }else{
+                Alert.alert('예약 오류', "예약 수정 중 오류가 발생했습니다.");
+                console.error("예약 수정 중 오류 발생:", error);
+            }
+
         }
+
     };
 
     return (
@@ -97,10 +116,10 @@ const EditReservationContextProvider = ({ prevReservation, children }: { prevRes
                 setStartTime,
                 setEndTime,
                 setTitle,
-                setParticipators,
-                setInstruments,
-                setParticipationAvailable,
                 setReservationType,
+                setParticipationAvailable,
+                setParticipators,
+               setBorrowInstruments,
 
                 isLoading,
                 verifyEditReservation,

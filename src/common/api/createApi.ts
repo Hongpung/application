@@ -230,20 +230,18 @@ type Build = {
     ) => () => RequestReturn<Response, Params>;
 }
 
-type Endpoints = Record<string, ((() => RequestReturn<any, any>)) extends (() => infer Ret) ?
-    Ret extends RequestReturn<infer R, infer P> ?
-    (() => (RequestReturn<R, P>))
-    :
-    never
-    :
-    Record<string, (params: any) => ReturnType<typeof useFetch<any>>> extends ((params: infer P) => infer Ret) ?
-    Ret extends ReturnType<typeof useFetch<infer R>> ?
-    ((params: P) => (ReturnType<typeof useFetch<R>>))
-    :
-    never
-    :
-    never
->;
+type Endpoints =
+    Record<string, ((() => RequestReturn<any, any>) | ((params: any) => ReturnType<typeof useFetch<any>>)) extends ((() => infer Ret) | ((params: infer P) => infer Ret)) ?
+        Ret extends RequestReturn<infer R, infer P> ?
+        (() => (RequestReturn<R, P>))
+        :
+        Ret extends ReturnType<typeof useFetch<infer R>> ?
+        ((params: P) => (ReturnType<typeof useFetch<R>>))
+        :
+        never
+        :
+        never
+    >;
 
 
 type RenameEndpoints<T extends Record<string, any>> = {

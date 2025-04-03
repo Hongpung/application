@@ -2,22 +2,15 @@ import { Color } from "@hongpung/src/common"
 import { View, Text, Pressable, StyleSheet } from "react-native"
 
 type ReservationTypeSelectorProps = {
-    disabled?: false
     reservationType: Exclude<ReservationType, 'EXTERNAL'>
     setReservationType: (changeType: Exclude<ReservationType, 'EXTERNAL'>) => void
     participationAvailable: boolean
     setParticipationAvailable: (changeAvailable: boolean) => void
-} | {
-    disabled: true
-    reservationType: Exclude<ReservationType, 'EXTERNAL'>
-    setReservationType: never
-    participationAvailable: boolean
-    setParticipationAvailable: never
 }
 
 export const ReservationTypeSelector: React.FC<ReservationTypeSelectorProps> = (props) => {
-    const { disabled = false, reservationType, participationAvailable, setReservationType, setParticipationAvailable } = props
 
+    const { reservationType, participationAvailable, setReservationType, setParticipationAvailable } = props
 
     return (
         <View>
@@ -27,14 +20,12 @@ export const ReservationTypeSelector: React.FC<ReservationTypeSelectorProps> = (
                 <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>정규 일정</Text>
                 <View style={{ width: 218, height: 36, borderRadius: 5, flexDirection: 'row', alignItems: 'center' }}>
                     <Pressable style={[{ width: 108, alignItems: 'center', borderBottomLeftRadius: 5, borderTopLeftRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderRightWidth: 0.5, borderColor: reservationType === 'REGULAR' ? Color['blue500'] : Color['red500'] }, reservationType === 'REGULAR' && { backgroundColor: Color['blue100'] }]}
-                        disabled={disabled}
                         onPress={() => { setReservationType('REGULAR'); setParticipationAvailable(false); }}>
                         <Text style={[style.buttonText, reservationType === 'REGULAR' ? { color: Color['blue600'] } : { color: Color['red300'] }]}>
                             예
                         </Text>
                     </Pressable>
                     <Pressable style={[{ width: 108, alignItems: 'center', borderBottomRightRadius: 5, borderTopRightRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderLeftWidth: 0.5, borderColor: reservationType === 'REGULAR' ? Color['blue500'] : Color['red500'] }, reservationType !== 'REGULAR' && { backgroundColor: Color['red100'] }]}
-                        disabled={disabled}
                         onPress={() => setReservationType('COMMON')}>
                         <Text style={[style.buttonText, reservationType === 'REGULAR' ? { color: Color['blue300'] } : { color: Color['red600'] }]}>
                             아니오
@@ -49,14 +40,14 @@ export const ReservationTypeSelector: React.FC<ReservationTypeSelectorProps> = (
                 <Text style={{ fontSize: 14, fontFamily: 'NanumSquareNeo-Regular', color: Color['grey400'] }}>열린 연습</Text>
                 <View style={{ width: 218, height: 36, borderRadius: 5, flexDirection: 'row', alignItems: 'center' }}>
                     <Pressable style={[{ width: 108, alignItems: 'center', borderBottomLeftRadius: 5, borderTopLeftRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderRightWidth: 0.5, borderColor: reservationType === 'REGULAR' ? Color['grey400'] : participationAvailable ? Color['blue500'] : Color['red500'] }, reservationType !== 'REGULAR' && participationAvailable && { backgroundColor: Color['blue100'] }]}
-                        disabled={disabled}
+                        disabled={reservationType === 'REGULAR'}
                         onPress={() => reservationType !== 'REGULAR' && setParticipationAvailable(true)}>
                         <Text style={[style.buttonText, reservationType === 'REGULAR' ? { color: Color['grey300'] } : participationAvailable ? { color: Color['blue600'] } : { color: Color['red300'] }]}>
                             예
                         </Text>
                     </Pressable>
                     <Pressable style={[{ width: 108, alignItems: 'center', borderBottomRightRadius: 5, borderTopRightRadius: 5, height: 36, justifyContent: 'center', borderWidth: 1, borderLeftWidth: 0.5, borderColor: reservationType === 'REGULAR' ? Color['grey400'] : participationAvailable ? Color['blue500'] : Color['red500'] }, reservationType === 'REGULAR' ? { backgroundColor: Color['grey100'] } : !participationAvailable && { backgroundColor: Color['red100'] }]}
-                        disabled={disabled}
+                        disabled={reservationType === 'REGULAR'}
                         onPress={() => reservationType !== 'REGULAR' && setParticipationAvailable(false)}>
                         <Text style={[style.buttonText, reservationType === 'REGULAR' ? { color: Color['grey400'] } : participationAvailable ? { color: Color['blue300'] } : { color: Color['red600'] }]}>
                             아니오

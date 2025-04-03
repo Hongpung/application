@@ -2,6 +2,7 @@ import { Pressable, View, Text } from "react-native"
 
 import { Color } from "@hongpung/src/common"
 import { DateTimeViewer } from "@hongpung/src/entities/reservation/ui/DateTimeViewer/DateTimeViewer"
+import React from "react"
 
 type DateTimeSelectorProps = {
     date?: string | null
@@ -23,3 +24,4 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = (props) => {
         </View>
     )
 }
+export default React.memo(DateTimeSelector)

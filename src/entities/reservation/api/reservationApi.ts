@@ -1,6 +1,6 @@
 import { baseApi } from "@hongpung/src/common/api"
 
-import { DailyReservationDto, ExistReservationDto, MonthlyReservationDto, ReservationCreateRequestBody, ReservationDto, ReservationEditRequestBody } from "../api/type"
+import { DailyReservationDto, ExistReservationDto, MonthlyReservationDto, ReservationDto } from "../api/type"
 import { DailyReservation, ReservationDetail } from "../model/type"
 import { mapReservationDetail } from "../lib/mapReservationDetail"
 import { myTodayReservationState } from "../model/myTodayReservationState"
@@ -78,41 +78,6 @@ const reservationApi = baseApi.addEndpoints({
             }
         }),
 
-        createReservation: build.request<{ reservationId: number }, ReservationCreateRequestBody>({
-            query: (body) => ({
-                url: '/reservation',
-                method: 'POST',
-                body,
-                withAuthorize: true
-            })
-        })
-        ,
-
-        editReservation: build.request<void, ReservationEditRequestBody>({
-            query: ({ reservationId, ...body }) => ({
-                url: `/reservation/${reservationId}`,
-                method: 'POST',
-                body,
-                withAuthorize: true
-            })
-        }),
-
-        deleteReservation: build.request<void, { reservationId: number }>({
-            query: ({ reservationId }) => ({
-                url: `/reservation/${reservationId}`,
-                method: 'DELETE',
-                withAuthorize: true
-            })
-        }),
-
-        leaveReservation: build.request<void, { reservationId: number }>({
-            query: ({ reservationId }) => ({
-                url: `/reservation/${reservationId}/leave`,
-                method: 'POST',
-                withAuthorize: true
-            })
-        })
-        ,
 
         loadMyTodayReservation: build.fetch<DailyReservationDto[], void>({
             recoilState: myTodayReservationState,
@@ -144,8 +109,6 @@ const reservationApi = baseApi.addEndpoints({
 
 export const {
     useLoadDailyReservationsFetch, useLoadReservationDetailFetch, useLoadOccupiedTimesFetch, useLoadMonthlyReservationsFetch,
-    useCreateReservationRequest, useDeleteReservationRequest, useEditReservationRequest,
-    useLeaveReservationRequest,
     useLoadMySchedulesFetch,
     useLoadMyTodayReservationFetch
 } = reservationApi

@@ -2,12 +2,12 @@ import { View } from 'react-native'
 import React, { useCallback } from 'react'
 import { TitleInput } from '@hongpung/src/features/reservation/figureReservation/ui/TitleInput/TitleInput'
 
-import { ReservationTypeSelector } from '../ReservationTypeSelector/ReservationTypeSelector'
-import { ParticipatorsSelector } from '../ParticipatorsSelector/ParticipatorsSelector'
-import { BorrowInstrumentsSelector } from '../BorrowInstrumentsSelector/BorrowInstrumentsSelector'
+import { ReservationTypeSelector } from '@hongpung/src/features/reservation/figureReservation/ui/ReservationTypeSelector/ReservationTypeSelector'
+import { ParticipatorsSelector } from '@hongpung/src/features/reservation/figureReservation/ui/ParticipatorsSelector/ParticipatorsSelector'
+import BorrowInstrumentsSelector from '@hongpung/src/features/reservation/figureReservation/ui/BorrowInstrumentsSelector/BorrowInstrumentsSelector'
 
-import { type ReservationForm as ReservationFormType } from '../../../model/type'
-import { DateTimeSelector } from '../DateTimeSelector/DateTimeSelector'
+import { type ReservationForm as ReservationFormType } from '@hongpung/src/features/reservation/model/type'
+import { DateTimeSelector } from '@hongpung/src/features/reservation/figureReservation/ui/DateTimeSelector/DateTimeSelector'
 
 
 type ReservationFormProps = {

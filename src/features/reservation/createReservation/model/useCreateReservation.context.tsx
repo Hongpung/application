@@ -5,21 +5,28 @@ import { useCreateReservationRequest } from "../api/createReservationApi";
 import { ReservationStackParamList } from "@hongpung/nav/ReservationStack";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
+import { Alert } from "react-native";
 
 interface CreateReservationContextProps {
+
     reservation: Partial<ReservationForm>;
 
     setDate: (date: ReservationForm['date']) => void;
     setStartTime: (time: ReservationForm['startTime']) => void;
     setEndTime: (time: ReservationForm['endTime']) => void;
+
     setTitle: (time: ReservationForm['title']) => void;
-    setParticipators: (participators: ReservationForm['participators']) => void;
-    setInstruments: (borrowInstruments: ReservationForm['borrowInstruments']) => void;
+
     setParticipationAvailable: (participationAvailable: ReservationForm['participationAvailable']) => void;
     setReservationType: (reservationType: ReservationForm['reservationType']) => void;
 
+    setParticipators: (participators: ReservationForm['participators']) => void;
+    setBorrowInstruments: (borrowInstruments: ReservationForm['borrowInstruments']) => void;
+
     isValidReservation: boolean;
     requestCreateReservation: () => Promise<void>;
+
+    isLoading: boolean;
 }
 
 const CreateReservationContext = createContext<CreateReservationContextProps | undefined>(undefined);
@@ -42,7 +49,7 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
 
     const navigation = useNavigation<CreateReservationNavProps>();
 
-    const { request } = useCreateReservationRequest();
+    const { request, error, isLoading } = useCreateReservationRequest();
 
     // setReservation을 업데이트 함수로 개선
     const setReservation = (update: Partial<ReservationForm>) => {
@@ -58,7 +65,7 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
     const setEndTime = (endTime: ReservationForm['endTime']) => setReservation({ endTime });
     const setTitle = (title: ReservationForm['title']) => setReservation({ title });
     const setParticipators = (participators: ReservationForm['participators']) => setReservation({ participators });
-    const setInstruments = (borrowInstruments: ReservationForm['borrowInstruments']) => setReservation({ borrowInstruments });
+    const setBorrowInstruments = (borrowInstruments: ReservationForm['borrowInstruments']) => setReservation({ borrowInstruments });
     const setParticipationAvailable = (participationAvailable: ReservationForm['participationAvailable']) => setReservation({ participationAvailable });
     const setReservationType = (reservationType: ReservationForm['reservationType']) => setReservation({ reservationType });
 
@@ -74,8 +81,27 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
             navigation.navigate('ReservationDetail', { reservationId })
             console.log("예약 생성 요청:", reservation);
             // 실제 API 요청을 추가할 것
-        } catch (error) {
-            console.error("예약 생성 중 오류 발생:", error);
+        } catch (e) {
+
+            if (error instanceof Error) {
+                Alert.alert(
+                    '예약 오류', // 타이틀
+                    error.message
+                )
+                console.error("예약 생성 중 오류 발생:", error.message);
+            }
+            if (e instanceof Error) {
+                Alert.alert(
+                    '예약 오류', // 타이틀
+                    e.message
+                )
+                console.error("예약 생성 중 오류 발생:", e.message);
+            }else{
+                Alert.alert(
+                    '예약 오류', // 타이틀
+                    '예약 생성 중 오류가 발생했어요.'
+                )
+            }
         }
     };
 
@@ -89,12 +115,13 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
                 setEndTime,
                 setTitle,
                 setParticipators,
-                setInstruments,
+                setBorrowInstruments,
                 setParticipationAvailable,
                 setReservationType,
 
                 isValidReservation,
                 requestCreateReservation,
+                isLoading
             }}
         >
             {children}
