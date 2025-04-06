@@ -20,7 +20,7 @@ const reservationApi = baseApi.addEndpoints({
 
         }),
 
-        loadOccupiedTimes: build.fetch<TimeFormat[], { date: Date }>({
+        loadOccupiedTimes: build.fetch<{ times: TimeFormat[], reservationId: number }[], { date: Date }>({
             query: ({ date }) => {
 
                 const koreanTime = new Date(date.getTime() + 9 * 60 * 60 * 1000)
@@ -33,8 +33,11 @@ const reservationApi = baseApi.addEndpoints({
                 }
             },
             transformResponse: (data: ExistReservationDto[]) => {
-                const occupiedTimes = data.map(reservation => (reservation.startTime, reservation.endTime))
-                return occupiedTimes;
+                return data.map(reservation => {
+                    const occupiedTimes = data.map(reservation => (reservation.startTime, reservation.endTime))
+                    return { reservationId: reservation.reservationId, times: occupiedTimes };
+                })
+
             }
         }),
 
@@ -67,7 +70,7 @@ const reservationApi = baseApi.addEndpoints({
             },
             transformResponse: (data: MonthlyReservationDto[]) => {
                 const reservedDates: { [key: number]: { color: string }[] } = [];
-                
+
                 data.map((reservation) => {
                     const reservedDate = new Date(reservation.date).getDate();
                     if (!reservedDates[reservedDate]) reservedDates[reservedDate] = [{ color: colorDefine(reservation) }];

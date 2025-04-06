@@ -11,17 +11,17 @@ import { getReservationEditRequestBody } from "@hongpung/src/entities/reservatio
 
 interface EditReservationContextProps {
 
-    reservation: ReservationForm;
+    reservation: ReservationForm & { reservationId: number };
 
     setDate: (date: ReservationForm['date']) => void;
     setStartTime: (time: ReservationForm['startTime']) => void;
     setEndTime: (time: ReservationForm['endTime']) => void;
-    
+
     setTitle: (time: ReservationForm['title']) => void;
-    
+
     setParticipationAvailable: (participationAvailable: ReservationForm['participationAvailable']) => void;
     setReservationType: (reservationType: ReservationForm['reservationType']) => void;
-    
+
     setParticipators: (participators: ReservationForm['participators']) => void;
     setBorrowInstruments: (borrowInstruments: ReservationForm['borrowInstruments']) => void;
 
@@ -43,7 +43,7 @@ const EditReservationContextProvider = ({ prevReservation, children }: { prevRes
 
     const navigation = useNavigation<EditReservationNavProps>();
 
-    const [reservation, setReservationState] = useState<ReservationForm>(prevReservation);
+    const [reservation, setReservationState] = useState<ReservationForm & { reservationId: number }>(prevReservation);
 
     const { request, isLoading, error } = useEditReservationRequest()
 
@@ -93,12 +93,12 @@ const EditReservationContextProvider = ({ prevReservation, children }: { prevRes
                 console.error("예약 수정 중 오류 발생:", e.message);
 
             }
-            else if(error instanceof Error) {
+            else if (error instanceof Error) {
 
                 Alert.alert('예약 오류', error?.message || "예약 수정 중 오류가 발생했습니다.");
                 console.error("예약 수정 중 오류 발생:", error);
 
-            }else{
+            } else {
                 Alert.alert('예약 오류', "예약 수정 중 오류가 발생했습니다.");
                 console.error("예약 수정 중 오류 발생:", error);
             }
@@ -119,7 +119,7 @@ const EditReservationContextProvider = ({ prevReservation, children }: { prevRes
                 setReservationType,
                 setParticipationAvailable,
                 setParticipators,
-               setBorrowInstruments,
+                setBorrowInstruments,
 
                 isLoading,
                 verifyEditReservation,

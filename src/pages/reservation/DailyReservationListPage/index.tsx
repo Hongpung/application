@@ -10,10 +10,10 @@ import { ReservationCard } from "@hongpung/src/entities/reservation/ui/Reservati
 import { TimeLine } from "@hongpung/src/widgets/reservation/ui/TimeLine/TimeLine"
 
 type DailyReservationListProps = {
-    date?: Date
+    date?: Date,
 }
 
-export const DailyReservationListPage: React.FC<DailyReservationListProps> = ({ date }) => {
+const DailyReservationListPage: React.FC<DailyReservationListProps> = ({ date }) => {
 
     const navigation = useNavigation();
     const [selectedDate, selectDate] = useState<Date>(date || new Date());
@@ -56,3 +56,5 @@ export const DailyReservationListPage: React.FC<DailyReservationListProps> = ({ 
         </View>
     )
 }
+
+export default DailyReservationListPage

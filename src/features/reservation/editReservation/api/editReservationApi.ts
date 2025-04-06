@@ -2,9 +2,9 @@ import { baseApi } from "@hongpung/src/common/api"
 import { ReservationEditRequestBody } from "./type"
 
 const editReservationApi = baseApi.addEndpoints({
-    endpoints: (build) => ({
+    endpoints: (builder) => ({
 
-        editReservation: build.request<void, ReservationEditRequestBody>({
+        editReservation: builder.request<void, ReservationEditRequestBody>({
             query: ({ reservationId, ...body }) => {
                 return {
                     url: `/reservation/${reservationId}`,

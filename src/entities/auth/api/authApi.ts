@@ -1,6 +1,5 @@
 import { baseApi } from "@hongpung/src/common/api";
 import { RequestLoginBody } from "./type";
-import { saveToken } from "@hongpung/src/common";
 
 const authApi = baseApi.addEndpoints({
     endpoints: (build) => ({

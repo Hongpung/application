@@ -9,7 +9,7 @@ import { Alert } from "react-native";
 
 interface CreateReservationContextProps {
 
-    reservation: Partial<ReservationForm>;
+    reservation: ReservationForm;
 
     setDate: (date: ReservationForm['date']) => void;
     setStartTime: (time: ReservationForm['startTime']) => void;

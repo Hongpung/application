@@ -1,12 +1,14 @@
-import { Suspense, useRef } from "react";
+import { useRef } from "react";
 import { ScrollView, View, Text, Pressable, Dimensions } from "react-native"
 
 import { Color, TimeArray, TimeFormat } from '@hongpung/src/common'
-import { useTimeSelctor } from "./useTimeSelctor";
-import { useLoadOccupiedTimesFetch } from "@hongpung/src/entities/reservation";
 
 type TimeLineProps = {
-    date: Date
+    occupiedTimes: TimeFormat[],
+    isLoading: boolean,
+    error: Error | null,
+    selectedTimeBlocks: TimeFormat[],
+    toggleTimeBlock: (time: TimeFormat) => void
 }
 
 const { width } = Dimensions.get('window')
@@ -14,12 +16,17 @@ const { width } = Dimensions.get('window')
 /**
  *   AM 10~ PM10까지의 시간 선택(눈금 표시)
  */
-export const TimeSelector: React.FC<TimeLineProps> = ({ date }) => {
+export const TimeSelector: React.FC<TimeLineProps> = ({
 
-    const { data: occupiedTimes, isLoading, error: isError } = useLoadOccupiedTimesFetch({ date })
+    occupiedTimes,
+    isLoading,
+    error,
+    selectedTimeBlocks,
+    toggleTimeBlock
 
-    const { selectedTimeBlocks, toggleTime } = useTimeSelctor(occupiedTimes || [])
-    
+}) => {
+
+
     const TimesRef = useRef<ScrollView | null>(null)
 
     if (isLoading && occupiedTimes == null)
@@ -31,7 +38,7 @@ export const TimeSelector: React.FC<TimeLineProps> = ({ date }) => {
             </View>
         )
 
-    if (isError || occupiedTimes == null)
+    if (error || occupiedTimes == null)
         return null;
 
     return (
@@ -87,7 +94,7 @@ export const TimeSelector: React.FC<TimeLineProps> = ({ date }) => {
                                     { position: 'relative', display: 'flex', height: 42, borderWidth: 2, borderColor: Color['grey200'], marginHorizontal: 24, width: width - 48, borderStyle: 'dotted', backgroundColor: occupiedTimes.includes(time) ? Color['grey200'] : '#FFF', zIndex: index },
                                     index != 0 && { top: -index * 2, height: 42 }, selectedTimeBlocks.includes(time) && { borderColor: Color['blue500'], backgroundColor: Color['blue100'], zIndex: index + 2 }
                                 ]}
-                                onPress={() => { if (!occupiedTimes.includes(time)) toggleTime(time) }}>
+                                onPress={() => { if (!occupiedTimes.includes(time)) toggleTimeBlock(time) }}>
                                 {/* { <View style={{ position: 'absolute', backgroundColor: Color['grey200'], height: 42, width: '100%', left: 20, top: -2, }}></View>} */}
                             </Pressable>
                         );
