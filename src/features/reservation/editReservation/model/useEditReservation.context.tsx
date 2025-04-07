@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { ReservationForm } from "../../model/type";
 import { TimeFormat } from "@hongpung/src/common";
 import { isEqual } from "lodash";
@@ -25,7 +25,7 @@ interface EditReservationContextProps {
     setParticipators: (participators: ReservationForm['participators']) => void;
     setBorrowInstruments: (borrowInstruments: ReservationForm['borrowInstruments']) => void;
 
-    verifyEditReservation: () => Promise<void>;
+    verifyEditReservation: (onVerfyied: () => void) => Promise<void>;
 
     requestEditReservation: () => Promise<void>;
 
@@ -55,27 +55,29 @@ const EditReservationContextProvider = ({ prevReservation, children }: { prevRes
         }));
     };
 
-    // 개별 Setter 함수 추가
-    const setDate = (date: ReservationForm['date']) => setReservation({ date });
-    const setStartTime = (startTime: ReservationForm['startTime']) => setReservation({ startTime });
-    const setEndTime = (endTime: ReservationForm['endTime']) => setReservation({ endTime });
-    const setTitle = (title: ReservationForm['title']) => setReservation({ title });
-    const setParticipators = (participators: ReservationForm['participators']) => setReservation({ participators });
-    const setBorrowInstruments = (borrowInstruments: ReservationForm['borrowInstruments']) => setReservation({ borrowInstruments });
-    const setParticipationAvailable = (participationAvailable: ReservationForm['participationAvailable']) => setReservation({ participationAvailable });
-    const setReservationType = (reservationType: ReservationForm['reservationType']) => setReservation({ reservationType });
+    // 각 필드에 대한 setter들을 묶어서 반환
+    const setters = useMemo(() => ({
+        setDate: (date: ReservationForm['date']) => setReservation({ date }),
+        setStartTime: (startTime: ReservationForm['startTime']) => setReservation({ startTime }),
+        setEndTime: (endTime: ReservationForm['endTime']) => setReservation({ endTime }),
+        setTitle: (title: ReservationForm['title']) => setReservation({ title }),
+        setParticipators: (participators: ReservationForm['participators']) => setReservation({ participators }),
+        setBorrowInstruments: (borrowInstruments: ReservationForm['borrowInstruments']) => setReservation({ borrowInstruments }),
+        setParticipationAvailable: (available: ReservationForm['participationAvailable']) => setReservation({ participationAvailable: available }),
+        setReservationType: (type: ReservationForm['reservationType']) => setReservation({ reservationType: type }),
+    }), [setReservation]);
 
     // 예약 생성 API 요청 함수 (더미 함수로 예시)
-    const verifyEditReservation = async () => {
+    const verifyEditReservation = useCallback(async (onVerfyied: () => void) => {
         if (isEqual(prevReservation, reservation)) {
             Alert.alert(
                 '예약 오류', // 타이틀
                 "기존 예약과 동일합니다."
             );
         } else {
-            navigation.navigate('ReservationStack', { screen: 'ReservationEditConfirm' })
+            onVerfyied()
         }
-    };
+    }, [reservation]);
 
     const requestEditReservation = async () => {
         try {
@@ -112,14 +114,7 @@ const EditReservationContextProvider = ({ prevReservation, children }: { prevRes
             value={{
                 reservation,
 
-                setDate,
-                setStartTime,
-                setEndTime,
-                setTitle,
-                setReservationType,
-                setParticipationAvailable,
-                setParticipators,
-                setBorrowInstruments,
+                ...setters,
 
                 isLoading,
                 verifyEditReservation,

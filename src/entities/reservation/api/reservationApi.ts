@@ -9,6 +9,7 @@ import { colorDefine } from "../lib/colorDefine"
 
 const reservationApi = baseApi.addEndpoints({
     endpoints: (build) => ({
+
         loadReservationDetail: build.fetch<ReservationDetail, { reservationId: number }>({
 
             query: ({ reservationId }) => ({
@@ -90,6 +91,7 @@ const reservationApi = baseApi.addEndpoints({
             })
         }),
 
+
         loadMySchedules: build.fetch<DailyReservationDto[], { skip?: number }>({
             query: ({ skip }) => {
 
@@ -111,7 +113,10 @@ const reservationApi = baseApi.addEndpoints({
 })
 
 export const {
-    useLoadDailyReservationsFetch, useLoadReservationDetailFetch, useLoadOccupiedTimesFetch, useLoadMonthlyReservationsFetch,
+    useLoadDailyReservationsFetch,
+    useLoadReservationDetailFetch,
+    useLoadOccupiedTimesFetch,
+    useLoadMonthlyReservationsFetch,
     useLoadMySchedulesFetch,
     useLoadMyTodayReservationFetch
 } = reservationApi

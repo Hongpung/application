@@ -7,13 +7,14 @@ import { useLoadMonthlyReservationsFetch } from "@hongpung/src/entities/reservat
 
 type FullCalendarProps = {
     onClickDate: (date: Date) => void
+    initialDate?: Date
 }
 
-export const FullCalendar: React.FC<FullCalendarProps> = ({ onClickDate }) => {
+export const FullCalendar: React.FC<FullCalendarProps> = ({ onClickDate, initialDate }) => {
 
     const today = new Date();
 
-    const { calendarMonth, datesInMonth, incrementMonth, decrementMonth } = useFullCalendar();
+    const { calendarMonth, datesInMonth, incrementMonth, decrementMonth } = useFullCalendar(initialDate);
     
     const { data: reservationsData, isLoading, error: isError } = useLoadMonthlyReservationsFetch({ calendarMonth });
 

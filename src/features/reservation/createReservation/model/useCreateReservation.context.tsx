@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { ReservationForm } from "../../model/type";
 import { parseReservationCreateRequestBody } from "../lib/parseReservationCreateRequestBody";
 import { useCreateReservationRequest } from "../api/createReservationApi";
@@ -59,15 +59,17 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
         }));
     };
 
-    // 개별 Setter 함수 추가
-    const setDate = (date: ReservationForm['date']) => setReservation({ date });
-    const setStartTime = (startTime: ReservationForm['startTime']) => setReservation({ startTime });
-    const setEndTime = (endTime: ReservationForm['endTime']) => setReservation({ endTime });
-    const setTitle = (title: ReservationForm['title']) => setReservation({ title });
-    const setParticipators = (participators: ReservationForm['participators']) => setReservation({ participators });
-    const setBorrowInstruments = (borrowInstruments: ReservationForm['borrowInstruments']) => setReservation({ borrowInstruments });
-    const setParticipationAvailable = (participationAvailable: ReservationForm['participationAvailable']) => setReservation({ participationAvailable });
-    const setReservationType = (reservationType: ReservationForm['reservationType']) => setReservation({ reservationType });
+    // 각 필드에 대한 setter들을 묶어서 반환
+    const setters = useMemo(() => ({
+        setDate: (date: ReservationForm['date']) => setReservation({ date, startTime: undefined, endTime: undefined }),
+        setStartTime: (startTime: ReservationForm['startTime']) => setReservation({ startTime }),
+        setEndTime: (endTime: ReservationForm['endTime']) => setReservation({ endTime }),
+        setTitle: (title: ReservationForm['title']) => setReservation({ title }),
+        setParticipators: (participators: ReservationForm['participators']) => setReservation({ participators }),
+        setBorrowInstruments: (borrowInstruments: ReservationForm['borrowInstruments']) => setReservation({ borrowInstruments }),
+        setParticipationAvailable: (available: ReservationForm['participationAvailable']) => setReservation({ participationAvailable: available }),
+        setReservationType: (type: ReservationForm['reservationType']) => setReservation({ reservationType: type }),
+    }), [setReservation]);
 
     const isValidReservation = isCompleteReservation(reservation)
 
@@ -96,7 +98,7 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
                     e.message
                 )
                 console.error("예약 생성 중 오류 발생:", e.message);
-            }else{
+            } else {
                 Alert.alert(
                     '예약 오류', // 타이틀
                     '예약 생성 중 오류가 발생했어요.'
@@ -110,14 +112,7 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
             value={{
                 reservation,
 
-                setDate,
-                setStartTime,
-                setEndTime,
-                setTitle,
-                setParticipators,
-                setBorrowInstruments,
-                setParticipationAvailable,
-                setReservationType,
+                ...setters,
 
                 isValidReservation,
                 requestCreateReservation,

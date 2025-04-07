@@ -3,17 +3,17 @@ import React from 'react'
 import { LongButton } from '@hongpung/src/common'
 import { useCreateReservation } from '../../model/useCreateReservation.context'
 
-export const CreateReservationButton: React.FC<{ isAble: boolean, onPress: () => void }> = ({ onPress }) => {
+export const CreateReservationButton: React.FC<{ isAgree: boolean, onPress: () => void }> = ({ isAgree, onPress }) => {
 
-    const reservationForm = useCreateReservation();
+    const { isValidReservation } = useCreateReservation();
 
     return (
         <LongButton
             innerContent='예약하기'
             color='blue'
-            isAble={Object.values(reservationForm).every(value => value !== null)}
+            isAble={isAgree && isValidReservation}
             onPress={onPress}
         />
     )
-    
+
 }

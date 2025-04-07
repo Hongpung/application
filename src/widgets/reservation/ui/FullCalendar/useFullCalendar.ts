@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 
-export const useFullCalendar = (currentDate?: Date) => {
+export const useFullCalendar = (initialDate?: Date) => {
 
-    const [calendarMonth, setMonth] = useState(currentDate ?? new Date())// 달력의 날짜F
+    const [calendarMonth, setMonth] = useState(initialDate ?? new Date())// 달력의 날짜F
     const [datesInMonth, setDatesInMonth] = useState<number[][]>([[]]); //날짜 배열
 
     const incrementMonth = () => {

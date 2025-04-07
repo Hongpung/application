@@ -22,7 +22,7 @@ type ReservationFormProps = {
     resetBorrowInstruments: () => void;
 
     navigateToParticipatorsPickerPage: () => void;
-    navigateToBorrowInstruemntPickerPage: () => void;
+    navigateToBorrowInstrumentsPickerPage: () => void;
 
     navigateDatePickerPage: () => void;
     navigateTimePickerPage: () => void;
@@ -32,15 +32,20 @@ export const ReservationForm: React.FC<ReservationFormProps> = (props) => {
 
     const {
         reservation,
+        
         setTitle,
         setParticipationAvailable,
         setReservationType,
+        
         resetParticipators,
         resetBorrowInstruments,
+        
         navigateDatePickerPage,
         navigateTimePickerPage,
+        
         navigateToParticipatorsPickerPage,
-        navigateToBorrowInstruemntPickerPage
+        navigateToBorrowInstrumentsPickerPage
+
     } = props
 
     const { startTime, endTime, title, participationAvailable, reservationType, participators, borrowInstruments, date } = reservation;
@@ -82,7 +87,7 @@ export const ReservationForm: React.FC<ReservationFormProps> = (props) => {
             />
 
             <BorrowInstrumentsSelector
-                onPress={navigateToBorrowInstruemntPickerPage}
+                onPress={navigateToBorrowInstrumentsPickerPage}
                 borrowInstruments={borrowInstruments}
                 resetBorrowInstruments={resetBorrowInstruments}
             />
