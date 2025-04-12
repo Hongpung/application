@@ -1,114 +1,35 @@
 import { StyleSheet, TextInput, Text, View, ScrollView, Image, Modal, Pressable, TouchableWithoutFeedback, KeyboardAvoidingView, Platform, Keyboard, Alert, ActivityIndicator } from 'react-native'
-import React, { useState } from 'react'
+import React from 'react'
 
-import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import Toast from 'react-native-toast-message';
-
-import { Icons, Selector, Color } from '@hongpung/src/common';
+import { Icons, Color } from '@hongpung/src/common';
 
 import { FullScreenLoadingModal } from '@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal';
 
 import { ClubInstrumentStackParamList } from '@hongpung/nav/InstrumentStack';
 
-import { uploadImageRequest } from '@hongpung/src/common/api/uploadImageApi';
 import { useImagePicker } from '@hongpung/src/common/lib/useImagePicker';
 
-import { type InstrumentType } from '@hongpung/src/entities/instrument';
-import { instrumentTypes } from '@hongpung/src/entities/instrument/constant/instrumentTypes';
-
-import { useCreateInsrumentRequest } from '@hongpung/src/features/instrument/createInstrument/api/createInstrumentApi';
-import { InstrumentCreateBody } from '@hongpung/src/features/instrument/createInstrument/api/type';
 import { CreateInstrumentButton } from '@hongpung/src/features/instrument/createInstrument/ui/CreateInstrumentButton/CreateInstrumentButton';
 import { InstrumentTypeSelector } from '@hongpung/src/features/instrument/composeInstrument/ui/InstrumentTypeSelector';
 import { InstrumentNameInput } from '@hongpung/src/features/instrument/composeInstrument/ui/InstrumentNameInput/InstrumentNameInput';
-
-const showCreateCompleteToast = () => {
-
-    Toast.show({
-        type: 'success',
-        text1: '악기 등록을 완료했어요!',
-        position: 'bottom',
-        bottomOffset: 60,
-        visibilityTime: 2000
-    });
-};
+import { useCreateInstrument } from '@hongpung/src/features/instrument/createInstrument/model/useCreateInstrument';
+import { useSelector } from '@hongpung/src/common/lib/useSelector';
 
 type InstrumentCreateNav = NativeStackNavigationProp<ClubInstrumentStackParamList, 'InstrumentCreate'>
 
 const InstrumentEditScreen: React.FC = () => {
 
-    
-
-    const navigation = useNavigation<InstrumentCreateNav>();
-
-    const [onSelectType, setSelectTypeVisible] = useState(false);
-
-
-    const { request: createInstrumentRequest, isLoading } = useCreateInsrumentRequest();
-
-
-    const dropdownCloseHandler = () => {
-        if (onSelectType)
-            setSelectTypeVisible(false)
-    }
-
 
     const { pickImageFromAlbum, selectedImage, selectedImageUri } = useImagePicker();
-    
-    const [name, setName] = useState('')
-    const [instrumentType, setInstrumentType] = useState<InstrumentType | null>(null);
+    const { createInstrumentRequest, instrumentType, name, setInstrumentType, setName, isLoading } = useCreateInstrument(selectedImage);
 
-    const SubmitHandler = () => {
-
-        const createInstrument = async () => {
-
-            try {
-
-                if (instrumentType === null) {
-                    Alert.alert('오류', '악기 종류를 선택해주세요.')
-                    return;
-                }
-
-                const submitForm: InstrumentCreateBody = { name: name, instrumentType: instrumentType }
-
-                if (!!selectedImage) {
-
-                    console.log('이미지 업로드 수행중')
-                    const uploadRespone = await uploadImageRequest(selectedImage, 'instruments')
-
-                    if (!uploadRespone) throw Error('업로드 실패')
-
-                    console.log('이미지 업로드 수행완료')
-                    const { imageUrl } = uploadRespone;
-                    submitForm.imageUrl = imageUrl;
-
-                }
-
-                const response = await createInstrumentRequest(submitForm)
-                const { instrumentId } = response;
-
-                showCreateCompleteToast();
-                navigation.replace('InstrumentSpecific', { instrumentId });
-
-            } catch (err: any) {
-                if (err.name === 'AbortError') {
-                    console.error('Request was canceled' + err.status);
-                } else {
-                    console.error(err.message + ' ' + err.status);
-                }
-            }
-        }
-
-        createInstrument();
-
-    }
-
+    const [onSelectType, setSelectTypeVisible, closeInstrumentTypeSelector] = useSelector();
 
     return (
         <TouchableWithoutFeedback
-            onPress={() => { Keyboard.dismiss(); dropdownCloseHandler() }} >
+            onPress={() => { Keyboard.dismiss(); closeInstrumentTypeSelector() }} >
             <KeyboardAvoidingView
                 style={styles.keyboardAvoidingView}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -150,8 +71,8 @@ const InstrumentEditScreen: React.FC = () => {
                                 setName={setName} />
 
                             <InstrumentTypeSelector
-                                setSelectTypeVisible={setSelectTypeVisible}
                                 onSelectType={onSelectType}
+                                setSelectTypeVisible={setSelectTypeVisible}
                                 instrumentType={instrumentType}
                                 setInstrumentType={setInstrumentType}
                             />
@@ -162,7 +83,7 @@ const InstrumentEditScreen: React.FC = () => {
                     <View style={styles.buttonContainer} >
 
                         <CreateInstrumentButton
-                            onPress={() => { }} />
+                            onPress={createInstrumentRequest} />
 
                     </View>
                 </View >
