@@ -1,11 +1,7 @@
-import { useEffect, useRef } from "react";
-import { Animated, Pressable, Text, View, StyleSheet } from "react-native";
-import { Icons } from "@hongpung/src/common";
-import { Color } from "@hongpung/ColorSet";
 import Dropdown from "./dropdown";
 
 
-interface SelectProps {
+interface SelectProps{
     label: string;
     value: string | null;
     onChange: (value: string) => void;

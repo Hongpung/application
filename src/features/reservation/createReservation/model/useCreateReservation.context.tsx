@@ -4,7 +4,7 @@ import { parseReservationCreateRequestBody } from "../lib/parseReservationCreate
 import { useCreateReservationRequest } from "../api/createReservationApi";
 import { ReservationStackParamList } from "@hongpung/nav/ReservationStack";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useNavigation } from "@react-navigation/native";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 import { Alert } from "react-native";
 
 interface CreateReservationContextProps {
@@ -80,6 +80,16 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
 
             const { reservationId } = await request(parseReservationCreateRequestBody(reservation));
 
+            navigation.dispatch(
+                CommonActions.reset({
+                  index: 2, // 마지막 화면의 인덱스 (0부터 시작)
+                  routes: [
+                    { name: 'HomeScreen' },
+                    { name: 'Screen1' },
+                    { name: 'Screen2' }, // 마지막에 보여질 화면
+                  ],
+                })
+              );
             navigation.navigate('ReservationDetail', { reservationId })
             console.log("예약 생성 요청:", reservation);
             // 실제 API 요청을 추가할 것

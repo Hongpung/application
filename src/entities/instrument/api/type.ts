@@ -10,16 +10,11 @@ export type InstrumentDto = {
     borrowAvailable: boolean,
 }
 
-export type InstrumentCreateBody = {
-    instrumentType: string
-    name: string
-    imageUrl?: string
-}
-
 export type InstrumentEditBody = {
+    instrumentId: number
     instrumentType: string
     name: string
-    borrowAvailable: boolean,
+    borrowAvailable: boolean
     imageUrl?: string
 }
 

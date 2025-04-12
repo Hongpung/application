@@ -1,6 +1,7 @@
 import { RealtimeSession, ReservationSession } from "@hongpung/pages/Reservation/SessionTypes";
 import { useOnReserve } from "@hongpung/recoil/authState";
 import { onUseSession } from "@hongpung/recoil/sessionState";
+import { uploadImageListRequest } from "@hongpung/src/common/api/uploadImageApi";
 import { getToken } from "@hongpung/src/common/lib/TokenHandler";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import { createContext, ReactNode, useContext, useState } from "react";
@@ -44,8 +45,6 @@ const CheckOutProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 
                 setLoading(true)
 
-                const formData = new FormData();
-
                 const photoFiles = photos.map(photo => {
 
                     const imageUri = photo.uri;
@@ -61,35 +60,9 @@ const CheckOutProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                     return imageFile
                 })
 
-                photoFiles.forEach((photo, index) => {
-                    formData.append('images', photo, `${photo.name}-${usingSession!.date}-${index}-${(new Date).toISOString()}`); // React Native에서 FormData 파일 처리 방식
-                });
+                const data = await uploadImageListRequest(photoFiles, 'end-session');
 
-                formData.append('path', 'end-session'); // 업로드 경로
 
-                const pictureUpload = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/upload-s3/images`, {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
-                    },
-                    body: formData,
-                });
-
-                const { uploadUrls }: { uploadUrls: { uploadUrl: string; imageUrl: string }[] } = await pictureUpload.json()
-                console.log(uploadUrls)
-                for (let i = 0; i < photos.length; i++) {
-                    const { uploadUrl } = uploadUrls[i];
-                    await fetch(uploadUrl, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'image/jpeg', // MIME 타입 지정
-                        },
-                        body: photoFiles[i],
-                    });
-                }
-
-                const imageUrls = uploadUrls.map(url => (url.imageUrl))
-                console.log(imageUrls)
 
                 const response = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/session/end`, {
                     method: 'POST',
@@ -97,7 +70,7 @@ const CheckOutProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
                         Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ returnImageUrls: imageUrls })
+                    body: JSON.stringify({ returnImageUrls: data.imageUrls })
                 })
 
                 if (!response.ok) throw Error('Failed')

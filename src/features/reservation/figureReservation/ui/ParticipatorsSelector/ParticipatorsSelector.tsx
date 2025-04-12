@@ -2,7 +2,7 @@ import { View, Text, Pressable } from "react-native"
 
 import { Color, Icons } from "@hongpung/src/common"
 
-import { User } from "@hongpung/src/entities/user/@x/reservation"
+import { User } from "@hongpung/src/entities/member/@x/reservation"
 
 import { ParticipatorsViewer } from "@hongpung/src/entities/reservation"
 

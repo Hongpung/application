@@ -1,7 +1,7 @@
-import { useRef } from "react";
+import { forwardRef, useRef } from "react";
 import { ScrollView, View, Text } from "react-native"
 
-import { Color,TimeLineArray } from '@hongpung/src/common'
+import { Color, TimeLineArray } from '@hongpung/src/common'
 
 type TimeLineProps = {
     children: React.ReactNode
@@ -11,12 +11,10 @@ type TimeLineProps = {
  *   AM 10~ PM10까지의 타임 라인(눈금 표시)
  *   children에는 위에 표시할 것들을 삽입
  */
-export const TimeLine: React.FC<TimeLineProps> = ({ children }) => {
-
-    const TimesRef = useRef<ScrollView | null>(null)
+export const TimeLine: React.FC<TimeLineProps> = forwardRef<ScrollView, TimeLineProps>(({ children }, ref) => {
 
     return (
-        <ScrollView ref={TimesRef}>
+        <ScrollView ref={ref}>
 
             {TimeLineArray.map((time, index) => {
                 return (
@@ -33,7 +31,7 @@ export const TimeLine: React.FC<TimeLineProps> = ({ children }) => {
                                 <View style={{ height: 0, borderWidth: 1, borderStyle: 'dotted', borderColor: Color[`grey100`] }} />
                             </View>
                         }
-                        
+
                     </>)
             })}
 
@@ -41,4 +39,4 @@ export const TimeLine: React.FC<TimeLineProps> = ({ children }) => {
 
         </ScrollView>
     )
-}
+})

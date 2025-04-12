@@ -1,1 +1,1 @@
-export { User } from '@hongpung/src/entities/user'
+export { Member as User } from '@hongpung/src/entities/member'

@@ -2,7 +2,7 @@
 import { isEqual } from "lodash";
 import { ReservationForm } from "../../model/type";
 import { Instrument } from "@hongpung/src/entities/instrument";
-import { User } from "@hongpung/src/entities/user";
+import { Member } from "@hongpung/src/entities/member";
 import { ReservationEditRequestBody } from "../api/type";
 
 
@@ -28,8 +28,8 @@ export function getReservationEditRequestBody(preReservation: ReservationForm & 
 
                 if (typedKey === 'participators') {
 
-                    const oldParticipatorIds = (oldValue as User[]).map((item) => item.memberId);
-                    const newParticipatorIds = (newValue as User[]).map((item) => item.memberId);
+                    const oldParticipatorIds = (oldValue as Member[]).map((item) => item.memberId);
+                    const newParticipatorIds = (newValue as Member[]).map((item) => item.memberId);
 
                     const added = newParticipatorIds.filter((item: number) => !oldParticipatorIds.includes(item));
                     const removed = oldParticipatorIds.filter((item: number) => !newParticipatorIds.includes(item));

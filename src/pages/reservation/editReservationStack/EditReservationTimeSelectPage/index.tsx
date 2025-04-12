@@ -19,7 +19,7 @@ const TimeSelectPage = () => {
     const [selectedTimeBlocks, setTimeBlocks] = useState<TimeFormat[]>([])
 
     const { startTime, endTime, date: selectedDate = new Date().toISOString().split('T')[0] } = reservation
-    const { occupiedTimes, error, isLoading } = useOccupiedTimes({ date: selectedDate, reservationId: reservation.reservationId })
+    const { occupiedTimes, error, isLoading } = useOccupiedTimes({ date: selectedDate })
     const { toggleTimeBlock } = useSelectTimes({ occupiedTimes, startTime, endTime, selectedTimeBlocks, setTimeBlocks })
 
     return (

@@ -12,7 +12,7 @@ interface RequestOptions {
     url: string;
     method: RequestMethod
     body?: any;
-    params?: Record<string, string | number | string[] | number[]>;
+    params?: Record<string, string | number | string[] | number[] | undefined>;
     withAuthorize?: boolean,
     options?: FetchOptions
 }
@@ -33,9 +33,9 @@ const buildApi = async <T>({ url, params, method, body, transformResponse, withA
 
     const urlWithParams = new URL(url);
     if (params)
-        Object.keys(params).forEach((key) => {
-            const value = params[key];
-            if (typeof value === 'number' || typeof value === 'string') {
+        Object.entries(params).forEach(([key, value]) => {
+            if (typeof value === 'undefined') return;
+            else if (typeof value === 'number' || typeof value === 'string') {
                 urlWithParams.searchParams.append(key, String(value));
             } else if (Array.isArray(value)) {
                 value.forEach((item) => urlWithParams.searchParams.append(key, String(item)));

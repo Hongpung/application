@@ -1,8 +1,10 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
+
 import { Image } from 'expo-image'
-import { Instrument } from '../../model/type'
+
 import { Color } from '@hongpung/src/common'
+import { Instrument } from '../../model/type'
 
 
 interface BorrowInstrumentCardProps {

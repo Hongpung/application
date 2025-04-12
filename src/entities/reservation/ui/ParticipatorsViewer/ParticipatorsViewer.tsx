@@ -1,5 +1,5 @@
 import { Color } from "@hongpung/src/common"
-import { User } from "@hongpung/src/entities/user/@x/reservation"
+import { User } from "@hongpung/src/entities/member/@x/reservation"
 import { View, Text, Image } from "react-native"
 
 type ParticipatorsViewerProps = {

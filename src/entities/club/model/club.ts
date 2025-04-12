@@ -1,5 +1,3 @@
-import { ClubName } from "@hongpung/src/common"
-
 export type Club ={
     clubName: ClubName
     clubId: number

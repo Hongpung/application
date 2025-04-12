@@ -3,7 +3,7 @@ import { TextInput, Text, View } from "react-native"
 import { useRecoilValue } from "recoil";
 
 import { Color } from "@hongpung/src/common";
-import { UserStatusState } from "@hongpung/src/entities/user";
+import { UserStatusState } from "@hongpung/src/entities/member";
 
 type TitleInputProps = {
     title?: string

@@ -49,7 +49,7 @@ type InReservationStackParamList = {
 };
 
 type ReservationStackParamList = {
-    ReserveCalendar?: { date?: string };
+    ReservationCalendar?: { date?: string };
     DailyReserveList: { date: string }
     ReservationDetail: { reservationId: number }
 
@@ -97,8 +97,10 @@ type MyClubStackStackParamList = {
 declare global {
     type IsAny<T> = 0 extends (1 & T) ? true : false;
 
-    type ReservationType = "REGULAR" | "COMMON" | "EXTERNAL"
+    type ReservationType = "REGULAR" | "COMMON" | "EXTERNAL";
 
+    type SessionType = 'REALTIME' | 'RESERVED';
+    
     type ScreenParams<StackParamList> = {
         [K in keyof StackParamList]: StackParamList[K] extends undefined
         ? { screen: K }
@@ -112,6 +114,10 @@ declare global {
     type BottomTabProps<K extends keyof BottomTabParamList> = BottomTabScreenProps<BottomTabParamList, K>;
 
     type ReservationStackProps<K extends keyof ReservationStackParamList> = NativeStackScreenProps<ReservationStackParamList, K>;
+
+    type ClubName = '들녘' | '산틀' | '신명화랑' | '악반' | '기타'
+
+    const clubNames: ClubName[] = ['들녘', '산틀', '신명화랑', '악반', '기타'] as const
 }
 
 

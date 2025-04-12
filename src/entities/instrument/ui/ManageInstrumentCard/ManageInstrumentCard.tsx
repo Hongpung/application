@@ -1,16 +1,18 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { Instrument } from '../../model/type'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { Image } from 'expo-image'
-import { InstrumentTag } from './InstrumentTag'
+
 import { Color } from '@hongpung/src/common'
+
+import { Instrument } from '../../model/type'
+import { InstrumentTag } from '../InstrumentTag/InstrumentTag'
 
 interface ManageInstrumentCardProps {
     instrument: Instrument
     onClickInstrument: (instrument: Instrument) => void
 }
 
-export const ManageInstrumentCard: React.FC<ManageInstrumentCardProps> = React.memo((props) => {
+export const ManageInstrumentCard: React.FC<ManageInstrumentCardProps> = (props) => {
 
     const { instrument, onClickInstrument } = props
 
@@ -42,7 +44,7 @@ export const ManageInstrumentCard: React.FC<ManageInstrumentCardProps> = React.m
             </View>
         </Pressable>
     )
-})
+}
 
 
 const styles = StyleSheet.create({

@@ -1,26 +1,20 @@
 import { baseApi } from "@hongpung/src/common/api";
+import { Member } from "@hongpung/src/entities/member";
 
 
 const searchInvitePossibleMembersApi = baseApi.addEndpoints({
     endpoints: (build) => ({
-        searchInvitePossibleMembers: build.fetch<void, { keyword?: string; clubId?: number[] }>({
-            query: ({ keyword, clubId }) => {
-                const params = {} as Record<string, any>;
-
-                if (keyword) params['keyword'] = keyword;
-                if (clubId) params['clubId'] = clubId;
+        searchInvitePossibleMembers: build.fetch<Member[], { keyword?: string; clubId?: number[], page?: number }>({
+            query: ({ page = 0, ...params }) => {
 
                 return {
                     url: `/member/invite-possible`,
                     withAuthorize: true,
-                    params,
+                    params: { page, ...params },
                 }
             }
         })
     })
 })
 
-
-
-
-
+export const { useSearchInvitePossibleMembersFetch } = searchInvitePossibleMembersApi;

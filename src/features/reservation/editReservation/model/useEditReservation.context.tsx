@@ -11,6 +11,7 @@ import { getReservationEditRequestBody } from "@hongpung/src/entities/reservatio
 
 interface EditReservationContextProps {
 
+    prevReservation: ReservationForm & { reservationId: number };
     reservation: ReservationForm & { reservationId: number };
 
     setDate: (date: ReservationForm['date']) => void;
@@ -26,6 +27,7 @@ interface EditReservationContextProps {
     setBorrowInstruments: (borrowInstruments: ReservationForm['borrowInstruments']) => void;
 
     verifyEditReservation: (onVerfyied: () => void) => Promise<void>;
+    differentKeys: (keyof ReservationForm)[]
 
     requestEditReservation: () => Promise<void>;
 
@@ -79,6 +81,22 @@ const EditReservationContextProvider = ({ prevReservation, children }: { prevRes
         }
     }, [reservation]);
 
+    const differenceKey = useMemo(() => {
+        if (!reservation) return [];
+
+        if (!prevReservation) return []; // 초기 상태면 전체 반환
+
+        const diff: (keyof ReservationForm)[] = [];
+
+        for (const key of Object.keys(reservation) as (keyof ReservationForm)[]) {
+            if (reservation[key] !== prevReservation[key]) {
+                diff.push(key);
+            }
+        }
+
+        return diff;
+    }, [reservation])
+
     const requestEditReservation = async () => {
         try {
             if (isEqual(prevReservation, reservation)) throw new Error("기존 예약과 동일합니다.");
@@ -112,8 +130,9 @@ const EditReservationContextProvider = ({ prevReservation, children }: { prevRes
     return (
         <EditReservationContext.Provider
             value={{
+                prevReservation,
                 reservation,
-
+                differentKeys: differenceKey,
                 ...setters,
 
                 isLoading,

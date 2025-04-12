@@ -32,34 +32,40 @@ export const ReservationForm: React.FC<ReservationFormProps> = (props) => {
 
     const {
         reservation,
-        
+
         setTitle,
         setParticipationAvailable,
         setReservationType,
-        
+
         resetParticipators,
         resetBorrowInstruments,
-        
+
         navigateDatePickerPage,
         navigateTimePickerPage,
-        
+
         navigateToParticipatorsPickerPage,
         navigateToBorrowInstrumentsPickerPage
 
     } = props
 
+
     const { startTime, endTime, title, participationAvailable, reservationType, participators, borrowInstruments, date } = reservation;
 
+
+
     const onDateTimePress = useCallback(() => {
-        if (!date)
+        if (!date) {
             navigateDatePickerPage();
-        else
+        }
+        else {
             navigateTimePickerPage();
+        }
     }, [])
+
 
     return (
 
-        <View>
+        <>
 
             <DateTimeSelector
                 date={date}
@@ -92,7 +98,7 @@ export const ReservationForm: React.FC<ReservationFormProps> = (props) => {
                 resetBorrowInstruments={resetBorrowInstruments}
             />
 
-        </View>
+        </>
 
     )
 }

@@ -1,4 +1,4 @@
-import { type User } from "@hongpung/src/entities/user/@x/reservation"
+import { type User } from "@hongpung/src/entities/member/@x/reservation"
 import { Instrument } from "../../instrument/@x/reservation"
 
 export interface ReservationDetail {

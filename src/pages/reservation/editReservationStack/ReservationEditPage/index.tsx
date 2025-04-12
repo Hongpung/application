@@ -38,19 +38,19 @@ const ReservationEditPage: React.FC = () => {
     );
 
     const goToDateSelect = useCallback(
-        () => navigation.navigate('ReservationDateSelectPage'),
+        () => navigation.navigate('EditReservationDateSelectPage'),
         []
     );
     const goToTimeSelect = useCallback(
-        () => navigation.navigate('ReservationDateSelectPage'),
+        () => navigation.navigate('EditReservationDateSelectPage'),
         []
     );
     const goToParticipatorsSelect = useCallback(
-        () => navigation.navigate('ParticipatorsPickerPage'),
+        () => navigation.navigate('EditParticipatorsPickerPage'),
         []
     );
     const goToBorrowInstrumentsSelect = useCallback(
-        () => navigation.navigate('BorrowInstrumentsPickerPage'),
+        () => navigation.navigate('EditBorrowInstrumentsPickerPage'),
         []
     );
 

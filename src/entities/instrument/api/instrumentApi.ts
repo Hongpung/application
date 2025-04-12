@@ -1,17 +1,10 @@
 import { baseApi } from "@hongpung/src/common/api";
-import { InstrumentCreateBody, InstrumentDto, InstrumentEditBody } from "./type";
+import { InstrumentEditBody } from "./type";
 
 const instrumentApi = baseApi.addEndpoints({
     endpoints: (build) => ({
-        createInsrument: build.request<{ instrumentId: number }, { instrumentId: number } & InstrumentCreateBody>({
-            query: (requestBody) => ({
-                url: '',
-                method: 'POST',
-                body: requestBody,
-                withAuthorize: true
-            })
-        }),
-        editInsrument: build.request<{ instrumentId: number }, { instrumentId: number } & InstrumentEditBody>({
+        
+        editInsrument: build.request<{ instrumentId: number },  InstrumentEditBody>({
             query: ({ instrumentId, ...requestBody }) => ({
                 url: `instrument/${instrumentId}`,
                 method: 'PATCH',
@@ -19,6 +12,7 @@ const instrumentApi = baseApi.addEndpoints({
                 withAuthorize: true
             })
         }),
+
         deleteInsrument: build.request<{ instrumentId: number }, { instrumentId: number }>({
             query: ({ instrumentId }) => ({
                 url: `instrument/${instrumentId}`,
@@ -26,7 +20,8 @@ const instrumentApi = baseApi.addEndpoints({
                 withAuthorize: true
             })
         })
+
     })
 })
 
-export const { useCreateInsrumentRequest, useDeleteInsrumentRequest, useEditInsrumentRequest } = instrumentApi
+export const { useDeleteInsrumentRequest, useEditInsrumentRequest } = instrumentApi

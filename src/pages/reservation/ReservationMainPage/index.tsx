@@ -1,0 +1,51 @@
+import React from "react";
+import { View, Dimensions, StyleSheet } from "react-native";
+import ScheduleCardList from "@hongpung/src/widgets/session/ui/ScheduleCardList/ScheduleCardList";
+import { useScheduleCardList } from "@hongpung/src/features/session/model/useScheduleCardList";
+import ScheduleStatusBar from "@hongpung/src/widgets/session/ui/ScheduleStatusBar/ScheduleStatusBar";
+import { useSessionListSocket } from "@hongpung/src/features/session/socket/useSessionListSocket";
+import { NavigateCalendarButton } from "@hongpung/src/common";
+
+const { height } = Dimensions.get("window");
+
+const ReservationMainScreen: React.FC<MainStackProps<'Reservation'>> = ({ navigation }) => {
+
+    const { sessionList } = useSessionListSocket();
+    const { cardViewRef, isOnAir, isParticipatible, scheduleCardList } = useScheduleCardList(sessionList);
+
+    return (
+        <View style={styles.container}>
+
+            <View style={{ gap: 24 }}>
+
+                <ScheduleStatusBar isOnAir={isOnAir} isParticipatible={isParticipatible} />
+
+                <ScheduleCardList
+                    ref={cardViewRef}
+                    isOnAir={isOnAir}
+                    scheduleCards={scheduleCardList}
+                    navigateToDetail={(reservationId) => navigation.push('ReservationDetail', { reservationId })}
+                    navigateToQRScan={() => navigation.push('QRScan')}
+                />
+
+            </View>
+
+
+            <NavigateCalendarButton
+                navigateReservationCalendar={() => navigation.push('ReservationCalendar')}
+            />
+
+        </View>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: "#FFF",
+        flex: 1,
+        flexDirection: "column",
+        paddingTop: height / 4,
+    },
+});
+
+export default ReservationMainScreen;
