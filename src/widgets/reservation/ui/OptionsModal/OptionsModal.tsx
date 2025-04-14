@@ -2,6 +2,7 @@ import React from 'react';
 import { Keyboard, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { ShortButton } from '@hongpung/src/common/ui/buttons';
 import { Color } from '@src/common';
+import { clubNames } from '@hongpung/src/entities/club';
 
 interface OptionsModalProps {
   visible: boolean;
@@ -88,8 +89,8 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
           </View>
 
           <View style={styles.buttonContainer}>
-            <ShortButton color="blue" isFilled={false} innerText="초기화" onPress={onClose} />
-            <ShortButton color="blue" isFilled innerText="적용" onPress={onApply} />
+            <ShortButton color="blue" isFilled={false} innerContent="초기화" onPress={onClose} />
+            <ShortButton color="blue" isFilled innerContent="적용" onPress={onApply} />
           </View>
         </View>
       </Pressable>

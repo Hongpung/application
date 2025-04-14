@@ -1,8 +1,8 @@
 import React from "react";
 import { View, ScrollView, StyleSheet } from "react-native";
 import { type Member } from "@hongpung/src/entities/member";
-import Header from "@hongpung/src/common/ui/header/Header";
-import ParticipatorList from "@hongpung/src/widgets/reservation/ui/ParticipatorList/ParticipatorList";
+import Header from "@hongpung/src/common/ui/Header/Header";
+import ParticipatorList from "@hongpung/src/widgets/member/ui/ParticipatorList/ParticipatorList";
 
 const ParticipatorListViewPage: React.FC<ReservationStackProps<'ReservationParticipatorsView'>> = ({ navigation, route }) => {
 
@@ -16,7 +16,7 @@ const ParticipatorListViewPage: React.FC<ReservationStackProps<'ReservationParti
                 HeaderName='참여 인원 목록'
             />
             <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <ParticipatorList participators={participators} />
+                <ParticipatorList members={participators}/>
             </ScrollView>
         </View>
     );

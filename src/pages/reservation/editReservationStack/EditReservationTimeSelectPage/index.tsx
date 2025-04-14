@@ -1,7 +1,7 @@
 import { ScrollView, View } from "react-native"
 
-import { TimeSelector } from "@hongpung/src/features/reservation/figureReservation/ui/TimeSelector/TimeSelector"
-import TimeSelectorHeader from "@hongpung/src/features/reservation/figureReservation/ui/TimeSelectorHeader/TimeSelectorHeader"
+import { TimeSelector } from "@hongpung/src/features/reservation/configureReservation/ui/TimeSelector/TimeSelector"
+import TimeSelectorHeader from "@hongpung/src/features/reservation/configureReservation/ui/TimeSelectorHeader/TimeSelectorHeader"
 
 import { useCreateReservation } from "@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context"
 import { TimeFormat } from "@hongpung/src/common"

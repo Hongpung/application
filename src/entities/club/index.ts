@@ -1,1 +1,2 @@
-export * from './model/club'
+export * from './model/type'
+export * from './constant/clubNames'

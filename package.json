@@ -16,6 +16,7 @@
     "@react-navigation/native-stack": "^6.10.0",
     "@types/react": "~18.3.12",
     "@types/react-native": "^0.73.0",
+    "@use-funnel/react-navigation-native": "^0.0.12",
     "eas-cli": "^14.5.0",
     "es-hangul": "^1.4.5",
     "expo": "^52.0.28",

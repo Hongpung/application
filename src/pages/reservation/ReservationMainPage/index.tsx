@@ -1,9 +1,9 @@
 import React from "react";
 import { View, Dimensions, StyleSheet } from "react-native";
 import ScheduleCardList from "@hongpung/src/widgets/session/ui/ScheduleCardList/ScheduleCardList";
-import { useScheduleCardList } from "@hongpung/src/features/session/model/useScheduleCardList";
+import { useScheduleCardList } from "@hongpung/src/features/session/loadSessionScheduleList/model/useScheduleCardList";
 import ScheduleStatusBar from "@hongpung/src/widgets/session/ui/ScheduleStatusBar/ScheduleStatusBar";
-import { useSessionListSocket } from "@hongpung/src/features/session/socket/useSessionListSocket";
+import { useSessionListSocket } from "@hongpung/src/features/session/loadSessionScheduleList/socket/useSessionListSocket";
 import { NavigateCalendarButton } from "@hongpung/src/common";
 
 const { height } = Dimensions.get("window");

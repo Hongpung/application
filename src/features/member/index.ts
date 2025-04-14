@@ -1,1 +1,1 @@
-export { loadInvitableUsers } from './api/load-invitible-users'
+export { useInvitePossibleMembersFetch } from './api/invitePossibleMembersApi'

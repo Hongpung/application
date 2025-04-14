@@ -1,0 +1,57 @@
+import React from "react";
+import { View, StyleSheet } from "react-native";
+
+import Header from "@hongpung/src/common/ui/Header/Header";
+import MiniCalendar from "@hongpung/src/common/ui/MiniCalendar";
+import { useMiniCalendar } from "@hongpung/src/common/lib/useMiniCalendar";
+
+import { useSessionColor } from "@hongpung/src/entities/session";
+
+import { useSessionLogList } from "@hongpung/src/features/session/viewMySessionLog/model/useSessionLogList";
+import { SessionLogList } from "@hongpung/src/widgets/session/ui/SessionLogList/SessionLogList";
+import { useLoadClubSessionLogFetch } from "@hongpung/src/features/club/reviewClubSession/api/clubSessionLogApi";
+
+const ClubSessionLogPage: React.FC<MainStackProps<"MyClub">> = ({
+  navigation,
+}) => {
+  const { currentMonth, selectedDate, handleDateSelect, handleMonthChange } =
+    useMiniCalendar();
+  const { data: sessionLogList, isLoading } = useLoadClubSessionLogFetch({
+    calendarMonth: currentMonth,
+  });
+  const dailySessionColors = useSessionColor({ sessionLogList });
+  const { matchedSessionList } = useSessionLogList(
+    sessionLogList,
+    selectedDate
+  );
+
+  const handleSessionPress = (sessionId: number) => {
+    navigation.push("MyPracticeInfo", { sessionId });
+  };
+
+  return (
+    <View style={styles.container}>
+      <Header HeaderName="동아리 연습 내역" leftButton={"arrow-back"} />
+      <MiniCalendar
+        dateItems={dailySessionColors}
+        selectedDate={selectedDate}
+        currentMonth={currentMonth}
+        onDateSelect={handleDateSelect}
+        onMonthChange={handleMonthChange}
+      />
+      <SessionLogList
+        sessions={matchedSessionList}
+        onSessionPress={(sessionId) => handleSessionPress(sessionId)}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FFF",
+  },
+});
+
+export default ClubSessionLogPage;

@@ -6,7 +6,7 @@ export type InstrumentDto = {
     imageUrl?: string  // url
     name: string
     instrumentType: InstrumentType
-    club: Exclude<Club, '기타'>
+    club: Exclude<ClubName, '기타'>
     borrowAvailable: boolean,
 }
 
@@ -29,7 +29,7 @@ export type InstrumentDetailDto = {
     imageUrl?: string  // url
     name: string
     instrumentType: InstrumentType
-    club: Exclude<Club, '기타'>
+    club: Exclude<ClubName, '기타'>
     borrowAvailable: boolean
     borrowHistory: BorrowHistory[]
 }

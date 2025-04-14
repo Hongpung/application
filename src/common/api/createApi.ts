@@ -12,7 +12,7 @@ interface RequestOptions {
     url: string;
     method: RequestMethod
     body?: any;
-    params?: Record<string, string | number | string[] | number[] | undefined>;
+    params?: Record<string, string | number | string[] | number[]>;
     withAuthorize?: boolean,
     options?: FetchOptions
 }
@@ -29,7 +29,7 @@ interface FetchOptions extends RequestInit {
     timeout?: number;
 }
 
-const buildApi = async <T>({ url, params, method, body, transformResponse, withAuthorize, options }: BuildOption<T>): Promise<T> => {
+const buildApi = async <T>({ url, params, method, body, transformResponse, withAuthorize = true, options }: BuildOption<T>): Promise<T> => {
 
     const urlWithParams = new URL(url);
     if (params)
@@ -302,9 +302,11 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
                         ? useRequestWithRecoil<Validate<R>, Validate<P>>({ recoilState })
                         : useRequest<Validate<R>, Validate<P>>();
 
-                    const executeRequest = async (params: Validate<P>) => { // ✅ params는 여기서 받음
-                        const { url, ...queryParams } = query(params);
-                        return request({ ...queryParams, url: `${baseUrl}${url}`, body: params, transformResponse });
+                    const executeRequest = async (data: Validate<P>) => { // ✅ params는 여기서 받음
+                        const { url, ...queryParams } = query(data);
+
+                        const finalUrl = `${baseUrl}${url}`;
+                        return request({ ...queryParams, url: finalUrl, body: data, transformResponse });
                     };
 
                     return { isLoading, error, request: executeRequest };

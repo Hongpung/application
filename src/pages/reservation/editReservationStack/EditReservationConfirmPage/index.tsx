@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView } from "rea
 import { useRecoilValue } from "recoil";
 
 import { Color, Icons } from "@hongpung/src/common";
-import Header from "@hongpung/src/common/ui/header/Header";
+import Header from "@hongpung/src/common/ui/Header/Header";
 
 import { UserStatusState } from "@hongpung/src/entities/member";
 

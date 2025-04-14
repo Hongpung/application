@@ -1,28 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { View, ScrollView, StyleSheet } from 'react-native';
-import InstrumentViewList from '@hongpung/src/widgets/InstrumentViewList/InstrumentViewList';
-import { type Instrument } from '@hongpung/src/entities/instrument';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import Header from '@hongpung/src/common/ui/header/Header';
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { type Instrument } from "@hongpung/src/entities/instrument";
+import Header from "@hongpung/src/common/ui/Header/Header";
+import BorrowInstrumentList from "@hongpung/src/widgets/instrument/ui/BorrowInstrumentList/BorrowInstrumentList";
+import { StackActions } from "@react-navigation/native";
 
-const ReservationInstrumentsViewScreen: React.FC<ReservationStackProps<'ReservationInstrumentsView'>> = ({ navigation, route }) => {
+const ReservationInstrumentsViewScreen: React.FC<
+  ReservationStackProps<"ReservationInstrumentsView">
+> = ({ navigation, route }) => {
   const { instruments } = route.params;
   const instrumentList: Instrument[] = JSON.parse(instruments);
 
   const handleInstrumentClick = (instrument: Instrument) => {
     // Handle instrument click
+    navigation.dispatch(
+      StackActions.push("InstrumentDetail", { instrumentId: instrument.instrumentId })
+    );
   };
 
   return (
     <View style={styles.container}>
-      <Header
-        leftButton={'close'}
-        HeaderName='대여 악기 목록'
-      />
+      <Header leftButton={"close"} HeaderName="대여 악기 목록" />
       <View style={styles.content}>
-        <InstrumentViewList
+        <BorrowInstrumentList
           instrumentList={instrumentList}
-          onInstrumentClick={handleInstrumentClick}
+          navigateToInstrumentDetail={handleInstrumentClick}
         />
       </View>
     </View>
@@ -32,11 +34,11 @@ const ReservationInstrumentsViewScreen: React.FC<ReservationStackProps<'Reservat
 export default ReservationInstrumentsViewScreen;
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-    },
-    content: {
-      flex: 1,
-    },
-  });
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  content: {
+    flex: 1,
+  },
+});

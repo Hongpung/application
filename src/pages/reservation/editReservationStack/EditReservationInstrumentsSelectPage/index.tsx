@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 import { Instrument } from "@hongpung/src/entities/instrument";
-import Header from '@hongpung/src/common/ui/header/Header'
+import Header from '@hongpung/src/common/ui/Header/Header'
 import { Color } from "@hongpung/src/common";
 
 import { useBorrowPossibleInstrumentsFetch } from "@hongpung/src/features/reservation/figureReservation/api/searchBorrowPossibleInstrumentsApi";
-import { BorrowInstrumentsConfirmButton } from "@hongpung/src/features/reservation/figureReservation/ui/BorrowInstrumentsConfirmButton/BorrowInstrumentsConfirmButton";
-import BorrowInstrumentsList from "@hongpung/src/features/reservation/figureReservation/ui/BorrowInstrumentsList/BorrowInstrumentsList";
+import { BorrowInstrumentsConfirmButton } from "@hongpung/src/features/reservation/configureReservation/ui/BorrowInstrumentsConfirmButton/BorrowInstrumentsConfirmButton";
+import BorrowPossibleInstrumentList from "@hongpung/src/widgets/instrument/ui/BorrowPossibleInstrumentList/BorrowPossibleInstrumentList";
 import { useEditReservation } from "@hongpung/src/features/reservation/editReservation/model/useEditReservation.context";
 
 
@@ -28,7 +28,7 @@ const BorrowInstrumentSelectScreen: React.FC = () => {
                         대여 할 수 있는 악기가 없습니다.
                     </Text>
                 ) : (
-                    <BorrowInstrumentsList
+                    <BorrowPossibleInstrumentList
                         instrumentList={data ?? []}
                         selectInstruments={setNewBorrowInstruments}
                         selectedInstruments={newBorrowInstruments}

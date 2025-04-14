@@ -4,7 +4,7 @@ import Toast from "react-native-toast-message";
 import { useRecoilState } from "recoil"
 import * as ImagePicker from 'expo-image-picker';
 import { getToken } from "@hongpung/src/common/lib/TokenHandler";
-import uploadImage from "@hongpung/utils/uploadImage";
+import uploadImage from "@hongpung/legacy/utils/uploadImage";
 import { useNavigation } from "@react-navigation/native";
 import { Color } from "@hongpung/ColorSet";
 import LongButton from "@hongpung/src/common/components/buttons/long-button";

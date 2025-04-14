@@ -1,1 +1,1 @@
-export { Club } from '../model/club'
+export { Club } from '../model/type'

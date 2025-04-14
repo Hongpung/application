@@ -1,13 +1,12 @@
-import { View } from 'react-native'
 import React, { useCallback } from 'react'
-import { TitleInput } from '@hongpung/src/features/reservation/figureReservation/ui/TitleInput/TitleInput'
+import { TitleInput } from '@hongpung/src/features/reservation/configureReservation/ui/TitleInput/TitleInput'
 
-import { ReservationTypeSelector } from '@hongpung/src/features/reservation/figureReservation/ui/ReservationTypeSelector/ReservationTypeSelector'
-import { ParticipatorsSelector } from '@hongpung/src/features/reservation/figureReservation/ui/ParticipatorsSelector/ParticipatorsSelector'
-import BorrowInstrumentsSelector from '@hongpung/src/features/reservation/figureReservation/ui/BorrowInstrumentsSelector/BorrowInstrumentsSelector'
+import { ReservationTypeSelector } from '@hongpung/src/features/reservation/configureReservation/ui/ReservationTypeSelector/ReservationTypeSelector'
+import { ParticipatorsSelector } from '@hongpung/src/features/reservation/configureReservation/ui/ParticipatorsSelector/ParticipatorsSelector'
+import BorrowInstrumentsSelector from '@hongpung/src/features/reservation/configureReservation/ui/BorrowInstrumentsSelector/BorrowInstrumentsSelector'
 
 import { type ReservationForm as ReservationFormType } from '@hongpung/src/features/reservation/model/type'
-import { DateTimeSelector } from '@hongpung/src/features/reservation/figureReservation/ui/DateTimeSelector/DateTimeSelector'
+import { DateTimeSelector } from '@hongpung/src/features/reservation/configureReservation/ui/DateTimeSelector/DateTimeSelector'
 
 
 type ReservationFormProps = {

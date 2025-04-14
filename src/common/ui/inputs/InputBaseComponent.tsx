@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, Re
 import { View, Text, StyleSheet, TextInput, Animated, Pressable, KeyboardTypeOptions, Dimensions } from 'react-native';
 import { Color } from '@hongpung/ColorSet';
 import { josa } from 'es-hangul';
-import { Icons } from '@hongpung/src/common';
+import { Icons, ValidationState } from '@hongpung/src/common';
 
 // 입력 상태 입력전, 입력 중, 입력 완료, 오류
 // 오류 판별은 외부에 일임해야함
@@ -13,7 +13,7 @@ type InputProps = {
     label: string,
     inputValue: string
     setInputValue: (text: string) => void
-    validationCondition: { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
+    validationCondition: ValidationState
     onBlur?: () => void;
     onFocus?: () => void;
     isEditible?: boolean

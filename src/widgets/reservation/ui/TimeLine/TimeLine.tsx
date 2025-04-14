@@ -1,4 +1,4 @@
-import { forwardRef, useRef } from "react";
+import React , { forwardRef } from "react";
 import { ScrollView, View, Text } from "react-native"
 
 import { Color, TimeLineArray } from '@hongpung/src/common'
@@ -19,7 +19,6 @@ export const TimeLine: React.FC<TimeLineProps> = forwardRef<ScrollView, TimeLine
             {TimeLineArray.map((time, index) => {
                 return (
                     <>
-
                         <View key={time} style={{ flexDirection: 'row', paddingHorizontal: 24, alignItems: 'center', height: 24 }}>
                             <View style={{ height: 1, backgroundColor: Color['grey200'], overflow: 'visible' }} />
                             <Text style={{ alignSelf: 'center', fontSize: 16, width: 56, textAlign: 'center', color: Color[`grey300`], fontFamily: 'NanumSquareNeo-Regular' }}>{time}</Text>

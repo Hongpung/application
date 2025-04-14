@@ -1,1 +1,2 @@
-export { type Instrument, instrumentTypeArray } from '../model/type'
+export { type Instrument} from '../model/type'
+export { instrumentTypes } from '../constant/instrumentTypes'

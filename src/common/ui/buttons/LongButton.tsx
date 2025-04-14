@@ -5,11 +5,11 @@ import { Color } from '../../../../ColorSet';
 type LongButtonProps = {
     innerContent: string | React.ReactNode,
     onPress: () => void,
-    isAble: boolean,
+    isAble?: boolean,
     color: "blue" | "red" | "green"
 }
 
-export const LongButton: React.FC<LongButtonProps> = React.memo(({ innerContent, onPress, isAble, color }) => {
+export const LongButton: React.FC<LongButtonProps> = React.memo(({ innerContent, onPress, isAble = true, color }) => {
     return (
         <Pressable
             style={[styles.basic, { backgroundColor: isAble ? Color[color + "500"] : Color[color + "300"] }]}

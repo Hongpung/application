@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 
-import ParticipatorList from '@hongpung/src/widgets/reservation/ui/ParticipatorList/ParticipatorList';
-import SelectedParticipatorList from '@hongpung/src/widgets/reservation/ui/SelectedParticipatorList/SelectedParticipatorList';
-import Header from '@src/common/ui/header/Header';
-import { Icons } from '@hongpung/src/common/ui/icons/Icons';
-import { ParticipatorsConfirmButton } from '@hongpung/src/features/reservation/figureReservation/ui/ParticipatorsConfirmButton/ParticipatorsConfirmButton';
+import SelectedParticipatorList from '@hongpung/src/widgets/reservation/ui/SelectedParticipatorHList/SelectedParticipatorHList';
+import Header from '@hongpung/src/common/ui/Header/Header';
+import { Icons } from '@hongpung/src/common/ui/Icons/Icons';
+import { ParticipatorsConfirmButton } from '@hongpung/src/features/reservation/configureReservation/ui/ParticipatorsConfirmButton/ParticipatorsConfirmButton';
 import OptionsModal from '@hongpung/src/widgets/reservation/ui/OptionsModal/OptionsModal';
-import FilterScrollView from '@hongpung/src/widgets/reservation/ui/FilterScrollView/FilterScrollView';
-import SearchBar from '@hongpung/src/widgets/reservation/ui/SearchBar/SearchBar';
+import FilterHList from '@hongpung/src/widgets/reservation/ui/FilterHList/FilterHList';
+import SearchMemberNameBar from '@hongpung/src/widgets/reservation/ui/SearchMemberNameBar.tsx/SearchMemberNameBar';
 import { useParticipatorsFilters } from '@hongpung/src/features/reservation/figureReservation/model/useParticipatorsFilters';
 import { useSelectParticipators } from '@hongpung/src/features/reservation/figureReservation/model/useSelectParticipators';
 import { Color } from '@hongpung/src/common';
 
 import { useInvitePossibleMemberData } from '@hongpung/src/features/reservation/figureReservation/model/useParaticipatorData';
 import { useEditReservation } from '@hongpung/src/features/reservation/editReservation/model/useEditReservation.context';
+import InvitePossibleMemberList from '@hongpung/src/widgets/reservation/ui/InvitePossibleMemberList/InvitePossibleMemberList';
 
 const ParticipantsSelectScreen: React.FC = () => {
-    
+
     const {
         findOptions,
         setFindOptions,
@@ -35,11 +35,11 @@ const ParticipantsSelectScreen: React.FC = () => {
 
     const { reservation, setParticipators } = useEditReservation();
 
-    const { data, isLast, isLoading, setPage } = useInvitePossibleMemberData(filterParams)
+    const { data, isLoading, loadNewPage } = useInvitePossibleMemberData(filterParams)
 
     const { ...participatorsData } = useSelectParticipators(reservation.participators);
 
-    const { newParticipators } = participatorsData;
+    const { newParticipators, toggleParticipator } = participatorsData;
 
     const [optionsSelectState, setOptionSelectState] = useState(false);
 
@@ -65,14 +65,14 @@ const ParticipantsSelectScreen: React.FC = () => {
                     onApply={handleApplyFilters}
                 />
 
-                <SearchBar
+                <SearchMemberNameBar
                     searchBarVisible={searchBarVisible}
                     setSearchBarVisible={setSearchBarVisible}
                     setFindOptions={setFindOptions}
                     debounceKeyword={debounceKeyword}
                 />
 
-                <FilterScrollView
+                <FilterHList
                     descendingOrder={descendingOrder}
                     setDescendingOrder={setDescendingOrder}
                     findOptions={findOptions}
@@ -89,12 +89,12 @@ const ParticipantsSelectScreen: React.FC = () => {
                     ) : (
                         <View style={styles.participantsListContainer}>
 
-                            <ParticipatorList
-                                data={data}
-                                isLast={isLast}
-                                setPage={setPage}
+                            <InvitePossibleMemberList
+                                invitePossibleMembers={data}
+                                selectedMembers={newParticipators}
+                                toggleMember={toggleParticipator}
+                                onEndReached={loadNewPage}
                                 isLoading={isLoading}
-                                {...participatorsData}
                             />
 
                         </View>

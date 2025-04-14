@@ -1,13 +1,18 @@
-import React from 'react'
+import React from "react";
 
-import { LongButton } from '@hongpung/src/common';
-import { useLogoutButton } from './useLogoutButton';
+import { LongButton } from "@hongpung/src/common";
 
-export const LogoutButton: React.FC = () => {
-
-    const { logoutHandler } = useLogoutButton();
-
-    return (
-        <LongButton color='red' innerContent='로그아웃' isAble={true} onPress={logoutHandler} />
-    )
+interface LogoutButtonProps {
+  onPress: () => void;
 }
+
+export const LogoutButton: React.FC<LogoutButtonProps> = ({ onPress }) => {
+  return (
+    <LongButton
+      color="red"
+      innerContent="로그아웃"
+      isAble={true}
+      onPress={onPress}
+    />
+  );
+};

@@ -1,6 +1,7 @@
 export {
     type DailyReservation,
-    type ReservationDetail
+    type ReservationDetail,
+    type Reservation
 } from './model/type'
 
 export { mapReservationDetail } from './lib/mapReservationDetail'

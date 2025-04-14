@@ -71,9 +71,9 @@ type CheckOutStackParamList = {
     CheckOutEnd: undefined;
 };
 
-type ClubInstrumentStackParamList = {
+type InstrumentStackParamList = {
     InstrumentsHome: undefined;
-    InstrumentSpecific: { instrumentId: number };
+    InstrumentDetail: { instrumentId: number };
     InstrumentCreate: undefined;
     InstrumentEdit: { instrumentInform: string };
 };
@@ -88,7 +88,7 @@ type BottomTabParamList = {
 type MyClubStackStackParamList = {
     MyClubHome: undefined;
     ClubMembers: undefined;
-    Instruments: ScreenParams<ClubInstrumentStackParamList>
+    ClubInstruments: ScreenParams<InstrumentStackParamList>
     ClubCalendar: undefined;
     MyClubPracticeInfo: { reservationId: number };
 };
@@ -100,6 +100,10 @@ declare global {
     type ReservationType = "REGULAR" | "COMMON" | "EXTERNAL";
 
     type SessionType = 'REALTIME' | 'RESERVED';
+    
+    type ClubName = '들녘' | '산틀' | '신명화랑' | '악반' | '기타'
+
+    type InstrumentType = '꽹과리' | '장구' | '북' | '소고' | '징' | '기타';
     
     type ScreenParams<StackParamList> = {
         [K in keyof StackParamList]: StackParamList[K] extends undefined
@@ -115,9 +119,12 @@ declare global {
 
     type ReservationStackProps<K extends keyof ReservationStackParamList> = NativeStackScreenProps<ReservationStackParamList, K>;
 
-    type ClubName = '들녘' | '산틀' | '신명화랑' | '악반' | '기타'
+    type ClubStackProps<K extends keyof MyClubStackStackParamList> = NativeStackScreenProps<ClubStackParamList, K>;
+    
+    type InstrumentStackProps<K extends keyof InstrumentStackParamList> = NativeStackScreenProps<InstrumentStackParamList, K>;
 
-    const clubNames: ClubName[] = ['들녘', '산틀', '신명화랑', '악반', '기타'] as const
+    type NoticeStackProps<K extends keyof NoticeStackParamList> = NativeStackScreenProps<NoticeStackParamList, K>;
+
 }
 
 

@@ -40,7 +40,11 @@ export interface ReservationSession extends BaseSession {
     attendanceList: { Member: Member, status: '출석' | '결석' | '지각' }[]
 }
 
-export interface SessionLog extends BaseSession {
+
+export type SessionLog = RealtimeSession & {
+    isForcedEnd: boolean;
+    returnImageUrl: string[];
+} | ReservationSession & {
     isForcedEnd: boolean;
     returnImageUrl: string[];
 }

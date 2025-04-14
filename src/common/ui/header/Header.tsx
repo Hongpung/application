@@ -12,19 +12,19 @@ interface HeaderProps {
     RightButton?: string | React.ReactNode
     RightAction?: () => void
     addLeftAction?: () => void
-    LeftAction?: () => void
+    leftAction?: () => void
 }
 
-const Header: React.FC<HeaderProps> = ({ leftButton, HeaderName, RightButton, RightAction, addLeftAction, LeftAction }) => {
+const Header: React.FC<HeaderProps> = ({ leftButton, HeaderName, RightButton, RightAction, addLeftAction, leftAction }) => {
     const navigation = useNavigation();
 
     return (
         <View style={styles.HeadrContainer}>
             <Pressable onPress={() => {
-                if (!LeftAction) {
+                if (!leftAction) {
                     navigation.goBack();
                 } else {
-                    LeftAction();
+                    leftAction();
                 }
                 if (addLeftAction)
                     addLeftAction();
@@ -42,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({ leftButton, HeaderName, RightButton, Ri
 };
 
 
-export default Header;
+export {Header};
 
 
 const styles = StyleSheet.create({

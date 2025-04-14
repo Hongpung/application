@@ -1,9 +1,8 @@
 import React from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 import { type Member } from "@hongpung/src/entities/member";
-import PickMemberCard from "@hongpung/src/features/member/inviteReservation/ui/PickMemberCard";
-import SkeletonPlaceholder from "react-native-skeleton-placeholder";
-import PickMemberCardSkeleton from "@hongpung/src/features/member/inviteReservation/ui/PickMemberCardSkeleton";
+import ParticipatorCard from "@hongpung/src/entities/member/ui/ParticipatorCard/ParticipatorCard";
+import MemberCardSkeleton from "@hongpung/src/entities/member/ui/MemberCardSkeleton/MemberCardSkeleton";
 
 interface InvitePossibleMemberListProps {
   invitePossibleMembers: Member[];
@@ -17,7 +16,7 @@ const InvitePossibleMemberList: React.FC<InvitePossibleMemberListProps> = ({ inv
 
   const renderItem = ({ item: member }: { item: Member }) => (
     <View style={styles.cardContainer}>
-      <PickMemberCard
+      <ParticipatorCard
         member={member}
         isPicked={selectedMembers.includes(member)}
         onPress={() => { toggleMember(member) }}
@@ -36,9 +35,9 @@ const InvitePossibleMemberList: React.FC<InvitePossibleMemberListProps> = ({ inv
       ListFooterComponent={
         isLoading ? (
           <>
-            <PickMemberCardSkeleton />
-            <PickMemberCardSkeleton />
-            <PickMemberCardSkeleton />
+            <MemberCardSkeleton />
+            <MemberCardSkeleton />
+            <MemberCardSkeleton />
           </>
         ) : null
       }

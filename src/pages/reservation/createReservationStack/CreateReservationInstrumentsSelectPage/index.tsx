@@ -3,62 +3,66 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { Instrument } from "@hongpung/src/entities/instrument";
 import { useCreateReservation } from "@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context";
-import Header from '@hongpung/src/common/ui/header/Header'
+import Header from "@hongpung/src/common/ui/Header/Header";
 import { Color } from "@hongpung/src/common";
 
-import { useBorrowPossibleInstrumentsFetch } from "@hongpung/src/features/reservation/figureReservation/api/searchBorrowPossibleInstrumentsApi";
-import { BorrowInstrumentsConfirmButton } from "@hongpung/src/features/reservation/figureReservation/ui/BorrowInstrumentsConfirmButton/BorrowInstrumentsConfirmButton";
-import BorrowInstrumentsList from "@hongpung/src/features/reservation/figureReservation/ui/BorrowInstrumentsList/BorrowInstrumentsList";
+import { useBorrowPossibleInstrumentsFetch } from "@hongpung/src/features/reservation/configureReservation/api/searchBorrowPossibleInstrumentsApi";
+import { BorrowInstrumentsConfirmButton } from "@hongpung/src/features/reservation/configureReservation/ui/BorrowInstrumentsConfirmButton/BorrowInstrumentsConfirmButton";
+import BorrowPossibleInstrumentList from "@hongpung/src/widgets/instrument/ui/BorrowPossibleInstrumentList/BorrowPossibleInstrumentList";
 
+const CreateReservationInstrumentsSelectPage: React.FC = () => {
+  const { data, isLoading } = useBorrowPossibleInstrumentsFetch();
+  const { reservation, setBorrowInstruments } = useCreateReservation();
 
-const BorrowInstrumentSelectScreen: React.FC = () => {
+  const [newBorrowInstruments, setNewBorrowInstruments] = useState<
+    Instrument[]
+  >(reservation.borrowInstruments);
 
-    const { data, isLoading } = useBorrowPossibleInstrumentsFetch();
-    const { reservation, setBorrowInstruments } = useCreateReservation();
-    const [newBorrowInstruments, setNewBorrowInstruments] = useState<Instrument[]>(reservation.borrowInstruments)
-
-
-    return (
-        <View style={styles.container}>
-            <Header leftButton="close" HeaderName="대여 악기 선택" />
-
-            <View style={styles.container}>
-                {data && data.length === 0 ? (
-                    <Text style={styles.emptyText}>
-                        대여 할 수 있는 악기가 없습니다.
-                    </Text>
-                ) : (
-                    <BorrowInstrumentsList
-                        instrumentList={data ?? []}
-                        selectInstruments={setNewBorrowInstruments}
-                        selectedInstruments={newBorrowInstruments}
-                    />
-                )}
-            </View>
-
-            {reservation.borrowInstruments.length > 0 &&
-                <BorrowInstrumentsConfirmButton
-                    borrowInstrumentsLength={newBorrowInstruments.length}
-                    onPress={() => { setBorrowInstruments(newBorrowInstruments) }}
-                />
-            }
-        </View>
+  const toggleInstrument = (instrument: Instrument) => {
+    setNewBorrowInstruments((prev) =>
+      prev.includes(instrument)
+        ? prev.filter((i) => i !== instrument)
+        : [...prev, instrument]
     );
+  };
+
+  return (
+    <View style={styles.container}>
+      <Header leftButton="close" HeaderName="대여 악기 선택" />
+
+      <View style={styles.container}>
+        <BorrowPossibleInstrumentList
+          instrumentList={data ?? []}
+          toggleInstrument={toggleInstrument}
+          selectedInstruments={newBorrowInstruments}
+          isLoading={isLoading}
+        />
+      </View>
+
+      {reservation.borrowInstruments.length > 0 && (
+        <BorrowInstrumentsConfirmButton
+          borrowInstrumentsLength={newBorrowInstruments.length}
+          onPress={() => {
+            setBorrowInstruments(newBorrowInstruments);
+          }}
+        />
+      )}
+    </View>
+  );
 };
 
-
-export default BorrowInstrumentSelectScreen;
+export default CreateReservationInstrumentsSelectPage;
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#FFF",
-    },
-    emptyText: {
-        marginHorizontal: "auto",
-        marginTop: 300,
-        fontFamily: "NanumSquareNeo-Bold",
-        fontSize: 18,
-        color: Color["grey400"],
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#FFF",
+  },
+  emptyText: {
+    marginHorizontal: "auto",
+    marginTop: 300,
+    fontFamily: "NanumSquareNeo-Bold",
+    fontSize: 18,
+    color: Color["grey400"],
+  },
 });

@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 
-import ParticipatorList from '@hongpung/src/widgets/reservation/ui/ParticipatorList/ParticipatorList';
-import SelectedParticipatorList from '@hongpung/src/widgets/reservation/ui/SelectedParticipatorList/SelectedParticipatorList';
-import Header from '@src/common/ui/header/Header';
-import { Icons } from '@hongpung/src/common/ui/icons/Icons';
-import { ParticipatorsConfirmButton } from '@hongpung/src/features/reservation/figureReservation/ui/ParticipatorsConfirmButton/ParticipatorsConfirmButton';
+import MemberList from '@hongpung/src/widgets/member/ui/MemberList/MemberList';
+import SelectedParticipatorList from '@hongpung/src/widgets/reservation/ui/SelectedParticipatorHList/SelectedParticipatorHList';
+import Header from '@hongpung/src/common/ui/Header/Header';
+import { Icons } from '@hongpung/src/common/ui/Icons/Icons';
+import { ParticipatorsConfirmButton } from '@hongpung/src/features/reservation/configureReservation/ui/ParticipatorsConfirmButton/ParticipatorsConfirmButton';
 import OptionsModal from '@hongpung/src/widgets/reservation/ui/OptionsModal/OptionsModal';
-import FilterScrollView from '@hongpung/src/widgets/reservation/ui/FilterScrollView/FilterScrollView';
-import SearchBar from '@hongpung/src/widgets/reservation/ui/SearchBar/SearchBar';
-import { useParticipatorsFilters } from '@hongpung/src/features/reservation/figureReservation/model/useParticipatorsFilters';
-import { useSelectParticipators } from '@hongpung/src/features/reservation/figureReservation/model/useSelectParticipators';
+import FilterHList from '@hongpung/src/widgets/reservation/ui/FilterHList/FilterHList';
+import SearchMemberNameBar from '@hongpung/src/widgets/reservation/ui/SearchMemberNameBar.tsx/SearchMemberNameBar';
 import { Color } from '@hongpung/src/common';
 import { useCreateReservation } from '@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context';
-import { useInvitePossibleMemberData } from '@hongpung/src/features/reservation/figureReservation/model/useParaticipatorData';
 import InvitePossibleMemberList from '@hongpung/src/widgets/reservation/ui/InvitePossibleMemberList/InvitePossibleMemberList';
+import { useParticipatorsFilters } from '@hongpung/src/features/reservation/configureReservation/model/useParticipatorsFilters';
+import { useInvitePossibleMemberData } from '@hongpung/src/features/reservation/configureReservation/model/useParaticipatorData';
+import { useSelectParticipators } from '@hongpung/src/features/reservation/configureReservation/model/useSelectParticipators';
 
 const ParticipantsSelectScreen: React.FC = () => {
 
@@ -35,7 +35,7 @@ const ParticipantsSelectScreen: React.FC = () => {
 
     const { reservation, setParticipators } = useCreateReservation();
 
-    const { data, isLast, isLoading, loadNewPage } = useInvitePossibleMemberData(filterParams)
+    const { data, isLoading, loadNewPage } = useInvitePossibleMemberData(filterParams)
 
     const { toggleParticipator, ...participatorsData } = useSelectParticipators(reservation.participators);
 
@@ -65,14 +65,14 @@ const ParticipantsSelectScreen: React.FC = () => {
                     onApply={handleApplyFilters}
                 />
 
-                <SearchBar
+                <SearchMemberNameBar
                     searchBarVisible={searchBarVisible}
                     setSearchBarVisible={setSearchBarVisible}
                     setFindOptions={setFindOptions}
                     debounceKeyword={debounceKeyword}
                 />
 
-                <FilterScrollView
+                <FilterHList
                     descendingOrder={descendingOrder}
                     setDescendingOrder={setDescendingOrder}
                     findOptions={findOptions}

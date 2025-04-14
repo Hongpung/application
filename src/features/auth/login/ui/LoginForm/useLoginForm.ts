@@ -1,11 +1,3 @@
-/**
- * 1. 로그인 정보를 담는 상태관리 변수 email, password가 있어야 함
- * 2. 로그인 정보의 상태를 담는 상태관리 변수가 있어야 하므로
- *    {password:string, state: error, errorText?:string}
- *     이런 식으로 구성하는게 더 이로움
- * 그렇게 하려면 inputComponet를 더 분리 해서 써야 함
- * 지금 해야될 일이 바로 그거네 inputComponent 리팩토링하고 즉각 적용하기
- */
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Keyboard } from "react-native";
 
@@ -15,15 +7,7 @@ import { StackActions, useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import { debounce } from "lodash";
 import { useLoginRequest } from "@hongpung/src/entities/auth/api/authApi";
-import { saveToken } from "@hongpung/src/common";
-
-
-
-
-// type LoginNavProps = NativeStackNavigationProp<RootStackParamList, "Login">;
-
-
-type validationCondition = | { state: 'PENDING' | 'BEFORE' | 'VALID' } | { state: 'ERROR', errorText: string }
+import { saveToken, ValidationState } from "@hongpung/src/common";
 
 
 interface LoginFormValue {
@@ -32,8 +16,8 @@ interface LoginFormValue {
 }
 
 interface LoginFormValidation {
-    email: validationCondition
-    password: validationCondition
+    email: ValidationState
+    password: ValidationState
 }
 
 
@@ -45,7 +29,7 @@ export const useLoginForm = () => {
     const [formValidation, setFormValidation] = useState<LoginFormValidation>({ email: { state: 'BEFORE' }, password: { state: 'BEFORE' } })
 
     //formData는 로그인 정보를 담는 상태관리 변수
-    const { request: login, isLoading, error } = useLoginRequest({ ...formData })
+    const { request: login, isLoading, error } = useLoginRequest()
 
     //formValidation은 로그인 정보의 상태를 담는 상태관리 변수
 
@@ -216,13 +200,11 @@ export const useLoginForm = () => {
 
             const { autoLogin, saveID } = options;
 
-            await login(async ({ token }) => {
-                await saveToken('token', token);
-                saveLoginOptions({ email, autoLogin, saveID })
-                navigation.dispatch(StackActions.replace('HomeStack'))
-            });
+            const { token } = await login(formData);
 
-
+            await saveToken('token', token);
+            saveLoginOptions({ email, autoLogin, saveID })
+            navigation.dispatch(StackActions.replace('HomeStack'))
         } catch (e: unknown) {
             if (e instanceof Error) {
 

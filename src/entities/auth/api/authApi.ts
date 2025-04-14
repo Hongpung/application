@@ -7,7 +7,8 @@ const authApi = baseApi.addEndpoints({
             query: (requestBody) => ({
                 url: '/auth/login',
                 method: 'POST',
-                body: requestBody
+                body: requestBody,
+                withAuthorize: false
             }),
         }),
         logout: build.request<void, void>({
