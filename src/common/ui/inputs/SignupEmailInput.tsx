@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, Animated, Pressable, Modal, Activity
 import { Color } from '@hongpung/ColorSet';
 import { josa } from 'es-hangul';
 import Toast from 'react-native-toast-message';
-import { InputBaseComponent } from './InputBaseComponent';
+import { BasicInput } from './InputBaseComponent';
 
 type InputProps = {
     label: string,
@@ -209,7 +209,7 @@ const SignUpEmailInput: React.FC<InputProps> = ({ onCodeSend, inputValue, setInp
     return (
         <View style={styles.inputGroup}>
             <View style={{ flex: 1 }}>
-                <InputBaseComponent
+                <BasicInput
                     ref={emailRef}
                     inputValue={inputValue}
                     setInputValue={setInputValue}

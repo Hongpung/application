@@ -1,11 +1,18 @@
 import { LongButton, ValidationState } from "@hongpung/src/common";
-import { InputBaseComponent } from "@hongpung/src/common/ui/inputs/InputBaseComponent";
-import { useRef, useState } from "react";
-import { View } from "react-native";
-import Toast from "react-native-toast-message";
-import { passwordSchema } from "../../model/passwordSchema";
+import { BasicInput } from "@hongpung/src/common/ui/inputs/InputBaseComponent";
+import { TextInput, View } from "react-native";
 
-export const ChangePasswordForm: React.FC<{
+interface PasswordValue {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+type PasswordFormValidation = {
+  [key in keyof PasswordValue]: ValidationState;
+};
+
+interface ChangePasswordFormProps {
   currentPassword: string;
   setCurrentPassword: (text: string) => void;
   newPassword: string;
@@ -13,100 +20,75 @@ export const ChangePasswordForm: React.FC<{
   confirmPassword: string;
   setConfirmPassword: (text: string) => void;
   onChangePassword: () => Promise<void>;
-}> = ({
-  currentPassword,
-  setCurrentPassword,
-  newPassword,
-  setNewPassword,
-  confirmPassword,
-  setConfirmPassword,
-  onChangePassword,
-}) => {
-  const currentPasswordRef = useRef<any | null>(null);
-  const newPasswordRef = useRef<any | null>(null);
-  const confirmPasswordRef = useRef<any | null>(null);
+  passwordValidation: PasswordFormValidation;
+  validateConfirmPassword: (text: PasswordValue["confirmPassword"]) => ValidationState;
+  validateNewPassword: (text: PasswordValue["newPassword"]) => ValidationState;
+  validateCurrentPassword: (text: PasswordValue["currentPassword"]) => ValidationState;
+  currentPasswordRef: React.RefObject<TextInput>;
+  newPasswordRef: React.RefObject<TextInput>;
+  confirmPasswordRef: React.RefObject<TextInput>;
+  isCanChangePassword: boolean;
+}
 
-  const validatePassword = (password: string): ValidationState => {
-    const result = passwordSchema.safeParse(password);
-    return result.success
-      ? { state: "VALID" }
-      : { state: "ERROR", errorText: result.error.errors[0].message };
-  };
-
-  const [curentPasswordValidation, setCurrentPasswordValidation] =
-    useState<ValidationState>({ state: "BEFORE" });
-  const [newPasswordValidation, setNewPasswordValidation] =
-    useState<ValidationState>({ state: "BEFORE" });
-  const [confirmPasswordValidation, setConfirmPasswordValidation] =
-    useState<ValidationState>({ state: "BEFORE" });
-
-  const handleChangePassword = async () => {
-    const currentPasswordValidation = validatePassword(currentPassword);
-    const newPasswordValidation = validatePassword(newPassword);
-    const confirmPasswordValidation = validatePassword(confirmPassword);
-
-    if (currentPasswordValidation.state === "ERROR") {
-      currentPasswordRef.current?.focus();
-      return;
-    }
-
-    if (newPasswordValidation.state === "ERROR") {
-      newPasswordRef.current?.focus();
-      return;
-    }
-
-    if (confirmPasswordValidation.state === "ERROR") {
-      confirmPasswordRef.current?.focus();
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      confirmPasswordRef.current?.focus();
-      Toast.show({ type: "error", text1: "비밀번호와 일치하지 않습니다." });
-      return;
-    }
-
-    await onChangePassword();
-  };
-
+export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = (
+  props
+) => {
+  const {
+    currentPassword,
+    setCurrentPassword,
+    newPassword,
+    setNewPassword,
+    confirmPassword,
+    setConfirmPassword,
+    onChangePassword,
+    passwordValidation,
+    currentPasswordRef,
+    newPasswordRef,
+    confirmPasswordRef,
+    validateConfirmPassword,
+    validateNewPassword,
+    validateCurrentPassword,
+    isCanChangePassword,
+  } = props;
+  
   return (
     <View style={{ flex: 1 }}>
       <View style={{ marginHorizontal: 48 }}>
-        <InputBaseComponent
+        <BasicInput
           ref={currentPasswordRef}
           label="현재 비밀번호"
           isEncryption
           inputValue={currentPassword}
           setInputValue={setCurrentPassword}
-          validationCondition={curentPasswordValidation}
+          validationCondition={passwordValidation.currentPassword}
           onBlur={() => {
-            setCurrentPasswordValidation(validatePassword(currentPassword));
+            validateCurrentPassword(currentPassword)
           }}
         />
       </View>
       <View style={{ marginHorizontal: 48 }}>
-        <InputBaseComponent
+        <BasicInput
           ref={newPasswordRef}
           label="새로운 비밀번호"
           isEncryption
           inputValue={newPassword}
           setInputValue={setNewPassword}
-          validationCondition={newPasswordValidation}
+          validationCondition={passwordValidation.newPassword}
           onBlur={() => {
-            setNewPasswordValidation(validatePassword(newPassword));
+            validateNewPassword(newPassword);
           }}
         />
       </View>
       <View style={{ marginHorizontal: 48 }}>
-        <InputBaseComponent
+        <BasicInput
           ref={confirmPasswordRef}
           label="새로운 비밀번호 확인"
           isEncryption
           inputValue={confirmPassword}
           setInputValue={setConfirmPassword}
-          validationCondition={confirmPasswordValidation}
+          validationCondition={passwordValidation.confirmPassword}
           onBlur={() => {
-            setConfirmPasswordValidation(validatePassword(confirmPassword));
+            validateConfirmPassword(confirmPassword);
           }}
         />
       </View>
@@ -114,12 +96,8 @@ export const ChangePasswordForm: React.FC<{
         <LongButton
           color={"green"}
           innerContent="비밀번호 변경"
-          isAble={
-            curentPasswordValidation.state === "VALID" &&
-            newPasswordValidation.state === "VALID" &&
-            confirmPasswordValidation.state === "VALID"
-          }
-          onPress={handleChangePassword}
+          isAble={isCanChangePassword}
+          onPress={onChangePassword}
         />
       </View>
     </View>

@@ -25,7 +25,7 @@ type InputProps = {
     requireMark?: boolean
 }
 
-export const InputBaseComponent = forwardRef<TextInput, InputProps>(({ label, isEncryption = false, color = "blue", isEditible = true, isRequired = true, requireMark = false, inputValue, setInputValue, keyboardType = 'default', maxLength = undefined, validationCondition, onBlur, onFocus }, ref) => {
+export const BasicInput = forwardRef<TextInput, InputProps>(({ label, isEncryption = false, color = "blue", isEditible = true, isRequired = true, requireMark = false, inputValue, setInputValue, keyboardType = 'default', maxLength = undefined, validationCondition, onBlur, onFocus }, ref) => {
     
     // 암호화 상태일때 보이는지 안보이는지 판별
     const [isVisible, setIsVisible] = useState(!isEncryption);

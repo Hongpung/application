@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Modal } from "react-native";
 import { LongButton } from "@hongpung/src/common";
 
@@ -6,17 +6,21 @@ interface ErrorModalProps {
   visible: boolean;
   title: string;
   message: string;
-  onConfirm: () => void;
+  onConfirm?: () => void;
 }
 
 export const ErrorModal: React.FC<ErrorModalProps> = ({
-  visible: initialVisible,
+  visible: externalVisible,
   title,
   message,
   onConfirm,
 }) => {
-  const [visible, setVisible] = useState(initialVisible);
 
+  const [visible, setVisible] = useState(externalVisible);
+  
+  useEffect(() => {
+    setVisible(externalVisible);
+  }, [externalVisible]);
   return (
     <Modal visible={visible} transparent>
       <View style={styles.modalContainer}>
@@ -28,7 +32,9 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
             innerContent="확인"
             onPress={() => {
               setVisible(false);
-              onConfirm();
+              if (onConfirm) {
+                onConfirm();
+              }
             }}
             isAble={true}
           />

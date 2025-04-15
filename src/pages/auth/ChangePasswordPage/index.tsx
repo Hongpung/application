@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -6,45 +6,14 @@ import {
   TouchableWithoutFeedback,
   View,
   Text,
-  Alert,
   StyleSheet,
 } from "react-native";
 import { Color, Header } from "@hongpung/src/common";
-import { useNavigation } from "@react-navigation/native";
-import Toast from "react-native-toast-message";
-import { useChangePasswordRequest } from "@hongpung/src/features/auth/changePassword/api/changePasswordApi";
-import { ChangePasswordForm } from "@hongpung/src/features/auth/changePassword/ui/ChangePasswordForm/ChangePasswordForm";
-import { changePasswordSuccessToast } from "@hongpung/src/features/auth/changePassword/lib/changeSuccessToast";
+
+import { ChangePasswordSection } from "@hongpung/src/widgets/auth/ui/ChangePasswordSection/ChangePasswordSection";
 
 const ChangePasswordScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const { request: changePasswordRequest } = useChangePasswordRequest();
-
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const changePassword = async () => {
-    try {
-      const { message } = await changePasswordRequest({
-        currentPassword,
-        newPassword,
-      });
-      if (!message) throw new Error("응답이 올바르지 않음");
-
-      changePasswordSuccessToast()
-      navigation.goBack();
-    } catch (error) {
-      Alert.alert(
-        "비밀번호 변경 실패",
-        "비밀번호 변경에 실패했습니다.\n" +
-          (error instanceof Error
-            ? error.message
-            : "비밀번호 확인 후 다시 시도해주세요.")
-      );
-    }
-  };
-
+  
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
@@ -52,15 +21,13 @@ const ChangePasswordScreen: React.FC = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
-        <Header leftButton={'close'} HeaderName="비밀번호 변경"/>
+        <Header leftButton={"close"} HeaderName="비밀번호 변경" />
         <View
           style={{
             height: 40,
           }}
         ></View>
-        <View
-          style={styles.descriptionContainer}
-        >
+        <View style={styles.descriptionContainer}>
           <Text style={styles.description}>
             {"로그인에 사용할 비밀번호를 변경해요."}
           </Text>
@@ -73,15 +40,7 @@ const ChangePasswordScreen: React.FC = () => {
             {"허용 특수문자: !,@,#,$,%,^,&,+,="}
           </Text>
         </View>
-        <ChangePasswordForm
-          currentPassword={currentPassword}
-          setCurrentPassword={setCurrentPassword}
-          newPassword={newPassword}
-          setNewPassword={setNewPassword}
-          confirmPassword={confirmPassword}
-          setConfirmPassword={setConfirmPassword}
-          onChangePassword={changePassword}
-        />
+        <ChangePasswordSection />
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );

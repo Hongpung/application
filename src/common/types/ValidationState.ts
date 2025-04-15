@@ -1,4 +1,6 @@
 export type ValidationState = {
-    state: "PENDING" | "BEFORE" | "VALID" | "ERROR";
-    errorText?: string;
+    state: "PENDING" | "BEFORE" | "VALID" ;
+}|{
+    state:"ERROR",
+    errorText:string
 }
