@@ -1,15 +1,15 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { type Instrument } from "@hongpung/src/entities/instrument";
-import Header from "@hongpung/src/common/ui/Header/Header";
+import { Header } from "@hongpung/src/common";
 import InstrumentViewList from "@hongpung/src/widgets/instrument/ui/InstrumentViewList/InstrumentViewList";
 import { useLoadClubInstrumentsFetch } from "@hongpung/src/features/club/manageInstrument/api/useLoadClubInstruments";
+import { ClubStackProps } from "@hongpung/src/navigation/ClubStackNavigation";
 
 const ClubInstrumentListPage: React.FC<ClubStackProps<"ClubInstruments">> = ({
   navigation,
   route,
 }) => {
-    
   const {
     data: instrumentList,
     isLoading,
@@ -17,9 +17,7 @@ const ClubInstrumentListPage: React.FC<ClubStackProps<"ClubInstruments">> = ({
   } = useLoadClubInstrumentsFetch();
 
   const handleInstrumentClick = (instrument: Instrument) => {
-    navigation.push("InstrumentDetail", {
-      instrumentId: instrument.instrumentId,
-    });
+    navigation.push("ClubInstruments");
   };
 
   return (

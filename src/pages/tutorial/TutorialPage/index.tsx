@@ -1,19 +1,13 @@
-import { StyleSheet, View, Image } from "react-native";
+import { StyleSheet, View } from "react-native";
 import React, { useRef, useState } from "react";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useNavigation } from "@react-navigation/native";
 import PagerView from "react-native-pager-view";
-import { Color } from "@hongpung/ColorSet";
-import { RootStackParamList } from "@hongpung/pageTypes";
 import { LongButton, ShortButton } from "@hongpung/src/common";
 import { PageIndicator } from "@hongpung/src/common/ui/PageIndicator";
 import ImagePage from "@hongpung/src/common/ui/ImagePage/ImagePage";
+import { RootStackScreenProps } from "@hongpung/src/navigation/RootStackNavigation";
 
-type TutorialProp = NativeStackNavigationProp<RootStackParamList, "Tutorial">;
 
-const TutorialScreen: React.FC = () => {
-  const navigation = useNavigation<TutorialProp>();
-  
+const TutorialScreen: React.FC<RootStackScreenProps<'Tutorial'>> = ({ navigation }) => {
   const [pageNum, setPageNum] = useState(0);
   const pagerRef = useRef<PagerView>(null);
 
@@ -27,7 +21,6 @@ const TutorialScreen: React.FC = () => {
     navigation.replace("Permission");
   };
 
-
   return (
     <View style={styles.basicBackground}>
       <PagerView
@@ -36,10 +29,22 @@ const TutorialScreen: React.FC = () => {
         ref={pagerRef}
         onPageScroll={(e) => setPageNum(e.nativeEvent.position)}
       >
-        <ImagePage key={'page-1'} imageSource={require("@hongpung/assets/images/tutorial/Tutorial-1.png")} />
-        <ImagePage key={'page-2'} imageSource={require("@hongpung/assets/images/tutorial/Tutorial-2.png")} />
-        <ImagePage key={'page-3'} imageSource={require("@hongpung/assets/images/tutorial/Tutorial-3.png")} />
-        <ImagePage key={'page-4'} imageSource={require("@hongpung/assets/images/tutorial/Tutorial-4.png")} />
+        <ImagePage
+          key={"page-1"}
+          imageSource={require("@hongpung/assets/images/tutorial/Tutorial-1.png")}
+        />
+        <ImagePage
+          key={"page-2"}
+          imageSource={require("@hongpung/assets/images/tutorial/Tutorial-2.png")}
+        />
+        <ImagePage
+          key={"page-3"}
+          imageSource={require("@hongpung/assets/images/tutorial/Tutorial-3.png")}
+        />
+        <ImagePage
+          key={"page-4"}
+          imageSource={require("@hongpung/assets/images/tutorial/Tutorial-4.png")}
+        />
       </PagerView>
       <View style={styles.footerContainer}>
         <PageIndicator currentPage={pageNum} totalPages={4} />

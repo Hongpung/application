@@ -5,10 +5,11 @@ import { useScheduleCardList } from "@hongpung/src/features/session/loadSessionS
 import ScheduleStatusBar from "@hongpung/src/widgets/session/ui/ScheduleStatusBar/ScheduleStatusBar";
 import { useSessionListSocket } from "@hongpung/src/features/session/loadSessionScheduleList/socket/useSessionListSocket";
 import { NavigateCalendarButton } from "@hongpung/src/common";
+import { MainTabScreenProps } from "@hongpung/src/navigation/MainTabNavigation";
 
 const { height } = Dimensions.get("window");
 
-const ReservationMainScreen: React.FC<MainStackProps<'Reservation'>> = ({ navigation }) => {
+const ReservationMainScreen: React.FC<MainTabScreenProps<'Reservation'>> = ({ navigation }) => {
 
     const { sessionList } = useSessionListSocket();
     const { cardViewRef, isOnAir, isParticipatible, scheduleCardList } = useScheduleCardList(sessionList);

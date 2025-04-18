@@ -7,9 +7,9 @@ import { ProfileBox } from "@hongpung/src/entities/member/ui/ProfileBox/ProfileB
 import { MyActivitiesSection } from "@hongpung/src/widgets/member/ui/MyActivitiesSection/MyActivitiesSection";
 import { SettingsSection } from "@hongpung/src/widgets/member/ui/SettingsSection/SettingsSection";
 import { FooterSection } from "@hongpung/src/widgets/member/ui/FooterSection/FooterSection";
+import { MainTabScreenProps } from "@hongpung/src/navigation/MainTabNavigation";
 
-const MyPageScreen: React.FC<MainStackProps<"BottomTab">> = ({ navigation }) => {
-
+const MyPageScreen: React.FC<MainTabScreenProps<"MyPage">> = ({ navigation }) => {
   const loginUser = useRecoilValue(UserStatusState);
 
   if (!loginUser) {

@@ -1,4 +1,4 @@
-export interface SubMenu {
+export interface SubMenu<T> {
   name: string;
-  link: string;
+  link:  keyof T;
 } 

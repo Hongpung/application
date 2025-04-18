@@ -16,6 +16,7 @@ const QRScanner: React.FC<QRScannerProps> = ({
   onToggleFlash,
   onBarcodeScanned,
 }) => {
+  
   return (
     <CameraView
       style={styles.camera}

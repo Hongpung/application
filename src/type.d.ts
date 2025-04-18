@@ -111,19 +111,19 @@ declare global {
         : { screen: K; params: StackParamList[K] }
     }[keyof StackParamList];
 
-    type RootStackProps<K extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, K>;
+    // type RootStackProps<K extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, K>;
 
-    type MainStackProps<K extends keyof MainStackParamList> = NativeStackScreenProps<MainStackParamList, K>;
+    // type MainStackProps<K extends keyof MainStackParamList> = NativeStackScreenProps<MainStackParamList, K>;
 
-    type BottomTabProps<K extends keyof BottomTabParamList> = BottomTabScreenProps<BottomTabParamList, K>;
+    // type BottomTabProps<K extends keyof BottomTabParamList> = BottomTabScreenProps<BottomTabParamList, K>;
 
-    type ReservationStackProps<K extends keyof ReservationStackParamList> = NativeStackScreenProps<ReservationStackParamList, K>;
+    // type ReservationStackProps<K extends keyof ReservationStackParamList> = NativeStackScreenProps<ReservationStackParamList, K>;
 
-    type ClubStackProps<K extends keyof MyClubStackStackParamList> = NativeStackScreenProps<ClubStackParamList, K>;
+    // type ClubStackProps<K extends keyof MyClubStackStackParamList> = NativeStackScreenProps<ClubStackParamList, K>;
     
-    type InstrumentStackProps<K extends keyof InstrumentStackParamList> = NativeStackScreenProps<InstrumentStackParamList, K>;
+    // type InstrumentStackProps<K extends keyof InstrumentStackParamList> = NativeStackScreenProps<InstrumentStackParamList, K>;
 
-    type NoticeStackProps<K extends keyof NoticeStackParamList> = NativeStackScreenProps<NoticeStackParamList, K>;
+    // type NoticeStackProps<K extends keyof NoticeStackParamList> = NativeStackScreenProps<NoticeStackParamList, K>;
 
 }
 

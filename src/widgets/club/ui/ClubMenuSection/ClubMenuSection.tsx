@@ -2,9 +2,10 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Color } from "@hongpung/src/common";
 import { Icons } from "@hongpung/src/common/ui/Icons/Icons";
 import { CLUB_MENUS } from "@hongpung/src/entities/club/constant/clubMenus";
+import { ClubStackParamList } from "@hongpung/src/navigation/ClubStackNavigation";
 
 interface ClubMenuSectionProps {
-  onMenuPress: (link: string) => void;
+  onMenuPress: (link: keyof ClubStackParamList) => void;
 }
 
 export const ClubMenuSection: React.FC<ClubMenuSectionProps> = ({

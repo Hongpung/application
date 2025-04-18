@@ -7,19 +7,20 @@ import { ClubFooterSection } from "@hongpung/src/widgets/club/ui/ClubFooterSecti
 import { useLoadClubInfoFetch } from "@hongpung/src/entities/club/api/clubApi";
 import { UserStatusState } from "@hongpung/src/entities/member";
 import { useRecoilValue } from "recoil";
+import { ClubStackParamList, ClubStackProps } from "@hongpung/src/navigation/ClubStackNavigation";
 
-const ClubMainPage: React.FC<ClubStackProps<"MyClubHome">> = ({
+const ClubMainPage: React.FC<ClubStackProps<"ClubMain">> = ({
   navigation,
 }) => {
   const { data, isLoading, error } = useLoadClubInfoFetch();
   const loginUser = useRecoilValue(UserStatusState);
 
-  const handleMenuPress = (link: string) => {
+  const handleMenuPress = (link: keyof ClubStackParamList) => {
     navigation.push(link);
   };
 
   const handleFooterPress = () => {
-    // TODO: 동아리 정보 변경 페이지로 이동
+    navigation.navigate("ClubInstruments");
   };
 
   if (loginUser?.club === "기타") {

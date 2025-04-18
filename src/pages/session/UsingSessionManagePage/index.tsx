@@ -10,26 +10,33 @@ import {
 
 import { useRecoilValue } from "recoil";
 import { ThisSessionState } from "@hongpung/src/entities/session";
-import { Member } from "@hongpung/src/entities/member";
 import { Color, ErrorModal, Header, Icons } from "@hongpung/src/common";
 import MemberList from "@hongpung/src/widgets/member/ui/MemberList/MemberList";
 import { useCalculateTime } from "@hongpung/src/features/session/useRoom/model/useCalculateTime";
-import { BorrowInstrumentCard } from "@hongpung/src/entities/instrument";
+import {
+  BorrowInstrumentCard,
+  Instrument,
+} from "@hongpung/src/entities/instrument";
 import { useExtendSessionRequest } from "@hongpung/src/features/session/useRoom/api/manageRoomApi";
 import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
 import { extendSessionSuccessToast } from "@hongpung/src/features/session/useRoom/lib/toast";
 import { SessionControlButton } from "@hongpung/src/features/session/useRoom/ui/SessionControlButton/SessionControlButton";
 import { useSeperateMember } from "@hongpung/src/features/session/useRoom/model/useSeperateMember";
+import { MainStackScreenProps } from "@hongpung/src/navigation/MainStackNavigation";
+import InstrumentModal from "@hongpung/src/widgets/instrument/ui/InstrumentModal/InstrumentModal";
+import { SessionManagementScreenProps } from "@hongpung/src/navigation/SessionManagementStackNavigation";
 
-const UsingManageScreen: React.FC<MainStackProps<"UsingManage">> = ({
-  navigation,
-}) => {
+const UsingManageScreen: React.FC<
+  SessionManagementScreenProps<"SessionManage">
+> = ({ navigation }) => {
   const usingSession = useRecoilValue(ThisSessionState);
 
   const { canExtand, canReturn } = useCalculateTime();
   const { request: extendRequest, isLoading } = useExtendSessionRequest();
   const { absentUsers, attendUsers, lateUsers } =
     useSeperateMember(usingSession);
+
+  const [instrument, setInstrument] = useState<Instrument | null>(null);
 
   const handleExtendSession = async () => {
     try {
@@ -66,6 +73,7 @@ const UsingManageScreen: React.FC<MainStackProps<"UsingManage">> = ({
     <View style={styles.container}>
       <FullScreenLoadingModal isLoading={isLoading} />
       <Header leftButton={"close"} />
+      <InstrumentModal instrument={instrument} />
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -95,9 +103,7 @@ const UsingManageScreen: React.FC<MainStackProps<"UsingManage">> = ({
                       instrument={item}
                       isPicked={false}
                       onClickInstrument={() => {
-                        navigation.push("InstrumentDetail", {
-                          instrumentId: item.instrumentId,
-                        });
+                        setInstrument(item);
                       }}
                     />
                   )}
@@ -142,7 +148,7 @@ const UsingManageScreen: React.FC<MainStackProps<"UsingManage">> = ({
         canReturn={canReturn}
         handleExtendSession={handleExtendSession}
         handleReturnSession={() => {
-          navigation.replace("CheckOut");
+          navigation.replace("CheckOutSession");
         }}
       />
     </View>

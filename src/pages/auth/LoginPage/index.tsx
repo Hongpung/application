@@ -1,5 +1,6 @@
 import { Color } from "@hongpung/src/common";
 import SignUpNavigationButton from "@hongpung/src/features/auth/signUp/ui/SignUpNavigatorButton/SignUpNavigationButton";
+import { LoginStackScreenProps } from "@hongpung/src/navigation/LoginStackNavigation";
 import LoginSection from "@hongpung/src/widgets/auth/ui/LoginSection/LoginSection";
 import { useCallback } from "react";
 import {
@@ -12,7 +13,7 @@ import {
   Platform,
 } from "react-native";
 
-const LoginPage: React.FC<RootStackProps<"Login">> = ({ navigation }) => {
+const LoginPage: React.FC<LoginStackScreenProps<"Login">> = ({ navigation }) => {
   const navigateToSignUp = useCallback(() => {
     navigation.navigate("SignUp");
   }, [navigation]);

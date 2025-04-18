@@ -2,7 +2,6 @@ import { createContext, useContext, useMemo, useState } from "react";
 import { ReservationForm } from "../../model/type";
 import { parseReservationCreateRequestBody } from "../lib/parseReservationCreateRequestBody";
 import { useCreateReservationRequest } from "../api/createReservationApi";
-import { ReservationStackParamList } from "@hongpung/nav/ReservationStack";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { CommonActions, useNavigation } from "@react-navigation/native";
 import { Alert } from "react-native";
@@ -31,8 +30,6 @@ interface CreateReservationContextProps {
 
 const CreateReservationContext = createContext<CreateReservationContextProps | undefined>(undefined);
 
-type CreateReservationNavProps = NativeStackNavigationProp<ReservationStackParamList, 'ReservationStack'>
-
 const CreateReservationContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     const [reservation, setReservationState] = useState<ReservationForm>({
@@ -47,7 +44,7 @@ const CreateReservationContextProvider = ({ children }: { children: React.ReactN
         return Object.values(reservation).every(value => value !== null);
     };
 
-    const navigation = useNavigation<CreateReservationNavProps>();
+    const navigation = useNavigation();
 
     const { request, error, isLoading } = useCreateReservationRequest();
 
