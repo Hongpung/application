@@ -8,12 +8,17 @@ import {
   Text,
   StyleSheet,
 } from "react-native";
-import { Color, Header } from "@hongpung/src/common";
+import { Color, Header, DescriptionBox } from "@hongpung/src/common";
 
 import { ChangePasswordSection } from "@hongpung/src/widgets/auth/ui/ChangePasswordSection/ChangePasswordSection";
 
 const ChangePasswordScreen: React.FC = () => {
-  
+  const descriptions = [
+    "로그인에 사용할 비밀번호를 변경해요.",
+    "새로운 비밀번호는 영문, 숫자, 특수문자를 포함한\n8~12자로 구성해야 해요.",
+    "허용 특수문자: !,@,#,$,%,^,&,+,=",
+  ];
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
@@ -27,19 +32,7 @@ const ChangePasswordScreen: React.FC = () => {
             height: 40,
           }}
         ></View>
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.description}>
-            {"로그인에 사용할 비밀번호를 변경해요."}
-          </Text>
-          <Text style={styles.description}>
-            {
-              "새로운 비밀번호는 영문, 숫자, 특수문자를 포함한\n8~12자로 구성해야 해요."
-            }
-          </Text>
-          <Text style={styles.description}>
-            {"허용 특수문자: !,@,#,$,%,^,&,+,="}
-          </Text>
-        </View>
+        <DescriptionBox descriptions={descriptions} style={styles.descriptionContainer} />
         <ChangePasswordSection />
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
@@ -53,17 +46,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFF",
   },
-  description: {
-    fontSize: 14,
-    fontFamily: "NanumSquareNeo-Light",
-    color: Color["grey500"],
-  },
   descriptionContainer: {
-    marginVertical: 8,
-    paddingHorizontal: 16,
-    marginHorizontal: 36,
-    backgroundColor: Color["grey100"],
-    paddingVertical: 12,
-    borderRadius: 5,
+    marginBottom: 20,
   },
 });

@@ -1,24 +1,33 @@
 import Dropdown from "./dropdown";
 
-
-interface SelectProps{
+interface SelectProps<T extends string> {
     label: string;
-    value: string | null;
-    onChange: (value: string) => void;
+    value: T | null;
+    onChange: (value: T) => void;
     visible: boolean;
     setVisible: (newValue: boolean) => void;
     trigger: React.ElementType;
-    options: string[];
-    children: React.ReactNode
-
-    color?: 'blue' | 'green'
-    align?: 'left' | 'right'
+    options: readonly T[];
+    children: React.ReactNode;
+    color?: 'blue' | 'green';
+    align?: 'left' | 'right';
 }
 
-export const Selector: React.FC<SelectProps> = ({ label, trigger, visible, setVisible, value, onChange, options, children, color = 'blue', align = 'left' }) => {
+export const Selector = <T extends string>({ 
+    label, 
+    trigger, 
+    visible, 
+    setVisible, 
+    value, 
+    onChange, 
+    options, 
+    children, 
+    color = 'blue', 
+    align = 'left' 
+}: SelectProps<T>) => {
     return (
         <Dropdown label={label} value={value} onChange={onChange} visible={visible} setVisible={setVisible}>
-            <Dropdown.Trigger as={trigger} >
+            <Dropdown.Trigger as={trigger}>
                 {children}
             </Dropdown.Trigger>
             <Dropdown.Menu>

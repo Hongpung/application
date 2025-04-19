@@ -3,16 +3,23 @@ import React from 'react';
 import { DropdownProvider } from './Dropdown.context';
 import { View } from 'react-native';
 
-interface DropdownProps {
+interface DropdownProps<T extends string> {
     label: string;
-    value: string | null;
-    visible: boolean
-    onChange: (value: string) => void;
-    setVisible: (newValue: boolean) => void
+    value: T | null;
+    visible: boolean;
+    onChange: (value: T) => void;
+    setVisible: (newValue: boolean) => void;
     children: React.ReactNode;
 }
 
-const DropdownContainer: React.FC<DropdownProps> = ({ label, value, visible, onChange, setVisible, children }) => {
+const DropdownContainer = <T extends string>({ 
+    label, 
+    value, 
+    visible, 
+    onChange, 
+    setVisible, 
+    children 
+}: DropdownProps<T>) => {
     return (
         <DropdownProvider value={value} visible={visible} setVisible={setVisible} setValue={onChange}>
             <View>

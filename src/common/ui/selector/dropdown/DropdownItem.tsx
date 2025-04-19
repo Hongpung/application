@@ -5,14 +5,18 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Color } from '@hongpung/ColorSet';
 import { Icons } from '@hongpung/src/common/ui';
 
-interface DropdownItemProps {
-    optionValue: string
-    color?: 'blue' | 'green'
-    align?: 'left' | 'right'
+interface DropdownItemProps<T extends string> {
+    optionValue: T;
+    color?: 'blue' | 'green';
+    align?: 'left' | 'right';
 }
 
-const DropdownItem: React.FC<DropdownItemProps> = ({ optionValue, color = 'blue', align = 'left' }) => {
-    const { setValue, close, value } = useDropdown();
+const DropdownItem = <T extends string>({ 
+    optionValue, 
+    color = 'blue', 
+    align = 'left' 
+}: DropdownItemProps<T>) => {
+    const { setValue, close, value } = useDropdown<T>();
 
     const handleClick = () => {
         setValue(optionValue);
@@ -50,4 +54,4 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: Color['grey400'],
     },
-})
+});

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   useIsDuplicatedEmailRequest,
@@ -7,22 +7,30 @@ import {
 import { ValidationState } from "@hongpung/src/common";
 import { signUpSchema, type SignUpFormData } from "./signUpSchema";
 import * as z from "zod";
+import { TextInput } from "react-native";
+import { clubNames } from "@hongpung/src/entities/club";
 
 type SignUpSteps = "EmailConfirm" | "Password" | "PersonalInfo";
 
 const useSignUpSteps = () => {
-
   const navigation = useNavigation();
   const [step, setStep] = useState<SignUpSteps>("EmailConfirm");
+
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const confirmPasswordRef = useRef<TextInput>(null);
+  const nameRef = useRef<TextInput>(null);
+  const nicknameRef = useRef<TextInput>(null);
+  const enrollmentNumberRef = useRef<TextInput>(null);
 
   const [formData, setFormData] = useState<SignUpFormData>({
     email: "",
     password: "",
     confirmPassword: "",
     name: "",
-    nickname: undefined,
-    clubId: null,
+    club: "",
     enrollmentNumber: 0,
+    nickname: "",
   });
 
   const [formValidation, setFormValidation] = useState<{
@@ -33,10 +41,10 @@ const useSignUpSteps = () => {
     confirmPassword: { state: "BEFORE" },
     name: { state: "BEFORE" },
     nickname: { state: "VALID" },
-    clubId: { state: "BEFORE" },
+    club: { state: "BEFORE" },
     enrollmentNumber: { state: "BEFORE" },
   });
-
+  const [isClubOptionsVisible, setIsClubOptionsVisible] = useState(false);
   const { request: signUp, isLoading } = useSignUpRequest();
   const { request: isDuplicatedEmail, isLoading: isDuplicatedEmailLoading } =
     useIsDuplicatedEmailRequest();
@@ -63,193 +71,256 @@ const useSignUpSteps = () => {
     }
   };
 
-  const setForm = useMemo(() => ({
-    setEmail: (email: string) => {
-      setFormValidation((prev) => ({
-        ...prev,
-        email: { state: "PENDING" },
-      }));
-      setFormData((prev) => ({ ...prev, email }));
-    },
-    setPassword: (password: string) => {
-      setFormValidation((prev) => ({
-        ...prev,
-        password: { state: "PENDING" },
-      }));
-      setFormData((prev) => ({ ...prev, password }));
-    },
-    setConfirmPassword: (confirmPassword: string) => {
-      setFormValidation((prev) => ({
-        ...prev,
-        confirmPassword: { state: "PENDING" },
-      }));
-      setFormData((prev) => ({ ...prev, confirmPassword }));
-    },
-    setName: (name: string) => {
-      setFormValidation((prev) => ({
-        ...prev,
-        name: { state: "PENDING" },
-      }));
-      setFormData((prev) => ({ ...prev, name }));
-    },
-    setNickname: (nickname: string) => {
-      setFormValidation((prev) => ({
-        ...prev,
-        nickname: { state: "PENDING" },
-      }));
-      setFormData((prev) => ({ ...prev, nickname }));
-    },
-    setClubId: (clubId: number | null) => {
-      setFormValidation((prev) => ({
-        ...prev,
-        clubId: { state: "PENDING" },
-      }));
-      setFormData((prev) => ({ ...prev, clubId }));
-    },
-    setEnrollmentNumber: (enrollmentNumber: string) => {
-      setFormValidation((prev) => ({
-        ...prev,
-        enrollmentNumber: { state: "PENDING" },
-      }));
-      setFormData((prev) => ({ ...prev, enrollmentNumber: Number(enrollmentNumber) }));
-    },
-  }),[setFormValidation,setFormData]);
+  const validations = useMemo(
+    () => ({
+      emailValidation: formValidation.email,
+      passwordValidation: formValidation.password,
+      confirmPasswordValidation: formValidation.confirmPassword,
+      clubIdValidation: formValidation.club,
+      nameValidation: formValidation.name,
+      nicknameValidation: formValidation.nickname,
+      enrollmemnNumberValidation: formValidation.enrollmentNumber,
+    }),
+    [formValidation]
+  );
 
-  const validateForm = useMemo(() => ({
-    validateEmail: async (email: string) => {
-      try {
-        await signUpSchema.innerType().shape.email.parseAsync(email);
-        const response = await isDuplicatedEmail({ email });
-        if (response.isRegistered) {
+  const setForm = useMemo(
+    () => ({
+      setEmail: (email: string) => {
+        setFormValidation((prev) => ({
+          ...prev,
+          email: { state: "PENDING" },
+        }));
+        setFormData((prev) => ({ ...prev, email }));
+      },
+      setPassword: (password: string) => {
+        setFormValidation((prev) => ({
+          ...prev,
+          password: { state: "PENDING" },
+        }));
+        setFormData((prev) => ({ ...prev, password }));
+      },
+      setConfirmPassword: (confirmPassword: string) => {
+        setFormValidation((prev) => ({
+          ...prev,
+          confirmPassword: { state: "PENDING" },
+        }));
+        setFormData((prev) => ({ ...prev, confirmPassword }));
+      },
+      setName: (name: string) => {
+        setFormValidation((prev) => ({
+          ...prev,
+          name: { state: "PENDING" },
+        }));
+        setFormData((prev) => ({ ...prev, name }));
+      },
+      setNickname: (nickname: string) => {
+        setFormValidation((prev) => ({
+          ...prev,
+          nickname: { state: "PENDING" },
+        }));
+        setFormData((prev) => ({ ...prev, nickname }));
+      },
+      setClub: (club: ClubName) => {
+        setFormValidation((prev) => ({
+          ...prev,
+          club: { state: "PENDING" },
+        }));
+        setFormData((prev) => ({ ...prev, club }));
+      },
+      setEnrollmentNumber: (enrollmentNumber: string) => {
+        setFormValidation((prev) => ({
+          ...prev,
+          enrollmentNumber: { state: "PENDING" },
+        }));
+        setFormData((prev) => ({
+          ...prev,
+          enrollmentNumber: Number(enrollmentNumber),
+        }));
+      },
+    }),
+    [setFormValidation, setFormData]
+  );
+
+  const validateForm = useMemo(
+    () => ({
+      validateEmail: async (email: string) => {
+        try {
+          await signUpSchema.innerType().shape.email.parseAsync(email);
+          const response = await isDuplicatedEmail({ email });
+          if (response.isRegistered) {
+            setFormValidation((prev) => ({
+              ...prev,
+              email: {
+                state: "ERROR",
+                errorText: "이미 사용중인 이메일입니다.",
+              },
+            }));
+            return;
+          }
           setFormValidation((prev) => ({
             ...prev,
-            email: { state: "ERROR", errorText: "이미 사용중인 이메일입니다." },
+            email: { state: "VALID" },
+          }));
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            setFormValidation((prev) => ({
+              ...prev,
+              email: { state: "ERROR", errorText: error.errors[0].message },
+            }));
+          }
+        }
+      },
+      validatePassword: (password: string) => {
+        try {
+          signUpSchema.innerType().shape.password.parse(password);
+          setFormValidation((prev) => ({
+            ...prev,
+            password: { state: "VALID" },
+          }));
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            setFormValidation((prev) => ({
+              ...prev,
+              password: { state: "ERROR", errorText: error.errors[0].message },
+            }));
+          }
+        }
+      },
+      validateConfirmPassword: (confirmPassword: string) => {
+        try {
+          signUpSchema.innerType().shape.confirmPassword.parse(confirmPassword);
+          if (confirmPassword !== formData.password) {
+            setFormValidation((prev) => ({
+              ...prev,
+              confirmPassword: {
+                state: "ERROR",
+                errorText: "비밀번호가 일치하지 않습니다.",
+              },
+            }));
+            return;
+          }
+          setFormValidation((prev) => ({
+            ...prev,
+            confirmPassword: { state: "VALID" },
+          }));
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            setFormValidation((prev) => ({
+              ...prev,
+              confirmPassword: {
+                state: "ERROR",
+                errorText: error.errors[0].message,
+              },
+            }));
+          }
+        }
+      },
+      validateName: (name: string) => {
+        try {
+          signUpSchema.innerType().shape.name.parse(name);
+          setFormValidation((prev) => ({
+            ...prev,
+            name: { state: "VALID" },
+          }));
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            setFormValidation((prev) => ({
+              ...prev,
+              name: { state: "ERROR", errorText: error.errors[0].message },
+            }));
+          }
+        }
+      },
+      validateClub: (club: ClubName | undefined) => {
+        if (!club) {
+          setFormValidation((prev) => ({
+            ...prev,
+            club: { state: "ERROR", errorText: "동아리를 선택해주세요." },
           }));
           return;
         }
-        setFormValidation((prev) => ({
-          ...prev,
-          email: { state: "VALID" },
-        }));
-      } catch (error) {
-        if (error instanceof z.ZodError) {
+        try {
+          signUpSchema.innerType().shape.club.parse(club);
           setFormValidation((prev) => ({
             ...prev,
-            email: { state: "ERROR", errorText: error.errors[0].message },
+            club: { state: "VALID" },
           }));
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            setFormValidation((prev) => ({
+              ...prev,
+              club: { state: "ERROR", errorText: error.errors[0].message },
+            }));
+          }
         }
-      }
-    },
-    validatePassword: (password: string) => {
-      try {
-        signUpSchema.innerType().shape.password.parse(password);
-        setFormValidation((prev) => ({
-          ...prev,
-          password: { state: "VALID" },
-        }));
-      } catch (error) {
-        if (error instanceof z.ZodError) {
+      },
+      validateNickname: (nickname: string) => {
+        if (!nickname || nickname.length === 0) {
           setFormValidation((prev) => ({
             ...prev,
-            password: { state: "ERROR", errorText: error.errors[0].message },
-          }));
-        }
-      }
-    },
-    validateConfirmPassword: (confirmPassword: string) => {
-      try {
-        signUpSchema.innerType().shape.confirmPassword.parse(confirmPassword);
-        if (confirmPassword !== formData.password) {
-          setFormValidation((prev) => ({
-            ...prev,
-            confirmPassword: {
-              state: "ERROR",
-              errorText: "비밀번호가 일치하지 않습니다.",
-            },
+            nickname: { state: "VALID" },
           }));
           return;
         }
-        setFormValidation((prev) => ({
-          ...prev,
-          confirmPassword: { state: "VALID" },
-        }));
-      } catch (error) {
-        if (error instanceof z.ZodError) {
+        try {
+          signUpSchema.innerType().shape.nickname.parse(nickname);
           setFormValidation((prev) => ({
             ...prev,
-            confirmPassword: { state: "ERROR", errorText: error.errors[0].message },
+            nickname: { state: "VALID" },
           }));
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            setFormValidation((prev) => ({
+              ...prev,
+              nickname: { state: "ERROR", errorText: error.errors[0].message },
+            }));
+          }
         }
-      }
-    },
-    validateName: (name: string) => {
-      try {
-        signUpSchema.innerType().shape.name.parse(name);
-        setFormValidation((prev) => ({
-          ...prev,
-          name: { state: "VALID" },
-        }));
-      } catch (error) {
-        if (error instanceof z.ZodError) {
+      },
+      validateEnrollmentNumber: (enrollmentNumber: string) => {
+        try {
+          signUpSchema
+            .innerType()
+            .shape.enrollmentNumber.parse(enrollmentNumber);
           setFormValidation((prev) => ({
             ...prev,
-            name: { state: "ERROR", errorText: error.errors[0].message },
+            enrollmentNumber: { state: "VALID" },
           }));
+        } catch (error) {
+          if (error instanceof z.ZodError) {
+            setFormValidation((prev) => ({
+              ...prev,
+              enrollmentNumber: {
+                state: "ERROR",
+                errorText: error.errors[0].message,
+              },
+            }));
+          }
         }
-      }
-    },
-    validateNickname: (nickname: string) => {
-      try {
-        signUpSchema.innerType().shape.nickname.parse(nickname);
-        setFormValidation((prev) => ({
-          ...prev,
-          nickname: { state: "VALID" },
-        }));
-      } catch (error) {
-        if (error instanceof z.ZodError) {
-          setFormValidation((prev) => ({
-            ...prev,
-            nickname: { state: "ERROR", errorText: error.errors[0].message },
-          }));
-        }
-      }
-    },
-    validateEnrollmentNumber: (enrollmentNumber: string) => {
-      try {
-        signUpSchema.innerType().shape.enrollmentNumber.parse(enrollmentNumber);
-        setFormValidation((prev) => ({
-          ...prev,
-          enrollmentNumber: { state: "VALID" },
-        }));
-      } catch (error) {
-        if (error instanceof z.ZodError) {
-          setFormValidation((prev) => ({
-            ...prev,
-            enrollmentNumber: { state: "ERROR", errorText: error.errors[0].message },
-          }));
-        }
-      }
-    },
-  }),[formData,setFormValidation]);
+      },
+    }),
+    [formData, setFormValidation]
+  );
 
   const isCanNextStep = useMemo(() => {
     if (step === "EmailConfirm") {
-      return formValidation.email.state === "VALID";
+      return formValidation.email?.state === "VALID";
     }
     if (step === "Password") {
       return (
-        formValidation.email.state === "VALID" &&
-        formValidation.password.state === "VALID" &&
-        formValidation.confirmPassword.state === "VALID"
+        formValidation.email?.state === "VALID" &&
+        formValidation.password?.state === "VALID" &&
+        formValidation.confirmPassword?.state === "VALID"
       );
     }
     if (step === "PersonalInfo") {
       return (
-        formValidation.email.state === "VALID" &&
-        formValidation.password.state === "VALID" &&
-        formValidation.confirmPassword.state === "VALID" &&
-        formValidation.name.state === "VALID" &&
-        formValidation.enrollmentNumber.state === "VALID"
+        formValidation.email?.state === "VALID" &&
+        formValidation.password?.state === "VALID" &&
+        formValidation.confirmPassword?.state === "VALID" &&
+        formValidation.name?.state === "VALID" &&
+        formValidation.enrollmentNumber?.state === "VALID"
       );
     }
     return false;
@@ -258,13 +329,26 @@ const useSignUpSteps = () => {
   const onSubmit = async () => {
     if (step === "PersonalInfo") {
       try {
+        if (
+          !formData.email ||
+          !formData.password ||
+          !formData.name ||
+          !formData.enrollmentNumber ||
+          !formData.club
+        ) {
+          throw new Error("모든 필드를 입력해주세요.");
+        }
+        const clubId = clubNames.findIndex((club) => club === formData.club);
+        if (clubId === -1) {
+          throw new Error("유효하지 않은 동아리입니다.");
+        }
         await signUpSchema.parseAsync(formData);
         signUp({
           email: formData.email,
           password: formData.password,
           name: formData.name,
           nickname: formData.nickname,
-          clubId: formData.clubId,
+          clubId,
           enrollmentNumber: formData.enrollmentNumber.toString(),
         });
       } catch (error) {
@@ -284,9 +368,18 @@ const useSignUpSteps = () => {
     prevStep,
     onClose,
     onSubmit,
+    emailRef,
+    passwordRef,
+    confirmPasswordRef,
+    nameRef,
+    nicknameRef,
+    enrollmentNumberRef,
+    isClubOptionsVisible,
+    setIsClubOptionsVisible,
     ...setForm,
     ...formData,
     ...validateForm,
+    ...validations,
     isCanNextStep,
     isLoading,
     isDuplicatedEmailLoading,
