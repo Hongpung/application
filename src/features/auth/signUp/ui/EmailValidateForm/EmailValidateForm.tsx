@@ -1,16 +1,16 @@
 import { ErrorModal, LongButton, ValidationState } from "@hongpung/src/common";
-import { BasicInput } from "@hongpung/src/common/ui/inputs/InputBaseComponent";
+import { BasicInput } from "@hongpung/src/common/ui/inputs/BasicInput";
 import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
 import { View, TextInput, StyleSheet, Pressable, Text } from "react-native";
 
 interface EmailValidateFormProps {
-  emailInputRef: React.RefObject<TextInput>;
-  verificationCodeInputRef: React.RefObject<TextInput>;
+  emailRef: React.RefObject<TextInput>;
+  verificationCodeRef: React.RefObject<TextInput>;
 
   email: string;
   setEmail: (email: string) => void;
   emailValidation: ValidationState;
-  valitateEmail: (email: string) => void;
+  validateEmail: (email: string) => void;
 
   //이메일 인증 코드 발송
   isSendingCode: boolean;
@@ -34,7 +34,7 @@ interface EmailValidateFormProps {
 
 const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
   //이메일
-  const { email, setEmail, emailValidation, valitateEmail, emailInputRef } =
+  const { email, setEmail, emailValidation, validateEmail: valitateEmail, emailRef: emailInputRef } =
     props;
 
   //이메일 인증 코드 발송
@@ -47,7 +47,7 @@ const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
 
   //이메일 인증 코드 검증
   const {
-    verificationCodeInputRef,
+    verificationCodeRef: verificationCodeInputRef,
 
     verificationCode,
     setVerificationCode,

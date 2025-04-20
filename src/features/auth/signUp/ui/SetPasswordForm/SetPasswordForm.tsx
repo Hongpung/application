@@ -1,5 +1,5 @@
 import { LongButton, ValidationState } from "@hongpung/src/common";
-import { BasicInput } from "@hongpung/src/common/ui/inputs/InputBaseComponent";
+import { BasicInput } from "@hongpung/src/common/ui/inputs/BasicInput";
 import { TextInput, View } from "react-native";
 
 interface SetPasswordFormProps {

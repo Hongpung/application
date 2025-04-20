@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TextInput, Animated, Pressable, Modal, Activity
 import { Color } from '@hongpung/ColorSet';
 import { josa } from 'es-hangul';
 import Toast from 'react-native-toast-message';
-import { BasicInput } from './InputBaseComponent';
+import { BasicInput } from './BasicInput';
 
 type InputProps = {
     label: string,

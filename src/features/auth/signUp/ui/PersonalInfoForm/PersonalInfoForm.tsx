@@ -5,7 +5,7 @@ import {
   Color,
   LongButton,
 } from "@hongpung/src/common";
-import { BasicInput } from "@hongpung/src/common/ui/inputs/InputBaseComponent";
+import { BasicInput } from "@hongpung/src/common/ui/inputs/BasicInput";
 import { clubNames } from "@hongpung/src/entities/club";
 import { TextInput, View, Text, Pressable } from "react-native";
 

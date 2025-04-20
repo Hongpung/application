@@ -19,7 +19,7 @@ type SessionManageNavigationProp<
   T extends keyof SessionManagementStackParamList
 > = CompositeNavigationProp<
   NativeStackNavigationProp<SessionManagementStackParamList, T>,
-  NativeStackNavigationProp<MainStackParamList,"SessionManagement">
+  NativeStackNavigationProp<MainStackParamList, "SessionManagement">
 >;
 
 export type SessionManagementScreenProps<
@@ -37,6 +37,7 @@ export const SessionManagementStackNavigation: React.FC = () => {
       }}
     >
       <SessionManagementStack.Screen
+        options={{ presentation: "modal" }}
         name="SessionManage"
         component={SessionManagementScreen}
       />

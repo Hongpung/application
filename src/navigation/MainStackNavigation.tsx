@@ -22,9 +22,12 @@ import {
   SessionManagementStackParamList,
 } from "./SessionManagementStackNavigation";
 import ChangePasswordPage from "@hongpung/src/pages/auth/ChangePasswordPage";
+import NotificationPage from "../pages/notification/NotificationPage";
 
 export type MainStackParamList = {
   MainTab: undefined;
+  Notification: undefined;
+
   WebView: { url: string; title?: string };
 
   Club: ScreenParams<ClubStackParamList>;
@@ -50,6 +53,11 @@ export const MainStackNavigation = () => {
   return (
     <MainStack.Navigator>
       <MainStack.Screen name="MainTab" component={MainTabNavigation} />
+      <MainStack.Screen
+        name="Notification"
+        component={NotificationPage}
+        options={{ presentation: "modal" }}
+      />
       {/* <MainStack.Screen name="WebView" component={WebViewPage} /> */}
       <MainStack.Screen
         name="SessionManagement"

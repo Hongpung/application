@@ -1,18 +1,16 @@
 import HomeScreen from "@hongpung/src/pages/home/HomePage";
 import {
   BottomTabNavigationProp,
-  BottomTabScreenProps,
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
 import {
   MainStackParamList,
-  MainStackScreenProps,
 } from "./MainStackNavigation";
 import MyPageScreen from "@hongpung/src/pages/member/MyPagePage";
 import QRCodeScreen from "@hongpung/src/pages/session/QRScanPage";
 import ReservationScreen from "@hongpung/src/pages/reservation/ReservationMainPage";
 import { Icons } from "../common";
-import { CompositeScreenProps, RouteProp } from "@react-navigation/native";
+import { RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 export type MainTabParamList = {

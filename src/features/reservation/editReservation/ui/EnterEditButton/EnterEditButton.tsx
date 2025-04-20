@@ -1,7 +1,6 @@
 import React from 'react'
 
 import { LongButton } from '@hongpung/src/common'
-import { isEditible } from '@hongpung/src/entities/reservation/lib/isEditible'
 
 interface EnterEditButtonProps {
     navigateToEditReservationPage: () => void

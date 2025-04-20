@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   useIsDuplicatedEmailRequest,
+  useSendVerificationCodeRequest,
   useSignUpRequest,
 } from "../api/signUpApi";
 import { ValidationState } from "@hongpung/src/common";
@@ -15,6 +16,7 @@ type SignUpSteps = "EmailConfirm" | "Password" | "PersonalInfo";
 const useSignUpSteps = () => {
   const navigation = useNavigation();
   const [step, setStep] = useState<SignUpSteps>("EmailConfirm");
+  const [isSendingCode, setIsSendingCode] = useState(false);
 
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
@@ -22,6 +24,7 @@ const useSignUpSteps = () => {
   const nameRef = useRef<TextInput>(null);
   const nicknameRef = useRef<TextInput>(null);
   const enrollmentNumberRef = useRef<TextInput>(null);
+  const verificationCodeRef = useRef<TextInput>(null);
 
   const [formData, setFormData] = useState<SignUpFormData>({
     email: "",
@@ -46,6 +49,7 @@ const useSignUpSteps = () => {
   });
   const [isClubOptionsVisible, setIsClubOptionsVisible] = useState(false);
   const { request: signUp, isLoading } = useSignUpRequest();
+  const { request: sendVerificationCode, isLoading: isSendingCodeLoading } = useSendVerificationCodeRequest();
   const { request: isDuplicatedEmail, isLoading: isDuplicatedEmailLoading } =
     useIsDuplicatedEmailRequest();
 
@@ -374,12 +378,15 @@ const useSignUpSteps = () => {
     nameRef,
     nicknameRef,
     enrollmentNumberRef,
+    verificationCodeRef,
     isClubOptionsVisible,
     setIsClubOptionsVisible,
+    isSendingCode,
     ...setForm,
     ...formData,
     ...validateForm,
     ...validations,
+    isSendingCodeLoading,
     isCanNextStep,
     isLoading,
     isDuplicatedEmailLoading,

@@ -6,7 +6,6 @@ import { Icons, ValidationState } from '@hongpung/src/common';
 
 // 입력 상태 입력전, 입력 중, 입력 완료, 오류
 // 오류 판별은 외부에 일임해야함
-const { width } = Dimensions.get('window')
 
 type InputProps = {
     ref?: Ref<TextInput>
@@ -65,6 +64,7 @@ export const BasicInput = forwardRef<TextInput, InputProps>(({ label, isEncrypti
                 ref={ref}
                 style={[styles.InputBox, { borderBottomColor: validationCondition?.state != 'ERROR' ? underlineColor : Color["red500"] }]}
                 placeholder={`${josa(label, '을/를')} 입력하세요` + `${!isRequired ? ' (없으면 빈칸)' : ``}`}
+                placeholderTextColor={Color['grey500']}
                 value={inputValue}
                 onChangeText={setInputValue}
                 secureTextEntry={isEncryption ? !isVisible : false}
@@ -99,7 +99,6 @@ const styles = StyleSheet.create({
         fontFamily: 'NanumSquareNeo-Regular',
         paddingHorizontal: 4,
         paddingVertical: 8,
-        placeholderTextColor: Color['grey500'],
         borderBottomWidth: 1
     },
     labelText: {
