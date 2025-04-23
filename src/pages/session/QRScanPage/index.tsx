@@ -1,6 +1,5 @@
-import { Header } from "@hongpung/src/common/ui/Header/Header";
-import { View, StyleSheet, Text } from "react-native";
-import { LongButton } from "@hongpung/src/common";
+import { Header } from "@hongpung/src/common";
+import { View, StyleSheet } from "react-native";
 import { useCameraPermission } from "@hongpung/src/common/lib/useCameraPermission";
 import { useQRScanner } from "@hongpung/src/features/session/qr/lib/useQRScanner";
 import QRScanFailedModal from "@hongpung/src/widgets/session/ui/QRScanFailedModal/QRScanFailedModal";

@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Header } from "@hongpung/src/common/ui/Header/Header";
+import { Header } from "@hongpung/src/common";
 import { CheckOutConfirmWidget } from "@hongpung/src/widgets/session/ui/CheckOutConfirmWidget";
 import { CheckOutDescriptionWidget } from "@hongpung/src/widgets/session/ui/CheckOutDescriptionWidget";
 import { CheckOutCameraWidget } from "@hongpung/src/widgets/session/ui/CheckOutCameraWidget";
@@ -10,13 +10,6 @@ import { useCheckOut } from "@hongpung/src/features/session/checkOutRoom/model/u
 import { SessionManagementScreenProps } from "@hongpung/src/navigation/SessionManagementStackNavigation";
 import { StepContainer, StepScreen, useStep } from "@hongpung/src/common/lib/useSteps";
 import { ErrorModal } from "@hongpung/src/common";
-
-type CheckOutStep =
-  | "CheckOutConfirm"
-  | "CheckOutDescription"
-  | "Camera"
-  | "ConfirmPhotos"
-  | "CheckOutComplete";
 
 const CheckOutScreen: React.FC<
   SessionManagementScreenProps<"CheckOutSession">
