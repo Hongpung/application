@@ -26,7 +26,7 @@ const LoginPage: React.FC<LoginStackScreenProps<"Login">> = ({ navigation }) => 
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
         <View style={styles.container}>
-          <Text style={styles.titleText}>LoginPage</Text>
+          <Text style={styles.titleText}>로그인</Text>
           <LoginSection />
           <Text style={styles.interSectionText}>홍풍이 처음이시라면?</Text>
           <SignUpNavigationButton navigateToSignUp={navigateToSignUp} />

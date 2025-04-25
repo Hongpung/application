@@ -3,6 +3,7 @@ import { FlatList, StyleSheet, View, Text } from "react-native";
 import { SessionLog } from "@hongpung/src/entities/session";
 import { SessionLogCard } from "@hongpung/src/entities/session/ui/SessionLogCard/SessionLogCard";
 import { daysOfWeek } from "@hongpung/src/common/constant/dayOfWeek";
+import { Color } from "@hongpung/src/common";
 
 interface SessionLogListProps {
   sessions: [string, SessionLog[]][];
@@ -38,10 +39,32 @@ export const SessionLogList: React.FC<SessionLogListProps> = ({
 
   return (
     <FlatList
+      style={{ flex: 1 }}
       data={sessions}
       renderItem={renderItem}
       keyExtractor={(item) => item[0]}
       contentContainerStyle={styles.container}
+      ListEmptyComponent={
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "flex-end",
+            alignItems: "center",
+            position: "relative",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 18,
+              fontFamily: "NanumSquareNeo-Regular",
+              color: Color["grey400"],
+              paddingBottom: "60%",
+            }}
+          >
+            연습 내역이 없어요.
+          </Text>
+        </View>
+      }
     />
   );
 };
@@ -49,5 +72,6 @@ export const SessionLogList: React.FC<SessionLogListProps> = ({
 const styles = StyleSheet.create({
   container: {
     padding: 16,
+    flex: 1,
   },
 });

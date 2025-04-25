@@ -6,7 +6,7 @@ import QRScanFailedModal from "@hongpung/src/widgets/session/ui/QRScanFailedModa
 import QRScanner from "@hongpung/src/features/session/qr/ui/QRScanner/QRScanner";
 import React from "react";
 import { MainTabScreenProps } from "@hongpung/src/navigation/MainTabNavigation";
-import NeedCameraPermssionPanel from "@hongpung/src/widgets/permission/ui/NeedCameraPermssionPanel/NeedCameraPermssionPanel";
+import { NeedCameraPermssionPanel } from "@hongpung/src/common";
 
 const QRScanPage: React.FC<MainTabScreenProps<"QRCode">> = ({ navigation }) => {
   const handleScanSuccess = () => {
@@ -20,7 +20,7 @@ const QRScanPage: React.FC<MainTabScreenProps<"QRCode">> = ({ navigation }) => {
   return (
     <View style={{ flex: 1 }}>
       <Header
-        HeaderName="QR 코드 스캔"
+        headerName="QR 코드 스캔"
         leftButton="close"
         leftAction={() => navigation.jumpTo("Home")}
       />

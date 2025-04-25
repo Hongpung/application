@@ -14,7 +14,7 @@ const LoginSettingPage: React.FC = () => {
   return (
     <View>
       <FullScreenLoadingModal isLoading={isLoading} />
-      <Header HeaderName="로그인 설정" leftButton="arrow-back" />
+      <Header headerName="로그인 설정" leftButton="arrow-back" />
       <View style={{ height: 24 }} />
       <View style={styles.autoLoginContainer}>
         <Text style={styles.autoLoginText}>자동 로그인 설정</Text>

@@ -16,17 +16,18 @@ const QRScanner: React.FC<QRScannerProps> = ({
   onToggleFlash,
   onBarcodeScanned,
 }) => {
-  
+  console.log(flash);
   return (
     <CameraView
       style={styles.camera}
-      facing={"back"}
+      facing="back"
       barcodeScannerSettings={{
         barcodeTypes: ["qr"],
       }}
       enableTorch={flash === "on"}
       onBarcodeScanned={onBarcodeScanned}
       ratio="16:9"
+
     >
       <QRScanBackDrop
         style={{

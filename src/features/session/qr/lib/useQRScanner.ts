@@ -17,6 +17,8 @@ export const useQRScanner = ({ onSuccess }: { onSuccess: () => void }) => {
 
   const resetScanStatus = useCallback(() => {
     setScanStatus("IDLE");
+    setFlash("off");
+    console.log("resetScanStatus");
   }, []);
 
   useEffect(() => {
@@ -40,26 +42,6 @@ export const useQRScanner = ({ onSuccess }: { onSuccess: () => void }) => {
       y < centerY + centerHeight / 2
     );
   }, []);
-
-  const handleOpen = (url: string) => {
-    if (scanStatus !== "IDLE") return;
-
-    try {
-      if (!url.startsWith("https://hongpung.com")) throw Error("invalid Url");
-
-      Alert.alert("QR코드 인식 완료", "QR코드 인식이 완료되었습니다.", [
-        {
-          text: "확인",
-          onPress: () => {
-            onSuccess();
-            setScanStatus("COMPLETE");
-          },
-        },
-      ]);
-    } catch (err) {
-      setScanStatus("FAILED");
-    }
-  };
 
   const handleScanned = useCallback(
     ({ type, data, bounds }: BarcodeScanningResult) => {

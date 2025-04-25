@@ -1,10 +1,11 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Color } from "@hongpung/src/common";
-import { Icons } from "@hongpung/src/common/ui/Icons/Icons";
-import { MY_ACTIVITIE_MENUS } from "../../../../entities/member/constants/myActivitiesSubMenu";
+import { Icons } from "@hongpung/src/common";
+import { MY_ACTIVITIE_MENUS } from "@hongpung/src/entities/member/constants/myActivitiesSubMenu";
+import { MainStackParamList } from "@hongpung/src/navigation/MainStackNavigation";
 
 interface MyActivitiesSectionProps {
-  onPress: (link: string) => void;
+  onPress: (link: keyof MainStackParamList) => void;
 }
 
 export const MyActivitiesSection: React.FC<MyActivitiesSectionProps> = ({

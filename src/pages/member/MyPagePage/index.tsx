@@ -8,36 +8,44 @@ import { MyActivitiesSection } from "@hongpung/src/widgets/member/ui/MyActivitie
 import { SettingsSection } from "@hongpung/src/widgets/member/ui/SettingsSection/SettingsSection";
 import { FooterSection } from "@hongpung/src/widgets/member/ui/FooterSection/FooterSection";
 import { MainTabScreenProps } from "@hongpung/src/navigation/MainTabNavigation";
+import { MainStackParamList } from "@hongpung/src/navigation/MainStackNavigation";
+import { Header } from "@hongpung/src/common";
 
-const MyPageScreen: React.FC<MainTabScreenProps<"MyPage">> = ({ navigation }) => {
+const MyPageScreen: React.FC<MainTabScreenProps<"MyPage">> = ({
+  navigation,
+}) => {
   const loginUser = useRecoilValue(UserStatusState);
 
   if (!loginUser) {
     return <View />;
   }
 
-  const handleMenuPress = (link: string) => {
-    navigation.push("MyPage", { screen: link });
+  const handleMenuPress = (link: keyof MainStackParamList) => {
+    navigation.push(link);
   };
 
   return (
-    <ScrollView bounces={false}>
-      <View style={styles.container}>
-        <View>
+    <View style={{ flex: 1 }}>
+      <Header headerName="내 정보" leftButton={null} />
+      <ScrollView style={{ flex: 1 }} bounces={false}>
+        <View style={styles.container}>
           <ProfileBox member={loginUser} />
+
+          <MyActivitiesSection onPress={handleMenuPress} />
+          <SettingsSection onPress={handleMenuPress} />
         </View>
 
-        <MyActivitiesSection onPress={handleMenuPress} />
-
-        <SettingsSection onPress={handleMenuPress} />
-      </View>
-
-      <FooterSection
-        onPressChangeInfo={() => handleMenuPress("ChangeMyInfo")}
-        onPressChangePassword={() => handleMenuPress("ChangePassword")}
-        onPressWithdrawal={() => handleMenuPress("WithdrawalAuth")}
-      />
-    </ScrollView>
+        <FooterSection
+          onPressChangeInfo={() => {
+            // handleMenuPress("ChangeMyInfo");
+          }}
+          onPressChangePassword={() => handleMenuPress("ChangePassword")}
+          onPressWithdrawal={() => {
+            // handleMenuPress("WithdrawalAuth");
+          }}
+        />
+      </ScrollView>
+    </View>
   );
 };
 

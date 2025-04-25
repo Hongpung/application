@@ -6,6 +6,7 @@ import ReservationTypeTable from "@hongpung/src/entities/reservation/ui/Reservat
 import { FullCalendar } from "@hongpung/src/widgets/reservation/ui/FullCalendar/FullCalendar";
 import { useReservationCalendar } from "@hongpung/src/features/reservation/configureReservation/model/useReservationCalendar";
 import { ReservationStackScreenProps } from "@hongpung/src/navigation/ReservationNavigation";
+import { Header } from "@hongpung/src/common";
 
 const ReservationCalendarPage: React.FC<
   ReservationStackScreenProps<"ReservationCalendar">
@@ -14,6 +15,7 @@ const ReservationCalendarPage: React.FC<
 
   return (
     <View style={styles.container}>
+      <Header leftButton={"close"} headerName={"예약 일정"} />
       <View style={styles.typeTable}>
         <ReservationTypeTable />
       </View>
@@ -22,7 +24,6 @@ const ReservationCalendarPage: React.FC<
           onClickDate={(date) => {
             const dateString = date.toISOString().split("T")[0];
             navigation.push("DailyReserveList", { date: dateString });
-            navigation.getParent()?.navigate("");
           }}
           {...calendarform}
         />
@@ -41,7 +42,7 @@ const styles = StyleSheet.create({
   typeTable: {
     position: "absolute",
     right: 32,
-    top: 30,
+    top: 56,
   },
   calendarContainer: {
     marginTop: 88,

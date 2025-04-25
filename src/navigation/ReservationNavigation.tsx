@@ -16,7 +16,9 @@ export type ReservationStackScreenProps<T extends keyof ReservationStackParamLis
 
 export const ReservationStackNavigation = () => {
     return (
-        <ReservationStack.Navigator>
+        <ReservationStack.Navigator screenOptions={{
+            headerShown: false,
+        }}>
             <ReservationStack.Screen name="ReservationCalendar" component={ReservationCalendarScreen} />
             <ReservationStack.Screen name="DailyReserveList" component={DailyReserveListScreen} />
             <ReservationStack.Screen name="ReservationDetail" component={ReservationDetailScreen} />

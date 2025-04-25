@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, Pressable, Linking } from "react-native";
 import { Color } from "@hongpung/src/common";
-import { Icons } from "@hongpung/src/common/ui/Icons/Icons";
+import { Icons } from "@hongpung/src/common";
 import { type Member } from "@hongpung/src/entities/member/model/type";
 import { RoleText } from "../RoleText/RoleText";
 
@@ -13,6 +13,7 @@ export const ProfileBox: React.FC<ProfileBoxProps> = ({ member }) => {
     
   if (!member) return null;
 
+  console.log(member)
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
@@ -97,6 +98,7 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 5,
     marginRight: 16,
+    alignSelf:'center'
   },
   profilePhotoPlaceholder: {
     backgroundColor: Color["grey200"],

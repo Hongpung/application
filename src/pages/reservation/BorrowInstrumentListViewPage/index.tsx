@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { type Instrument } from "@hongpung/src/entities/instrument";
-import Header from "@hongpung/src/common/ui/Header/Header";
+import { Header } from "@hongpung/src/common";
 import BorrowInstrumentList from "@hongpung/src/widgets/instrument/ui/BorrowInstrumentList/BorrowInstrumentList";
 import { StackActions } from "@react-navigation/native";
 
@@ -20,7 +20,7 @@ const ReservationInstrumentsViewScreen: React.FC<
 
   return (
     <View style={styles.container}>
-      <Header leftButton={"close"} HeaderName="대여 악기 목록" />
+      <Header leftButton={"close"} headerName="대여 악기 목록" />
       <View style={styles.content}>
         <BorrowInstrumentList
           instrumentList={instrumentList}

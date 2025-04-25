@@ -26,7 +26,7 @@ const ChangePasswordScreen: React.FC = () => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
-        <Header leftButton={"close"} HeaderName="비밀번호 변경" />
+        <Header leftButton={"close"} headerName="비밀번호 변경" />
         <View
           style={{
             height: 40,

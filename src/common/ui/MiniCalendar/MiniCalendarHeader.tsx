@@ -27,13 +27,13 @@ const MiniCalendarHeader: React.FC<MiniCalendarHeaderProps> = ({
   return (
     <View style={styles.container}>
       <Pressable onPress={handlePrevMonth} style={styles.button}>
-        <Icons name="chevron-forward" size={24} color={Color.grey800} />
+        <Icons name="chevron-back" size={24} color={Color['grey400']} />
       </Pressable>
       <Text style={styles.monthText}>
-        {currentMonth.getFullYear()}년 {currentMonth.getMonth() + 1}월
+        {currentMonth.getFullYear()}. {(currentMonth.getMonth() + 1).toString().padStart(2, '0')}
       </Text>
       <Pressable onPress={handleNextMonth} style={styles.button}>
-        <Icons name="chevron-back" size={24} color={Color.grey800} />
+        <Icons name="chevron-forward" size={24} color={Color['grey400']} />
       </Pressable>
     </View>
   );
@@ -43,8 +43,9 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     paddingVertical: 16,
+    marginHorizontal: 32
   },
   button: {
     padding: 8,
@@ -53,7 +54,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: "NanumSquareNeo-Bold",
     color: Color.grey800,
-    marginHorizontal: 16,
+    marginHorizontal: 8,
   },
 });
 

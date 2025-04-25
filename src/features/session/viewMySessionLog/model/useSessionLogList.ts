@@ -1,7 +1,11 @@
 import { SessionLog } from "@hongpung/src/entities/session";
 import { useCallback, useMemo } from "react";
 
-export const useSessionLogList = (sessionList: Record<string, SessionLog[]> | null, selectedDate: Date | null) => {
+export const useSessionLogList = (sessionList?: Record<string, SessionLog[]> | null, selectedDate?: Date | null) => {
+
+    if (!sessionList || !selectedDate) {
+        return { matchedSessionList: {} as [string, SessionLog[]][] };
+    }
 
     const matchSessionListToDate = useCallback((sessionList: Record<string, SessionLog[]>, selectedDate: Date | null) => {
 

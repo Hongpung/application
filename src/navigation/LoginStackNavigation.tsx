@@ -16,7 +16,9 @@ const LoginStack = createNativeStackNavigator<LoginStackParamList>();
 
 export const LoginStackNavigation = () => {
   return (
-    <LoginStack.Navigator>
+    <LoginStack.Navigator screenOptions={{
+      headerShown: false,
+    }}>
       <LoginStack.Screen name="Login" component={LoginScreen} />
       <LoginStack.Screen name="SignUp" component={SignUpScreen} />
       <LoginStack.Screen name="ResetPassword" component={ResetPasswordScreen} />

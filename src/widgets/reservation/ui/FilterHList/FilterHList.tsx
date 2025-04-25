@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, ScrollView, Text, View, StyleSheet } from "react-native";
-import { Icons } from "@hongpung/src/common/ui/Icons/Icons";
+import { Icons } from "@hongpung/src/common";
 import { Color } from "@src/common";
 
 interface FilterHListProps {

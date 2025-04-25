@@ -1,6 +1,6 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Color } from "@hongpung/src/common";
-import { Icons } from "@hongpung/src/common/ui/Icons/Icons";
+import { Icons } from "@hongpung/src/common";
 import { CLUB_MENUS } from "@hongpung/src/entities/club/constant/clubMenus";
 import { ClubStackParamList } from "@hongpung/src/navigation/ClubStackNavigation";
 

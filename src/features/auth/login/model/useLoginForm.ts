@@ -206,7 +206,6 @@ export const useLoginForm = () => {
     }
 
     try {
-
       const { email } = formData;
 
       const { autoLogin, saveID } = options;
@@ -215,7 +214,7 @@ export const useLoginForm = () => {
 
       await saveToken("token", token);
       saveLoginOptions({ email, autoLogin, saveID });
-      navigation.dispatch(StackActions.replace("HomeStack"));
+      navigation.dispatch(StackActions.replace("Main"));
     } catch (e: unknown) {
       if (e instanceof Error) {
         if (

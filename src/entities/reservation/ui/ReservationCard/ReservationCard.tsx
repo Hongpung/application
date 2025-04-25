@@ -31,7 +31,7 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, o
 
         <Pressable
             key={'rid' + reservation.reservationId}
-            style={{ position: 'absolute', top: cardTopPosition, width: width - 72, height: cardHeight, borderRadius: 10, borderWidth: 2, borderColor: color, backgroundColor: '#FFF', marginHorizontal: 36, overflow: 'hidden' }}
+            style={{ position: 'absolute', top: cardTopPosition, width: width - 72, height: cardHeight, borderRadius: 10, borderWidth: 2, borderColor: Color[color], backgroundColor: '#FFF', marginHorizontal: 36, overflow: 'hidden' }}
             onPress={onPress}>
 
             {/* title */}

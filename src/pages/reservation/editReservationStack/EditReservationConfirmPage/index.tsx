@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView } from "rea
 import { useRecoilValue } from "recoil";
 
 import { Color, Icons } from "@hongpung/src/common";
-import Header from "@hongpung/src/common/ui/Header/Header";
+import { Header } from "@hongpung/src/common";
 
 import { UserStatusState } from "@hongpung/src/entities/member";
 
@@ -26,7 +26,7 @@ const EditReservationConfirmPage = () => {
             <View>
                 <Header
                     leftButton={'close'}
-                    HeaderName="예약 수정 정보 확인"
+                    headerName="예약 수정 정보 확인"
                 />
             </View>
         );
@@ -36,7 +36,7 @@ const EditReservationConfirmPage = () => {
         <View style={EditReservationConfirmStyles.container}>
             <Header
                 leftButton={'close'}
-                HeaderName="예약 수정 정보 확인"
+                headerName="예약 수정 정보 확인"
             />
 
             <ScrollView style={{ flexDirection: 'column', gap: 24, paddingVertical: 24 }}>

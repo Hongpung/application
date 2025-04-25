@@ -10,7 +10,7 @@ interface ReservationTicketProps {
   onPressTicket: (reservationId: number) => void;
 }
 
-const ReservationTicket: React.FC<ReservationTicketProps> = ({
+export const ReservationTicket: React.FC<ReservationTicketProps> = ({
   reservation,
   onPressTicket,
 }) => {
@@ -60,5 +60,3 @@ const styles = StyleSheet.create({
     color: Color['grey400'],
   },
 });
-
-export default ReservationTicket; 

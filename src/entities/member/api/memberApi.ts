@@ -12,7 +12,7 @@ const memberApi = baseApi.addEndpoints({
             recoilState: UserStatusState,
             query: () => {
                 return {
-                    url: '/member/status',
+                    url: '/member/my-status',
                     withAuthorize: true
                 }
             }

@@ -2,7 +2,7 @@ import { View, Text, Dimensions } from "react-native"
 
 import { Color } from "@hongpung/src/common";
 
-import { instrumentTypeArray } from "@hongpung/src/entities/instrument/@x/reservation";
+import { instrumentTypes } from "@hongpung/src/entities/instrument/@x/reservation";
 
 type BorrowInstrumentsViewerProps = {
     borrowInstruments: any[]
@@ -19,7 +19,7 @@ export const BorrowInstrumentsViewer: React.FC<BorrowInstrumentsViewerProps> = (
             {borrowInstruments.length > 0 ?
                 <View style={{ alignItems: 'center', justifyContent: 'center', borderRadius: 10, height: 72, backgroundColor: Color['grey200'] }}>
                     <View style={{ flexDirection: 'row' }}>
-                        {instrumentTypeArray.map((type) => {
+                        {instrumentTypes.map((type) => {
                             if ('징' === type) return null;
                             if ('기타' === type) {
                                 const instCount = borrowInstruments.filter((instrument) => instrument.instrumentType == type || instrument.instrumentType == '징').length

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import { useRecoilValue } from "recoil";
 
 import { Color, Icons } from "@hongpung/src/common";
-import Header from "@hongpung/src/common/ui/Header/Header";
+import { Header } from "@hongpung/src/common";
 
 import { UserStatusState } from "@hongpung/src/entities/member";
 
@@ -27,7 +27,7 @@ const CreateReservation = () => {
             <View>
                 <Header
                     leftButton={'close'}
-                    HeaderName="예약 작성 정보 확인"
+                    headerName="예약 작성 정보 확인"
                 />
             </View>)
     }
@@ -37,7 +37,7 @@ const CreateReservation = () => {
 
             <Header
                 leftButton={'close'}
-                HeaderName="예약 작성 정보 확인"
+                headerName="예약 작성 정보 확인"
             />
 
             <View style={CreateReservationStyles.blockContainer}>

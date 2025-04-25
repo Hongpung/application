@@ -7,7 +7,7 @@ import {
   useLoadReservationDetailFetch,
 } from "@hongpung/src/entities/reservation";
 import { ReservationTypeViewer } from "@hongpung/src/entities/reservation/ui/ReservationTypeViewer/ReservationTypeViewer";
-import { Header } from "@hongpung/src/common/ui/Header/Header";
+import { Header } from "@hongpung/src/common";
 import { useRecoilValue } from "recoil";
 import { UserStatusState } from "@hongpung/src/entities/member";
 import { Color } from "@hongpung/src/common";
@@ -19,23 +19,29 @@ import { EnterEditButton } from "@hongpung/src/features/reservation/editReservat
 import { ReservationStackParamList } from "@hongpung/src/navigation/ReservationNavigation";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-type ReservationDetailPageProps = NativeStackScreenProps<ReservationStackParamList, "ReservationDetail">;
+type ReservationDetailPageProps = NativeStackScreenProps<
+  ReservationStackParamList,
+  "ReservationDetail"
+>;
 
-const ReservationDetailPage: React.FC<ReservationDetailPageProps> = ({ navigation, route }) => {
-
+const ReservationDetailPage: React.FC<ReservationDetailPageProps> = ({
+  navigation,
+  route,
+}) => {
   const { reservationId } = route.params;
-
+  console.log("reservationId", reservationId);
   const {
     data: reservation,
     isLoading,
     error,
   } = useLoadReservationDetailFetch({ reservationId });
+  console.log("reservationDetail", reservation);
   const loginUser = useRecoilValue(UserStatusState);
 
   if (isLoading) {
     return (
       <View>
-        <Header leftButton={"close"} HeaderName="예약 상세 정보" />
+        <Header leftButton={"close"} headerName="예약 상세 정보" />
         <ScrollView contentContainerStyle={styles.scrollView}>
           <SkeletonPlaceholder>
             <View>
@@ -97,11 +103,41 @@ const ReservationDetailPage: React.FC<ReservationDetailPageProps> = ({ navigatio
       </View>
     );
   }
-  if (!reservation) {
+  if (!reservation || error) {
     Alert.alert("오류", "오류가 발생했습니다. 다시 시도해주세요.");
     navigation.goBack();
 
     return <View></View>;
+  }
+  const { reservationType } = reservation;
+
+  if (reservationType === "EXTERNAL") {
+    const { date, startTime, endTime, title, creatorName } = reservation;
+    return (
+      <View style={{ flex: 1, backgroundColor: "#FFF" }}>
+        <Header leftButton={"close"} headerName="예약 상세 정보" />
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={{ gap: 24, paddingHorizontal: 12 }}
+        >
+          <DateTimeViewer date={date} startTime={startTime} endTime={endTime} />
+
+          <View style={styles.row}>
+            <Text style={styles.label}>예약자</Text>
+            <Text style={styles.value}>{`${creatorName}`}</Text>
+          </View>
+
+          <View style={styles.row}>
+            <Text style={styles.label}>예약명</Text>
+            <Text style={styles.value}>{title}</Text>
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>예약 유형</Text>
+            <Text style={styles.value}>외부 일정</Text>
+          </View>
+        </ScrollView>
+      </View>
+    );
   }
 
   const {
@@ -113,44 +149,18 @@ const ReservationDetailPage: React.FC<ReservationDetailPageProps> = ({ navigatio
     creatorName,
     participationAvailable,
     participators,
-    reservationType,
     creatorId,
     creatorNickname,
   } = reservation;
 
-  if (reservationType === "EXTERNAL") {
-    return (
-      <View>
-        <Header leftButton={"close"} HeaderName="예약 상세 정보" />
-        <ScrollView contentContainerStyle={styles.scrollView}>
-          <DateTimeViewer date={date} startTime={startTime} endTime={endTime} />
-
-          <View style={styles.row}>
-            <Text style={styles.label}>예약자</Text>
-            <Text style={styles.value}>{`${creatorName}${
-              !!creatorNickname ? ` (${creatorNickname})` : ""
-            }`}</Text>
-          </View>
-
-          <View style={styles.row}>
-            <Text style={styles.label}>예약명</Text>
-            <Text style={styles.value}>{title}</Text>
-          </View>
-
-          <View>
-            <Text>예약유형</Text>
-            <Text>외부 일정</Text>
-          </View>
-        </ScrollView>
-      </View>
-    );
-  }
-
   return (
-    <View>
-      <Header leftButton={"close"} HeaderName="예약 상세 정보" />
+    <View style={{ flex: 1, backgroundColor: "#FFF", gap: 16 }}>
+      <Header leftButton={"close"} headerName="예약 상세 정보" />
 
-      <ScrollView contentContainerStyle={styles.scrollView}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={{ gap: 24, paddingHorizontal: 12 }}
+      >
         <DateTimeViewer date={date} startTime={startTime} endTime={endTime} />
 
         <View style={styles.row}>
@@ -170,8 +180,14 @@ const ReservationDetailPage: React.FC<ReservationDetailPageProps> = ({ navigatio
           participationAvailable={participationAvailable}
         />
 
+        <View style={styles.row}>
+          <Text style={styles.label}>참가 인원</Text>
+        </View>
         <ParticipatorsViewer participators={participators} />
 
+        <View style={styles.row}>
+          <Text style={styles.label}>대여 악기</Text>
+        </View>
         <BorrowInstrumentsViewer borrowInstruments={borrowInstruments} />
 
         {/* 삭제하기 버튼 */}
@@ -202,11 +218,11 @@ const ReservationDetailPage: React.FC<ReservationDetailPageProps> = ({ navigatio
       {creatorId !== loginUser?.memberId && isEditible(date) && (
         <View style={styles.bottomButton}>
           <EnterEditButton
-            navigateToEditReservationPage={() =>{
-            //   navigation.push("ReservationStack", {
-            //     screen: "inReservation",
-            //     params: { reservationId, date },
-            //   })
+            navigateToEditReservationPage={() => {
+              //   navigation.push("ReservationStack", {
+              //     screen: "inReservation",
+              //     params: { reservationId, date },
+              //   })
             }}
           />
         </View>

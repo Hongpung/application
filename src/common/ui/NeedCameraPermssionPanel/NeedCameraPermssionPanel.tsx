@@ -1,8 +1,9 @@
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { LongButton } from "@hongpung/src/common";
 import { useCameraPermission } from "@hongpung/src/common/lib/useCameraPermission";
 
-const NeedCameraPermssionPanel = () => {
+export const NeedCameraPermssionPanel:React.FC = () => {
 
   const { requestPermission } = useCameraPermission();
 
@@ -20,8 +21,6 @@ const NeedCameraPermssionPanel = () => {
     </View>
   );
 };
-
-export default NeedCameraPermssionPanel;
 
 const styles = StyleSheet.create({
   container: {

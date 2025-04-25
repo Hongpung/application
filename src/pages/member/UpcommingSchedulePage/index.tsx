@@ -2,8 +2,10 @@ import { StyleSheet, View } from "react-native";
 import React, { useCallback } from "react";
 import MyScheduleList from "@hongpung/src/features/member/loadMyUpcommingSchedule/ui/MyScheduleList/MyScheduleList";
 import { useLoadMyUpcommingSchedule } from "@hongpung/src/features/member/loadMyUpcommingSchedule/model/useLoadMyUpcommingSchedule";
+import { MainStackScreenProps } from "@hongpung/src/navigation/MainStackNavigation";
+import { Header } from "@hongpung/src/common";
 
-const UpcommingSchedulePage: React.FC<MainStackProps<"MyPage">> = ({
+const UpcommingSchedulePage: React.FC<MainStackScreenProps<"UpComingReservation">> = ({
   navigation,
 }) => {
   const { reservationList, isLoading, loadMore } = useLoadMyUpcommingSchedule();
@@ -13,11 +15,11 @@ const UpcommingSchedulePage: React.FC<MainStackProps<"MyPage">> = ({
       screen: "ReservationDetail",
       params: { reservationId },
     });
-  }, [navigation]);
+  }, []);
 
   const navigateToReservation = useCallback(() => {
-    navigation.navigate("Reservation");
-  }, [navigation]);
+    navigation.navigate("Reservation",{screen:"ReservationCalendar"});
+  }, []);
 
   if (isLoading) {
     return <View style={styles.container} />;
@@ -25,6 +27,7 @@ const UpcommingSchedulePage: React.FC<MainStackProps<"MyPage">> = ({
 
   return (
     <View style={styles.container}>
+      <Header headerName="다가오는 일정" leftButton={"arrow-back"} />
       <MyScheduleList
         groupedReservations={reservationList}
         onPressReservationTicek={onPressReservationTicek}

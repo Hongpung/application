@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View, Alert, Linking } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -21,27 +21,7 @@ const NotificationSettingPage: React.FC = () => {
   const { request: updateNotificationStatusRequest, isLoading } =
     useUpdateNotificationStatusRequest();
   const [isEnabled, setIsEnabled] = useState(false);
-
-  const handleNotificationStatus = useCallback(async () => {
-    try {
-      if (isEnabled) {
-        const NToken = await registerForPushNotificationsAsync();
-        await updateNotificationStatusRequest({
-          pushEnable: true,
-          notificationToken: NToken,
-        });
-        notificationOnSuccessToast();
-      } else {
-        await updateNotificationStatusRequest({
-          pushEnable: false,
-          notificationToken: null,
-        });
-        notificationOffSuccessToast();
-      }
-    } catch (e) {
-      Alert.alert("오류", "알림 설정 변경에 실패했어요.\n다시 시도해주세요.");
-    }
-  }, [isEnabled, updateNotificationStatusRequest]);
+  const isEnabledRef = useRef(isEnabled);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -50,13 +30,40 @@ const NotificationSettingPage: React.FC = () => {
     };
 
     loadSettings();
-  }, []);
+  });
 
   useEffect(() => {
+    isEnabledRef.current = isEnabled;
+  }, [isEnabled]);
+  
+  useEffect(() => {
     return () => {
+      const handleNotificationStatus = async () => {
+        try {
+          if (isEnabledRef.current) {
+            const NToken = await registerForPushNotificationsAsync();
+            await updateNotificationStatusRequest({
+              pushEnable: true,
+              notificationToken: NToken,
+            });
+            notificationOnSuccessToast();
+          } else {
+            await updateNotificationStatusRequest({
+              pushEnable: false,
+              notificationToken: null,
+            });
+            notificationOffSuccessToast();
+          }
+        } catch (e) {
+          Alert.alert("오류", "알림 설정 변경에 실패했어요.\n다시 시도해주세요.");
+        }
+      };
+  
+      // cleanup 함수에서는 async 직접 못 쓰니까 바로 실행
       handleNotificationStatus();
     };
-  }, [handleNotificationStatus]);
+  }, []);
+
 
   const toggleNotification = async () => {
     const { status } = await Notifications.requestPermissionsAsync();
@@ -75,7 +82,7 @@ const NotificationSettingPage: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Header HeaderName="알림 설정" leftButton={"arrow-back"} />
+      <Header headerName="알림 설정" leftButton={"arrow-back"} />
       <FullScreenLoadingModal isLoading={isLoading} />
       <View style={styles.switchContainer}>
         <Text style={styles.label}>푸시 알림</Text>

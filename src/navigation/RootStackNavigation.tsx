@@ -28,15 +28,15 @@ export type RootStackScreenProps<T extends keyof RootStackParamList> =
 
 export const RootStackNavigation: React.FC<{
   startDomain: "Tutorial" | "Permission" | "LoginStack" | "Main";
-}> = ({ startDomain }) => {
+}> = ({ startDomain = "Tutorial" }) => {
   return (
-    <NavigationContainer>
-      <RootStack.Navigator initialRouteName={startDomain}>
+      <RootStack.Navigator initialRouteName={startDomain} screenOptions={{
+        headerShown: false,
+      }}>
         <RootStack.Screen name="Tutorial" component={TutorialScreen} />
         <RootStack.Screen name="Permission" component={PermissionScreen} />
         <RootStack.Screen name="LoginStack" component={LoginStack} />
         <RootStack.Screen name="Main" component={MainStack} />
       </RootStack.Navigator>
-    </NavigationContainer>
   );
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 
-import Header from "@hongpung/src/common/ui/Header/Header";
+import { Header } from "@hongpung/src/common";
 import MiniCalendar from "@hongpung/src/common/ui/MiniCalendar";
 import { useMiniCalendar } from "@hongpung/src/common/lib/useMiniCalendar";
 
@@ -10,8 +10,9 @@ import { useSessionColor } from "@hongpung/src/entities/session";
 import { useSessionLogList } from "@hongpung/src/features/session/viewMySessionLog/model/useSessionLogList";
 import { SessionLogList } from "@hongpung/src/widgets/session/ui/SessionLogList/SessionLogList";
 import { useLoadClubSessionLogFetch } from "@hongpung/src/features/club/reviewClubSession/api/clubSessionLogApi";
+import { ClubStackProps } from "@hongpung/src/navigation/ClubStackNavigation";
 
-const ClubSessionLogPage: React.FC<MainStackProps<"MyClub">> = ({
+const ClubSessionLogPage: React.FC<ClubStackProps<"ClubLogs">> = ({
   navigation,
 }) => {
   const { currentMonth, selectedDate, handleDateSelect, handleMonthChange } =
@@ -26,12 +27,12 @@ const ClubSessionLogPage: React.FC<MainStackProps<"MyClub">> = ({
   );
 
   const handleSessionPress = (sessionId: number) => {
-    navigation.push("MyPracticeInfo", { sessionId });
+    // navigation.push("MyPracticeInfo", { sessionId });
   };
 
   return (
     <View style={styles.container}>
-      <Header HeaderName="동아리 연습 내역" leftButton={"arrow-back"} />
+      <Header headerName="동아리 연습 내역" leftButton={"arrow-back"} />
       <MiniCalendar
         dateItems={dailySessionColors}
         selectedDate={selectedDate}

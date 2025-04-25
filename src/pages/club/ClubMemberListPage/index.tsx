@@ -4,8 +4,9 @@ import {
   useLoadMyClubMembersFetch,
   type Member,
 } from "@hongpung/src/entities/member";
-import Header from "@hongpung/src/common/ui/Header/Header";
+import { Header } from "@hongpung/src/common";
 import MemberList from "@hongpung/src/widgets/member/ui/MemberList/MemberList";
+import { ClubStackProps } from "@hongpung/src/navigation/ClubStackNavigation";
 
 const ClubMemberListPage: React.FC<ClubStackProps<"ClubMembers">> = ({
   navigation,
@@ -15,7 +16,7 @@ const ClubMemberListPage: React.FC<ClubStackProps<"ClubMembers">> = ({
 
   return (
     <View style={styles.container}>
-      <Header leftButton={"close"} HeaderName="동아리원 목록" />
+      <Header leftButton={"close"} headerName="동아리원 목록" />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <MemberList members={members} isLoading={isLoading} />
       </ScrollView>

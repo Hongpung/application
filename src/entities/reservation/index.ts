@@ -10,6 +10,9 @@ export { getReservationEditRequestBody } from '../../features/reservation/editRe
 
 export { ParticipatorsViewer } from './ui/ParticipatorsViewer/ParticipatorsViewer'
 export { BorrowInstrumentsViewer } from './ui/BorrowInstruments/BorrowInstruments'
-
+export { DateTimeViewer } from './ui/DateTimeViewer/DateTimeViewer'
+export { ReservationTypeViewer } from './ui/ReservationTypeViewer/ReservationTypeViewer'
+export { ReservationCard } from './ui/ReservationCard/ReservationCard'
+export { ReservationTicket } from './ui/ReservationTicket/ReservationTicket'
 
 export { useLoadDailyReservationsFetch, useLoadReservationDetailFetch, useLoadOccupiedTimesFetch, useLoadMonthlyReservationsFetch } from './api/reservationApi'

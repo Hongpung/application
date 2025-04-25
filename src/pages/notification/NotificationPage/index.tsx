@@ -1,14 +1,13 @@
 import {
   Alert,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 
-import { Color } from "@hongpung/src/common";
+import { Color, Header } from "@hongpung/src/common";
 
 import { NotificationList } from "@hongpung/src/widgets/notification/ui/NotificationList/NotificationList";
 import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
@@ -57,15 +56,10 @@ const NotificationScreen: React.FC = () => {
     readAll();
   }, []);
 
-  if (isLoading || !notificationData)
-    return (
-      <View style={{ flex: 1, backgroundColor: "#FFF" }}>
-        <FullScreenLoadingModal isLoading={isLoading} />
-      </View>
-    );
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={{ flex: 1, backgroundColor: "#FFF" }}>
+      <Header headerName="알림" leftButton={"close"} />
       <View style={{ marginTop: 6 }} />
       <View style={styles.container}>
         <View
@@ -76,7 +70,7 @@ const NotificationScreen: React.FC = () => {
             marginVertical: 8,
           }}
         >
-          {notificationData.length > 0 && (
+          {notificationData && notificationData.length > 0 && (
             <Pressable
               onPress={() => {
                 Alert.alert("확인", "알림을 모두 삭제할까요?", [
@@ -108,8 +102,9 @@ const NotificationScreen: React.FC = () => {
           handleDelete={handleDelete}
           lastReadNotificationId={lastReadNotification?.notificationId}
         />
+
       </View>
-    </ScrollView>
+    </View>
   );
 };
 

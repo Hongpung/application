@@ -6,22 +6,9 @@ export const useLoadMyUpcommingSchedule = () => {
 
     const [skip, setSkip] = useState(0);
     const [reservationList, setReservationList] = useState<Reservation[]>([]);
-
     const { data: loadReservations, isLoading } = useLoadMyUpcommingScheduleFetch(
         { skip }
     );
-
-    const groupReservationsByDate = (reservations: Reservation[]): [string, Reservation[]][] => {
-        const grouped: { [key: string]: Reservation[] } = {};
-        reservations.forEach(reservation => {
-            if (!grouped[reservation.date]) {
-                grouped[reservation.date] = [];
-            }
-            grouped[reservation.date].push(reservation);
-        });
-
-        return Object.entries(grouped);
-    };
 
     useEffect(() => {
         if (loadReservations && loadReservations.length > 0) {
@@ -34,6 +21,20 @@ export const useLoadMyUpcommingSchedule = () => {
             setSkip((prev) => prev + 1);
         }
     }, [loadReservations]);
+    
+    const groupReservationsByDate = (reservations: Reservation[]): [string, Reservation[]][] => {
+        const grouped: { [key: string]: Reservation[] } = {};
+        reservations.forEach(reservation => {
+            if (!grouped[reservation.date]) {
+                grouped[reservation.date] = [];
+            }
+            grouped[reservation.date].push(reservation);
+        });
+
+        return Object.entries(grouped);
+    };
+
+    
 
     return {
         reservationList: groupReservationsByDate(reservationList),

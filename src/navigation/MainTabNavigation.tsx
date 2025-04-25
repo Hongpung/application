@@ -3,9 +3,7 @@ import {
   BottomTabNavigationProp,
   createBottomTabNavigator,
 } from "@react-navigation/bottom-tabs";
-import {
-  MainStackParamList,
-} from "./MainStackNavigation";
+import { MainStackParamList } from "./MainStackNavigation";
 import MyPageScreen from "@hongpung/src/pages/member/MyPagePage";
 import QRCodeScreen from "@hongpung/src/pages/session/QRScanPage";
 import ReservationScreen from "@hongpung/src/pages/reservation/ReservationMainPage";
@@ -77,6 +75,7 @@ export const MainTabNavigation: React.FC = () => {
           ),
           tabBarLabel: "QR 스캔",
           tabBarStyle: { display: "none" },
+          unmountOnBlur: true,
         }}
       />
       <MainTab.Screen

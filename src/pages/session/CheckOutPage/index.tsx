@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Header } from "@hongpung/src/common";
+import { Header, NeedCameraPermssionPanel } from "@hongpung/src/common";
 import { CheckOutConfirmWidget } from "@hongpung/src/widgets/session/ui/CheckOutConfirmWidget";
 import { CheckOutDescriptionWidget } from "@hongpung/src/widgets/session/ui/CheckOutDescriptionWidget";
 import { CheckOutCameraWidget } from "@hongpung/src/widgets/session/ui/CheckOutCameraWidget";
@@ -8,7 +8,12 @@ import { CheckOutConfirmPhotosWidget } from "@hongpung/src/widgets/session/ui/Ch
 import { CheckOutCompleteWidget } from "@hongpung/src/widgets/session/ui/CheckOutCompleteWidget";
 import { useCheckOut } from "@hongpung/src/features/session/checkOutRoom/model/useCheckOut";
 import { SessionManagementScreenProps } from "@hongpung/src/navigation/SessionManagementStackNavigation";
-import { StepContainer, StepScreen, useStep } from "@hongpung/src/common/lib/useSteps";
+import {
+  StepContainer,
+  StepScreen,
+  useStep,
+} from "@hongpung/src/common/lib/useSteps";
+import { useCameraPermission } from "@hongpung/src/common/lib/useCameraPermission";
 import { ErrorModal } from "@hongpung/src/common";
 
 const CheckOutScreen: React.FC<
@@ -16,6 +21,7 @@ const CheckOutScreen: React.FC<
 > = ({ navigation }) => {
   const checkOutState = useCheckOut();
 
+  const { hasPermission } = useCameraPermission();
   const navigateToHome = () => navigation.navigate("MainTab");
 
   const handleLeftAction = () => {
@@ -39,7 +45,11 @@ const CheckOutScreen: React.FC<
           name="CheckOutDescription"
           screen={CheckOutDescriptionWidget}
         />
-        <StepScreen name="Camera" screen={CheckOutCameraWidget} />
+        {hasPermission ? (
+          <StepScreen name="Camera" screen={CheckOutCameraWidget} />
+        ) : (
+          <StepScreen name="Camera" screen={NeedCameraPermssionPanel} />
+        )}
         <StepScreen name="ConfirmPhotos" screen={CheckOutConfirmPhotosWidget} />
         <StepScreen name="CheckOutComplete" screen={CheckOutCompleteWidget} />
       </StepContainer>

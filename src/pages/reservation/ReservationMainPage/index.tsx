@@ -9,44 +9,49 @@ import { MainTabScreenProps } from "@hongpung/src/navigation/MainTabNavigation";
 
 const { height } = Dimensions.get("window");
 
-const ReservationMainScreen: React.FC<MainTabScreenProps<'Reservation'>> = ({ navigation }) => {
+const ReservationMainScreen: React.FC<MainTabScreenProps<"Reservation">> = ({
+  navigation,
+}) => {
+  const { sessionList } = useSessionListSocket();
+  const { cardViewRef, isOnAir, isParticipatible, scheduleCardList } =
+    useScheduleCardList(sessionList);
 
-    const { sessionList } = useSessionListSocket();
-    const { cardViewRef, isOnAir, isParticipatible, scheduleCardList } = useScheduleCardList(sessionList);
-
-    return (
-        <View style={styles.container}>
-
-            <View style={{ gap: 24 }}>
-
-                <ScheduleStatusBar isOnAir={isOnAir} isParticipatible={isParticipatible} />
-
-                <ScheduleCardList
-                    ref={cardViewRef}
-                    isOnAir={isOnAir}
-                    scheduleCards={scheduleCardList}
-                    navigateToDetail={(reservationId) => navigation.push('ReservationDetail', { reservationId })}
-                    navigateToQRScan={() => navigation.push('QRScan')}
-                />
-
-            </View>
-
-
-            <NavigateCalendarButton
-                navigateReservationCalendar={() => navigation.push('ReservationCalendar')}
-            />
-
-        </View>
-    );
+  return (
+    <View style={styles.container}>
+      <View style={{ gap: 24 }}>
+        <ScheduleStatusBar
+          isOnAir={isOnAir}
+          isParticipatible={isParticipatible}
+        />
+        <ScheduleCardList
+          ref={cardViewRef}
+          isOnAir={isOnAir}
+          scheduleCards={scheduleCardList}
+          navigateToDetail={(reservationId) =>
+            navigation.push("Reservation", {
+              screen: "ReservationDetail",
+              params: { reservationId },
+            })
+          }
+          navigateToQRScan={() => navigation.jumpTo("QRCode")}
+        />
+      </View>
+      <NavigateCalendarButton
+        navigateReservationCalendar={() =>
+          navigation.push("Reservation", { screen: "ReservationCalendar" })
+        }
+      />
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: "#FFF",
-        flex: 1,
-        flexDirection: "column",
-        paddingTop: height / 4,
-    },
+  container: {
+    backgroundColor: "#FFF",
+    flex: 1,
+    flexDirection: "column",
+    paddingTop: height / 4,
+  },
 });
 
 export default ReservationMainScreen;

@@ -29,8 +29,9 @@ const styles = StyleSheet.create({
         position: "absolute",
         width: 120,
         height: 120,
-        right: 24,
+        right: 32,
         bottom: -4,
+        zIndex:2
     },
     reservationBox: {
         borderWidth: 1,

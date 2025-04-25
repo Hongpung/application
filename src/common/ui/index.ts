@@ -1,4 +1,4 @@
-export { Icons } from './icons/icons'
+export { Icons } from './icons/Icons'
 export { LongButton, ShortButton } from './buttons'
 export { Switch } from './switch/switch'
 export { CheckboxComponent as Checkbox } from './CheckBox/CheckBox'
@@ -9,3 +9,4 @@ export { NavigateCalendarButton } from './NavigateCalendarButton/NavigateCalenda
 export { Header } from './header/Header'
 export { ErrorModal } from './ErrorModal/ErrorModal'
 export { DescriptionBox } from './DescriptionBox/DescriptionBox'
+export { NeedCameraPermssionPanel } from './NeedCameraPermssionPanel/NeedCameraPermssionPanel'

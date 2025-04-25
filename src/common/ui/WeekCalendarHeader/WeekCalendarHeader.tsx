@@ -1,18 +1,20 @@
 import { Pressable, View, Text, StyleSheet, Dimensions } from "react-native"
 import { Color, Icons } from "@hongpung/src/common";
 import { useMemo } from "react";
+import { useNavigation } from "@react-navigation/native";
 
 type WeekCalendarHeaderProps = {
     selectedDate: Date
     changeDate: (selectedDate: Date) => void
     onPressBackButton: () => void
     rightButton?: React.ReactNode
+    isLimit?: boolean
 }
 
 const { width } = Dimensions.get('window')
 
-export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selectedDate, changeDate, onPressBackButton, rightButton }) => {
-
+export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selectedDate, changeDate, onPressBackButton, rightButton, isLimit = false }) => {
+    const navigation = useNavigation();
     const today = new Date()
 
     const datesOfWeek = useMemo(() => {
@@ -72,7 +74,7 @@ export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selected
                 backgroundColor: '#FFF',
                 paddingHorizontal: 24
             }}>
-                <Pressable onPress={() => { }} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28 }}>
+                <Pressable onPress={() => { navigation.goBack()}} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28 }}>
                     <Icons name='arrow-back' size={24} color={Color['blue500']} />
                 </Pressable>
                 <View style={styles.MonthRow}>
@@ -96,7 +98,7 @@ export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selected
                     {rightButton}
                 </View>
             </View>
-            <View style={{ height: 60, marginHorizontal: 32, width: width - 64, alignItems: 'center' }}>
+            <View style={{ marginHorizontal: 32, width: width - 64, alignItems: 'center' }}>
                 <View style={{ height: 4 }} />
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 264 }}>
                     <Text style={styles.DayText}>월</Text>
@@ -110,7 +112,7 @@ export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selected
 
                 <View style={{ height: 4 }} />
 
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 8 }}>
 
                     <Pressable style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: 32, width: 32, }} onPress={prevWeek} >
                         <Icons size={24} name={'chevron-back'} color={Color['blue500']} />
@@ -120,7 +122,7 @@ export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({ selected
                         {datesOfWeek.map(date => (
                             <Pressable
                                 key={`${date}`}
-                                onPress={() => { date > new Date(today.getTime() + 13 * 60 * 60 * 1000) && changeDate(date) }}
+                                onPress={() => { isLimit ?  date > new Date(today.getTime() + 13 * 60 * 60 * 1000) && changeDate(date) :changeDate(date) }}
                                 style={[{ width: 28, height: 28, borderRadius: 5, justifyContent: 'center' }, selectedDate.getDate() == date.getDate() && { backgroundColor: Color['blue100'] }]}
                             >
                                 <Text style={[styles.Date, (date <= new Date(today.getTime() + 13 * 60 * 60 * 1000)) && { color: Color['grey300'] }]}>{date.getDate()}</Text>

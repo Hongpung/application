@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Color, LongButton } from "@hongpung/src/common";
-import { Switch } from "@hongpung/src/common/ui/Switch/Switch";
+import { Switch } from "@hongpung/src/common";
 import { CheckInEmptySessionCard } from "@hongpung/src/entities/session/ui/CheckInEmptySessionCard/CheckInEmptySessionCard";
 import { ReservationSession } from "@hongpung/src/entities/session";
 

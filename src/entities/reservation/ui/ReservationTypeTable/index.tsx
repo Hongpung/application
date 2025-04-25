@@ -21,8 +21,6 @@ const ReservationTypeTable: React.FC = () => {
 
             </View>
 
-            <View style={{ height: 4 }} />
-
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
 
                 <View style={{ backgroundColor: Color['green500'], height: 4, width: 20, borderRadius: 5, marginRight: 8 }} />

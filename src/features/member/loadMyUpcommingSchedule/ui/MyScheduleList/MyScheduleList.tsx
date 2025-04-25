@@ -2,14 +2,14 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import React from "react";
 
 import { Reservation } from "@hongpung/src/entities/reservation";
-import ReservationTicket from "@hongpung/src/entities/reservation/ui/ReservationTicket/ReservationTicket";
+import { ReservationTicket } from "@hongpung/src/entities/reservation";
 import { getDisplayDate } from "../../lib/getDisplayData";
 import EmptySchedule from "@hongpung/src/widgets/member/ui/EmptySchedule/EmptySchedule";
 
 interface MyScheduleListProps {
   groupedReservations: [string, Reservation[]][];
   onPressReservationTicek: (reservationId: number) => void;
-  navigateToReservation:() => void;
+  navigateToReservation: () => void;
   onEndReached: () => void;
   isLoading: boolean;
 }
@@ -19,8 +19,10 @@ const MyScheduleList: React.FC<MyScheduleListProps> = ({
   onPressReservationTicek: onReservationPress,
   navigateToReservation,
   onEndReached,
-  isLoading,
 }) => {
+  const keyExtractor = (item: [string, Reservation[]]) => item[0];
+  console.log(groupedReservations);
+
   const renderItem = ({
     item: [date, reservations],
   }: {
@@ -42,10 +44,9 @@ const MyScheduleList: React.FC<MyScheduleListProps> = ({
     );
   };
 
-  const keyExtractor = (item: [string, Reservation[]]) => item[0];
-
   return (
     <FlatList
+      style={{ flex: 1 }}
       data={groupedReservations}
       renderItem={renderItem}
       keyExtractor={keyExtractor}
@@ -53,13 +54,16 @@ const MyScheduleList: React.FC<MyScheduleListProps> = ({
       onEndReachedThreshold={0.5}
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
-      ListEmptyComponent={<EmptySchedule navigateToReservation={navigateToReservation} />}
+      ListEmptyComponent={() => (
+        <EmptySchedule navigateToReservation={navigateToReservation} />
+      )}
     />
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     paddingHorizontal: 24,
     paddingVertical: 12,
   },

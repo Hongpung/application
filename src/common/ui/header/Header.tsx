@@ -8,14 +8,14 @@ import { Icons } from '@hongpung/src/common';
 
 interface HeaderProps {
     leftButton: ComponentProps<typeof Ionicons>['name'] | null
-    HeaderName?: string
+    headerName?: string
     RightButton?: string | React.ReactNode
-    RightAction?: () => void
+    rightAction?: () => void
     addLeftAction?: () => void
     leftAction?: () => void
 }
 
-const Header: React.FC<HeaderProps> = ({ leftButton, HeaderName, RightButton, RightAction, addLeftAction, leftAction }) => {
+const Header: React.FC<HeaderProps> = ({ leftButton, headerName, RightButton, rightAction, addLeftAction, leftAction }) => {
     const navigation = useNavigation();
 
     return (
@@ -33,8 +33,8 @@ const Header: React.FC<HeaderProps> = ({ leftButton, HeaderName, RightButton, Ri
             >
                 {leftButton != null && < Icons size={24} name={leftButton ?? 'close'} color={Color['blue500']} />}
             </Pressable>
-            <Text style={styles.Title}>{HeaderName}</Text>
-            {RightButton && <Pressable onPress={RightAction} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}>
+            <Text style={styles.Title}>{headerName}</Text>
+            {RightButton && <Pressable onPress={rightAction} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}>
                 {!!RightButton && typeof RightButton == 'string' ? <Text style={styles.Text}>{RightButton}</Text> : RightButton}
             </Pressable>}
         </View>

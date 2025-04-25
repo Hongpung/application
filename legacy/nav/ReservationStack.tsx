@@ -10,7 +10,7 @@ import TimeSelectScreen from "@hongpung/pages/Reservation/InReservation/TimeSele
 import ReservationCalendarScreen from "@hongpung/pages/Reservation/ReservationCalendarScreen";
 import ReservationDetailScreen from "@hongpung/pages/Reservation/ViewDetailReservation/ReservationDetailScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Header from "@hongpung/src/common/ui/Header/Header";
+import { Header } from "@hongpung/src/common";
 import { ScreenParams } from "./HomeStacks";
 import ReservationParticipatorsViewScreen from "@hongpung/pages/Reservation/ViewDetailReservation/ReservationParticipatorsViewScreen";
 import ReservationInstrumentsViewScreen from "@hongpung/pages/Reservation/ViewDetailReservation/ReservationInstrumentsViewScreen";
@@ -41,7 +41,7 @@ const InReservationStacks = () => {
                     options={{
                         animation: 'none',
                         headerShown: true,
-                        header: () => <Header leftButton='close' HeaderName='연습실 예약' />
+                        header: () => <Header leftButton='close' headerName='연습실 예약' />
                     }}
                 />
                 <InReservationStack.Screen
@@ -50,7 +50,7 @@ const InReservationStacks = () => {
                     options={{
                         headerShown: true,
                         animation: 'none',
-                        header: ({ navigation }) => <Header leftButton='close' HeaderName='예약 일시 선택' LeftAction={() => navigation.navigate('inReservation')} />
+                        header: ({ navigation }) => <Header leftButton='close' headerName='예약 일시 선택' LeftAction={() => navigation.navigate('inReservation')} />
                     }}
                 />
                 <InReservationStack.Screen
@@ -119,8 +119,8 @@ const ReservationStacks = () => {
                 component={ReservationCalendarScreen}
                 options={{
                     headerShown: true,
-                    header: ({ navigation }) => <Header leftButton='close' HeaderName='연습실 예약 조회' RightButton='예약'
-                        RightAction={() => {
+                    header: ({ navigation }) => <Header leftButton='close' headerName='연습실 예약 조회' RightButton='예약'
+                        rightAction={() => {
                             navigation.push('ReservationStack')
                         }}
                     />
@@ -140,7 +140,7 @@ const ReservationStacks = () => {
                 component={ReservationParticipatorsViewScreen}
                 options={{
                     headerShown: true,
-                    header: () => <Header leftButton='close' HeaderName='참여 인원' />
+                    header: () => <Header leftButton='close' headerName='참여 인원' />
                 }}
 
             />
@@ -150,7 +150,7 @@ const ReservationStacks = () => {
                 component={ReservationInstrumentsViewScreen}
                 options={{
                     headerShown: true,
-                    header: () => <Header leftButton='close' HeaderName='대여 악기' />
+                    header: () => <Header leftButton='close' headerName='대여 악기' />
                 }}
 
             />
@@ -162,7 +162,7 @@ const ReservationStacks = () => {
                 options={{
                     animation: 'none',
                     headerShown: true,
-                    header: () => <Header leftButton='close' HeaderName='예약 조회' />
+                    header: () => <Header leftButton='close' headerName='예약 조회' />
                 }}
             />
 

@@ -7,7 +7,7 @@ import { View, Text, StyleSheet } from "react-native";
 import React from "react";
 
 type NotificationListProps = {
-  data: NotificationType[];
+  data: NotificationType[]|null;
   handleDelete: (notificationId: number) => void;
   lastReadNotificationId?: number;
 };

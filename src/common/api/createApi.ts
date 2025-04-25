@@ -68,6 +68,7 @@ const buildApi = async <T>({
   options,
 }: BuildOption<T>): Promise<T> => {
   const urlWithParams = new URL(url);
+
   if (params)
     Object.entries(params).forEach(([key, value]) => {
       if (typeof value === "undefined") return;
@@ -84,7 +85,7 @@ const buildApi = async <T>({
 
   if (options) {
     if (withAuthorize) {
-      const token = getToken("token");
+      const token = await getToken("token");
       fetchOptions.headers = {
         ...fetchOptions.headers,
         ...options.headers,
@@ -96,20 +97,30 @@ const buildApi = async <T>({
 
   if (body) fetchOptions["body"] = JSON.stringify(body);
 
-  const response = await fetch(urlWithParams.toString(), {
-    method,
-    ...fetchOptions,
-  });
+  try {
+    const response = await fetch(urlWithParams.toString(), {
+      method,
+      ...fetchOptions,
+    });
 
-  const data = await response.json();
-  return transformResponse ? transformResponse(data) : (data as T);
+    if (response.status === 401) {
+      throw new Error("Unauthorized");
+    }
+    const data = await response.json();
+
+    console.log("data", data);
+
+    return transformResponse ? transformResponse(data) : (data as T);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const useRequest = <T, P>() => {
   const [isLoading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const request = useCallback(
+  const request = (
     async ({
       options,
       transformResponse,
@@ -123,7 +134,9 @@ const useRequest = <T, P>() => {
         options?.timeout ? options.timeout : 5000
       );
       try {
+        setError(null);
         setLoading(true);
+        
         const result = await buildApi<T>({
           options: { ...options, signal },
           ...requestParams,
@@ -140,8 +153,7 @@ const useRequest = <T, P>() => {
         setLoading(false);
         clearTimeout(timeoutId);
       }
-    },
-    []
+    }
   );
 
   return { isLoading, error, request };
@@ -205,8 +217,8 @@ const useFetch = <T>({
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
-  const isFocused = useIsFocused();
 
+  
   useEffect(() => {
     const fetchDataAsync = async () => {
       const controller = new AbortController();
@@ -215,7 +227,7 @@ const useFetch = <T>({
         () => controller.abort(),
         options?.timeout ? options.timeout : 5000
       );
-
+      
       try {
         setLoading(true);
         const result = await buildApi<T>({
@@ -235,7 +247,7 @@ const useFetch = <T>({
     };
 
     fetchDataAsync();
-  }, [url, params, transformResponse, isFocused]); // url과 params가 변경되면 다시 실행
+  }, [url, JSON.stringify(params), transformResponse]); // url과 params가 변경되면 다시 실행
 
   return { data, isLoading, error };
 };
@@ -251,7 +263,7 @@ const useFetchWithRecoil = <T>({
   const [data, setData] = useRecoilState<T | null>(recoilState);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
-  const isFocused = useIsFocused();
+
   useEffect(() => {
     const fetchDataAsync = async () => {
       const controller = new AbortController();
@@ -279,7 +291,7 @@ const useFetchWithRecoil = <T>({
     };
 
     fetchDataAsync();
-  }, [url, params, transformResponse, isFocused]); // url과 params가 변경되면 다시 실행
+  }, [url, params, transformResponse]); // url과 params가 변경되면 다시 실행
 
   return { data, isLoading, error };
 };
@@ -305,9 +317,10 @@ type Build = {
     recoilState?: RecoilState<Validate<Response> | null>;
     query: (params: Validate<Params>) => Omit<RequestOptions, "method">;
     transformResponse?: (data: any) => Validate<Response>;
-  }) => (
-    params: Validate<Params>
-  ) => ReturnType<typeof useFetch<Validate<Response>>>;
+  }) => {
+    type: "fetch";
+    Fn: (params: Validate<Params>) => ReturnType<typeof useFetch<Validate<Response>>>;
+  };
 
   request: <Response, Params>(config: {
     recoilState?: RecoilState<Validate<Response> | null>;
@@ -315,28 +328,31 @@ type Build = {
       method: Exclude<RequestMethod, "GET">;
     };
     transformResponse?: (data: unknown) => Validate<Response>;
-  }) => () => RequestReturn<Response, Params>;
+  }) => {
+    type: "request";
+    Fn: () => RequestReturn<Response, Params>;
+  };
 };
 
 type Endpoints = Record<
   string,
 
-    | (() => RequestReturn<any, any>)
-    | ((params: any) => ReturnType<typeof useFetch<any>>) extends
-    | (() => infer Ret)
-    | ((params: infer P) => infer Ret)
+    | ({type: "request", Fn: () => RequestReturn<any, any>})
+    | ({type: "fetch", Fn: (params: any) => ReturnType<typeof useFetch<any>>}) extends
+    | {type: "request", Fn: (() => infer Ret)}
+    | {type: "fetch", Fn: ((params: infer P) => infer Ret)}
     ? Ret extends RequestReturn<infer R, infer P>
-      ? () => RequestReturn<R, P>
+      ? {type: "request", Fn: () => RequestReturn<R, P>}
       : Ret extends ReturnType<typeof useFetch<infer R>>
-      ? (params: P) => ReturnType<typeof useFetch<R>>
+      ? {type: "fetch", Fn: (params: P) => ReturnType<typeof useFetch<R>>}
       : never
     : never
 >;
 
 type RenameEndpoints<T extends Record<string, any>> = {
-  [K in keyof T & string]: T[K] extends () => RequestReturn<infer R, infer P>
+  [K in keyof T & string]: T[K] extends {type: "request", Fn: () => RequestReturn<infer R, infer P>}
     ? { key: `use${Capitalize<K>}Request`; params: P; response: R }
-    : T[K] extends (params: infer P) => ReturnType<typeof useFetch<infer R>>
+    : T[K] extends {type: "fetch", Fn: (params: infer P) => ReturnType<typeof useFetch<infer R>>}
     ? { key: `use${Capitalize<K>}Fetch`; params: P; response: R }
     : never;
 };
@@ -364,22 +380,26 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
         query: (params: Validate<P>) => Omit<RequestOptions, "method">;
         transformResponse?: (data: any) => Validate<R>;
       }) => {
-        return (params: Validate<P>) => {
-          const { url, params: queryParams } = query(params);
-          const finalUrl = `${baseUrl}${url}`;
-          if (recoilState)
-            return useFetchWithRecoil<Validate<R>>({
-              ...queryParams,
-              url: finalUrl,
-              transformResponse,
-              recoilState,
-            });
-          else
-            return useFetch<Validate<R>>({
-              ...queryParams,
-              url: finalUrl,
-              transformResponse,
-            });
+        return {
+          type: "fetch",
+          Fn: (params: Validate<P>) => {
+            const { url, params: queryParams } = query(params);
+            const finalUrl = `${baseUrl}${url}`;
+            if (recoilState) {
+              return useFetchWithRecoil<Validate<R>>({
+                params:queryParams,
+                url: finalUrl,
+                transformResponse,
+                recoilState,
+              });
+            } else {
+              return useFetch<Validate<R>>({
+                params:queryParams,
+                url: finalUrl,
+                transformResponse,
+              });
+            }
+          },
         };
       },
 
@@ -394,30 +414,31 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
         };
         transformResponse?: (data: any) => Validate<R>;
       }) => {
-        return () => {
-          // ✅ 이제 훅 호출 시 userParams를 받지 않음
-          const { isLoading, error, request } = recoilState
-            ? useRequestWithRecoil<Validate<R>, Validate<P>>({ recoilState })
-            : useRequest<Validate<R>, Validate<P>>();
+        return {
+          type: "request",
+          Fn: () => {
+            const { isLoading, error, request } = recoilState
+              ? useRequestWithRecoil<Validate<R>, Validate<P>>({ recoilState })
+              : useRequest<Validate<R>, Validate<P>>();
 
-          const executeRequest = async (data: Validate<P>) => {
-            // ✅ params는 여기서 받음
-            const { url, ...queryParams } = query(data);
+            const executeRequest = async (data: Validate<P>) => {
+              const { url, ...queryParams } = query(data);
+              const finalUrl = `${baseUrl}${url}`;
+              return request({
+                ...queryParams,
+                url: finalUrl,
+                body: data,
+                transformResponse,
+              });
+            };
 
-            const finalUrl = `${baseUrl}${url}`;
-            return request({
-              ...queryParams,
-              url: finalUrl,
-              body: data,
-              transformResponse,
-            });
-          };
-
-          return { isLoading, error, request: executeRequest };
+            return { isLoading, error, request: executeRequest };
+          },
         };
       },
     };
   };
+
 
   return {
     addEndpoints: <T extends Endpoints>({
@@ -430,11 +451,13 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
         if (Object.prototype.hasOwnProperty.call(builtEndpoints, key)) {
           const endpoint = builtEndpoints[key];
           const capitalizedKey = capitalize(key);
+
           const hookName =
-            "request" in endpoint
-              ? `use${capitalizedKey}Request`
-              : `use${capitalizedKey}Fetch`;
-          namedEndpoints[hookName] = endpoint;
+          endpoint.type === "request"
+          ? `use${capitalizedKey}Request`
+          : `use${capitalizedKey}Fetch`;
+
+          namedEndpoints[hookName] = endpoint.Fn;
         }
       }
 

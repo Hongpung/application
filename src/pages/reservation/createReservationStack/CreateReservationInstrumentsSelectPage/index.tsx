@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 import { Instrument } from "@hongpung/src/entities/instrument";
 import { useCreateReservation } from "@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context";
-import Header from "@hongpung/src/common/ui/Header/Header";
+import { Header } from "@hongpung/src/common";
 import { Color } from "@hongpung/src/common";
 
 import { useBorrowPossibleInstrumentsFetch } from "@hongpung/src/features/reservation/configureReservation/api/searchBorrowPossibleInstrumentsApi";
@@ -28,7 +28,7 @@ const CreateReservationInstrumentsSelectPage: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Header leftButton="close" HeaderName="대여 악기 선택" />
+      <Header leftButton="close" headerName="대여 악기 선택" />
 
       <View style={styles.container}>
         <BorrowPossibleInstrumentList

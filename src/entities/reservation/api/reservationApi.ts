@@ -61,7 +61,6 @@ const reservationApi = baseApi.addEndpoints({
             query: ({ calendarMonth }) => {
 
                 const koreanTime = new Date(calendarMonth.getTime() + 9 * 60 * 60 * 1000)
-
                 return ({
                     url: `/reservation/month-calendar`,
                     params: { year: koreanTime.getUTCFullYear(), month: koreanTime.getUTCMonth() + 1 },
@@ -71,7 +70,7 @@ const reservationApi = baseApi.addEndpoints({
             },
             transformResponse: (data: MonthlyReservationDto[]) => {
                 const reservedDates: { [key: number]: { color: string }[] } = [];
-
+                
                 data.map((reservation) => {
                     const reservedDate = new Date(reservation.date).getDate();
                     if (!reservedDates[reservedDate]) reservedDates[reservedDate] = [{ color: colorDefine(reservation) }];

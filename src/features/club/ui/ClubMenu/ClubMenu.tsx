@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Color } from "@hongpung/src/common";
-import { Icons } from "@hongpung/src/common/ui/Icons/Icons";
+import { Icons } from "@hongpung/src/common";
 import { type ClubMenu as ClubMenuType } from "@hongpung/src/entities/club/model/type";
 
 interface ClubMenuProps {

@@ -1,9 +1,8 @@
 import {
   createNativeStackNavigator,
-  NativeStackNavigationProp,
   NativeStackScreenProps,
 } from "@react-navigation/native-stack";
-import { MainTabNavigation } from "./MainTabNavigation";
+import { MainTabNavigation, MainTabParamList } from "./MainTabNavigation";
 import LoginSettingPage from "@hongpung/src/pages/setting/LoginSettingPage";
 import NotificationSettingPage from "@hongpung/src/pages/setting/NotificationSettingPage";
 import UpComingReservationPage from "@hongpung/src/pages/member/UpcommingSchedulePage";
@@ -22,10 +21,11 @@ import {
   SessionManagementStackParamList,
 } from "./SessionManagementStackNavigation";
 import ChangePasswordPage from "@hongpung/src/pages/auth/ChangePasswordPage";
-import NotificationPage from "../pages/notification/NotificationPage";
+import NotificationPage from "@hongpung/src/pages/notification/NotificationPage";
+import { useLoadMyStatusFetch } from "@hongpung/src/entities/member";
 
 export type MainStackParamList = {
-  MainTab: undefined;
+  MainTab: ScreenParams<MainTabParamList>;
   Notification: undefined;
 
   WebView: { url: string; title?: string };
@@ -50,8 +50,13 @@ export type MainStackScreenProps<T extends keyof MainStackParamList> =
 const MainStack = createNativeStackNavigator<MainStackParamList>();
 
 export const MainStackNavigation = () => {
+  const {} = useLoadMyStatusFetch();
   return (
-    <MainStack.Navigator>
+    <MainStack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
       <MainStack.Screen name="MainTab" component={MainTabNavigation} />
       <MainStack.Screen
         name="Notification"

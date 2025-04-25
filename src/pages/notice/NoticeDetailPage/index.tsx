@@ -18,7 +18,7 @@ const NoticeDetailPage: React.FC<NoticeStackProps<"NoticeDetail">> = ({
 
   return (
     <View style={styles.container}>
-      <Header leftButton={"arrow-back"} HeaderName="공지사항" />
+      <Header leftButton={"arrow-back"} headerName="공지사항" />
       <View style={styles.contentContainer}>
         <View style={styles.noticeCard}>
           <Text style={styles.noticeTitle}>

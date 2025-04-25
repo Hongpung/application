@@ -16,7 +16,7 @@ const NoticeListPage: React.FC<MainStackProps<"NoticeStack">> = ({
 
   return (
     <View style={{ flex: 1 }}>
-      <Header leftButton={"arrow-back"} HeaderName="공지사항" />
+      <Header leftButton={"arrow-back"} headerName="공지사항" />
       {isLoading ? (
         <ActivityIndicator color={Color["blue500"]} size={"large"} />
       ) : (

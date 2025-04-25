@@ -22,7 +22,7 @@ const ClubInstrumentListPage: React.FC<ClubStackProps<"ClubInstruments">> = ({
 
   return (
     <View style={styles.container}>
-      <Header leftButton="close" HeaderName="악기 목록" />
+      <Header leftButton="close" headerName="악기 목록" />
       <View style={styles.content}>
         <InstrumentViewList
           instrumentList={instrumentList || []}

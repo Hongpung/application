@@ -10,15 +10,16 @@ import Toast from 'react-native-toast-message';
 import { RecoilRoot } from 'recoil';
 
 import { toastConfig } from './src/common/config/toast.config';
-import { useAppLoad } from './hoc/useAppLoad';
-import { RootStacks } from './nav/RootStack';
+import { RootStackNavigation } from './src/navigation/RootStackNavigation';
 import { Color } from './ColorSet';
+import { useFirstPage } from './src/common/lib/useFirstPage';
+import { useFonts } from './src/common/lib/useFonts';
 
 
-const ContentsContainer: React.FC<{ startDomain: "Login" | "Tutorial" | "HomeStack" }> = ({ startDomain }) => {
+const ContentsContainer: React.FC<{ startDomain: "Tutorial" | "Permission" | "LoginStack" | "Main" }> = ({ startDomain }) => {
   return (
     <NavigationContainer>
-      <RootStacks startDomain={startDomain} />
+      <RootStackNavigation startDomain={startDomain} />
     </NavigationContainer>
   )
 }
@@ -53,18 +54,17 @@ if (Platform.OS == 'android')
 
 const AppLoader: React.FC = () => {
 
-  const { firstScreen, fontLoaded, banners } = useAppLoad();
+  const { firstScreen } = useFirstPage();
+  const { fontLoaded } = useFonts();
 
   const getLoadingText = () => {
     if (!fontLoaded) return '폰트 로딩중';
     if (!firstScreen) return '기본 정보 로딩중';
-    if (banners.state === 'LOADED') return '';
-    if (banners.state === 'FAILED') return '배너 로딩 실패';
-    return '배너 로딩중';
+    return '';
   };
 
 
-  if (!fontLoaded || !firstScreen || banners.state != 'LOADED') {
+  if (!fontLoaded || !firstScreen ) {
     return (
       <View style={{ flex: 1 }}>
         <ImageBackground source={require('./assets/splash.png')}
@@ -75,32 +75,6 @@ const AppLoader: React.FC = () => {
         <Text style={{ position: 'absolute', bottom: 20, right: 20, color: Color['grey400'], fontFamily: 'NanumSquareNeo-Bold' }}>
           {getLoadingText()}
         </Text>
-
-        <Modal visible={banners.state == 'FAILED'} transparent>
-          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <View style={{
-              borderRadius: 20,
-              minHeight: 200,
-              paddingVertical: 24,
-              marginHorizontal: 24,
-              display: 'flex',
-              gap: 12,
-              justifyContent: 'center',
-              alignItems: 'center',
-              backgroundColor: '#fff',
-            }}>
-              <Text style={{
-                fontSize: 18,
-                fontWeight: 'bold',
-                color: 'red',
-              }}>데이터를 불러오는 데 실패했습니다.</Text>
-              <Text style={{
-                fontSize: 16,
-                color: '#333',
-              }}>인터넷 연결을 확인 후 앱을 다시 시작해주세요.</Text>
-            </View>
-          </View>
-        </Modal>
       </View>
     );
   }
