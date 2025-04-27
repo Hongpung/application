@@ -2,7 +2,7 @@ import { StyleSheet, Modal, Pressable } from "react-native";
 import { Icons } from "@hongpung/src/common";
 import { Member } from "@hongpung/src/entities/member";
 import { ProfileBox } from "../ProfileBox/ProfileBox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface MemberDetailModalProps {
   selectedMember: Member | null;
@@ -11,7 +11,11 @@ interface MemberDetailModalProps {
 export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
   selectedMember,
 }) => {
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(true);
+
+  useEffect(() => {
+    setIsModalVisible(true);
+  }, [selectedMember]);
 
   if (!selectedMember) {
     return null;

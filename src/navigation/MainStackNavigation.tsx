@@ -23,6 +23,8 @@ import {
 import ChangePasswordPage from "@hongpung/src/pages/auth/ChangePasswordPage";
 import NotificationPage from "@hongpung/src/pages/notification/NotificationPage";
 import { useLoadMyStatusFetch } from "@hongpung/src/entities/member";
+import ReservationInstrumentsViewScreen from "../pages/reservation/BorrowInstrumentListViewPage";
+import ParticipatorListViewPage from "../pages/reservation/ParticipatorListViewPage";
 
 export type MainStackParamList = {
   MainTab: ScreenParams<MainTabParamList>;
@@ -42,6 +44,9 @@ export type MainStackParamList = {
   NotificationSetting: undefined;
 
   ChangePassword: undefined;
+
+  BorrowInstrumentList: { borrowInstruments: string };
+  ParticipatorList: { participators: string };
 };
 
 export type MainStackScreenProps<T extends keyof MainStackParamList> =
@@ -57,13 +62,18 @@ export const MainStackNavigation = () => {
         headerShown: false,
       }}
     >
-      <MainStack.Screen name="MainTab" component={MainTabNavigation} />
+      <MainStack.Screen
+        name="MainTab"
+        component={MainTabNavigation}
+        options={{
+          headerShown: false,
+        }}
+      />
       <MainStack.Screen
         name="Notification"
         component={NotificationPage}
         options={{ presentation: "modal" }}
       />
-      {/* <MainStack.Screen name="WebView" component={WebViewPage} /> */}
       <MainStack.Screen
         name="SessionManagement"
         component={SessionManagementStack}
@@ -85,6 +95,19 @@ export const MainStackNavigation = () => {
       <MainStack.Screen name="MyLog" component={MyLogPage} />
 
       <MainStack.Screen name="ChangePassword" component={ChangePasswordPage} />
+
+      <MainStack.Screen
+        name="BorrowInstrumentList"
+        component={ReservationInstrumentsViewScreen}
+      />
+
+      <MainStack.Screen
+        name="ParticipatorList"
+        component={ParticipatorListViewPage}
+      />
+
+      {/* <MainStack.Screen name="WebView" component={WebViewPage} /> */}
+      
     </MainStack.Navigator>
   );
 };

@@ -1,4 +1,4 @@
-import { Color } from "@hongpung/ColorSet"
+import { Color } from "@hongpung/src/common"
 import { Icons } from "@hongpung/src/common"
 import { View, Text, Pressable, Dimensions, StyleSheet } from "react-native"
 

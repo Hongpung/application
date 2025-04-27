@@ -1,9 +1,8 @@
 import { Color } from "@hongpung/src/common";
 import { View, Text, StyleSheet } from "react-native";
-import { isOpen } from "../../../../entities/session/lib/isRoomOpen";
 
 type ScheduleStatusBarProps = {
-    isOnAir: boolean,
+    isOnAir: 'PREPARING' | 'ON_AIR' | 'CLOSED' | 'AVAILABLE',
     isParticipatible: boolean
 }
 
@@ -12,13 +11,15 @@ const ScheduleStatusBar: React.FC<ScheduleStatusBarProps> = ({ isOnAir, isPartic
         <View style={styles.container}>
             <Text style={styles.title}>연습실 이용상태</Text>
             <View style={styles.statusContainer}>
-                {isOnAir && isParticipatible && (
+                {isOnAir === 'ON_AIR' && isParticipatible && (
                     <Text style={[styles.statusBadge, styles.participatible]}>참여가능</Text>
                 )}
-                {isOnAir ? (
+                {isOnAir === 'ON_AIR' && !isParticipatible ? (
                     <Text style={[styles.statusBadge, styles.inUse]}>사용중</Text>
-                ) : isOpen() ? (
+                ) : isOnAir === 'AVAILABLE' ? (
                     <Text style={[styles.statusBadge, styles.available]}>사용 가능</Text>
+                ) : isOnAir === 'PREPARING' ? (
+                    <Text style={[styles.statusBadge, styles.unavailable]}>준비중</Text>
                 ) : (
                     <Text style={[styles.statusBadge, styles.unavailable]}>이용 불가</Text>
                 )}

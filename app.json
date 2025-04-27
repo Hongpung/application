@@ -71,9 +71,7 @@
         "projectId": "1de88024-4522-477b-99c9-b458d373a286"
       }
     },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "runtimeVersion": "1.0.0",
     "updates": {
       "requestHeaders": {
         "expo-channel-name": "production"

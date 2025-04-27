@@ -2,7 +2,7 @@
 import React, { FC } from 'react';
 import { useDropdown } from './Dropdown.context';
 import { ScrollView, View } from 'react-native';
-import { Color } from '@hongpung/ColorSet';
+import { Color } from '@hongpung/src/common';
 
 export interface DropdownMenuProps {
     children: React.ReactNode;

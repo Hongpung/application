@@ -16,3 +16,5 @@ export { ReservationCard } from './ui/ReservationCard/ReservationCard'
 export { ReservationTicket } from './ui/ReservationTicket/ReservationTicket'
 
 export { useLoadDailyReservationsFetch, useLoadReservationDetailFetch, useLoadOccupiedTimesFetch, useLoadMonthlyReservationsFetch } from './api/reservationApi'
+
+export { myTodayReservationState } from './model/myTodayReservationState'

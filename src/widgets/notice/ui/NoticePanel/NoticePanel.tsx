@@ -1,18 +1,13 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Pressable,
-} from "react-native";
+import { StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
-import { Color } from "@hongpung/ColorSet";
+import { Color } from "@hongpung/src/common";
 import { Icons } from "@hongpung/src/common";
 import { BriefNotice } from "@hongpung/src/entities/notice/model/type";
 import NoticeItem from "@hongpung/src/entities/notice/ui/NoticeItem/NoticeItem";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 type NoticePanelProps = {
-  noticeList: BriefNotice[];
+  noticeList?: BriefNotice[];
   isLoading: boolean;
   navigateToNoticeDetail: (noticeId: number) => void;
   navigateToNoticeList: () => void;
@@ -26,23 +21,18 @@ const NoticePanel: React.FC<NoticePanelProps> = (props) => {
     navigateToNoticeList,
   } = props;
 
-  if (isLoading) {
-    return (
-      <View>
-        <Text style={styles.title}>공지사항</Text>
-      </View>
-    );
-  }
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Icons name="megaphone" size={16} color={Color["grey400"]} />
         <Text style={styles.title}>공지사항</Text>
       </View>
-      {isLoading ? (
-        <SkeletonPlaceholder>
-          <View style={{ width: "100%", height: 84, padding: 16, }}></View>
-        </SkeletonPlaceholder>
+      {!noticeList ? (
+        <View style={styles.noticeList}>
+          <View style={{ width: 60, height: 60, borderRadius: 50 }} />
+        </View>
+      ) : isLoading ? (
+        <View style={{ width: 60, height: 60, borderRadius: 50 }} />
       ) : (
         <View style={styles.noticeList}>
           {noticeList && noticeList.length > 0 ? (

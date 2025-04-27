@@ -7,9 +7,11 @@ import { MainStackParamList } from "./MainStackNavigation";
 import MyPageScreen from "@hongpung/src/pages/member/MyPagePage";
 import QRCodeScreen from "@hongpung/src/pages/session/QRScanPage";
 import ReservationScreen from "@hongpung/src/pages/reservation/ReservationMainPage";
-import { Icons } from "../common";
+import { Color, Icons } from "../common";
 import { RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { BlurView } from "expo-blur";
+import { StyleSheet } from "react-native";
 
 export type MainTabParamList = {
   Home: undefined;
@@ -40,7 +42,30 @@ export const MainTabNavigation: React.FC = () => {
   return (
     <MainTab.Navigator
       screenOptions={{
+        tabBarHideOnKeyboard: true,
+        tabBarActiveTintColor: Color["blue500"],
+        tabBarInactiveTintColor: Color["grey300"],
+        tabBarStyle: {
+          height: 72,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          borderTopWidth: 1,
+          borderLeftWidth: 1,
+          borderRightWidth: 1,
+          borderTopColor: Color["grey100"],
+          borderLeftColor: Color["grey100"],
+          borderRightColor: Color["grey100"],
+          backgroundColor: "#FFF",
+          position: "absolute",
+        },
         headerShown: false,
+        tabBarIconStyle: {
+          width: 36,
+          height: 36,
+          marginTop: 8,
+          marginBottom: 2,
+        },
+        tabBarLabelStyle: { fontFamily: "NanumSquareNeo-Bold", fontSize: 12 },
       }}
     >
       <MainTab.Screen

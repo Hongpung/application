@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { RecoilState, useRecoilState, useSetRecoilState } from "recoil";
 import { getToken } from "../lib/TokenHandler";
-import { useIsFocused } from "@react-navigation/native";
+import {
+  StackActions,
+  useIsFocused,
+  useNavigation,
+} from "@react-navigation/native";
 
 type RequestMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -106,6 +110,13 @@ const buildApi = async <T>({
     if (response.status === 401) {
       throw new Error("Unauthorized");
     }
+    if (response.status === 403) {
+      if (withAuthorize) {
+        throw new Error("Unauthorized");
+      } else {
+        throw new Error("Forbidden");
+      }
+    }
     const data = await response.json();
 
     console.log("data", data);
@@ -119,42 +130,44 @@ const buildApi = async <T>({
 const useRequest = <T, P>() => {
   const [isLoading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
+  const navigation = useNavigation();
+  const request = async ({
+    options,
+    transformResponse,
+    body,
+    ...requestParams
+  }: RequestParams<T> & { body: P }) => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      options?.timeout ? options.timeout : 5000
+    );
+    try {
+      setError(null);
+      setLoading(true);
 
-  const request = (
-    async ({
-      options,
-      transformResponse,
-      body,
-      ...requestParams
-    }: RequestParams<T> & { body: P }) => {
-      const controller = new AbortController();
-      const signal = controller.signal;
-      const timeoutId = setTimeout(
-        () => controller.abort(),
-        options?.timeout ? options.timeout : 5000
-      );
-      try {
-        setError(null);
-        setLoading(true);
-        
-        const result = await buildApi<T>({
-          options: { ...options, signal },
-          ...requestParams,
-          body: body ?? undefined,
-        });
+      const result = await buildApi<T>({
+        options: { ...options, signal },
+        ...requestParams,
+        body: body ?? undefined,
+      });
 
-        setError(null); // 요청 성공 시 에러 상태 초기화
+      setError(null); // 요청 성공 시 에러 상태 초기화
 
-        return transformResponse ? transformResponse(result) : result;
-      } catch (err) {
-        setError(err as Error);
-        throw err;
-      } finally {
-        setLoading(false);
-        clearTimeout(timeoutId);
+      return transformResponse ? transformResponse(result) : result;
+    } catch (err) {
+      setError(err as Error);
+      if (err instanceof Error && err.message === "Unauthorized") {
+        navigation.setOptions({ animation: "none" });
+        navigation.dispatch(StackActions.replace("LoginStack"));
       }
+      throw err;
+    } finally {
+      setLoading(false);
+      clearTimeout(timeoutId);
     }
-  );
+  };
 
   return { isLoading, error, request };
 };
@@ -164,6 +177,7 @@ const useRequestWithRecoil = <T, P>({
 }: {
   recoilState: RecoilState<T | null>;
 }) => {
+  const navigation = useNavigation();
   const setData = useSetRecoilState<T | null>(recoilState);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
@@ -195,6 +209,10 @@ const useRequestWithRecoil = <T, P>({
       } catch (err) {
         setError(err as Error);
         setData(null); // 요청 실패 시 데이터 초기화
+        if (err instanceof Error && err.message === "Unauthorized") {
+          navigation.setOptions({ animation: "none" });
+          navigation.dispatch(StackActions.replace("LoginStack"));
+        }
         throw err;
       } finally {
         setLoading(false);
@@ -217,8 +235,7 @@ const useFetch = <T>({
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
-
-  
+  const navigation = useNavigation();
   useEffect(() => {
     const fetchDataAsync = async () => {
       const controller = new AbortController();
@@ -227,7 +244,7 @@ const useFetch = <T>({
         () => controller.abort(),
         options?.timeout ? options.timeout : 5000
       );
-      
+
       try {
         setLoading(true);
         const result = await buildApi<T>({
@@ -239,6 +256,10 @@ const useFetch = <T>({
         setData(transformResponse ? transformResponse(result) : result);
       } catch (err) {
         setError(err as Error);
+        if (err instanceof Error && err.message === "Unauthorized") {
+          navigation.setOptions({ animation: "none" });
+          navigation.dispatch(StackActions.replace("LoginStack"));
+        }
         throw err;
       } finally {
         setLoading(false);
@@ -263,7 +284,7 @@ const useFetchWithRecoil = <T>({
   const [data, setData] = useRecoilState<T | null>(recoilState);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
-
+  const navigation = useNavigation();
   useEffect(() => {
     const fetchDataAsync = async () => {
       const controller = new AbortController();
@@ -283,6 +304,10 @@ const useFetchWithRecoil = <T>({
         setData(transformResponse ? transformResponse(result) : result);
       } catch (err) {
         setError(err as Error);
+        if (err instanceof Error && err.message === "Unauthorized") {
+          navigation.setOptions({ animation: "none" });
+          navigation.dispatch(StackActions.replace("LoginStack"));
+        }
         throw err;
       } finally {
         setLoading(false);
@@ -319,7 +344,9 @@ type Build = {
     transformResponse?: (data: any) => Validate<Response>;
   }) => {
     type: "fetch";
-    Fn: (params: Validate<Params>) => ReturnType<typeof useFetch<Validate<Response>>>;
+    Fn: (
+      params: Validate<Params>
+    ) => ReturnType<typeof useFetch<Validate<Response>>>;
   };
 
   request: <Response, Params>(config: {
@@ -337,22 +364,31 @@ type Build = {
 type Endpoints = Record<
   string,
 
-    | ({type: "request", Fn: () => RequestReturn<any, any>})
-    | ({type: "fetch", Fn: (params: any) => ReturnType<typeof useFetch<any>>}) extends
-    | {type: "request", Fn: (() => infer Ret)}
-    | {type: "fetch", Fn: ((params: infer P) => infer Ret)}
+    | { type: "request"; Fn: () => RequestReturn<any, any> }
+    | {
+        type: "fetch";
+        Fn: (params: any) => ReturnType<typeof useFetch<any>>;
+      } extends
+    | { type: "request"; Fn: () => infer Ret }
+    | { type: "fetch"; Fn: (params: infer P) => infer Ret }
     ? Ret extends RequestReturn<infer R, infer P>
-      ? {type: "request", Fn: () => RequestReturn<R, P>}
+      ? { type: "request"; Fn: () => RequestReturn<R, P> }
       : Ret extends ReturnType<typeof useFetch<infer R>>
-      ? {type: "fetch", Fn: (params: P) => ReturnType<typeof useFetch<R>>}
+      ? { type: "fetch"; Fn: (params: P) => ReturnType<typeof useFetch<R>> }
       : never
     : never
 >;
 
 type RenameEndpoints<T extends Record<string, any>> = {
-  [K in keyof T & string]: T[K] extends {type: "request", Fn: () => RequestReturn<infer R, infer P>}
+  [K in keyof T & string]: T[K] extends {
+    type: "request";
+    Fn: () => RequestReturn<infer R, infer P>;
+  }
     ? { key: `use${Capitalize<K>}Request`; params: P; response: R }
-    : T[K] extends {type: "fetch", Fn: (params: infer P) => ReturnType<typeof useFetch<infer R>>}
+    : T[K] extends {
+        type: "fetch";
+        Fn: (params: infer P) => ReturnType<typeof useFetch<infer R>>;
+      }
     ? { key: `use${Capitalize<K>}Fetch`; params: P; response: R }
     : never;
 };
@@ -387,14 +423,14 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
             const finalUrl = `${baseUrl}${url}`;
             if (recoilState) {
               return useFetchWithRecoil<Validate<R>>({
-                params:queryParams,
+                params: queryParams,
                 url: finalUrl,
                 transformResponse,
                 recoilState,
               });
             } else {
               return useFetch<Validate<R>>({
-                params:queryParams,
+                params: queryParams,
                 url: finalUrl,
                 transformResponse,
               });
@@ -439,7 +475,6 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
     };
   };
 
-
   return {
     addEndpoints: <T extends Endpoints>({
       endpoints: endpointsBuilder,
@@ -453,9 +488,9 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
           const capitalizedKey = capitalize(key);
 
           const hookName =
-          endpoint.type === "request"
-          ? `use${capitalizedKey}Request`
-          : `use${capitalizedKey}Fetch`;
+            endpoint.type === "request"
+              ? `use${capitalizedKey}Request`
+              : `use${capitalizedKey}Fetch`;
 
           namedEndpoints[hookName] = endpoint.Fn;
         }

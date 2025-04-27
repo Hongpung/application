@@ -1,4 +1,4 @@
-import { Color } from "@hongpung/ColorSet";
+import { Color } from "@hongpung/src/common";
 import { View, Text, StyleSheet } from "react-native";
 import { SessionTimer } from "@hongpung/src/features/session/useRoom/ui/SessionTimer/SessionTimer";
 import React from "react";

@@ -1,4 +1,11 @@
-import { ScrollView, View, Text, Alert, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  Alert,
+  StyleSheet,
+  Pressable,
+} from "react-native";
 
 import { DateTimeViewer } from "@hongpung/src/entities/reservation/ui/DateTimeViewer/DateTimeViewer";
 import {
@@ -17,7 +24,9 @@ import { isEditible } from "@hongpung/src/entities/reservation/lib/isEditible";
 import { LeaveReservationButton } from "@hongpung/src/features/reservation/leaveReservation/ui/LeaveReservationButton/LeaveReservationButton";
 import { EnterEditButton } from "@hongpung/src/features/reservation/editReservation/ui/EnterEditButton/EnterEditButton";
 import { ReservationStackParamList } from "@hongpung/src/navigation/ReservationNavigation";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
+import { useNavigation } from "@react-navigation/native";
+import { MainStackParamList } from "@hongpung/src/navigation/MainStackNavigation";
 
 type ReservationDetailPageProps = NativeStackScreenProps<
   ReservationStackParamList,
@@ -29,6 +38,7 @@ const ReservationDetailPage: React.FC<ReservationDetailPageProps> = ({
   route,
 }) => {
   const { reservationId } = route.params;
+  const rootNavigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
   console.log("reservationId", reservationId);
   const {
     data: reservation,
@@ -183,12 +193,24 @@ const ReservationDetailPage: React.FC<ReservationDetailPageProps> = ({
         <View style={styles.row}>
           <Text style={styles.label}>참가 인원</Text>
         </View>
-        <ParticipatorsViewer participators={participators} />
+        <Pressable onPress={() => {
+          rootNavigation.navigate("ParticipatorList", {
+            participators: JSON.stringify(participators),
+          })
+        }}>
+          <ParticipatorsViewer participators={participators} />
+        </Pressable>
 
         <View style={styles.row}>
           <Text style={styles.label}>대여 악기</Text>
         </View>
-        <BorrowInstrumentsViewer borrowInstruments={borrowInstruments} />
+        <Pressable onPress={() => {
+          rootNavigation.navigate("BorrowInstrumentList", {
+            borrowInstruments: JSON.stringify(borrowInstruments),
+          })
+        }}>
+          <BorrowInstrumentsViewer borrowInstruments={borrowInstruments} />
+        </Pressable>
 
         {/* 삭제하기 버튼 */}
 

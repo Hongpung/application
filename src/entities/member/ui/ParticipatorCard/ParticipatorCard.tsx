@@ -44,8 +44,8 @@ const ParticipatorCard: React.FC<ParticipatorCardProps> = ({ member, isPicked, o
 
             </View>
             <View style={{ position: 'absolute', borderRadius: 200, right: 16, bottom: 8, flexDirection: 'row', alignItems: 'flex-end' }}>
-                <Text style={[{ marginRight: 1 }, styles.clubInfo]}>{`@ ` + member.enrollmentNumber}</Text>
-                <Text style={styles.clubInfo}>{member.club}</Text>
+                <Text style={[{ marginRight: 1 }, styles.clubInfo]}>{`@ ` + member.club}</Text>
+                <Text style={styles.clubInfo}>{member.enrollmentNumber}</Text>
             </View>
         </Pressable>
     )

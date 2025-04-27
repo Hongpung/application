@@ -1,5 +1,6 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Color } from "@hongpung/src/common";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 interface FooterSectionProps {
   onPressChangeInfo: () => void;
@@ -12,9 +13,10 @@ export const FooterSection: React.FC<FooterSectionProps> = ({
   onPressChangePassword,
   onPressWithdrawal,
 }) => {
+  const tabBarHeight = useBottomTabBarHeight();
   return (
 
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: tabBarHeight+24 }]}>
       <Pressable
         style={styles.menuItem}
         onPress={onPressChangeInfo}

@@ -8,7 +8,6 @@ import { ClubStackProps } from "@hongpung/src/navigation/ClubStackNavigation";
 
 const ClubInstrumentListPage: React.FC<ClubStackProps<"ClubInstruments">> = ({
   navigation,
-  route,
 }) => {
   const {
     data: instrumentList,
@@ -23,12 +22,11 @@ const ClubInstrumentListPage: React.FC<ClubStackProps<"ClubInstruments">> = ({
   return (
     <View style={styles.container}>
       <Header leftButton="close" headerName="악기 목록" />
-      <View style={styles.content}>
-        <InstrumentViewList
-          instrumentList={instrumentList || []}
-          onInstrumentClick={handleInstrumentClick}
-        />
-      </View>
+      <InstrumentViewList
+        instrumentList={instrumentList ? instrumentList : []}
+        isLoading={isLoading}
+        onInstrumentClick={handleInstrumentClick}
+      />
     </View>
   );
 };

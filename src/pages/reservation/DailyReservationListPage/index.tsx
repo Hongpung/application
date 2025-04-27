@@ -33,6 +33,9 @@ const DailyReservationListPage: React.FC<
           if (navigation.canGoBack()) navigation.goBack();
         }}
         selectedDate={selectedDate}
+        navigateToCreateReservation={() => {
+          
+        }}
       />
       <TimeLine>
         {reservations?.map((reservation) => (

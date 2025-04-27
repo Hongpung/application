@@ -1,7 +1,7 @@
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 
-import { Color } from '../../../ColorSet';
+import { Color } from '../../../import { Color } from '@hongpung/src/common';
 import Animated, { interpolate, SharedValue, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';

@@ -6,7 +6,7 @@ export const useLoadClubInstruments = () => {
         endpoints: (build) => ({
             loadClubInstruments: build.fetch<Instrument[], void>({
                 query: () => ({
-                    url: '/instrument/club',
+                    url: '/club/my-club/instruments',
                     withAuthorize: true
                 })
             })

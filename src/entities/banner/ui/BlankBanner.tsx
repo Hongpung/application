@@ -1,11 +1,11 @@
 import { Text, View } from 'react-native'
 import React from 'react'
 
-import { Color } from '@hongpung/ColorSet';
+import { Color } from '@hongpung/src/common';
 
 export const BlankBanner: React.FC = () => {
     return (
-        <View style={{ flex: 1, backgroundColor: Color['red300'] }}>
+        <View style={{ height: 120, backgroundColor: Color['red300'] }}>
             <View style={{ position: 'absolute', top: 30, left: 22 }}>
                 <Text style={{ fontFamily: 'NanumSquareNeo-ExtraBold', color: '#FFF', fontSize: 20 }}>아직 등록된 배너가 없어요</Text>
             </View>

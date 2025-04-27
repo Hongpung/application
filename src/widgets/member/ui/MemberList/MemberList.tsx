@@ -5,6 +5,7 @@ import MemberCard from "@hongpung/src/entities/member/ui/MemberCard/MemberCard";
 import MemberCardSkeleton from "@hongpung/src/entities/member/ui/MemberCardSkeleton/MemberCardSkeleton";
 import { MemberDetailModal } from "@hongpung/src/entities/member/ui/MemberDetailModal/MemberDetailModal";
 import { Color } from "@hongpung/src/common";
+import { Skeleton } from "moti/skeleton";
 
 interface MemberListProps {
   members: Member[] | null;
@@ -17,31 +18,36 @@ const MemberList: React.FC<MemberListProps> = ({
   isLoading = false,
   EmptyComponent,
 }) => {
-
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
   const renderItem = ({ item: member }: { item: Member }) => (
     <View style={styles.cardContainer}>
-      <MemberCard member={member} onPress={() => {setSelectedMember(member)}} />
+      <MemberCard
+        member={member}
+        onPress={() => {
+          setSelectedMember(member);
+        }}
+      />
     </View>
   );
-
+  if (isLoading)
+    return (
+      <>
+        {Array.from({ length: 10 }).map((_, index) => (
+          <MemberCardSkeleton key={index} />
+        ))}
+      </>
+    );
   return (
     <>
       <MemberDetailModal selectedMember={selectedMember} />
       <FlatList
+        style={{ flex: 1 }}
         data={members}
-        contentContainerStyle={styles.listContainer}
         keyExtractor={(member) => member.memberId.toString()}
         renderItem={renderItem}
         ListEmptyComponent={
-          isLoading ? (
-            <View style={styles.skeletonContainer}>
-              {Array.from({ length: 10 }).map((_, index) => (
-                <MemberCardSkeleton key={index} />
-              ))}
-            </View>
-          ) : !!EmptyComponent ? (
+          !!EmptyComponent ? (
             <View>{EmptyComponent}</View>
           ) : (
             <Text style={styles.emptyText}>인원이 없습니다.</Text>
@@ -53,9 +59,6 @@ const MemberList: React.FC<MemberListProps> = ({
 };
 
 const styles = StyleSheet.create({
-  listContainer: {
-    flex: 1,
-  },
   cardContainer: {
     marginVertical: 8,
     marginHorizontal: 24,
@@ -88,7 +91,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: Color['grey500'],
+    color: Color["grey500"],
     textAlign: "center",
   },
 });

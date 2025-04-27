@@ -5,8 +5,12 @@ import { useRecoilValue } from "recoil";
 import { Color } from "@hongpung/src/common";
 import { UserStatusState } from "@hongpung/src/entities/member";
 
-export const ClubPortalPanel: React.FC<MainStackProps<"Home">> = ({
-  navigation,
+interface ClubPortalPanelProps {
+  navigateToClubHome: () => void;
+}
+
+export const ClubPortalPanel: React.FC<ClubPortalPanelProps> = ({
+  navigateToClubHome,
 }) => {
   const loginUser = useRecoilValue(UserStatusState);
 
@@ -14,11 +18,11 @@ export const ClubPortalPanel: React.FC<MainStackProps<"Home">> = ({
     <TouchableOpacity
       activeOpacity={0.75}
       style={styles.container}
-      onPress={() => navigation.navigate("MyClub", { screen: "MyClubHome" })}
+      onPress={navigateToClubHome}
     >
       <Text style={styles.title}>우리 동아리</Text>
       <Image
-        source={require("../../assets/images/ClubBanner.png")}
+        source={require("@hongpung/assets/images/ClubBanner.png")}
         style={styles.bannerImage}
       />
 

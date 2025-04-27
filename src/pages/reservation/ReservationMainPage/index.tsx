@@ -16,6 +16,8 @@ const ReservationMainScreen: React.FC<MainTabScreenProps<"Reservation">> = ({
   const { cardViewRef, isOnAir, isParticipatible, scheduleCardList } =
     useScheduleCardList(sessionList);
 
+  console.log(sessionList);
+
   return (
     <View style={styles.container}>
       <View style={{ gap: 24 }}>

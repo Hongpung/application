@@ -1,6 +1,5 @@
-import { useNavigation } from "@react-navigation/native";
 import { Session } from "../../model/type";
-import { Color } from "@hongpung/ColorSet";
+import { Color } from "@hongpung/src/common";
 import { Icons } from "@hongpung/src/common";
 import { BlurView } from "expo-blur";
 import { View, Pressable, Text, Dimensions, StyleSheet } from "react-native";

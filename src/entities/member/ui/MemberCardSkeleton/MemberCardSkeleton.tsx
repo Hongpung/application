@@ -1,19 +1,52 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-
-import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import { Skeleton } from "moti/skeleton";
+import { Color } from "@hongpung/src/common";
 
 const MemberCardSkeleton: React.FC = () => {
   return (
-    <SkeletonPlaceholder>
+    <Skeleton.Group show>
       <View style={styles.container}>
-        <View style={styles.profilePhoto} />
+        {/* 프로필 사진 */}
+        <Skeleton
+          transition={{
+            type: "spring",
+            duration: 400,
+            delay: 100,
+          }}
+          width={60}
+          height={80}
+          radius={5}
+          colors={[Color["grey100"], Color["grey300"]]}
+        />
+
+        {/* 텍스트 부분 */}
         <View style={styles.textContainer}>
-          <View style={styles.namePlaceholder} />
-          <View style={styles.nicknamePlaceholder} />
+          <Skeleton
+            transition={{
+              type: "spring",
+              duration: 400,
+              delay: 100,
+            }}
+            width="40%"
+            height={16}
+            radius={4}
+            colors={[Color["grey100"], Color["grey300"]]}
+          />
+          <Skeleton
+            transition={{
+              type: "spring",
+              duration: 400,
+              delay: 100,
+            }}  
+            width="60%"
+            height={14}
+            radius={4}
+            colors={[Color["grey100"], Color["grey300"]]}
+          />
         </View>
       </View>
-    </SkeletonPlaceholder>
+    </Skeleton.Group>
   );
 };
 
@@ -25,30 +58,24 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginVertical: 8,
     marginHorizontal: 24,
+    borderWidth: 1,
+    borderColor: Color["grey100"],
     backgroundColor: "#FFF",
+    gap: 24,
     padding: 16,
   },
   profilePhoto: {
-    width: 60,
-    height: 80,
-    borderRadius: 5,
     marginRight: 24,
   },
   textContainer: {
     flex: 1,
     justifyContent: "center",
+    gap: 12,
   },
   namePlaceholder: {
-    width: "50%",
-    height: 16,
-    borderRadius: 4,
     marginBottom: 8,
   },
-  nicknamePlaceholder: {
-    width: "30%",
-    height: 14,
-    borderRadius: 4,
-  },
+  nicknamePlaceholder: {},
 });
 
 export default MemberCardSkeleton;

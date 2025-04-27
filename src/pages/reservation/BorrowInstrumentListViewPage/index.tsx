@@ -4,12 +4,13 @@ import { type Instrument } from "@hongpung/src/entities/instrument";
 import { Header } from "@hongpung/src/common";
 import BorrowInstrumentList from "@hongpung/src/widgets/instrument/ui/BorrowInstrumentList/BorrowInstrumentList";
 import { StackActions } from "@react-navigation/native";
+import { MainStackScreenProps } from "@hongpung/src/navigation/MainStackNavigation";
 
 const ReservationInstrumentsViewScreen: React.FC<
-  ReservationStackProps<"ReservationInstrumentsView">
+  MainStackScreenProps<"BorrowInstrumentList">
 > = ({ navigation, route }) => {
-  const { instruments } = route.params;
-  const instrumentList: Instrument[] = JSON.parse(instruments);
+  const { borrowInstruments } = route.params;
+  const instrumentList: Instrument[] = JSON.parse(borrowInstruments);
 
   const handleInstrumentClick = (instrument: Instrument) => {
     // Handle instrument click

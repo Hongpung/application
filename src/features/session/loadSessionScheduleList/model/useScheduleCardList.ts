@@ -6,7 +6,7 @@ import { FlatList } from "react-native";
 
 const useScheduleCardList = (sessionList: Session[] | null) => {
 
-    const [isOnAir, setOnAir] = useState(false);
+    const [isOnAir, setOnAir] = useState<'PREPARING' | 'ON_AIR' | 'CLOSED' | 'AVAILABLE'>('AVAILABLE');
     const [isParticipatible, setParticipatible] = useState(false);
     const [scheduleCardList, setScheduleCardList] = useState<ScheduleCard[]>([])
     const [slideToIndex, setSlideToIndex] = useState<number | null>(null)
@@ -22,16 +22,20 @@ const useScheduleCardList = (sessionList: Session[] | null) => {
         const slideTo: { index: number | null } = { index: null }
         const fetchReservationCards: ScheduleCard[] = []
 
-        setOnAir(false) // onAir 상태 초기화
+        const sortedSessionList = sessionList.sort((a, b) => (a.startTime.localeCompare(b.startTime)));
+        
+        setOnAir('AVAILABLE') // onAir 상태 초기화
 
-        sessionList.forEach((session, index) => {
+        sortedSessionList.forEach((session, index) => {
             if (session.sessionType === 'RESERVED') {
-                handleReservedSession(session, index, sessionList, fetchReservationCards, slideTo, koreaTime);
+                handleReservedSession(session, index, sortedSessionList, fetchReservationCards, slideTo, koreaTime);
             } else if (session.sessionType === 'REALTIME') {
-                handleRealtimeSession(session, index, sessionList, fetchReservationCards, slideTo, koreaTime);
+                handleRealtimeSession(session, index, sortedSessionList, fetchReservationCards, slideTo, koreaTime);
             }
         });
-
+        if (!isOpen) {
+            setOnAir('CLOSED');
+        }
         // 슬라이드 인덱스 설정
         if (!slideTo.index && fetchReservationCards.length > 1) {
             slideTo.index = fetchReservationCards.length - 1;
@@ -60,20 +64,22 @@ const useScheduleCardList = (sessionList: Session[] | null) => {
     ) {
         if (session.status === 'AFTER' || session.status === 'DISCARDED') {
             fetchReservationCards.push({ type: 'session', session });
-            if (!sessionList[index + 1] && isOpen() && koreaTime <= timeToDate('22:00:00')) {
+            if (!sessionList[index + 1] && isOpen) {
                 slideTo.index = index + 1;
                 fetchReservationCards.push({ type: 'empty', nextReservationTime: '없음' });
             }
         } else if (session.status === 'ONAIR') {
             slideTo.index = index;
-            setOnAir(true);
+            setOnAir('ON_AIR');
             setParticipatible(session.participationAvailable);
             fetchReservationCards.push({ type: 'session', session });
         } else if (session.status === 'BEFORE') {
-            if (!slideTo.index) {
+            if (slideTo.index === null) {
                 slideTo.index = index;
-                if (isSessionStartInTime(session, koreaTime)) {
+                if (isSessionStartInTime(session, koreaTime) && isOpen) {
                     fetchReservationCards.push({ type: 'empty', nextReservationTime: session.startTime });
+                } else if (isOpen) {
+                    setOnAir('PREPARING');
                 }
             }
             fetchReservationCards.push({ type: 'session', session });
@@ -91,9 +97,9 @@ const useScheduleCardList = (sessionList: Session[] | null) => {
     ) {
         fetchReservationCards.push({ type: 'session', session });
         if (session.status === 'ONAIR') {
-            setOnAir(true);
+            setOnAir('ON_AIR');
             setParticipatible(session.participationAvailable);
-        } else if (!sessionList[index + 1] && isOpen() && koreaTime <= timeToDate('22:00:00')) {
+        } else if (!sessionList[index + 1] && isOpen && koreaTime <= timeToDate('22:00:00')) {
             slideTo.index = index + 1;
             fetchReservationCards.push({ type: 'empty', nextReservationTime: '없음' });
         }

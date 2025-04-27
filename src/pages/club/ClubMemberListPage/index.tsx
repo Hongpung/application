@@ -17,16 +17,14 @@ const ClubMemberListPage: React.FC<ClubStackProps<"ClubMembers">> = ({
   return (
     <View style={styles.container}>
       <Header leftButton={"close"} headerName="동아리원 목록" />
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <MemberList members={members} isLoading={isLoading} />
-      </ScrollView>
+      <MemberList members={members} isLoading={isLoading} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     backgroundColor: "#fff",
   },
   scrollContainer: {

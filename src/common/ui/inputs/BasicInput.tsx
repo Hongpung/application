@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle, Ref } from 'react';
 import { View, Text, StyleSheet, TextInput, Animated, Pressable, KeyboardTypeOptions, Dimensions } from 'react-native';
-import { Color } from '@hongpung/ColorSet';
+import { Color } from '@hongpung/src/common';
 import { josa } from 'es-hangul';
 import { Icons, ValidationState } from '@hongpung/src/common';
 

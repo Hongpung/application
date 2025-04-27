@@ -2,7 +2,7 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React, { ComponentProps } from 'react'
 import { useNavigation } from "@react-navigation/native";
-import { Color } from '@hongpung/ColorSet';
+import { Color } from '@hongpung/src/common';
 import { Ionicons } from '@expo/vector-icons';
 import { Icons } from '@hongpung/src/common';
 

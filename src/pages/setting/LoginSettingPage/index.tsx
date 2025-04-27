@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { Color } from "@hongpung/ColorSet";
+import { Color } from "@hongpung/src/common";
 import { Header, Switch } from "@hongpung/src/common";
 import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
 import { LogoutButton } from "@hongpung/src/features/auth/logout/ui/LogoutButton";

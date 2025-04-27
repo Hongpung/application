@@ -32,7 +32,7 @@ const BottomTab = () => {
             },
             headerShown: false,
             tabBarIconStyle: { width: 36, height: 36, marginTop: 8, marginBottom: 2 },
-            tabBarLabelStyle: { fontFamily: 'NanumSquareNeo-Bold', fontSize: 12 }
+            tabBarLabelStyle: { fontFamily: 'NanumSquareNeo-Bold', fontSize: 12 },
         }}>
 
             <Tab.Screen name="Home"

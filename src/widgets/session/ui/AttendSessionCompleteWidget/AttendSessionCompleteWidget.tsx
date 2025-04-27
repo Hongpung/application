@@ -1,4 +1,4 @@
-import { Color } from "@hongpung/ColorSet";
+import { Color } from "@hongpung/src/common";
 import { CheckInAttendStatus } from "@hongpung/src/features/session/checkInRoom/model/type";
 import LottieView from "lottie-react-native";
 import { View, Text, StyleSheet } from "react-native";

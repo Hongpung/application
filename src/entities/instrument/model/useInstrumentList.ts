@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Instrument } from "./type";
 
-const useInstrumentList = ({ instrumentList }: { instrumentList: Instrument[] }) => {
+const useInstrumentList = ({ instrumentList }: { instrumentList: Instrument[]|null }) => {
 
     const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
 
@@ -21,6 +21,8 @@ const useInstrumentList = ({ instrumentList }: { instrumentList: Instrument[] })
             "소고": [],
             "기타": []
         };
+
+        if (!instrumentList) return instrumentMappedByType;
 
         instrumentList.forEach(instrument => {
 

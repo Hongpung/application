@@ -26,13 +26,14 @@ export const ClubProfileSection: React.FC<ClubProfileProps> = ({
   roleData,
   isLoading,
 }) => {
-  if (isLoading) {
+  if (isLoading && roleData === null) {
     return (
       <SkeletonPlaceholder>
-        <View style={styles.container}>
+        <View>
           <View style={styles.profileImageContainer}>
             <View style={styles.profileImage} />
           </View>
+
           <View style={styles.infoContainer}>
             <View style={styles.info}>
               <View style={styles.skeletonLabel} />
@@ -74,7 +75,7 @@ export const ClubProfileSection: React.FC<ClubProfileProps> = ({
         <View style={styles.info}>
           <Text style={styles.infoLabel}>패짱</Text>
           <Text style={styles.infoValue}>
-            {roleData[0].member
+            {roleData && roleData.length > 0 && roleData[0].member
               ? `${roleData[0].member.name}${
                   roleData[0].member.nickname
                     ? ` (${roleData[0].member.nickname})`
@@ -87,7 +88,7 @@ export const ClubProfileSection: React.FC<ClubProfileProps> = ({
         <View style={styles.info}>
           <Text style={styles.infoLabel}>상쇠</Text>
           <Text style={styles.infoValue}>
-            {roleData[1].member
+            {roleData && roleData.length > 1 && roleData[1].member
               ? `${roleData[1].member.name}${
                   roleData[1].member.nickname
                     ? ` (${roleData[1].member.nickname})`
