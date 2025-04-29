@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { View, Text } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { ReservationStackScreenProps } from "@hongpung/src/navigation/ReservationNavigation";
+import { View } from "react-native";
+import { ReservationStackScreenProps } from "@hongpung/src/common/navigation";
 import { WeekCalendarHeader } from "@hongpung/src/common/ui/WeekCalendarHeader/WeekCalendarHeader";
 
 import { useLoadDailyReservationsFetch } from "@hongpung/src/entities/reservation";
@@ -43,8 +42,11 @@ const DailyReservationListPage: React.FC<
             reservation={reservation}
             onPress={() => {
               //예약 화면으로 이동
-              navigation.push("ReservationDetail", {
-                reservationId: reservation.reservationId,
+              navigation.push("Reservation", {
+                screen: "ReservationDetail",
+                params: {
+                  reservationId: reservation.reservationId,
+                },
               });
             }}
           />

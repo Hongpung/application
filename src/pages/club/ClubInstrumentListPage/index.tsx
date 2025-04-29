@@ -4,7 +4,7 @@ import { type Instrument } from "@hongpung/src/entities/instrument";
 import { Header } from "@hongpung/src/common";
 import InstrumentViewList from "@hongpung/src/widgets/instrument/ui/InstrumentViewList/InstrumentViewList";
 import { useLoadClubInstrumentsFetch } from "@hongpung/src/features/club/manageInstrument/api/useLoadClubInstruments";
-import { ClubStackProps } from "@hongpung/src/navigation/ClubStackNavigation";
+import { ClubStackProps } from "@hongpung/src/common/navigation";
 
 const ClubInstrumentListPage: React.FC<ClubStackProps<"ClubInstruments">> = ({
   navigation,
@@ -16,7 +16,9 @@ const ClubInstrumentListPage: React.FC<ClubStackProps<"ClubInstruments">> = ({
   } = useLoadClubInstrumentsFetch();
 
   const handleInstrumentClick = (instrument: Instrument) => {
-    navigation.push("ClubInstruments");
+    navigation.push("InstrumentDetail", {
+      instrumentId: instrument.instrumentId,
+    });
   };
 
   return (

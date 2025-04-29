@@ -18,6 +18,7 @@ import { MainTabNavigation } from "./MainTabNavigation";
 import { ClubStackNavigation as ClubStack } from "./ClubStackNavigation";
 import { ReservationStackNavigation as ReservationStack } from "./ReservationNavigation";
 import { SessionManagementStackNavigation as SessionManagementStack } from "./SessionManagementStackNavigation";
+import InstrumentDetailPage from "../pages/instrument/InstrumentDetailPage";
 
 const MainStack = createNativeStackNavigator<MainStackParamList>();
 
@@ -74,6 +75,11 @@ export const MainStackNavigation = () => {
       />
 
       <MainStack.Screen name="WebView" component={WebViewPage} />
+
+      <MainStack.Screen
+        name="InstrumentDetail"
+        component={InstrumentDetailPage}
+      />
     </MainStack.Navigator>
   );
 };

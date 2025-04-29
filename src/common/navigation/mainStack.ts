@@ -24,6 +24,7 @@ export type MainStackParamList = {
 
   ChangePassword: undefined;
 
+  InstrumentDetail: { instrumentId: number };
   BorrowInstrumentList: { borrowInstruments: string };
   ParticipatorList: { participators: string };
 };
