@@ -1,41 +1,18 @@
-import { ErrorModal, LongButton, ValidationState } from "@hongpung/src/common";
+import { ErrorModal, LongButton } from "@hongpung/src/common";
 import { BasicInput } from "@hongpung/src/common/ui/inputs/BasicInput";
 import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
-import { View, TextInput, StyleSheet, Pressable, Text } from "react-native";
-
-interface EmailValidateFormProps {
-  emailRef: React.RefObject<TextInput>;
-  verificationCodeRef: React.RefObject<TextInput>;
-
-  email: string;
-  setEmail: (email: string) => void;
-  emailValidation: ValidationState;
-  validateEmail: (email: string) => void;
-
-  //이메일 인증 코드 발송
-  isSendingCode: boolean;
-  isSendingCodeError: boolean;
-
-  sendVerificationCode: () => void;
-  isSendingCodeLoading: boolean;
-
-  verificationCode: string;
-  verificationCodeValidation: ValidationState;
-  setVerificationCode: (code: string) => void;
-  validateVerificationCode: (code: string) => void;
-
-  verifyCode: () => void;
-  isVerifyingCodeLoading: boolean;
-  isVerifyingCodeError: boolean;
-  isVerifyingCodeSuccess: boolean;
-
-  isVerifyingCode: boolean;
-}
+import { View, StyleSheet, Pressable, Text } from "react-native";
+import { EmailValidateFormProps } from "../../model/type";
 
 const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
   //이메일
-  const { email, setEmail, emailValidation, validateEmail: valitateEmail, emailRef: emailInputRef } =
-    props;
+  const {
+    email,
+    setEmail,
+    emailValidation,
+    validateEmail: valitateEmail,
+    emailRef: emailInputRef,
+  } = props;
 
   //이메일 인증 코드 발송
   const {
@@ -62,12 +39,11 @@ const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
 
   return (
     <View style={styles.container}>
-        
       <FullScreenLoadingModal
         isLoading={isVerifyingCodeLoading || isSendingCodeLoading}
       />
       <ErrorModal
-        visible={isSendingCodeError}
+        visible={isSendingCodeError !== null}
         title={"오류"}
         message={
           "이메일 인증번호 전송에 실패했어요.\n인터넷 확인 후 다시 시도해주세요."
@@ -75,7 +51,7 @@ const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
       />
 
       <ErrorModal
-        visible={isVerifyingCodeError}
+        visible={isVerifyingCodeError !== null}
         title={"오류"}
         message={
           "인증번호 검증에 실패했어요.\n인터넷 확인 후 다시 시도해주세요."
@@ -103,21 +79,12 @@ const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
             </Text>
           </Pressable>
         </View>
-        <BasicInput
-          ref={emailInputRef}
-          label="이메일"
-          inputValue={email}
-          setInputValue={setEmail}
-          validationCondition={emailValidation}
-          onBlur={() => {
-            valitateEmail(email);
-          }}
-        />
-
         {isSendingCode && (
           <BasicInput
             ref={verificationCodeInputRef}
             label="인증 코드"
+            keyboardType="number-pad"
+            color="green"
             inputValue={verificationCode}
             setInputValue={setVerificationCode}
             validationCondition={verificationCodeValidation}
@@ -128,11 +95,14 @@ const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
         )}
       </View>
 
-      <LongButton
-        innerContent="이메일 인증"
-        color="green"
-        onPress={verifyCode}
-      />
+      <View style={styles.buttonContainer}>
+        <LongButton
+          innerContent="이메일 인증"
+          color="green"
+          onPress={verifyCode}
+          isAble={verificationCodeValidation.state === "VALID"}
+        />
+      </View>
     </View>
   );
 };
@@ -146,7 +116,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 12,
     width: "100%",
-    paddingHorizontal: 48,
     position: "relative",
   },
   button: {
@@ -169,10 +138,20 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    display: "flex",
+    flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
   },
   inputContainer: {
     gap: 24,
+    flexDirection: "column",
+    width: "100%",
+    flexGrow: 1,
+    paddingHorizontal: 48,
+  },
+  buttonContainer: {
+    width: "100%",
+    paddingHorizontal: 12,
   },
 });

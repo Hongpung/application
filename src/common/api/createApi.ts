@@ -117,6 +117,9 @@ const buildApi = async <T>({
         throw new Error("Forbidden");
       }
     }
+    if(!response.ok){
+      throw new Error("Errored");
+    }
     const data = await response.json();
 
     console.log("data", data);
@@ -158,7 +161,7 @@ const useRequest = <T, P>() => {
       return transformResponse ? transformResponse(result) : result;
     } catch (err) {
       setError(err as Error);
-      if (err instanceof Error && err.message === "Unauthorized") {
+      if (err instanceof Error && err.message === "Unauthorized" && requestParams.withAuthorize) {
         navigation.setOptions({ animation: "none" });
         navigation.dispatch(StackActions.replace("LoginStack"));
       }
@@ -209,7 +212,7 @@ const useRequestWithRecoil = <T, P>({
       } catch (err) {
         setError(err as Error);
         setData(null); // 요청 실패 시 데이터 초기화
-        if (err instanceof Error && err.message === "Unauthorized") {
+        if (err instanceof Error && err.message === "Unauthorized"&& requestParams.withAuthorize) {
           navigation.setOptions({ animation: "none" });
           navigation.dispatch(StackActions.replace("LoginStack"));
         }
@@ -225,52 +228,55 @@ const useRequestWithRecoil = <T, P>({
   return { isLoading, error, request };
 };
 
-// useFetch 커스텀 훅 (useEffect를 통한 데이터 로딩 처리)
+
 const useFetch = <T>({
   url,
   params,
   transformResponse,
   options,
+  withAuthorize = true,
 }: FetchParams<T>) => {
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const navigation = useNavigation();
-  useEffect(() => {
-    const fetchDataAsync = async () => {
-      const controller = new AbortController();
-      const signal = controller.signal;
-      const timeoutId = setTimeout(
-        () => controller.abort(),
-        options?.timeout ? options.timeout : 5000
-      );
 
-      try {
-        setLoading(true);
-        const result = await buildApi<T>({
-          url,
-          params,
-          method: "GET",
-          options: { ...options, signal },
-        });
-        setData(transformResponse ? transformResponse(result) : result);
-      } catch (err) {
-        setError(err as Error);
-        if (err instanceof Error && err.message === "Unauthorized") {
-          navigation.setOptions({ animation: "none" });
-          navigation.dispatch(StackActions.replace("LoginStack"));
-        }
-        throw err;
-      } finally {
-        setLoading(false);
-        clearTimeout(timeoutId);
+  const fetchData = useCallback(async () => {
+    const controller = new AbortController();
+    const signal = controller.signal;
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      options?.timeout ? options.timeout : 5000
+    );
+
+    try {
+      setLoading(true);
+      const result = await buildApi<T>({
+        url,
+        params,
+        method: "GET",
+        options: { ...options, signal },
+      });
+      setData(transformResponse ? transformResponse(result) : result);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+      if (err instanceof Error && err.message === "Unauthorized" && withAuthorize) {
+        navigation.setOptions({ animation: "none" });
+        navigation.dispatch(StackActions.replace("LoginStack"));
       }
-    };
+      throw err;
+    } finally {
+      setLoading(false);
+      clearTimeout(timeoutId);
+    }
+  }, [url, JSON.stringify(params), transformResponse]);
 
-    fetchDataAsync();
-  }, [url, JSON.stringify(params), transformResponse]); // url과 params가 변경되면 다시 실행
+  useEffect(() => {
+    fetchData(); // 최초 mount 시 실행
+  }, [fetchData]);
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, refetch: fetchData };
 };
 
 // useFetch 커스텀 훅 (useEffect를 통한 데이터 로딩 처리)
@@ -280,14 +286,15 @@ const useFetchWithRecoil = <T>({
   transformResponse,
   options,
   recoilState,
+  withAuthorize = true,
 }: FetchParams<T> & { recoilState: RecoilState<T | null> }) => {
   const [data, setData] = useRecoilState<T | null>(recoilState);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const navigation = useNavigation();
-  useEffect(() => {
-    const fetchDataAsync = async () => {
-      const controller = new AbortController();
+
+  const fetchData = useCallback(async () => {
+    const controller = new AbortController();
       const signal = controller.signal;
       const timeoutId = setTimeout(
         () => controller.abort(),
@@ -304,7 +311,7 @@ const useFetchWithRecoil = <T>({
         setData(transformResponse ? transformResponse(result) : result);
       } catch (err) {
         setError(err as Error);
-        if (err instanceof Error && err.message === "Unauthorized") {
+        if (err instanceof Error && err.message === "Unauthorized" && withAuthorize) {
           navigation.setOptions({ animation: "none" });
           navigation.dispatch(StackActions.replace("LoginStack"));
         }
@@ -313,21 +320,18 @@ const useFetchWithRecoil = <T>({
         setLoading(false);
         clearTimeout(timeoutId);
       }
-    };
+  }, [url, JSON.stringify(params), transformResponse]);
 
-    fetchDataAsync();
-  }, [url, params, transformResponse]); // url과 params가 변경되면 다시 실행
+  useEffect(() => {
+    fetchData()
+  }, [fetchData]); // url과 params가 변경되면 다시 실행
 
-  return { data, isLoading, error };
+  return { data, isLoading, error, refetch:fetchData };
 };
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 /** 메인 타입, 커플 타입 순 */
-type ValidateGeneric<R, P> = IsAny<P> extends true
-  ? never
-  : IsAny<R> extends true
-  ? never
-  : R;
+
 type Validate<T> = IsAny<T> extends true ? never : T;
 
 type RequestReturn<Response, Params> = {

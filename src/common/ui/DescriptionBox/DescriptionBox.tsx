@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, ViewStyle, StyleProp } from "react-native";
-import { Color } from "../..";
+import { Color } from "../../constant/color";
 
 interface DescriptionBoxProps {
   descriptions: string[];
@@ -35,5 +35,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "NanumSquareNeo-Light",
     color: Color["grey500"],
+    lineHeight: 20,
   },
 });

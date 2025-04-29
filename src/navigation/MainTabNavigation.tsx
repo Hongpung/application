@@ -1,40 +1,12 @@
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+import { MainTabParamList } from "@hongpung/src/common/navigation";
+import { Color, Icons } from "@hongpung/src/common";
+
 import HomeScreen from "@hongpung/src/pages/home/HomePage";
-import {
-  BottomTabNavigationProp,
-  createBottomTabNavigator,
-} from "@react-navigation/bottom-tabs";
-import { MainStackParamList } from "./MainStackNavigation";
 import MyPageScreen from "@hongpung/src/pages/member/MyPagePage";
 import QRCodeScreen from "@hongpung/src/pages/session/QRScanPage";
 import ReservationScreen from "@hongpung/src/pages/reservation/ReservationMainPage";
-import { Color, Icons } from "../common";
-import { RouteProp } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { BlurView } from "expo-blur";
-import { StyleSheet } from "react-native";
-
-export type MainTabParamList = {
-  Home: undefined;
-  QRCode: undefined;
-  Reservation: undefined;
-  MyPage: undefined;
-};
-
-type MainTabStackNavigation = NativeStackNavigationProp<
-  MainStackParamList,
-  "MainTab"
->;
-type MainTabNavigation<T extends keyof MainTabParamList> =
-  BottomTabNavigationProp<MainTabParamList, T>;
-type MainTabRouteProps<T extends keyof MainTabParamList> = RouteProp<
-  MainTabParamList,
-  T
->;
-
-export type MainTabScreenProps<T extends keyof MainTabParamList> = {
-  navigation: MainTabNavigation<T> & MainTabStackNavigation;
-  route: MainTabRouteProps<T>;
-};
 
 const MainTab = createBottomTabNavigator<MainTabParamList>();
 

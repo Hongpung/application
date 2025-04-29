@@ -1,21 +1,21 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
-  useIsDuplicatedEmailRequest,
-  useSendVerificationCodeRequest,
+  useIsRegisteredEmailRequest,
+  useSendSignUpVerificationCodeRequest as useSendVerificationCodeRequest,
   useSignUpRequest,
-} from "../api/signUpApi";
+  useVerifySignUpVerificationCodeRequest as useVerifyCodeRequest,
+} from "@hongpung/src/entities/auth";
 import { ValidationState } from "@hongpung/src/common";
 import { signUpSchema, type SignUpFormData } from "./signUpSchema";
 import * as z from "zod";
-import { TextInput } from "react-native";
+import { Alert, BackHandler, TextInput } from "react-native";
 import { clubNames } from "@hongpung/src/entities/club";
-
-type SignUpSteps = "EmailConfirm" | "Password" | "PersonalInfo";
+import { SignUpStep } from "./type";
 
 const useSignUpSteps = () => {
   const navigation = useNavigation();
-  const [step, setStep] = useState<SignUpSteps>("EmailConfirm");
+  const [step, setStep] = useState<SignUpStep>("EmailConfirm");
   const [isSendingCode, setIsSendingCode] = useState(false);
 
   const emailRef = useRef<TextInput>(null);
@@ -25,19 +25,55 @@ const useSignUpSteps = () => {
   const nicknameRef = useRef<TextInput>(null);
   const enrollmentNumberRef = useRef<TextInput>(null);
   const verificationCodeRef = useRef<TextInput>(null);
+  const [verificationCode, setVerificationCode] = useState("");
 
   const [formData, setFormData] = useState<SignUpFormData>({
     email: "",
     password: "",
     confirmPassword: "",
     name: "",
-    club: "",
-    enrollmentNumber: 0,
+    club: null,
+    enrollmentNumber: "",
     nickname: "",
   });
 
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        // 뒤로가기 막기
+        Alert.alert(
+          "확인",
+          "회원가입을 취소하시겠습니까?",
+          [
+            { text: "닫기" },
+            {
+              text: "취소",
+              style: "destructive",
+              onPress: () => {
+                navigation.goBack();
+              },
+            },
+          ],
+          { cancelable: true }
+        );
+        return true; // true를 리턴하면 뒤로가기가 막힘
+      }
+    );
+
+    return () => {
+      // 컴포넌트 unmount 시 이벤트 제거
+      backHandler.remove();
+    };
+  }, []);
+
+  const [verificationCodeValidation, setVerificationCodeValidation] =
+    useState<ValidationState>({
+      state: "BEFORE",
+    });
+
   const [formValidation, setFormValidation] = useState<{
-    [key in keyof SignUpFormData]: ValidationState;
+    [key in keyof Required<SignUpFormData>]: ValidationState;
   }>({
     email: { state: "BEFORE" },
     password: { state: "BEFORE" },
@@ -48,10 +84,23 @@ const useSignUpSteps = () => {
     enrollmentNumber: { state: "BEFORE" },
   });
   const [isClubOptionsVisible, setIsClubOptionsVisible] = useState(false);
-  const { request: signUp, isLoading } = useSignUpRequest();
-  const { request: sendVerificationCode, isLoading: isSendingCodeLoading } = useSendVerificationCodeRequest();
+  const {
+    request: signUp,
+    isLoading: isSignUpLoading,
+    error: isSignUpError,
+  } = useSignUpRequest();
+  const {
+    request: sendVerificationCode,
+    isLoading: isSendingCodeLoading,
+    error: isSendingCodeError,
+  } = useSendVerificationCodeRequest();
   const { request: isDuplicatedEmail, isLoading: isDuplicatedEmailLoading } =
-    useIsDuplicatedEmailRequest();
+    useIsRegisteredEmailRequest();
+  const {
+    request: requestVerifyingCode,
+    isLoading: isVerifyingCodeLoading,
+    error: isVerifyingCodeError,
+  } = useVerifyCodeRequest();
 
   const nextStep = () => {
     setStep((prev) => {
@@ -70,9 +119,21 @@ const useSignUpSteps = () => {
   };
 
   const onClose = () => {
-    if (confirm("회원가입을 취소하시겠습니까?")) {
-      navigation.goBack();
-    }
+    Alert.alert(
+      "확인",
+      "회원가입을 취소하시겠습니까?",
+      [
+        { text: "닫기" },
+        {
+          text: "취소",
+          style: "destructive",
+          onPress: () => {
+            navigation.goBack();
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   const validations = useMemo(
@@ -80,10 +141,10 @@ const useSignUpSteps = () => {
       emailValidation: formValidation.email,
       passwordValidation: formValidation.password,
       confirmPasswordValidation: formValidation.confirmPassword,
-      clubIdValidation: formValidation.club,
+      clubValidation: formValidation.club,
       nameValidation: formValidation.name,
       nicknameValidation: formValidation.nickname,
-      enrollmemnNumberValidation: formValidation.enrollmentNumber,
+      enrollmentNumberValidation: formValidation.enrollmentNumber,
     }),
     [formValidation]
   );
@@ -139,7 +200,7 @@ const useSignUpSteps = () => {
         }));
         setFormData((prev) => ({
           ...prev,
-          enrollmentNumber: Number(enrollmentNumber),
+          enrollmentNumber,
         }));
       },
     }),
@@ -151,8 +212,8 @@ const useSignUpSteps = () => {
       validateEmail: async (email: string) => {
         try {
           await signUpSchema.innerType().shape.email.parseAsync(email);
-          const response = await isDuplicatedEmail({ email });
-          if (response.isRegistered) {
+          const { isRegistered } = await isDuplicatedEmail({ email });
+          if (isRegistered === true) {
             setFormValidation((prev) => ({
               ...prev,
               email: {
@@ -359,10 +420,86 @@ const useSignUpSteps = () => {
         if (error instanceof z.ZodError) {
           // 전체 폼 검증 실패 시 에러 처리
           console.error("폼 검증 실패:", error.errors);
+        } else if (error instanceof Error) {
+          Alert.alert("회원가입 실패", error.message, [{ text: "확인" }]);
+        } else {
+          Alert.alert("회원가입 실패:", "알 수 없는 오류가 발생했어요.");
         }
       }
     } else {
       nextStep();
+    }
+  };
+
+  const validateVerificationCode = async (code: string) => {
+    if (code.length !== 6) {
+      setVerificationCodeValidation({
+        state: "ERROR",
+        errorText: "6자리 숫자를 입력해주세요.",
+      });
+      return;
+    }
+  };
+
+  const onPressSendVerificationCode = async () => {
+    if (formData.email) {
+      await validateForm.validateEmail(formData.email);
+      if (formValidation.email.state === "ERROR") {
+        return;
+      }
+      try {
+        await sendVerificationCode({
+          email: formData.email,
+        });
+        setIsSendingCode(true);
+      } catch {
+        setIsSendingCode(false);
+      }
+      setIsSendingCode(true);
+    } else {
+      setVerificationCodeValidation({
+        state: "ERROR",
+        errorText: "이메일을 입력해주세요.",
+      });
+    }
+  };
+
+  const verifyCode = async () => {
+    if (verificationCode.length !== 6) {
+      setVerificationCodeValidation({
+        state: "ERROR",
+        errorText: "6자리 숫자를 입력해주세요.",
+      });
+      return;
+    }
+    if (formData.email) {
+      console.log("verificationCode", verificationCode);
+      try {
+        await requestVerifyingCode({
+          code: verificationCode,
+          email: formData.email,
+        });
+        setStep("Password");
+      } catch (error) {
+        console.error("인증 코드 검증 실패:", error);
+      }
+    } else {
+      setVerificationCodeValidation({
+        state: "ERROR",
+        errorText: "이메일을 입력해주세요.",
+      });
+    }
+  };
+
+  const dissmissClubOptions = () => {
+    setIsClubOptionsVisible(false);
+    validateForm.validateClub(formData.club || undefined);
+  };
+
+  const onSignUp = async () => {
+    await onSubmit();
+    if (isCanNextStep) {
+      await onSubmit();
     }
   };
 
@@ -381,15 +518,27 @@ const useSignUpSteps = () => {
     verificationCodeRef,
     isClubOptionsVisible,
     setIsClubOptionsVisible,
+    sendVerificationCode: onPressSendVerificationCode,
+    verificationCode,
+    setVerificationCode,
+    validateVerificationCode,
+    verificationCodeValidation,
+    isSendingCodeLoading,
+    isSendingCodeError,
+    verifyCode,
+    isVerifyingCodeLoading,
+    isVerifyingCodeError,
     isSendingCode,
+    dissmissClubOptions,
     ...setForm,
     ...formData,
     ...validateForm,
     ...validations,
-    isSendingCodeLoading,
     isCanNextStep,
-    isLoading,
+    isSignUpLoading,
+    isSignUpError,
     isDuplicatedEmailLoading,
+    signUp: onSignUp,
   };
 };
 

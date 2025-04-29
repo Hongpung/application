@@ -1,15 +1,8 @@
 import { View, Text, Pressable } from "react-native"
 import { Icons } from "@hongpung/src/common"
-import { Color } from "@hongpung/ColorSet"
-import { useNavigation } from "@react-navigation/native"
-import { MainStackParamList } from "@hongpung/nav/HomeStacks"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-
-type BannerNavParams = NativeStackNavigationProp<MainStackParamList, 'Home'>
+import { Color } from "@hongpung/src/common"
 
 const BannerIndicator: React.FC<{ bannerIndex: number, bannerLength: number, onPress: () => void }> = ({ bannerIndex, bannerLength, onPress }) => {
-
-    const navigation = useNavigation<BannerNavParams>()
 
     return (
         <View style={{ position: 'absolute', backgroundColor: Color['grey600'], bottom: 8, right: 8, borderRadius: 50, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 2, height: 20, justifyContent: 'center' }}>

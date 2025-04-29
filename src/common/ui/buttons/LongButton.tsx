@@ -1,6 +1,6 @@
 import { StyleSheet, Text, Pressable } from "react-native";
 import React from "react";
-import { Color } from "../..";
+import { Color } from "../../constant/color";
 
 type LongButtonProps = {
   innerContent: string | React.ReactNode;

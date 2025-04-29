@@ -1,5 +1,5 @@
 import { View, Pressable, Text } from "react-native";
-import { Color } from "../../config/color.config";
+import { Color } from "../../constant/color";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 interface MainFooterProps {
@@ -7,7 +7,7 @@ interface MainFooterProps {
   navigateToPrivacyPolicy: () => void;
 }
 
-const MainFooter: React.FC<MainFooterProps> = ({
+export const MainFooter: React.FC<MainFooterProps> = ({
   navigateToServiceTerms,
   navigateToPrivacyPolicy,
 }) => {
@@ -96,5 +96,3 @@ const MainFooter: React.FC<MainFooterProps> = ({
     </View>
   );
 };
-
-export default MainFooter;

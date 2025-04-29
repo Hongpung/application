@@ -8,7 +8,7 @@ import { Header } from "./Header";
 import { TimeInfo } from "./TimeInfo";
 import { ExtendButton } from "./ExtendButton";
 import { useEffect, useRef } from "react";
-
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 interface SessionManageBottomSheetProps {
   toggleBottomSheet: () => void;
   isSlideUp: boolean;
@@ -19,15 +19,16 @@ export const SessionManageBottomSheet: React.FC<
   SessionManageBottomSheetProps
 > = ({ toggleBottomSheet, isSlideUp, navigateToUsingManage }) => {
   useUsingRoomSocket();
+  const BottomSheetHeight = useBottomTabBarHeight();
 
-  // const usingSession = useRecoilValue(ThisSessionState);
+  const usingSession = useRecoilValue(ThisSessionState);
   const { remainingHour, remainingMinute } = useCalculateTime();
 
   const bottomAnim = useRef(new Animated.Value(0)).current;
 
   const moveUp = () => {
     Animated.timing(bottomAnim, {
-      toValue: 0, // 이동하고자 하는 bottom 값
+      toValue: -50+BottomSheetHeight, // 이동하고자 하는 bottom 값
       duration: 300, // 애니메이션 시간 (ms)
       useNativeDriver: false, // layout 관련 속성은 false
     }).start();
@@ -35,7 +36,7 @@ export const SessionManageBottomSheet: React.FC<
 
   const moveDown = () => {
     Animated.timing(bottomAnim, {
-      toValue: -90,
+      toValue: -140+BottomSheetHeight,
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -48,15 +49,15 @@ export const SessionManageBottomSheet: React.FC<
       moveDown();
     }
   }, [isSlideUp]);
-  // if (!usingSession)
-  //   return (
-  //     <ErrorModal
-  //       visible={true}
-  //       title={"세션 종료"}
-  //       message={"세션이 존재하지 않아요."}
-  //       onConfirm={() => {}}
-  //     />
-  //   );
+  if (!usingSession)
+    return (
+      <ErrorModal
+        visible={true}
+        title={"세션 종료"}
+        message={"세션이 존재하지 않아요."}
+        onConfirm={() => {}}
+      />
+    );
 
   return (
     <Animated.View
@@ -94,6 +95,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
     overflow: "hidden",
+    paddingBottom: 50,
   },
   infoContainer: {
     flexDirection: "row",

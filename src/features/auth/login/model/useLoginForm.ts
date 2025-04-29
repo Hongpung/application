@@ -6,7 +6,7 @@ import { TextInput } from "react-native-gesture-handler";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import { debounce } from "lodash";
-import { useLoginRequest } from "@hongpung/src/features/auth/login/api/loginApi";
+import { useLoginRequest } from "@hongpung/src/entities/auth";
 import { saveToken, ValidationState } from "@hongpung/src/common";
 
 interface LoginFormValue {
@@ -212,6 +212,10 @@ export const useLoginForm = () => {
 
       const { token } = await login(formData);
 
+      if (!token) {
+        throw new Error("로그인 실패");
+      }
+      
       await saveToken("token", token);
       saveLoginOptions({ email, autoLogin, saveID });
       navigation.dispatch(StackActions.replace("Main"));

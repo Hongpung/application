@@ -10,6 +10,7 @@ import {
 const useAutoLogin = () => {
   const [autoLogin, setAutoLogin] = useState(false);
   const autoLoginRef = useRef(autoLogin);
+  const isChangedRef = useRef(false);
 
   useEffect(() => {
     autoLoginRef.current = autoLogin;
@@ -39,7 +40,7 @@ const useAutoLogin = () => {
     }
   }, []);
 
-  const turnOffAutoLogin = async () => {
+  const turnOffAutoLogin = useCallback(async () => {
     try {
       await AsyncStorage.removeItem("autoLogin");
       turnOffAutoLoginSuccessToast();
@@ -48,16 +49,23 @@ const useAutoLogin = () => {
       setAutoLogin(true);
       turnOffAutoLoginFailedToast();
     }
-  };
+  }, []);
 
   useEffect(() => {
     return () => {
-      if (autoLoginRef.current) turnOnAutoLogin();
-      else turnOffAutoLogin();
+      if (isChangedRef.current) {
+        if (autoLoginRef.current) turnOnAutoLogin();
+        else turnOffAutoLogin();
+      }
     };
   }, []);
 
-  return [autoLogin, setAutoLogin] as const;
+  const toggleAutoLogin = useCallback(() => {
+    isChangedRef.current = true;
+    setAutoLogin((prev) => !prev);
+  }, []);
+
+  return [autoLogin, toggleAutoLogin] as const;
 };
 
 export default useAutoLogin;

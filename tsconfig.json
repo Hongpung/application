@@ -19,7 +19,7 @@
   "include": [
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "src/widgets/auth/ui/CreateNewPaaswordSection"  ],
   "exclude": [
     "node_modules"
   ],

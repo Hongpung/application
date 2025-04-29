@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Text,
   View,
@@ -22,9 +22,8 @@ import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/Ful
 import { extendSessionSuccessToast } from "@hongpung/src/features/session/useRoom/lib/toast";
 import { SessionControlButton } from "@hongpung/src/features/session/useRoom/ui/SessionControlButton/SessionControlButton";
 import { useSeperateMember } from "@hongpung/src/features/session/useRoom/model/useSeperateMember";
-import { MainStackScreenProps } from "@hongpung/src/navigation/MainStackNavigation";
 import InstrumentModal from "@hongpung/src/widgets/instrument/ui/InstrumentModal/InstrumentModal";
-import { SessionManagementScreenProps } from "@hongpung/src/navigation/SessionManagementStackNavigation";
+import { SessionManagementScreenProps } from "@hongpung/src/common/navigation";
 
 const UsingManageScreen: React.FC<
   SessionManagementScreenProps<"SessionManage">
@@ -148,7 +147,10 @@ const UsingManageScreen: React.FC<
         canReturn={canReturn}
         handleExtendSession={handleExtendSession}
         handleReturnSession={() => {
-          navigation.replace("CheckOutSession");
+          navigation.replace("SessionManagement", {
+            screen: "CheckOutSession",
+            params: { sessionId: usingSession.sessionId },
+          });
         }}
       />
     </View>

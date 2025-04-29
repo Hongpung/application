@@ -15,6 +15,7 @@ import { ChangePasswordSection } from "@hongpung/src/widgets/auth/ui/ChangePassw
 const ChangePasswordScreen: React.FC = () => {
   const descriptions = [
     "로그인에 사용할 비밀번호를 변경해요.",
+    "",
     "새로운 비밀번호는 영문, 숫자, 특수문자를 포함한\n8~12자로 구성해야 해요.",
     "허용 특수문자: !,@,#,$,%,^,&,+,=",
   ];

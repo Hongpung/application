@@ -76,7 +76,7 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
       </View>
 
       {LoginError && (
-        <Text style={styles.errorText}>{LoginError?.message}</Text>
+        <Text style={styles.errorText}>{LoginError?.message === "Unauthorized" ? "이메일 또는 비밀번호가 올바르지 않습니다." : LoginError?.message}</Text>
       )}
 
       <View style={styles.checkboxContainer}>
@@ -124,9 +124,9 @@ const styles = StyleSheet.create({
   errorText: {
     color: Color["red500"],
     fontFamily: "NanumSquareNeo-Bold",
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    fontSize: 12,
+    paddingVertical: 4,
+    paddingHorizontal: 48+4,
+    fontSize: 14,
   },
   checkboxContainer: {
     display: "flex",

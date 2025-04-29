@@ -1,26 +1,26 @@
 import { ScrollView, View, StyleSheet, Alert } from "react-native";
 import React from "react";
-import { Color } from "@hongpung/src/common";
+import { Color, Header } from "@hongpung/src/common";
 import { ClubProfileSection } from "@hongpung/src/widgets/club/ui/ClubProfileSection/ClubProfileSection";
 import { ClubMenuSection } from "@hongpung/src/widgets/club/ui/ClubMenuSection/ClubMenuSection";
 import { ClubFooterSection } from "@hongpung/src/widgets/club/ui/ClubFooterSection/ClubFooterSection";
 import { useLoadClubInfoFetch } from "@hongpung/src/entities/club/api/clubApi";
 import { UserStatusState } from "@hongpung/src/entities/member";
 import { useRecoilValue } from "recoil";
-import { ClubStackParamList, ClubStackProps } from "@hongpung/src/navigation/ClubStackNavigation";
-
-const ClubMainPage: React.FC<ClubStackProps<"ClubMain">> = ({
-  navigation,
-}) => {
+import {
+  ClubStackProps,
+} from "@hongpung/src/navigation/ClubStackNavigation";
+import { ClubParamList } from "@hongpung/src/common/navigation";
+const ClubMainPage: React.FC<ClubStackProps<"ClubMain">> = ({ navigation }) => {
   const { data, isLoading, error } = useLoadClubInfoFetch();
   const loginUser = useRecoilValue(UserStatusState);
 
-  const handleMenuPress = (link: keyof ClubStackParamList) => {
-    navigation.push(link);
+  const handleMenuPress = (link: keyof ClubParamList) => {
+    navigation.push("Club", { screen: link });
   };
 
   const handleFooterPress = () => {
-    navigation.navigate("ClubInstruments");
+    // navigation.navigate("Club", { screen: "ClubInstruments" });
   };
 
   if (loginUser?.club === "기타") {
@@ -43,6 +43,7 @@ const ClubMainPage: React.FC<ClubStackProps<"ClubMain">> = ({
 
   return (
     <View style={styles.container}>
+      <Header leftButton="close" headerName="동아리 홈" />
       <ScrollView bounces={false} contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
           {isLoading && data !== null ? (

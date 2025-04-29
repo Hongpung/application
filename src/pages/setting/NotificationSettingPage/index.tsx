@@ -22,6 +22,7 @@ const NotificationSettingPage: React.FC = () => {
     useUpdateNotificationStatusRequest();
   const [isEnabled, setIsEnabled] = useState(false);
   const isEnabledRef = useRef(isEnabled);
+  const isChangedRef = useRef(false);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -38,9 +39,10 @@ const NotificationSettingPage: React.FC = () => {
   
   useEffect(() => {
     return () => {
-      const handleNotificationStatus = async () => {
-        try {
-          if (isEnabledRef.current) {
+      if (isChangedRef.current) {
+        const handleNotificationStatus = async () => {
+          try {
+            if (isEnabledRef.current) {
             const NToken = await registerForPushNotificationsAsync();
             await updateNotificationStatusRequest({
               pushEnable: true,
@@ -60,12 +62,14 @@ const NotificationSettingPage: React.FC = () => {
       };
   
       // cleanup 함수에서는 async 직접 못 쓰니까 바로 실행
-      handleNotificationStatus();
+        handleNotificationStatus();
+      }
     };
   }, []);
 
 
   const toggleNotification = async () => {
+    isChangedRef.current = true;
     const { status } = await Notifications.requestPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
@@ -95,7 +99,7 @@ const NotificationSettingPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Color["grey100"]
   },
   loadingContainer: {
     flex: 1,
@@ -108,6 +112,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginHorizontal: 36,
     justifyContent: "space-between",
+    paddingTop: 24,
   },
   label: {
     fontFamily: "NanumSquareNeo-Bold",

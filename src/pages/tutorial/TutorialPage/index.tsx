@@ -4,7 +4,7 @@ import PagerView from "react-native-pager-view";
 import { LongButton, ShortButton } from "@hongpung/src/common";
 import { PageIndicator } from "@hongpung/src/common/ui/PageIndicator";
 import ImagePage from "@hongpung/src/common/ui/ImagePage/ImagePage";
-import { RootStackScreenProps } from "@hongpung/src/navigation/RootStackNavigation";
+import { RootStackScreenProps } from "@hongpung/src/common/navigation";
 
 
 const TutorialScreen: React.FC<RootStackScreenProps<'Tutorial'>> = ({ navigation }) => {

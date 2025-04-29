@@ -2,7 +2,7 @@ import { useRef, useState, useMemo } from "react";
 import { ValidationState } from "@hongpung/src/common";
 import { passwordSchema, type PasswordFormData } from "./passwordSchema";
 import * as z from "zod";
-import { useChangePasswordRequest } from "../api/changePasswordApi";
+import { useChangePasswordRequest } from "@hongpung/src/entities/auth";
 import { TextInput } from "react-native";
 
 interface PasswordValue {

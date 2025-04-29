@@ -2,10 +2,11 @@ import { getToken } from "@hongpung/src/common/lib/TokenHandler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import Toast from "react-native-toast-message";
+import { RootStackParamList } from "@hongpung/src/common/navigation";
 
 export const useFirstPage = () => {
   const [firstScreen, setFirstScreen] = useState<
-    "Tutorial" | "LoginStack" | "Main" | null
+    Exclude<keyof RootStackParamList, "Permission"> | null
   >(null);
 
   useEffect(() => {

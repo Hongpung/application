@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { LongButton } from "@hongpung/src/common";
-import { useCameraPermission } from "@hongpung/src/common/lib/useCameraPermission";
+import { LongButton } from "../buttons/LongButton";
+import { useCameraPermission } from "../../lib/useCameraPermission";
 
 export const NeedCameraPermssionPanel:React.FC = () => {
 

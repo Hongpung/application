@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Modal } from "react-native";
-import { LongButton } from "@hongpung/src/common";
+import { LongButton } from "../buttons/LongButton";
 
 interface ErrorModalProps {
   visible: boolean;

@@ -2,8 +2,8 @@
 import React from 'react';
 import { useDropdown } from './Dropdown.context';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Color } from '@hongpung/src/common';
-import { Icons } from '@hongpung/src/common/ui';
+import { Color } from '../../../constant/color';
+import { Icons } from '../../icons/Icons';
 
 interface DropdownItemProps<T extends string> {
     optionValue: T;

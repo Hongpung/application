@@ -50,7 +50,7 @@ export const ClubSelectorLabel: React.FC<SelectorLabelProps> = ({
           {
             borderBottomWidth: 1,
             borderBottomColor: isErrored ? Color["red500"] : Color["green500"],
-            color: value ? Color["grey800"] : Color["grey300"],
+            color: value ? Color["grey800"] : Color["grey400"],
           },
         ]}
       >
@@ -80,6 +80,8 @@ const styles = StyleSheet.create({
     height: 20,
   },
   errorText: {
+    position: "absolute",
+    top:"100%",
     color: Color["red500"],
     fontFamily: "NanumSquareNeo-Bold",
     paddingTop: 8,

@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Image, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { Color } from "@hongpung/src/common";
+import { Color } from "../../constant/color";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
 interface NavigateCalendarButtonProps {

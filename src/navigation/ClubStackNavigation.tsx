@@ -1,36 +1,13 @@
-import {
-  createNativeStackNavigator,
-  NativeStackNavigationProp,
-  NativeStackScreenProps,
-} from "@react-navigation/native-stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+import { ClubParamList } from "@hongpung/src/common/navigation";
+
 import ClubMainScreen from "@hongpung/src/pages/club/ClubMainPage";
 import ClubInstrumentsScreen from "@hongpung/src/pages/club/ClubInstrumentListPage";
 import ClubMembersScreen from "@hongpung/src/pages/club/ClubMemberListPage";
 import ClubLogsScreen from "@hongpung/src/pages/club/ClubSessionLogPage";
-import { CompositeNavigationProp, RouteProp } from "@react-navigation/native";
-import { MainStackParamList } from "./MainStackNavigation";
-// import ClubScheduleScreen from "@hongpung/src/pages/club/ClubSchedulePage"
 
-export type ClubStackParamList = {
-  ClubMain: undefined;
-  ClubInstruments: undefined;
-  ClubMembers: undefined;
-  ClubLogs: undefined;
-  ClubCalendar: undefined;
-};
-
-const ClubStack = createNativeStackNavigator<ClubStackParamList>();
-
-type ClubStackNavigationProp<T extends keyof ClubStackParamList> =
-  CompositeNavigationProp<
-    NativeStackNavigationProp<ClubStackParamList, T>,
-    NativeStackNavigationProp<MainStackParamList,"SessionManagement">
-  >;
-
-export type ClubStackProps<T extends keyof ClubStackParamList> = {
-  navigation: ClubStackNavigationProp<T>;
-  route: RouteProp<ClubStackParamList, T>;
-};
+const ClubStack = createNativeStackNavigator<ClubParamList>();
 
 export const ClubStackNavigation = () => {
   return (

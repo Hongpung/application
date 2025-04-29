@@ -2,9 +2,9 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native'
 import React, { ComponentProps } from 'react'
 import { useNavigation } from "@react-navigation/native";
-import { Color } from '@hongpung/src/common';
+import { Color } from '../../constant/color';
 import { Ionicons } from '@expo/vector-icons';
-import { Icons } from '@hongpung/src/common';
+import { Icons } from '../icons/Icons';
 
 interface HeaderProps {
     leftButton: ComponentProps<typeof Ionicons>['name'] | null
@@ -29,9 +29,9 @@ const Header: React.FC<HeaderProps> = ({ leftButton, headerName, RightButton, ri
                 if (addLeftAction)
                     addLeftAction();
             }}
-                style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, left: 22, width: 28, height: 28 }}
+                style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 10, left: 20, width: 36, height: 36 }}
             >
-                {leftButton != null && < Icons size={24} name={leftButton ?? 'close'} color={Color['blue500']} />}
+                {leftButton != null && < Icons size={28} name={leftButton ?? 'close'} />}
             </Pressable>
             <Text style={styles.Title}>{headerName}</Text>
             {RightButton && <Pressable onPress={rightAction} style={{ alignItems: 'center', justifyContent: 'center', position: 'absolute', top: 11, right: 22, height: 28 }}>
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
         fontSize: 20
     },
     HeadrContainer: {
-        height: 50,
+        height: 56,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',

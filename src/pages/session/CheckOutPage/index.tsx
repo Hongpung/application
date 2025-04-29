@@ -6,6 +6,7 @@ import { CheckOutDescriptionWidget } from "@hongpung/src/widgets/session/ui/Chec
 import { CheckOutCameraWidget } from "@hongpung/src/widgets/session/ui/CheckOutCameraWidget";
 import { CheckOutConfirmPhotosWidget } from "@hongpung/src/widgets/session/ui/CheckOutConfirmPhotosWidget";
 import { CheckOutCompleteWidget } from "@hongpung/src/widgets/session/ui/CheckOutCompleteWidget";
+
 import { useCheckOut } from "@hongpung/src/features/session/checkOutRoom/model/useCheckOut";
 import { SessionManagementScreenProps } from "@hongpung/src/navigation/SessionManagementStackNavigation";
 import {
@@ -22,7 +23,8 @@ const CheckOutScreen: React.FC<
   const checkOutState = useCheckOut();
 
   const { hasPermission } = useCameraPermission();
-  const navigateToHome = () => navigation.navigate("MainTab");
+  const navigateToHome = () =>
+    navigation.navigate("MainTab", { screen: "Home" });
 
   const handleLeftAction = () => {
     if (confirm("이용 종료를 취소하시겠습니까?")) {

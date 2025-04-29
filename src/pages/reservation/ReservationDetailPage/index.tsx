@@ -23,29 +23,20 @@ import { DeleteReservationButton } from "@hongpung/src/features/reservation/dele
 import { isEditible } from "@hongpung/src/entities/reservation/lib/isEditible";
 import { LeaveReservationButton } from "@hongpung/src/features/reservation/leaveReservation/ui/LeaveReservationButton/LeaveReservationButton";
 import { EnterEditButton } from "@hongpung/src/features/reservation/editReservation/ui/EnterEditButton/EnterEditButton";
-import { ReservationStackParamList } from "@hongpung/src/navigation/ReservationNavigation";
-import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useNavigation } from "@react-navigation/native";
-import { MainStackParamList } from "@hongpung/src/navigation/MainStackNavigation";
+import { ReservationStackScreenProps } from "@hongpung/src/common/navigation";
 
-type ReservationDetailPageProps = NativeStackScreenProps<
-  ReservationStackParamList,
-  "ReservationDetail"
->;
-
-const ReservationDetailPage: React.FC<ReservationDetailPageProps> = ({
+const ReservationDetailPage: React.FC<ReservationStackScreenProps<"ReservationDetail">> = ({
   navigation,
   route,
 }) => {
+
   const { reservationId } = route.params;
-  const rootNavigation = useNavigation<NativeStackNavigationProp<MainStackParamList>>();
-  console.log("reservationId", reservationId);
   const {
     data: reservation,
     isLoading,
     error,
   } = useLoadReservationDetailFetch({ reservationId });
-  console.log("reservationDetail", reservation);
+
   const loginUser = useRecoilValue(UserStatusState);
 
   if (isLoading) {
@@ -128,22 +119,50 @@ const ReservationDetailPage: React.FC<ReservationDetailPageProps> = ({
         <Header leftButton={"close"} headerName="예약 상세 정보" />
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={{ gap: 24, paddingHorizontal: 12 }}
+          contentContainerStyle={{ gap: 24 }}
         >
-          <DateTimeViewer date={date} startTime={startTime} endTime={endTime} />
+          <View
+            style={{
+              gap: 24,
+              backgroundColor: Color["grey100"],
+            }}
+          >
+            <View
+              style={{
+                backgroundColor: "#FFF",
+                paddingVertical: 12,
+                paddingHorizontal: 12,
+              }}
+            >
+              <DateTimeViewer
+                date={date}
+                startTime={startTime}
+                endTime={endTime}
+              />
+            </View>
+            <View
+              style={{
+                gap: 24,
+                backgroundColor: "#FFF",
+                paddingVertical: 24,
+                backgroundClip: "border-box",
+                paddingHorizontal: 12,
+              }}
+            >
+              <View style={styles.row}>
+                <Text style={styles.label}>예약자</Text>
+                <Text style={styles.value}>{`${creatorName}`}</Text>
+              </View>
 
-          <View style={styles.row}>
-            <Text style={styles.label}>예약자</Text>
-            <Text style={styles.value}>{`${creatorName}`}</Text>
-          </View>
-
-          <View style={styles.row}>
-            <Text style={styles.label}>예약명</Text>
-            <Text style={styles.value}>{title}</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>예약 유형</Text>
-            <Text style={styles.value}>외부 일정</Text>
+              <View style={styles.row}>
+                <Text style={styles.label}>예약명</Text>
+                <Text style={styles.value}>{title}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>예약 유형</Text>
+                <Text style={styles.value}>외부 일정</Text>
+              </View>
+            </View>
           </View>
         </ScrollView>
       </View>
@@ -167,50 +186,88 @@ const ReservationDetailPage: React.FC<ReservationDetailPageProps> = ({
     <View style={{ flex: 1, backgroundColor: "#FFF", gap: 16 }}>
       <Header leftButton={"close"} headerName="예약 상세 정보" />
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={{ gap: 24, paddingHorizontal: 12 }}
-      >
-        <DateTimeViewer date={date} startTime={startTime} endTime={endTime} />
+      <ScrollView style={styles.scrollView} contentContainerStyle={{ gap: 24 }}>
+        <View
+          style={{
+            gap: 24,
+            backgroundColor: Color["grey100"],
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "#FFF",
+              paddingVertical: 12,
+              paddingHorizontal: 12,
+            }}
+          >
+            <DateTimeViewer
+              date={date}
+              startTime={startTime}
+              endTime={endTime}
+            />
+          </View>
+          <View
+            style={{
+              gap: 24,
+              backgroundColor: "#FFF",
+              paddingVertical: 24,
+              backgroundClip: "border-box",
+              paddingHorizontal: 12,
+            }}
+          >
+            <View style={styles.row}>
+              <Text style={styles.label}>예약자</Text>
+              <Text style={styles.value}>{`${creatorName}${
+                !!creatorNickname ? ` (${creatorNickname})` : ""
+              }`}</Text>
+            </View>
 
-        <View style={styles.row}>
-          <Text style={styles.label}>예약자</Text>
-          <Text style={styles.value}>{`${creatorName}${
-            !!creatorNickname ? ` (${creatorNickname})` : ""
-          }`}</Text>
+            <View style={styles.row}>
+              <Text style={styles.label}>예약명</Text>
+              <Text style={styles.value}>{title}</Text>
+            </View>
+
+            <ReservationTypeViewer
+              reservationType={reservationType}
+              participationAvailable={participationAvailable}
+            />
+          </View>
+          <View
+            style={{
+              gap: 24,
+              backgroundColor: "#FFF",
+              paddingVertical: 24,
+              backgroundClip: "border-box",
+              paddingHorizontal: 12,
+            }}
+          >
+            <View style={styles.row}>
+              <Text style={styles.label}>참가 인원</Text>
+            </View>
+            <Pressable
+              onPress={() => {
+                navigation.navigate("ParticipatorList", {
+                  participators: JSON.stringify(participators),
+                });
+              }}
+            >
+              <ParticipatorsViewer participators={participators} />
+            </Pressable>
+
+            <View style={styles.row}>
+              <Text style={styles.label}>대여 악기</Text>
+            </View>
+            <Pressable
+              onPress={() => {
+                navigation.navigate("BorrowInstrumentList", {
+                  borrowInstruments: JSON.stringify(borrowInstruments),
+                });
+              }}
+            >
+              <BorrowInstrumentsViewer borrowInstruments={borrowInstruments} />
+            </Pressable>
+          </View>
         </View>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>예약명</Text>
-          <Text style={styles.value}>{title}</Text>
-        </View>
-
-        <ReservationTypeViewer
-          reservationType={reservationType}
-          participationAvailable={participationAvailable}
-        />
-
-        <View style={styles.row}>
-          <Text style={styles.label}>참가 인원</Text>
-        </View>
-        <Pressable onPress={() => {
-          rootNavigation.navigate("ParticipatorList", {
-            participators: JSON.stringify(participators),
-          })
-        }}>
-          <ParticipatorsViewer participators={participators} />
-        </Pressable>
-
-        <View style={styles.row}>
-          <Text style={styles.label}>대여 악기</Text>
-        </View>
-        <Pressable onPress={() => {
-          rootNavigation.navigate("BorrowInstrumentList", {
-            borrowInstruments: JSON.stringify(borrowInstruments),
-          })
-        }}>
-          <BorrowInstrumentsViewer borrowInstruments={borrowInstruments} />
-        </Pressable>
 
         {/* 삭제하기 버튼 */}
 
@@ -277,8 +334,10 @@ const styles = StyleSheet.create({
   bottomButton: {
     flexDirection: "column",
     gap: 8,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
+    paddingVertical: 8,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    paddingHorizontal: 12,
   },
   placeholderRow: {
     flexDirection: "row",

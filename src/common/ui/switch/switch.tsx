@@ -1,7 +1,7 @@
 import { Animated, View, StyleSheet, Pressable } from "react-native";
 import React, { useCallback, useRef } from "react";
 
-import { Color } from "@hongpung/src/common";
+import { Color } from "../../constant/color";
 
 export const Switch: React.FC<{
   onChange: (value: boolean) => void;

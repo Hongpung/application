@@ -1,8 +1,8 @@
 import { Color } from "@hongpung/src/common";
-import SignUpNavigationButton from "@hongpung/src/features/auth/signUp/ui/SignUpNavigatorButton/SignUpNavigationButton";
-import { LoginStackScreenProps } from "@hongpung/src/navigation/LoginStackNavigation";
+import SignUpNavigationButton from "@hongpung/src/widgets/auth/ui/SignUpNavigatorButton/SignUpNavigationButton";
+import { LoginStackScreenProps } from "@hongpung/src/common/navigation";
 import LoginSection from "@hongpung/src/widgets/auth/ui/LoginSection/LoginSection";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import {
   View,
   Text,
@@ -11,11 +11,20 @@ import {
   Keyboard,
   StyleSheet,
   Platform,
+  Pressable,
 } from "react-native";
+import { AlertButton } from "@hongpung/src/common/ui/AlertButton/AlertButton";
+import { FindAccountActionsSection } from "@hongpung/src/widgets/auth/ui/FindAccountActionsSection/FindAccountActionsSection";
 
-const LoginPage: React.FC<LoginStackScreenProps<"Login">> = ({ navigation }) => {
+const LoginPage: React.FC<LoginStackScreenProps<"Login">> = ({
+  navigation,
+}) => {
   const navigateToSignUp = useCallback(() => {
     navigation.navigate("SignUp");
+  }, [navigation]);
+
+  const navigateToResetPassword = useCallback(() => {
+    navigation.navigate("ResetPassword");
   }, [navigation]);
 
   return (
@@ -30,6 +39,7 @@ const LoginPage: React.FC<LoginStackScreenProps<"Login">> = ({ navigation }) => 
           <LoginSection />
           <Text style={styles.interSectionText}>홍풍이 처음이시라면?</Text>
           <SignUpNavigationButton navigateToSignUp={navigateToSignUp} />
+          <FindAccountActionsSection onPressResetPassword={navigateToResetPassword} />
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>

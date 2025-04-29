@@ -1,61 +1,28 @@
-import {
-  createNativeStackNavigator,
-  NativeStackScreenProps,
-} from "@react-navigation/native-stack";
-import { MainTabNavigation, MainTabParamList } from "./MainTabNavigation";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+import { MainStackParamList } from "@hongpung/src/common/navigation";
+import { useLoadMyStatusFetch } from "@hongpung/src/entities/member";
+
 import LoginSettingPage from "@hongpung/src/pages/setting/LoginSettingPage";
 import NotificationSettingPage from "@hongpung/src/pages/setting/NotificationSettingPage";
 import UpComingReservationPage from "@hongpung/src/pages/member/UpcommingSchedulePage";
 import MyLogPage from "@hongpung/src/pages/member/MySessionLogPage";
 import CheckInPage from "@hongpung/src/pages/session/CheckInPage";
-import {
-  ClubStackNavigation as ClubStack,
-  ClubStackParamList,
-} from "./ClubStackNavigation";
-import {
-  ReservationStackNavigation as ReservationStack,
-  ReservationStackParamList,
-} from "./ReservationNavigation";
-import {
-  SessionManagementStackNavigation as SessionManagementStack,
-  SessionManagementStackParamList,
-} from "./SessionManagementStackNavigation";
 import ChangePasswordPage from "@hongpung/src/pages/auth/ChangePasswordPage";
 import NotificationPage from "@hongpung/src/pages/notification/NotificationPage";
-import { useLoadMyStatusFetch } from "@hongpung/src/entities/member";
-import ReservationInstrumentsViewScreen from "../pages/reservation/BorrowInstrumentListViewPage";
-import ParticipatorListViewPage from "../pages/reservation/ParticipatorListViewPage";
+import ReservationInstrumentsViewScreen from "@hongpung/src/pages/reservation/BorrowInstrumentListViewPage";
+import ParticipatorListViewPage from "@hongpung/src/pages/reservation/ParticipatorListViewPage";
+import WebViewPage from "@hongpung/src/pages/webview/WebViewPage";
 
-export type MainStackParamList = {
-  MainTab: ScreenParams<MainTabParamList>;
-  Notification: undefined;
-
-  WebView: { url: string; title?: string };
-
-  Club: ScreenParams<ClubStackParamList>;
-
-  Reservation: ScreenParams<ReservationStackParamList>;
-  CheckIn: undefined;
-  SessionManagement: ScreenParams<SessionManagementStackParamList>;
-
-  UpComingReservation: undefined;
-  MyLog: undefined;
-  LoginSetting: undefined;
-  NotificationSetting: undefined;
-
-  ChangePassword: undefined;
-
-  BorrowInstrumentList: { borrowInstruments: string };
-  ParticipatorList: { participators: string };
-};
-
-export type MainStackScreenProps<T extends keyof MainStackParamList> =
-  NativeStackScreenProps<MainStackParamList, T>;
+import { MainTabNavigation } from "./MainTabNavigation";
+import { ClubStackNavigation as ClubStack } from "./ClubStackNavigation";
+import { ReservationStackNavigation as ReservationStack } from "./ReservationNavigation";
+import { SessionManagementStackNavigation as SessionManagementStack } from "./SessionManagementStackNavigation";
 
 const MainStack = createNativeStackNavigator<MainStackParamList>();
 
 export const MainStackNavigation = () => {
-  const {} = useLoadMyStatusFetch();
+  useLoadMyStatusFetch();
   return (
     <MainStack.Navigator
       screenOptions={{
@@ -106,8 +73,7 @@ export const MainStackNavigation = () => {
         component={ParticipatorListViewPage}
       />
 
-      {/* <MainStack.Screen name="WebView" component={WebViewPage} /> */}
-      
+      <MainStack.Screen name="WebView" component={WebViewPage} />
     </MainStack.Navigator>
   );
 };

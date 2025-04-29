@@ -1,4 +1,3 @@
-import { MainTabScreenProps } from "@hongpung/src/navigation/MainTabNavigation";
 import { ScrollView, View, StyleSheet, Text } from "react-native";
 import { NotificationIcon } from "@hongpung/src/features/notification/notReadNotification/ui/NotificationIcon/NotificationIcon";
 import { SessionManageBottomSheet } from "@hongpung/src/widgets/session/ui/SessionManageBottomSheet";
@@ -8,18 +7,14 @@ import { useMemo, useState } from "react";
 import TodaySchedule from "@hongpung/components/home/TodaySchedule";
 import { UserStatusState } from "@hongpung/src/entities/member";
 import { myTodayReservationState } from "@hongpung/src/entities/reservation";
-import { Color } from "@hongpung/src/common";
+import { Color, MainFooter } from "@hongpung/src/common";
 import { BannerSlider } from "@hongpung/src/widgets/banner/ui/BannerSlider/BannerSlider";
 import { ClubPortalPanel } from "@hongpung/src/widgets/club/ui/ClubPortalPanel/ClubPortalPanel";
 import NoticePanel from "@hongpung/src/widgets/notice/ui/NoticePanel/NoticePanel";
 import { useNoticePanel } from "@hongpung/src/widgets/notice/model/useNoticePanel";
-import MainFooter from "@hongpung/src/common/ui/MainFooter/MainFooter";
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { MainTabScreenProps } from "@hongpung/src/common/navigation";
 
-type HomePageProps = MainTabScreenProps<"Home">;
-
-const HomePage: React.FC<HomePageProps> = ({ navigation }) => {
-  const tabBarHeight = useBottomTabBarHeight();
+const HomePage: React.FC<MainTabScreenProps<"Home">> = ({ navigation }) => {
   const isUsingSession = useRecoilValue(UseRoomState);
   const loginUser = useRecoilValue(UserStatusState);
   const today = useMemo(() => {
@@ -108,11 +103,17 @@ const HomePage: React.FC<HomePageProps> = ({ navigation }) => {
           />
         </View>
         <MainFooter
-          navigateToServiceTerms={function (): void {
-            throw new Error("Function not implemented.");
+          navigateToServiceTerms={(): void => {
+            navigation.push("WebView", {
+              title: "서비스 이용약관",
+              url: "https://storage.hongpung.com/terms/%EC%84%9C%EB%B9%84%EC%8A%A4+%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80.html",
+            });
           }}
-          navigateToPrivacyPolicy={function (): void {
-            throw new Error("Function not implemented.");
+          navigateToPrivacyPolicy={(): void => {
+            navigation.push("WebView", {
+              title: "개인정보 처리방침",
+              url: "https://storage.hongpung.com/terms/%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4+%EC%B2%98%EB%A6%AC%EB%B0%A9%EC%B9%A8.html",
+            });
           }}
         />
       </ScrollView>

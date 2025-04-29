@@ -29,15 +29,16 @@ export const signUpSchema = z
       .regex(/^[가-힣]+$/, "닉네임은 한글만 입력 가능합니다.")
       .optional(),
 
-    club: z.string().refine((val) => {
-      return clubNames.includes(val as ClubName);
-    }, "유효하지 않은 동아리입니다."),
+    club: z.custom<ClubName|null>((val) => {
+      return typeof val === 'string' && clubNames.includes(val as ClubName);
+    }, {
+      message: "유효하지 않은 동아리입니다."
+    }),
 
     enrollmentNumber: z
       .string()
       .length(2, "학번은 2자여야 합니다.")
       .regex(/^\d{2}$/, "학번은 숫자로만 구성되어야 합니다.")
-      .transform((val) => Number(val)),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "비밀번호가 일치하지 않습니다.",
