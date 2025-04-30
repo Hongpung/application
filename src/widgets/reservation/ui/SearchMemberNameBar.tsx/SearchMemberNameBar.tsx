@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Pressable, TextInput, View, StyleSheet } from 'react-native';
-import { Icons } from '@hongpung/src/common/ui/Icons/Icons';
-import { Color } from '@src/common';
+import { Color, Icons } from '@hongpung/src/common';
 
 
 type FindOptions = {

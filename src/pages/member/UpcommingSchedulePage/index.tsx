@@ -2,7 +2,7 @@ import { StyleSheet, View } from "react-native";
 import React, { useCallback } from "react";
 import MyScheduleList from "@hongpung/src/features/member/loadMyUpcommingSchedule/ui/MyScheduleList/MyScheduleList";
 import { useLoadMyUpcommingSchedule } from "@hongpung/src/features/member/loadMyUpcommingSchedule/model/useLoadMyUpcommingSchedule";
-import { MainStackScreenProps } from "@hongpung/src/navigation/MainStackNavigation";
+import { MainStackScreenProps } from "@hongpung/src/common/navigation";
 import { Header } from "@hongpung/src/common";
 
 const UpcommingSchedulePage: React.FC<MainStackScreenProps<"UpComingReservation">> = ({

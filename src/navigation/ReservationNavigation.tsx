@@ -1,9 +1,13 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
+import { ReservationParamList } from "@hongpung/src/common/navigation";
+
 import ReservationCalendarScreen from "@hongpung/src/pages/reservation/ReservationCalendarPage";
 import DailyReserveListScreen from "@hongpung/src/pages/reservation/DailyReservationListPage";
 import ReservationDetailScreen from "@hongpung/src/pages/reservation/ReservationDetailPage";
 
-import { ReservationParamList } from "@hongpung/src/common/navigation";
+import { EditReservationNavigation } from "./EditReservationNavigation";
+import { CreateReservationNavigation } from "./CreateReservationNavigation";
 
 const ReservationStack = createNativeStackNavigator<ReservationParamList>();
 
@@ -25,6 +29,14 @@ export const ReservationStackNavigation = () => {
       <ReservationStack.Screen
         name="ReservationDetail"
         component={ReservationDetailScreen}
+      />
+      <ReservationStack.Screen
+        name="EditReservation"
+        component={EditReservationNavigation}
+      />
+      <ReservationStack.Screen
+        name="CreateReservation"
+        component={CreateReservationNavigation}
       />
     </ReservationStack.Navigator>
   );

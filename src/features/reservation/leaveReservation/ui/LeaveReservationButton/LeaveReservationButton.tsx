@@ -1,18 +1,25 @@
 import React from "react";
-
-import { ErrorModal, LongButton } from "@hongpung/src/common";
-import { isEditible } from "@hongpung/src/entities/reservation/lib/isEditible";
-import { useLeaveReservationRequest } from "../../api/leaveReservationApi";
 import { Alert } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
 
-interface DeleteReservationButtonProps {
+import { useNavigation } from "@react-navigation/native";
+
+import {
+  ErrorModal,
+  FullScreenLoadingModal,
+  LongButton,
+} from "@hongpung/src/common";
+
+import {
+  isEditible,
+  useLeaveReservationRequest,
+} from "@hongpung/src/entities/reservation";
+
+interface LeaveReservationButtonProps {
   reservationId: number;
   date: string;
 }
 
-export const LeaveReservationButton: React.FC<DeleteReservationButtonProps> = ({
+export const LeaveReservationButton: React.FC<LeaveReservationButtonProps> = ({
   date,
   reservationId,
 }) => {

@@ -1,9 +1,9 @@
 
 import { isEqual } from "lodash";
-import { ReservationForm } from "../../model/type";
-import { Instrument } from "@hongpung/src/entities/instrument";
-import { Member } from "@hongpung/src/entities/member";
-import { ReservationEditRequestBody } from "../api/type";
+import type { ReservationForm } from "../model/type";
+import type { Instrument } from "@hongpung/src/entities/instrument";
+import type { Member } from "@hongpung/src/entities/member";
+import type { ReservationEditRequestBody } from "../api/type";
 
 
 /**

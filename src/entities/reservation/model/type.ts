@@ -1,5 +1,6 @@
-import { type User } from "@hongpung/src/entities/member/@x/reservation";
+import { type Member } from "@hongpung/src/entities/member/@x/reservation";
 import { Instrument } from "../../instrument/@x/reservation";
+import { TimeFormat } from "@hongpung/src/common";
 
 export interface Reservation {
   reservationId: number;
@@ -38,7 +39,7 @@ export type ReservationDetail =
 
       participationAvailable: boolean;
 
-      participators: User[];
+      participators: Member[];
 
       borrowInstruments: Instrument[];
     }
@@ -56,6 +57,27 @@ export type ReservationDetail =
       reservationType: "EXTERNAL";
       participationAvailable: boolean;
     };
+
+    
+export type ReservationForm = {
+
+  title: string // 예약 제목
+
+  date?: string // 예약 날짜 yyyy-mm-dd 형식
+
+  startTime?: TimeFormat// 시작 시간 hh:mm 형식
+  endTime?: TimeFormat// 시작 시간 hh:mm 형식
+
+  reservationType: Exclude<ReservationType, 'EXTERNAL'>
+
+  participationAvailable: boolean
+
+  participators: Member[]
+
+  borrowInstruments: Instrument[]
+
+}
+
 
 export interface DailyReservation {
   reservationId: number;

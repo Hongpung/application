@@ -4,7 +4,7 @@ import { type Instrument } from "@hongpung/src/entities/instrument";
 import { Header } from "@hongpung/src/common";
 import BorrowInstrumentList from "@hongpung/src/widgets/instrument/ui/BorrowInstrumentList/BorrowInstrumentList";
 import { StackActions } from "@react-navigation/native";
-import { MainStackScreenProps } from "@hongpung/src/navigation/MainStackNavigation";
+import { MainStackScreenProps } from "@hongpung/src/common/navigation";
 
 const ReservationInstrumentsViewScreen: React.FC<
   MainStackScreenProps<"BorrowInstrumentList">

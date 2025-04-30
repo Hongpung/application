@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Reservation } from "@hongpung/src/entities/reservation";
-import { useLoadMyUpcommingScheduleFetch } from "../api/upcommingScheduleApi";
+import { useLoadMyUpcommingScheduleFetch } from "@hongpung/src/entities/reservation";
 
 export const useLoadMyUpcommingSchedule = () => {
 

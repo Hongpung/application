@@ -1,8 +1,9 @@
-import { baseApi } from "@hongpung/src/common/api";
+import { baseApi } from "@hongpung/src/common";
 import { RequestLoginBody, SignUpRequestBody } from "./type";
 
 const authApi = baseApi.addEndpoints({
   endpoints: (builder) => ({
+
     changePassword: builder.request<
       { message: string },
       { currentPassword: string; newPassword: string }
@@ -14,6 +15,7 @@ const authApi = baseApi.addEndpoints({
         body: { currentPassword, newPassword },
       }),
     }),
+
     login: builder.request<{ token: string }, RequestLoginBody>({
       query: ({ email, password }) => ({
         url: "/auth/login",
@@ -27,12 +29,14 @@ const authApi = baseApi.addEndpoints({
         },
       }),
     }),
+    
     logout: builder.request<void, void>({
       query: () => ({
         method: "POST",
         url: "/auth/logout",
       }),
     }),
+
     isRegisteredEmail: builder.request<
       { isRegistered: boolean },
       { email: string }
@@ -48,6 +52,7 @@ const authApi = baseApi.addEndpoints({
         },
       }),
     }),
+
     signUp: builder.request<void, SignUpRequestBody>({
       query: (body) => ({ url: "/signup", method: "POST", body }),
     }),
@@ -67,6 +72,7 @@ const authApi = baseApi.addEndpoints({
         },
       }),
     }),
+
     verifySignUpVerificationCode: builder.request<
       { isVerified: boolean },
       { email: string; code: string }
@@ -82,6 +88,7 @@ const authApi = baseApi.addEndpoints({
         },
       }),
     }),
+
     sendResetPasswordVerificationCode: builder.request<
       { message: string },
       { email: string }
@@ -98,6 +105,7 @@ const authApi = baseApi.addEndpoints({
         body,
       }),
     }),
+
     verifyResetPasswordVerificationCode: builder.request<
       { token: string },
       { email: string; code: string }
@@ -114,6 +122,7 @@ const authApi = baseApi.addEndpoints({
         },
       }),
     }),
+    
     resetPassword: builder.request<
       void,
       { email: string; newPassword: string; oneTimeToken: string }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useSearchInvitePossibleMembersFetch } from '../api/searchInvitePossibleMembersApi';
+import { useSearchInvitePossibleMembersFetch } from '@hongpung/src/entities/reservation';
 import { Member } from '@hongpung/src/entities/member';
 import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';

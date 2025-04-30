@@ -1,5 +1,5 @@
-import { Instrument } from "../../instrument/@x/session";
-import { Member } from "../../member/@x/session";
+import { Instrument } from "@hongpung/src/entities/instrument/@x/session";
+import { Member } from "@hongpung/src/entities/member/@x/reservation";
 
 interface BaseSession {
     sessionId: number;           // 세션 ID

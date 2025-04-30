@@ -4,10 +4,10 @@ import {
   Instrument,
 } from "@hongpung/src/entities/instrument";
 import { Pressable, FlatList, View, Text, StyleSheet } from "react-native";
-import { useInstrumentList } from "../../../../entities/instrument/model/useInstrumentList";
+import { useInstrumentList } from "@hongpung/src/entities/instrument";
 
 type BorrowPossibleInstrumentListProps = {
-  instrumentList: Instrument[];
+  instrumentList: Instrument[] | null;
   selectedInstruments: Instrument[];
   toggleInstrument: (instrument: Instrument) => void;
   isLoading: boolean;
@@ -16,8 +16,9 @@ type BorrowPossibleInstrumentListProps = {
 const BorrowPossibleInstrumentList: React.FC<
   BorrowPossibleInstrumentListProps
 > = ({ instrumentList, selectedInstruments, toggleInstrument, isLoading }) => {
-  const { isOpen, toggleAccordion, orderInstruments } =
-    useInstrumentList({ instrumentList });
+  const { isOpen, toggleAccordion, orderInstruments } = useInstrumentList({
+    instrumentList,
+  });
 
   if (isLoading) {
     return (
@@ -27,13 +28,18 @@ const BorrowPossibleInstrumentList: React.FC<
     );
   }
 
-  const data = Object.entries(orderInstruments).map(([type, instruments]) => ({
-    type,
-    instruments,
-    selectedCount: instruments.filter((instrument) =>
-      selectedInstruments.includes(instrument)
-    ).length,
-  }));
+  const data =
+    instrumentList && instrumentList.length > 0
+      ? Object.entries(orderInstruments).map(([type, instruments]) => {
+          return {
+            type,
+            instruments,
+            selectedCount: instruments.filter((instrument) =>
+              selectedInstruments.includes(instrument)
+            ).length,
+          };
+        })
+      : [];
 
   const renderItem = ({ item }: { item: (typeof data)[0] }) => {
     if (item.instruments.length === 0) return null;
@@ -79,12 +85,17 @@ const BorrowPossibleInstrumentList: React.FC<
     );
   };
 
+  console.log("data", data);
+
   return (
     <FlatList
       data={data}
       renderItem={renderItem}
       keyExtractor={(item) => item.type}
       showsVerticalScrollIndicator={false}
+      ListEmptyComponent={
+          <Text style={styles.emptyText}>대여 할 수 있는 악기가 없습니다.</Text>
+      }
     />
   );
 };
@@ -114,6 +125,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     rowGap: 16,
     paddingVertical: 12,
+  },
+  emptyText: {
+    marginHorizontal: "auto",
+    marginTop: "60%",
+    fontFamily: "NanumSquareNeo-Bold",
+    fontSize: 18,
+    color: Color["grey400"],
   },
 });
 

@@ -5,20 +5,19 @@ import { useCreateReservation } from "../../model/useCreateReservation.context";
 
 type CreateReservationButtonProps = {
   isAgree: boolean;
-  navigateToConfirmScreen: () => void;
 };
 
 export const CreateReservationButton: React.FC<
   CreateReservationButtonProps
-> = ({ isAgree, navigateToConfirmScreen }) => {
-  const { isValidReservation } = useCreateReservation();
+> = ({ isAgree }) => {
+  const { isValidReservation , requestCreateReservation} = useCreateReservation();
 
   return (
     <LongButton
-      innerContent="예약하기"
+      innerContent="예약 확정하기"
       color="blue"
       isAble={isAgree && isValidReservation}
-      onPress={navigateToConfirmScreen}
+      onPress={requestCreateReservation}
     />
   );
 };

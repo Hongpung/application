@@ -1,5 +1,5 @@
-import { ReservationDto } from "../api/type";
-import { ReservationDetail } from "../model/type";
+import type { ReservationDto } from "../api/type";
+import type { ReservationDetail } from "../model/type";
 
 export function mapReservationDetail(dto: ReservationDto): ReservationDetail {
   if (dto.reservationType !== "EXTERNAL") {

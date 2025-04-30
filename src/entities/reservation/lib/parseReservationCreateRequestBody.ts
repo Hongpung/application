@@ -1,10 +1,7 @@
-import { ReservationForm } from "../../model/type";
-import { ReservationCreateRequestBody } from "../api/type";
-
-
+import type { ReservationForm } from "../model/type";
+import type { ReservationCreateRequestBody } from "../api/type";
 
 export const parseReservationCreateRequestBody = ({ participators, borrowInstruments, reservationType, ...reservation }: Required<ReservationForm>): ReservationCreateRequestBody => {
-    
     return {
         ...reservation,
         reservationType: reservationType as Exclude<ReservationType, "EXTERNAL">,

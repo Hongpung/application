@@ -1,10 +1,11 @@
 import React from 'react'
+import { Alert } from 'react-native'
+
+import { useNavigation } from '@react-navigation/native'
 
 import { LongButton } from '@hongpung/src/common'
-import { isEditible } from '@hongpung/src/entities/reservation/lib/isEditible'
-import { useDeleteReservationRequest } from '../../api/editReservationApi'
-import { Alert } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+
+import { isEditible, useDeleteReservationRequest } from '@hongpung/src/entities/reservation'
 
 interface DeleteReservationButtonProps {
     reservationId: number

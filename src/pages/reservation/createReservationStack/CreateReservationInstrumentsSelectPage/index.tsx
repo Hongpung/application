@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 
+import { Header, Color } from "@hongpung/src/common";
 import { Instrument } from "@hongpung/src/entities/instrument";
-import { useCreateReservation } from "@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context";
-import { Header } from "@hongpung/src/common";
-import { Color } from "@hongpung/src/common";
+import { useBorrowPossibleInstrumentsFetch } from "@hongpung/src/entities/reservation";
 
-import { useBorrowPossibleInstrumentsFetch } from "@hongpung/src/features/reservation/configureReservation/api/searchBorrowPossibleInstrumentsApi";
+import { useCreateReservation } from "@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context";
 import { BorrowInstrumentsConfirmButton } from "@hongpung/src/features/reservation/configureReservation/ui/BorrowInstrumentsConfirmButton/BorrowInstrumentsConfirmButton";
+
 import BorrowPossibleInstrumentList from "@hongpung/src/widgets/instrument/ui/BorrowPossibleInstrumentList/BorrowPossibleInstrumentList";
 
-const CreateReservationInstrumentsSelectPage: React.FC = () => {
+const CreateReservationBorrowInstrumentsSelectScreen: React.FC = () => {
   const { data, isLoading } = useBorrowPossibleInstrumentsFetch();
   const { reservation, setBorrowInstruments } = useCreateReservation();
 
@@ -51,7 +51,7 @@ const CreateReservationInstrumentsSelectPage: React.FC = () => {
   );
 };
 
-export default CreateReservationInstrumentsSelectPage;
+export default CreateReservationBorrowInstrumentsSelectScreen;
 
 const styles = StyleSheet.create({
   container: {

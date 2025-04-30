@@ -72,7 +72,7 @@ export const TimeSelector: React.FC<TimeLineProps> = ({
                                         (selectedTimeBlocks.includes(`${time}:00` as TimeFormat) || selectedTimeBlocks.includes(`${time - 1}:30` as TimeFormat)) && { color: Color['blue500'] }
                                     ]}
                                 >
-                                    {time}
+                                    {time}:00
                                 </Text>
                             </View>
 

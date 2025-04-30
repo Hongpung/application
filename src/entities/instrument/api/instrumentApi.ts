@@ -20,6 +20,7 @@ const instrumentApi = baseApi.addEndpoints({
                 withAuthorize: true
             })
         }),
+        
         loadInstrumentDetail: build.fetch<InstrumentDetailDto, { instrumentId: number }>({
             query: ({ instrumentId }) => ({
                 url: `/instrument/${instrumentId}`,

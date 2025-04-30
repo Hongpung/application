@@ -12,6 +12,7 @@ import Toast from "react-native-toast-message";
 import { useMemo } from "react";
 
 export const AppContainer: React.FC = () => {
+  
   const { firstScreen } = useFirstPage();
   const { fontLoaded } = useFonts();
 

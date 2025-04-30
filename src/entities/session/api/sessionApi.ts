@@ -1,7 +1,7 @@
-import { baseApi } from "@hongpung/src/common/api";
-import { SessionLog } from "@hongpung/src/entities/session";
+import { baseApi } from "@hongpung/src/common";
+import { SessionLog } from "../model/type";
 
-const clubSessionLogApi = baseApi.addEndpoints({
+const sessionApi = baseApi.addEndpoints({
     endpoints: (builder) => ({
         loadClubSessionLog: builder.fetch<Record<string, SessionLog[]>, { calendarMonth: Date }>({
             query: ({ calendarMonth }) => {
@@ -9,7 +9,8 @@ const clubSessionLogApi = baseApi.addEndpoints({
                 const month = calendarMonth.getMonth();
                 return ({
                     url: '/session-log/club',
-                    params: { year, month }
+                    params: { year, month },
+                    withAuthorize: true
                 })
             },
             transformResponse: (response: SessionLog[]) => {
@@ -27,7 +28,7 @@ const clubSessionLogApi = baseApi.addEndpoints({
                 return sessionLogList;
             }
         }),
-    }),
-});
+    })
+})
 
-export const { useLoadClubSessionLogFetch } = clubSessionLogApi;
+export const { useLoadClubSessionLogFetch } = sessionApi;

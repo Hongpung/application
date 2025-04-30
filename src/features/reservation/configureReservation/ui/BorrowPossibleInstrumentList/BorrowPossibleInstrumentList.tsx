@@ -4,7 +4,7 @@ import {
   Instrument,
 } from "@hongpung/src/entities/instrument";
 import { Pressable, FlatList, View, Text, StyleSheet } from "react-native";
-import { useInstrumentList } from "../../../../../entities/instrument/model/useInstrumentList";
+import { useInstrumentList } from "@hongpung/src/entities/instrument";
 
 type BorrowPossibleInstrumentListProps = {
   instrumentList: Instrument[];

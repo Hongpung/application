@@ -5,12 +5,14 @@ import { Header } from "@hongpung/src/common";
 import MiniCalendar from "@hongpung/src/common/ui/MiniCalendar";
 import { useMiniCalendar } from "@hongpung/src/common/lib/useMiniCalendar";
 
-import { useSessionColor } from "@hongpung/src/entities/session";
+import {
+  useSessionColor,
+  useLoadClubSessionLogFetch,
+} from "@hongpung/src/entities/session";
 
 import { useSessionLogList } from "@hongpung/src/features/session/viewMySessionLog/model/useSessionLogList";
 import { SessionLogList } from "@hongpung/src/widgets/session/ui/SessionLogList/SessionLogList";
-import { useLoadClubSessionLogFetch } from "@hongpung/src/features/club/reviewClubSession/api/clubSessionLogApi";
-import { ClubStackProps } from "@hongpung/src/navigation/ClubStackNavigation";
+import { ClubStackProps } from "@hongpung/src/common/navigation";
 
 const ClubSessionLogPage: React.FC<ClubStackProps<"ClubLogs">> = ({
   navigation,
@@ -27,7 +29,7 @@ const ClubSessionLogPage: React.FC<ClubStackProps<"ClubLogs">> = ({
   );
 
   const handleSessionPress = (sessionId: number) => {
-    // navigation.push("MyPracticeInfo", { sessionId });
+    // navigation.push("SessionLogDetail", { sessionId });
   };
 
   return (

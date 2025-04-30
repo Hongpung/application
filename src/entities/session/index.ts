@@ -11,3 +11,4 @@ export * from './ui/SessionLogCard/SessionLogCard';
 export * from './lib/useSessionColor';
 export * from './model/UseRoomState'
 export * from './model/ThisSessionState'
+export * from './api/sessionApi'

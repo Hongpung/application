@@ -1,203 +1,196 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import { Text, View, StyleSheet } from "react-native";
 
-import MemberList from '@hongpung/src/widgets/member/ui/MemberList/MemberList';
-import SelectedParticipatorList from '@hongpung/src/widgets/reservation/ui/SelectedParticipatorHList/SelectedParticipatorHList';
-import Header from '@hongpung/src/common/ui/Header/Header';
-import { Icons } from '@hongpung/src/common/ui/Icons/Icons';
-import { ParticipatorsConfirmButton } from '@hongpung/src/features/reservation/configureReservation/ui/ParticipatorsConfirmButton/ParticipatorsConfirmButton';
-import OptionsModal from '@hongpung/src/widgets/reservation/ui/OptionsModal/OptionsModal';
-import FilterHList from '@hongpung/src/widgets/reservation/ui/FilterHList/FilterHList';
-import SearchMemberNameBar from '@hongpung/src/widgets/reservation/ui/SearchMemberNameBar.tsx/SearchMemberNameBar';
-import { Color } from '@hongpung/src/common';
-import { useCreateReservation } from '@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context';
-import InvitePossibleMemberList from '@hongpung/src/widgets/reservation/ui/InvitePossibleMemberList/InvitePossibleMemberList';
-import { useParticipatorsFilters } from '@hongpung/src/features/reservation/configureReservation/model/useParticipatorsFilters';
-import { useInvitePossibleMemberData } from '@hongpung/src/features/reservation/configureReservation/model/useParaticipatorData';
-import { useSelectParticipators } from '@hongpung/src/features/reservation/configureReservation/model/useSelectParticipators';
+import { Header, Color, Icons } from "@hongpung/src/common";
+import { ParticipatorsConfirmButton } from "@hongpung/src/features/reservation/configureReservation/ui/ParticipatorsConfirmButton/ParticipatorsConfirmButton";
 
-const ParticipantsSelectScreen: React.FC = () => {
+import SelectedParticipatorList from "@hongpung/src/widgets/reservation/ui/SelectedParticipatorHList/SelectedParticipatorHList";
+import OptionsModal from "@hongpung/src/widgets/reservation/ui/OptionsModal/OptionsModal";
+import FilterHList from "@hongpung/src/widgets/reservation/ui/FilterHList/FilterHList";
+import SearchMemberNameBar from "@hongpung/src/widgets/reservation/ui/SearchMemberNameBar.tsx/SearchMemberNameBar";
 
-    const {
-        findOptions,
-        setFindOptions,
-        descendingOrder,
-        setDescendingOrder,
-        selectedClubs,
-        setClubsOption,
-        selectedEnrollmentNumberRange,
-        setEnrollmentNumberRange,
-        debounceKeyword,
-        handleApplyFilters,
-        handleResetFilters,
-        filterParams,
-    } = useParticipatorsFilters();
+import { useCreateReservation } from "@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context";
+import InvitePossibleMemberList from "@hongpung/src/widgets/reservation/ui/InvitePossibleMemberList/InvitePossibleMemberList";
+import { useParticipatorsFilters } from "@hongpung/src/features/reservation/configureReservation/model/useParticipatorsFilters";
+import { useInvitePossibleMemberData } from "@hongpung/src/features/reservation/configureReservation/model/useParaticipatorData";
+import { useSelectParticipators } from "@hongpung/src/features/reservation/configureReservation/model/useSelectParticipators";
 
-    const { reservation, setParticipators } = useCreateReservation();
+const CreateReservationParticipatorsSelectScreen: React.FC = () => {
+  const {
+    findOptions,
+    setFindOptions,
+    descendingOrder,
+    setDescendingOrder,
+    selectedClubs,
+    setClubsOption,
+    selectedEnrollmentNumberRange,
+    setEnrollmentNumberRange,
+    debounceKeyword,
+    handleApplyFilters,
+    handleResetFilters,
+    filterParams,
+  } = useParticipatorsFilters();
 
-    const { data, isLoading, loadNewPage } = useInvitePossibleMemberData(filterParams)
+  const { reservation, setParticipators } = useCreateReservation();
 
-    const { toggleParticipator, ...participatorsData } = useSelectParticipators(reservation.participators);
+  const { data, isLoading, loadNewPage } =
+    useInvitePossibleMemberData(filterParams);
 
-    const { newParticipators } = participatorsData;
+  const { toggleParticipator, ...participatorsData } = useSelectParticipators(
+    reservation.participators
+  );
 
-    const [optionsSelectState, setOptionSelectState] = useState(false);
+  const { newParticipators } = participatorsData;
 
-    const [searchBarVisible, setSearchBarVisible] = useState(false);
+  const [optionsSelectState, setOptionSelectState] = useState(false);
 
-    return (
-        <View style={styles.container}>
-            <Header
-                leftButton='close'
-                HeaderName={'인원 선택'}
-                RightButton={<Icons size={28} name={'search'} color={Color['grey400']} />}
-                RightAction={() => setSearchBarVisible(true)}
+  const [searchBarVisible, setSearchBarVisible] = useState(false);
+
+  return (
+    <View style={styles.container}>
+      <Header
+        leftButton="close"
+        headerName={"인원 선택"}
+        RightButton={
+          <Icons size={28} name={"search"} color={Color["grey400"]} />
+        }
+        rightAction={() => setSearchBarVisible(true)}
+      />
+      <>
+        <OptionsModal
+          visible={optionsSelectState}
+          selectedClubs={selectedClubs}
+          setClubsOption={setClubsOption}
+          selectedEnrollmentNumberRange={selectedEnrollmentNumberRange}
+          setEnrollmentNumberRange={setEnrollmentNumberRange}
+          onClose={handleResetFilters}
+          onApply={handleApplyFilters}
+        />
+
+        <SearchMemberNameBar
+          searchBarVisible={searchBarVisible}
+          setSearchBarVisible={setSearchBarVisible}
+          setFindOptions={setFindOptions}
+          debounceKeyword={debounceKeyword}
+        />
+
+        <FilterHList
+          descendingOrder={descendingOrder}
+          setDescendingOrder={setDescendingOrder}
+          findOptions={findOptions}
+          setOptionSelectState={setOptionSelectState}
+        />
+
+        {data?.length === 0 ? (
+          <View style={styles.noParticipantsContainer}>
+            <Text style={styles.noParticipantsText}>
+              함께 할 수 있는 인원이 없습니다.
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.participantsListContainer}>
+            <InvitePossibleMemberList
+              invitePossibleMembers={data}
+              onEndReached={loadNewPage}
+              isLoading={isLoading}
+              selectedMembers={newParticipators}
+              toggleMember={toggleParticipator}
             />
-            <>
+          </View>
+        )}
 
-                <OptionsModal
-                    visible={optionsSelectState}
-                    selectedClubs={selectedClubs}
-                    setClubsOption={setClubsOption}
-                    selectedEnrollmentNumberRange={selectedEnrollmentNumberRange}
-                    setEnrollmentNumberRange={setEnrollmentNumberRange}
-                    onClose={handleResetFilters}
-                    onApply={handleApplyFilters}
-                />
+        {newParticipators.length > 0 && (
+          <View style={styles.selectedParticipantsContainer}>
+            <SelectedParticipatorList {...participatorsData} />
 
-                <SearchMemberNameBar
-                    searchBarVisible={searchBarVisible}
-                    setSearchBarVisible={setSearchBarVisible}
-                    setFindOptions={setFindOptions}
-                    debounceKeyword={debounceKeyword}
-                />
-
-                <FilterHList
-                    descendingOrder={descendingOrder}
-                    setDescendingOrder={setDescendingOrder}
-                    findOptions={findOptions}
-                    setOptionSelectState={setOptionSelectState}
-                />
-
-                {data?.length === 0 ?
-                    (
-                        <View style={styles.noParticipantsContainer}>
-                            <Text style={styles.noParticipantsText}>
-                                함께 할 수 있는 인원이 없습니다.
-                            </Text>
-                        </View>
-                    ) : (
-                        <View style={styles.participantsListContainer}>
-
-                            <InvitePossibleMemberList
-                                invitePossibleMembers={data}
-                                onEndReached={loadNewPage}
-                                isLoading={isLoading}
-                                selectedMembers={newParticipators}
-                                toggleMember={toggleParticipator}
-                            />
-
-                        </View>
-                    )}
-
-                {newParticipators.length > 0 && (
-                    <View style={styles.selectedParticipantsContainer}>
-
-                        <SelectedParticipatorList
-                            {...participatorsData}
-                        />
-
-                        <ParticipatorsConfirmButton
-                            participatorsLength={newParticipators.length}
-                            onPress={() => setParticipators([...newParticipators])}
-                        />
-
-                    </View>
-                )}
-            </>
-        </View>
-    );
+            <ParticipatorsConfirmButton
+              participatorsLength={newParticipators.length}
+              onPress={() => setParticipators([...newParticipators])}
+            />
+          </View>
+        )}
+      </>
+    </View>
+  );
 };
 
-export default ParticipantsSelectScreen;
-
-
+export default CreateReservationParticipatorsSelectScreen;
 
 export const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#FFF',
-    },
-    searchBarContainer: {
-        backgroundColor: Color['grey100'],
-        paddingHorizontal: 24,
-        paddingVertical: 8,
-    },
-    searchBar: {
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    searchInput: {
-        paddingHorizontal: 12,
-        fontSize: 16,
-        height: 32,
-        flex: 1,
-    },
-    searchCloseButton: {
-        height: 36,
-        width: 36,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    filterBarContainer: {
-        height: 32,
-        marginTop: 8,
-        marginHorizontal: 24,
-        gap: 8,
-        alignItems: 'flex-start',
-        paddingHorizontal: 4,
-    },
-    filterBox: {
-        height: 32,
-        paddingHorizontal: 10,
-        borderRadius: 15,
-        borderWidth: 1,
-        borderColor: Color['grey200'],
-        justifyContent: 'center',
-        backgroundColor: '#FFF',
-    },
-    filterText: {
-        fontFamily: 'NanumSquareNeo-Regular',
-        fontSize: 14,
-    },
-    filterButton: {
-        borderRadius: 5,
-        paddingHorizontal: 10,
-        backgroundColor: Color['grey100'],
-        height: 32,
-        justifyContent: 'center',
-    },
-    noParticipantsContainer: {
-        backgroundColor: '#FFF',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flex: 1,
-    },
-    noParticipantsText: {
-        marginHorizontal: 'auto',
-        fontFamily: 'NanumSquareNeo-Bold',
-        fontSize: 18,
-        color: Color['grey400'],
-    },
-    participantsListContainer: {
-        flex: 1,
-        marginTop: 12,
-        position: 'relative',
-    },
-    selectedParticipantsContainer: {
-        paddingTop: 12,
-        width: '100%',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#FFF",
+  },
+  searchBarContainer: {
+    backgroundColor: Color["grey100"],
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+  },
+  searchBar: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  searchInput: {
+    paddingHorizontal: 12,
+    fontSize: 16,
+    height: 32,
+    flex: 1,
+  },
+  searchCloseButton: {
+    height: 36,
+    width: 36,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  filterBarContainer: {
+    height: 32,
+    marginTop: 8,
+    marginHorizontal: 24,
+    gap: 8,
+    alignItems: "flex-start",
+    paddingHorizontal: 4,
+  },
+  filterBox: {
+    height: 32,
+    paddingHorizontal: 10,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: Color["grey200"],
+    justifyContent: "center",
+    backgroundColor: "#FFF",
+  },
+  filterText: {
+    fontFamily: "NanumSquareNeo-Regular",
+    fontSize: 14,
+  },
+  filterButton: {
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    backgroundColor: Color["grey100"],
+    height: 32,
+    justifyContent: "center",
+  },
+  noParticipantsContainer: {
+    backgroundColor: "#FFF",
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+  noParticipantsText: {
+    marginHorizontal: "auto",
+    fontFamily: "NanumSquareNeo-Bold",
+    fontSize: 18,
+    color: Color["grey400"],
+  },
+  participantsListContainer: {
+    flex: 1,
+    marginTop: 12,
+    position: "relative",
+  },
+  selectedParticipantsContainer: {
+    paddingTop: 12,
+    width: "100%",
+  },
 });

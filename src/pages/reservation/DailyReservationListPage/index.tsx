@@ -33,7 +33,10 @@ const DailyReservationListPage: React.FC<
         }}
         selectedDate={selectedDate}
         navigateToCreateReservation={() => {
-          
+          navigation.push("CreateReservation", {
+            screen: "CreateReservationForm",
+            params: { date: selectedDate.toISOString() },
+          });
         }}
       />
       <TimeLine>
