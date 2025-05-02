@@ -65,7 +65,7 @@ const InstrumentViewList: React.FC<InstrumentViewListProps> = ({
         ]}
       >
         {Array.from({ length: 8 }).map((_, index) => (
-          <InstrumentSkeletonCard />
+          <InstrumentSkeletonCard key={index + "skeleton"} />
         ))}
       </View>
     );

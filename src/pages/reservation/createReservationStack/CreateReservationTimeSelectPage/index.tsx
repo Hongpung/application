@@ -8,7 +8,6 @@ import { LongButton, TimeArray, TimeFormat } from "@hongpung/src/common";
 import { useState } from "react";
 import { useOccupiedTimes } from "@hongpung/src/features/reservation/configureReservation/model/useOccupiedTimes";
 import { useSelectTimes } from "@hongpung/src/features/reservation/configureReservation/model/useSelectTimes";
-import { useNavigation } from "@react-navigation/native";
 import { CreateReservationStackScreenProps } from "@hongpung/src/common/navigation/createReservation";
 
 const CreateReservationTimeSelectScreen: React.FC<
@@ -34,6 +33,7 @@ const CreateReservationTimeSelectScreen: React.FC<
     setTimeBlocks,
   });
 
+  console.log(occupiedTimes);
   return (
     <View style={{ flex: 1, backgroundColor: "#FFF" }}>
       <TimeSelectorHeader

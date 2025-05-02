@@ -1,13 +1,14 @@
-import { NotificationType } from "@hongpung/src/entities/notification/model/type";
-import { NotificationCard } from "@hongpung/src/features/notification/manageNotification/ui/NotificationCard/NotificationCard";
-import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
+import React from "react";
+import { View, Text, StyleSheet, FlatList } from "react-native";
+
+import { NotificationType } from "@hongpung/src/entities/notification";
+import { SwipeableNotificationCard } from "../SwipeableNotificationCard/SwipeableNotificationCard";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { Color } from "@hongpung/src/common";
-import { View, Text, StyleSheet } from "react-native";
-import React from "react";
 
 type NotificationListProps = {
-  data: NotificationType[]|null;
+  data: NotificationType[] | null;
   handleDelete: (notificationId: number) => void;
   lastReadNotificationId?: number;
 };
@@ -21,18 +22,17 @@ export const NotificationList: React.FC<NotificationListProps> = ({
     <GestureHandlerRootView>
       <FlatList
         data={data}
+        contentContainerStyle={{ gap: 8 }}
         renderItem={({ item }) => (
           <>
             {item.notificationId == lastReadNotificationId && (
               <View key={"latest-line"} style={styles.latestLine}>
                 <View style={styles.separator} />
-                <Text style={styles.previousNotificationText}>
-                  이전 알림
-                </Text>
+                <Text style={styles.previousNotificationText}>이전 알림</Text>
                 <View style={styles.separator} />
               </View>
             )}
-            <NotificationCard
+            <SwipeableNotificationCard
               notification={item}
               onDelete={() => {
                 handleDelete(item.notificationId);
@@ -44,9 +44,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>
-              새로운 알림이 없습니다.
-            </Text>
+            <Text style={styles.emptyText}>새로운 알림이 없습니다.</Text>
           </View>
         }
       />

@@ -1,27 +1,27 @@
 import { Color } from "@hongpung/src/common";
 import { NotificationType } from "@hongpung/src/entities/notification/model/type";
+import NotificationCard from "@hongpung/src/entities/notification/ui/NotificationCard/NotificationCard";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, View, Text, StyleSheet } from "react-native";
-import Swipeable,{ SwipeableMethods } from "react-native-gesture-handler/ReanimatedSwipeable";
+import { Pressable, Text, StyleSheet } from "react-native";
+import Swipeable, {
+  SwipeableMethods,
+} from "react-native-gesture-handler/ReanimatedSwipeable";
 import Animated, {
   interpolate,
   SharedValue,
   useAnimatedStyle,
 } from "react-native-reanimated";
 
-import { calculateTimeDifference } from "../../lib/calculatgeTimeDifference";
-
-type NotificationCard = {
+type SwipeableNotificationCardProps = {
   notification: NotificationType;
   onDelete: () => void;
 };
 
-export const NotificationCard: React.FC<NotificationCard> = ({
+export const SwipeableNotificationCard: React.FC<SwipeableNotificationCardProps> = ({
   notification,
   onDelete,
 }) => {
-  
   const navigation = useNavigation();
   const [isSwiped, setIsSwiped] = useState(false); // Swipeable 상태 관리
 
@@ -68,8 +68,9 @@ export const NotificationCard: React.FC<NotificationCard> = ({
       onSwipeableWillClose={() => setIsSwiped(false)}
       onSwipeableOpenStartDrag={() => setIsSwiped(true)}
     >
-      <Animated.View style={[styles.NotificationCard]}>
-        <Pressable
+      <Animated.View>
+        <NotificationCard
+          notification={notification}
           onPress={() => {
             if (isSwiped) return;
             else if (notification.data.data?.reservationId) {
@@ -92,30 +93,7 @@ export const NotificationCard: React.FC<NotificationCard> = ({
               );
             }
           }}
-        >
-          <View style={styles.notificationContent}>
-            <View style={styles.titleContainer}>
-              <Text style={styles.titleText}>{notification.data.title}</Text>
-            </View>
-            <Text style={styles.timestampText}>
-              {calculateTimeDifference(new Date(notification.timestamp))}
-            </Text>
-          </View>
-          <View style={styles.bodyContainer}>
-            <Text
-              style={[
-                styles.bodyText,
-                {
-                  color: notification.isRead
-                    ? Color["grey300"]
-                    : Color["grey600"],
-                },
-              ]}
-            >
-              {notification.data.body}
-            </Text>
-          </View>
-        </Pressable>
+        />
       </Animated.View>
     </Swipeable>
   );
@@ -127,16 +105,6 @@ const styles = StyleSheet.create({
     position: "relative",
     backgroundColor: "white",
     overflow: "scroll",
-  },
-  NotificationCard: {
-    marginHorizontal: 28,
-    marginVertical: 6,
-    flex: 1,
-    height: 120,
-    borderRadius: 5,
-    borderWidth: 1,
-    borderColor: Color["grey100"],
-    backgroundColor: "#FFF",
   },
   rightAction: {
     justifyContent: "center",

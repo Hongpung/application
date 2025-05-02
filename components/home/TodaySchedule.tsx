@@ -1,23 +1,12 @@
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import React, { useMemo } from "react";
-import { useIsFocused } from "@react-navigation/native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React from "react";
 import { Color } from "@hongpung/src/common";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilValue } from "recoil";
+
 import {
   myTodayReservationState,
   ReservationCard,
 } from "@hongpung/src/entities/reservation";
-
-import { UserStatusState } from "@hongpung/src/entities/member";
-import { NotificationIcon } from "@hongpung/src/features/notification/notReadNotification/ui/NotificationIcon/NotificationIcon";
-
-const { width } = Dimensions.get("window");
 
 interface TodayScheduleProps {
   navigateToReservationDetail: (reservationId: number) => void;
@@ -28,10 +17,7 @@ const TodaySchedule: React.FC<TodayScheduleProps> = ({
   navigateToReservationDetail,
   navigateToReservationCalendar,
 }) => {
-
-  const [todayReservationsData, setTodayReservations] = useRecoilState(
-    myTodayReservationState
-  );
+  const todayReservationsData = useRecoilValue(myTodayReservationState);
 
   return (
     <View
@@ -51,7 +37,7 @@ const TodaySchedule: React.FC<TodayScheduleProps> = ({
     >
       {todayReservationsData && todayReservationsData?.length > 0 ? (
         <View style={{ display: "flex", gap: 4 }}>
-          {todayReservationsData?.map((reservation, index) => {
+          {todayReservationsData?.map((reservation) => {
             return (
               <ReservationCard
                 key={reservation.reservationId}

@@ -42,6 +42,7 @@ const DailyReservationListPage: React.FC<
       <TimeLine>
         {reservations?.map((reservation) => (
           <ReservationCard
+            key={reservation.reservationId}
             reservation={reservation}
             onPress={() => {
               //예약 화면으로 이동

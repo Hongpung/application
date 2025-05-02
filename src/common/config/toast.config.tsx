@@ -1,4 +1,4 @@
-import { Icons } from '../ui/icons/Icons';
+import { Icons } from '../ui/Icons/Icons';
 import { Color } from '../constant/color';
 import { View, TouchableOpacity, Text, Pressable } from 'react-native';
 import Toast, { BaseToastProps } from 'react-native-toast-message';

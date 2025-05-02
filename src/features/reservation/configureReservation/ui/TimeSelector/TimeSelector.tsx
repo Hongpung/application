@@ -45,7 +45,7 @@ export const TimeSelector: React.FC<TimeLineProps> = ({
         <ScrollView ref={TimesRef}>
             {Array.from({ length: 13 }, (_, index) => (index + 10)).map((time, index) => {
                 return (
-                    <View key={time + index} pointerEvents="none">
+                    <View key={"time-line" + index} pointerEvents="none">
 
                         <View style={{ flexDirection: 'row', marginHorizontal: 24, alignItems: 'center', height: 24, justifyContent: 'center' }}>
 

@@ -86,13 +86,12 @@ export const DateTimeViewer: React.FC<DateTimeDisplayProps> = ({
           marginHorizontal: 40,
           backgroundColor: Color["grey100"],
           borderRadius: 10,
+          justifyContent: "center",
         }}
       >
         <View
           style={{
             flexDirection: "row",
-            marginTop: 8,
-            marginLeft: 8,
             alignItems: "center",
           }}
         >
@@ -178,7 +177,6 @@ export const DateTimeViewer: React.FC<DateTimeDisplayProps> = ({
           <View
             style={{
               flexDirection: "row",
-              marginTop: 20,
               alignItems: "center",
               justifyContent: "space-evenly",
             }}
@@ -197,7 +195,6 @@ export const DateTimeViewer: React.FC<DateTimeDisplayProps> = ({
           <View
             style={{
               flexDirection: "row",
-              marginTop: 20,
               alignItems: "center",
               justifyContent: "space-evenly",
             }}

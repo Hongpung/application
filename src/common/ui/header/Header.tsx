@@ -4,7 +4,7 @@ import React, { ComponentProps } from 'react'
 import { useNavigation } from "@react-navigation/native";
 import { Color } from '../../constant/color';
 import { Ionicons } from '@expo/vector-icons';
-import { Icons } from '../icons/Icons';
+import { Icons } from '../Icons/Icons';
 
 interface HeaderProps {
     leftButton: ComponentProps<typeof Ionicons>['name'] | null

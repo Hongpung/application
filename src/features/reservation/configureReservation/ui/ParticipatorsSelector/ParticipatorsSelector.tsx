@@ -2,17 +2,17 @@ import { View, Text, Pressable } from "react-native"
 
 import { Color, Icons } from "@hongpung/src/common"
 
-import { User } from "@hongpung/src/entities/member/@x/reservation"
+import { Member } from "@hongpung/src/entities/member"
 
 import { ParticipatorsViewer } from "@hongpung/src/entities/reservation"
 
-type ParticipantsSelectorProps = {
-    participators: User[]
+type ParticipatorsSelectorProps = {
+    participators: Member[]
     onPress: () => void
     resetParticipator: () => void
 }
 
-export const ParticipatorsSelector: React.FC<ParticipantsSelectorProps> = ({ participators, onPress, resetParticipator }) => {
+export const ParticipatorsSelector: React.FC<ParticipatorsSelectorProps> = ({ participators, onPress, resetParticipator }) => {
 
     return (
         <View>

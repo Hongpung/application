@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import { Color } from "../../constant/color";
 import { josa } from "es-hangul";
-import { Icons } from "../icons/Icons";
+import { Icons } from "../Icons/Icons";
 import { ValidationState } from "../../types/ValidationState";
 
 // 입력 상태 입력전, 입력 중, 입력 완료, 오류

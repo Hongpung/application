@@ -16,7 +16,7 @@ import {
 } from "../model/type";
 import { mapReservationDetail } from "../lib/mapReservationDetail";
 import { myTodayReservationState } from "../model/myTodayReservationState";
-import { TimeFormat } from "@hongpung/src/common";
+import { TimeArray, TimeFormat } from "@hongpung/src/common";
 import { colorDefine } from "../lib/colorDefine";
 import type { Member } from "@hongpung/src/entities/member/@x/reservation";
 import { Instrument } from "../../instrument/@x/reservation";
@@ -51,9 +51,15 @@ const reservationApi = baseApi.addEndpoints({
       },
       transformResponse: (data: ExistReservationDto[]) => {
         return data.map((reservation) => {
-          const occupiedTimes = data.map(
-            (reservation) => (reservation.startTime, reservation.endTime)
-          );
+          const occupiedTimes = data.map((reservation) => {
+            const firstTimeIndex = TimeArray.indexOf(
+              reservation.startTime
+            );
+            const lastTimeIndex = TimeArray.indexOf(
+              reservation.endTime
+            );
+            return TimeArray.slice(firstTimeIndex, lastTimeIndex)
+          }).flat();
           return {
             reservationId: reservation.reservationId,
             times: occupiedTimes,

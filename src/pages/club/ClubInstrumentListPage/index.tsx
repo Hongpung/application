@@ -3,7 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { type Instrument } from "@hongpung/src/entities/instrument";
 import { Header } from "@hongpung/src/common";
 import InstrumentViewList from "@hongpung/src/widgets/instrument/ui/InstrumentViewList/InstrumentViewList";
-import { useLoadClubInstrumentsFetch } from "@hongpung/src/features/club/manageInstrument/api/useLoadClubInstruments";
+import { useLoadClubInstrumentsFetch } from "@hongpung/src/entities/club";
 import { ClubStackProps } from "@hongpung/src/common/navigation";
 
 const ClubInstrumentListPage: React.FC<ClubStackProps<"ClubInstruments">> = ({

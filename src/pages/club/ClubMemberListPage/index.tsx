@@ -1,12 +1,9 @@
 import React from "react";
-import { View, ScrollView, StyleSheet } from "react-native";
-import {
-  useLoadMyClubMembersFetch,
-  type Member,
-} from "@hongpung/src/entities/member";
+import { View, StyleSheet } from "react-native";
+import { useLoadMyClubMembersFetch } from "@hongpung/src/entities/club";
 import { Header } from "@hongpung/src/common";
 import MemberList from "@hongpung/src/widgets/member/ui/MemberList/MemberList";
-import { ClubStackProps } from "@hongpung/src/navigation/ClubStackNavigation";
+import { ClubStackProps } from "@hongpung/src/common/navigation";
 
 const ClubMemberListPage: React.FC<ClubStackProps<"ClubMembers">> = ({
   navigation,

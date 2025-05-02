@@ -3,7 +3,7 @@ import React from 'react';
 import { useDropdown } from './Dropdown.context';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Color } from '../../../constant/color';
-import { Icons } from '../../icons/Icons';
+import { Icons } from '../../Icons/Icons';
 
 interface DropdownItemProps<T extends string> {
     optionValue: T;

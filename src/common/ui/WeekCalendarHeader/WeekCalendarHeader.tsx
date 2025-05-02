@@ -1,6 +1,6 @@
 import { Pressable, View, Text, StyleSheet, Dimensions } from "react-native";
 import { Color } from "../../constant/color";
-import { Icons } from "../icons/Icons";
+import { Icons } from "../Icons/Icons";
 import { useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 
