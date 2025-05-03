@@ -3,7 +3,6 @@ import React, {
   useEffect,
   useRef,
   forwardRef,
-  useImperativeHandle,
   Ref,
 } from "react";
 import {
@@ -14,7 +13,6 @@ import {
   Animated,
   Pressable,
   KeyboardTypeOptions,
-  Dimensions,
 } from "react-native";
 import { Color } from "../../constant/color";
 import { josa } from "es-hangul";

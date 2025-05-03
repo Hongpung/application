@@ -1,7 +1,6 @@
-// Dropdown/DropdownItem.tsx
 import React from 'react';
 import { useDropdown } from './Dropdown.context';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import { Color } from '../../../constant/color';
 import { Icons } from '../../Icons/Icons';
 

@@ -1,6 +1,3 @@
-import { atom } from "recoil";
+import { atom } from "jotai";
 
-export const UseRoomState = atom<boolean>({
-    key: 'UseRoomState',
-    default: false,
-});
+export const UseRoomState = atom<boolean>(false);

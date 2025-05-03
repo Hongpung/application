@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 
 import { Color, Icons } from "@hongpung/src/common";
 import { Header } from "@hongpung/src/common";
@@ -25,6 +25,7 @@ import { isEqual } from "lodash";
 import { useRef } from "react";
 import { EditReservationButton } from "@hongpung/src/features/reservation/editReservation/ui/EditReservationButton/EditReservationButton";
 import { instrumentTypes } from "@hongpung/src/entities/instrument/constant/instrumentTypes";
+import { EditReservationStackScreenProps } from "@hongpung/src/common/navigation/editReservation";
 
 const EditReservationConfirmPage = () => {
   const {
@@ -81,8 +82,8 @@ const DifferenceData = ({
   keys: (keyof ReservationForm)[];
   textColor: keyof typeof Color;
 }) => {
-  const loginUser = useRecoilValue(UserStatusState);
-  const navigation = useNavigation();
+  const loginUser = useAtomValue(UserStatusState);
+  const navigation = useNavigation<EditReservationStackScreenProps<"EditReservationConfirm">["navigation"]>();
 
   const timeRendered = useRef<boolean>(false);
   return (
@@ -176,7 +177,7 @@ const DifferenceData = ({
                       </Text>
                       <TouchableOpacity
                         onPress={() =>
-                          navigation.navigate("ReservationParticipatorsView", {
+                          navigation.navigate("ParticipatorList", {
                             participators: JSON.stringify(
                               reservation.participators
                             ),
@@ -228,8 +229,8 @@ const DifferenceData = ({
                       </Text>
                       <TouchableOpacity
                         onPress={() =>
-                          navigation.navigate("ReservationInstrumentsView", {
-                            instruments: JSON.stringify(
+                          navigation.navigate("BorrowInstrumentList", {
+                            borrowInstruments: JSON.stringify(
                               reservation.borrowInstruments
                             ),
                           })

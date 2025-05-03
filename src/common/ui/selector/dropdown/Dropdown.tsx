@@ -1,4 +1,3 @@
-// Dropdown/Dropdown.tsx
 import React from 'react';
 import { DropdownProvider } from './Dropdown.context';
 import { View } from 'react-native';

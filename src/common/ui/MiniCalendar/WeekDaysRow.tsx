@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, View, StyleSheet, Dimensions } from "react-native";
 import { WEEK_DAYS } from "../../constant/weekDays";
-import { Color } from "@hongpung/src/common";
+import { Color } from "../../constant/color";
 
 const { width } = Dimensions.get("window");
 

@@ -23,7 +23,9 @@ import InstrumentDetailPage from "../pages/instrument/InstrumentDetailPage";
 const MainStack = createNativeStackNavigator<MainStackParamList>();
 
 export const MainStackNavigation = () => {
+
   useLoadMyStatusFetch();
+
   return (
     <MainStack.Navigator
       screenOptions={{

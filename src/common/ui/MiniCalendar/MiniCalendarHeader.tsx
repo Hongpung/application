@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import { Color, Icons } from "@hongpung/src/common";
+import { Color } from "../../constant/color";
+import { Icons } from "../Icons/Icons";
 
 interface MiniCalendarHeaderProps {
   currentMonth: Date;

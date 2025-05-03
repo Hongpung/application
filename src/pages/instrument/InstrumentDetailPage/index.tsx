@@ -11,7 +11,7 @@ import {
   Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 
 import { Color } from "@hongpung/src/common";
 import { UserStatusState } from "@hongpung/src/entities/member";
@@ -32,7 +32,7 @@ const InstrumentDetailPage: React.FC<
 
   const [imageModalVisible, setImageModalVisible] = useState(false);
   const [aspectRatio, setAspectRatio] = useState<number | null>(null);
-  const loginUser = useRecoilValue(UserStatusState);
+  const loginUser = useAtomValue(UserStatusState);
 
   useEffect(() => {
     if (!!data?.imageUrl) {

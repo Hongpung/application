@@ -3,7 +3,7 @@ import { ThisSessionState } from "@hongpung/src/entities/session";
 import { useCalculateTime } from "@hongpung/src/features/session/useRoom/model/useCalculateTime";
 import { useUsingRoomSocket } from "@hongpung/src/features/session/useRoom/socket/useUsingRoomSocket";
 import { View, StyleSheet, Animated } from "react-native";
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 import { Header } from "./Header";
 import { TimeInfo } from "./TimeInfo";
 import { ExtendButton } from "./ExtendButton";
@@ -21,7 +21,7 @@ export const SessionManageBottomSheet: React.FC<
   useUsingRoomSocket();
   const BottomSheetHeight = useBottomTabBarHeight();
 
-  const usingSession = useRecoilValue(ThisSessionState);
+  const usingSession = useAtomValue(ThisSessionState);
   const { remainingHour, remainingMinute } = useCalculateTime();
 
   const bottomAnim = useRef(new Animated.Value(0)).current;

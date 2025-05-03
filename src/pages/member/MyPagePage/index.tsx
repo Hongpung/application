@@ -1,20 +1,22 @@
 import { ScrollView, View, StyleSheet } from "react-native";
 import React from "react";
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 import { UserStatusState } from "@hongpung/src/entities/member";
 import { ProfileBox } from "@hongpung/src/entities/member/ui/ProfileBox/ProfileBox";
 
 import { MyActivitiesSection } from "@hongpung/src/widgets/member/ui/MyActivitiesSection/MyActivitiesSection";
 import { SettingsSection } from "@hongpung/src/widgets/member/ui/SettingsSection/SettingsSection";
 import { FooterSection } from "@hongpung/src/widgets/member/ui/FooterSection/FooterSection";
-import { MainTabScreenProps } from "@hongpung/src/navigation/MainTabNavigation";
-import { MainStackParamList } from "@hongpung/src/navigation/MainStackNavigation";
+import {
+  MainTabScreenProps,
+  MainStackParamList,
+} from "@hongpung/src/common/navigation";
 import { Header } from "@hongpung/src/common";
 
 const MyPageScreen: React.FC<MainTabScreenProps<"MyPage">> = ({
   navigation,
 }) => {
-  const loginUser = useRecoilValue(UserStatusState);
+  const loginUser = useAtomValue(UserStatusState);
 
   if (!loginUser) {
     return <View />;

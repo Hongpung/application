@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Pressable } from 'react-native'
-import React, { useState } from 'react'
+import React from 'react'
 import { Color } from '../../constant/color';
 
 

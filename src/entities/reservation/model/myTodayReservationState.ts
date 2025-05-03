@@ -1,7 +1,4 @@
-import { atom } from "recoil";
+import { atom } from "jotai";
 import { DailyReservation } from "./type";
 
-export const myTodayReservationState = atom<DailyReservation[] | null>({
-    key: 'myTodayReservationState',
-    default: null
-})
+export const myTodayReservationState = atom<DailyReservation[] | null>(null);

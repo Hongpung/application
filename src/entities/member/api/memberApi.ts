@@ -1,24 +1,19 @@
-
 import { baseApi } from "@hongpung/src/common/api";
 import { Member } from "../model/type";
 import { UserStatusState } from "../model/UserStatusState";
 
-
 const memberApi = baseApi.addEndpoints({
-    endpoints: (build) => ({
+  endpoints: (build) => ({
+    loadMyStatus: build.fetch<Member, void>({
+      recoilState: UserStatusState,
+      query: () => {
+        return {
+          url: "/member/my-status",
+          withAuthorize: true,
+        };
+      },
+    }),
+  }),
+});
 
-        loadMyStatus: build.fetch<Member, void>({
-            recoilState: UserStatusState,
-            query: () => {
-                return {
-                    url: '/member/my-status',
-                    withAuthorize: true
-                }
-            }
-        }),
-
-    })
-})
-
-
-export const {  useLoadMyStatusFetch } = memberApi
+export const { useLoadMyStatusFetch } = memberApi;

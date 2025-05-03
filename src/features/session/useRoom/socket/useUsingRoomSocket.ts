@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Alert, AppState, AppStateStatus } from "react-native";
 
-import { useRecoilState } from "recoil";
+import { useAtom } from "jotai";
 import { StackActions, useNavigation } from "@react-navigation/native";
 
 import Toast from "react-native-toast-message";
@@ -19,8 +19,8 @@ export const useUsingRoomSocket = () => {
 
     const navigation = useNavigation();
 
-    const [sessionState, setSessionState] = useRecoilState(ThisSessionState)
-    const [isUseRoom, setUseRoom] = useRecoilState(UseRoomState)
+    const [sessionState, setSessionState] = useAtom(ThisSessionState)
+    const [isUseRoom, setUseRoom] = useAtom(UseRoomState)
 
     const connectSocket = async () => {
         if (socketRef.current) {

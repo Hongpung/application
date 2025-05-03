@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { View } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { Pressable, View, Text } from "react-native";
 import { ReservationStackScreenProps } from "@hongpung/src/common/navigation";
 import { WeekCalendarHeader } from "@hongpung/src/common/ui/WeekCalendarHeader/WeekCalendarHeader";
 
@@ -7,6 +7,7 @@ import { useLoadDailyReservationsFetch } from "@hongpung/src/entities/reservatio
 import { ReservationCard } from "@hongpung/src/entities/reservation/ui/ReservationCard/ReservationCard";
 
 import { TimeLine } from "@hongpung/src/widgets/reservation/ui/TimeLine/TimeLine";
+import { Color } from "@hongpung/src/common";
 
 const DailyReservationListPage: React.FC<
   ReservationStackScreenProps<"DailyReserveList">
@@ -21,6 +22,17 @@ const DailyReservationListPage: React.FC<
     error,
   } = useLoadDailyReservationsFetch({ date: selectedDate });
 
+  const isCreatePossible = useMemo(() => {
+    const today = new Date();
+    return selectedDate.getTime() + 4 * 60 * 60 * 1000 >= today.getTime();
+  }, [selectedDate]);
+
+  const navigateToCreateReservation = useCallback(() => {
+    navigation.push("CreateReservation", {
+      screen: "CreateReservationForm",
+      params: { date: selectedDate.toISOString() },
+    });
+  }, [navigation, selectedDate]);
   return (
     <View style={{ flex: 1, backgroundColor: "#FFF" }}>
       <WeekCalendarHeader
@@ -32,12 +44,27 @@ const DailyReservationListPage: React.FC<
           if (navigation.canGoBack()) navigation.goBack();
         }}
         selectedDate={selectedDate}
-        navigateToCreateReservation={() => {
-          navigation.push("CreateReservation", {
-            screen: "CreateReservationForm",
-            params: { date: selectedDate.toISOString() },
-          });
-        }}
+        RightButton={
+          isCreatePossible && (
+            <Pressable
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              onPress={navigateToCreateReservation}
+            >
+              <Text
+                style={{
+                  color: Color["blue500"],
+                  fontSize: 16,
+                  fontFamily: "NanumSquareNeo-Bold",
+                }}
+              >
+                추가
+              </Text>
+            </Pressable>
+          )
+        }
       />
       <TimeLine>
         {reservations?.map((reservation) => (

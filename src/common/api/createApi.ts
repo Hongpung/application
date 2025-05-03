@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { RecoilState, useRecoilState, useSetRecoilState } from "recoil";
+import { useAtom, useSetAtom, WritableAtom } from "jotai";
 import { getToken } from "../lib/TokenHandler";
 import {
   StackActions,
-  useIsFocused,
   useNavigation,
 } from "@react-navigation/native";
 
@@ -178,10 +177,10 @@ const useRequest = <T, P>() => {
 const useRequestWithRecoil = <T, P>({
   recoilState,
 }: {
-  recoilState: RecoilState<T | null>;
+  recoilState: WritableAtom<T | null, [T | null], void>;
 }) => {
   const navigation = useNavigation();
-  const setData = useSetRecoilState<T | null>(recoilState);
+  const setData = useSetAtom(recoilState);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -287,8 +286,8 @@ const useFetchWithRecoil = <T>({
   options,
   recoilState,
   withAuthorize = true,
-}: FetchParams<T> & { recoilState: RecoilState<T | null> }) => {
-  const [data, setData] = useRecoilState<T | null>(recoilState);
+}: FetchParams<T> & { recoilState: WritableAtom<T | null, [T | null], void> }) => {
+  const [data, setData] = useAtom(recoilState);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const navigation = useNavigation();
@@ -343,7 +342,7 @@ type RequestReturn<Response, Params> = {
 type Build = {
   fetch: <Response, Params>(config: {
     // R, P에 any 비허용
-    recoilState?: RecoilState<Validate<Response> | null>;
+    recoilState?: WritableAtom<Validate<Response> | null, [Validate<Response> | null], void>;
     query: (params: Validate<Params>) => Omit<RequestOptions, "method">;
     transformResponse?: (data: any) => Validate<Response>;
   }) => {
@@ -354,7 +353,7 @@ type Build = {
   };
 
   request: <Response, Params>(config: {
-    recoilState?: RecoilState<Validate<Response> | null>;
+    recoilState?: WritableAtom<Validate<Response> | null, [Validate<Response> | null], void>;
     query: (params: Validate<Params>) => Omit<RequestOptions, "method"> & {
       method: Exclude<RequestMethod, "GET">;
     };
@@ -416,7 +415,7 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
         query,
         transformResponse,
       }: {
-        recoilState?: RecoilState<Validate<R> | null>;
+        recoilState?: WritableAtom<Validate<R> | null, [Validate<R> | null], void>;
         query: (params: Validate<P>) => Omit<RequestOptions, "method">;
         transformResponse?: (data: any) => Validate<R>;
       }) => {
@@ -448,7 +447,7 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
         query,
         transformResponse,
       }: {
-        recoilState?: RecoilState<Validate<R> | null>;
+        recoilState?: WritableAtom<Validate<R> | null, [Validate<R> | null], void>;
         query: (params: Validate<P>) => Omit<RequestOptions, "method"> & {
           method: Exclude<RequestMethod, "GET">;
         };

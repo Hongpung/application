@@ -1,4 +1,3 @@
-// Dropdown/DropdownTrigger.tsx
 import React, { FC } from 'react';
 import { useDropdown } from './Dropdown.context';
 

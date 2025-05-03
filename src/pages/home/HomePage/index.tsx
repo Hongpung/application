@@ -2,7 +2,7 @@ import { ScrollView, View, StyleSheet, Text } from "react-native";
 import { NotificationIcon } from "@hongpung/src/features/notification/notReadNotification/ui/NotificationIcon/NotificationIcon";
 import { SessionManageBottomSheet } from "@hongpung/src/widgets/session/ui/SessionManageBottomSheet";
 import { UseRoomState } from "@hongpung/src/entities/session";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useAtom, useAtomValue } from "jotai";
 import { useMemo, useState } from "react";
 import TodaySchedule from "@hongpung/components/home/TodaySchedule";
 import { UserStatusState } from "@hongpung/src/entities/member";
@@ -15,13 +15,13 @@ import { useNoticePanel } from "@hongpung/src/widgets/notice/model/useNoticePane
 import { MainTabScreenProps } from "@hongpung/src/common/navigation";
 
 const HomePage: React.FC<MainTabScreenProps<"Home">> = ({ navigation }) => {
-  const isUsingSession = useRecoilValue(UseRoomState);
-  const loginUser = useRecoilValue(UserStatusState);
+  const isUsingSession = useAtomValue(UseRoomState);
+  const loginUser = useAtomValue(UserStatusState);
   const today = useMemo(() => {
     return new Date().toISOString().split("T")[0];
   }, []);
   const { noticeList, isLoading } = useNoticePanel();
-  const [todayReservationsData, setTodayReservations] = useRecoilState(
+  const [todayReservationsData, setTodayReservations] = useAtom(
     myTodayReservationState
   );
   const [isSlideUp, setIsSlideUp] = useState(false);

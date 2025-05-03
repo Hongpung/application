@@ -1,6 +1,6 @@
 import { TextInput, Text, View } from "react-native"
 
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 
 import { Color } from "@hongpung/src/common";
 import { UserStatusState } from "@hongpung/src/entities/member";
@@ -12,7 +12,7 @@ type TitleInputProps = {
 
 export const TitleInput: React.FC<TitleInputProps> = ({ title, setTitle }) => {
 
-    const userStatus = useRecoilValue(UserStatusState)
+    const userStatus = useAtomValue(UserStatusState)
 
     return (
         <View>

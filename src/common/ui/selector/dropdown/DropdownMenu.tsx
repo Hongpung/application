@@ -1,4 +1,3 @@
-// Dropdown/DropdownMenu.tsx
 import React, { FC } from "react";
 import { useDropdown } from "./Dropdown.context";
 import { ScrollView, View } from "react-native";

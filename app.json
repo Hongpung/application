@@ -6,11 +6,13 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "jsEngine":"hermes",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "cover",
       "backgroundColor": "#ffffff"
     },
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
       "infoPlist": {
@@ -38,7 +40,6 @@
         "NOTIFICATIONS"
       ],
       "versionCode": 8,
-      "usesCleartextTraffic": true,
       "package": "com.widepants.HongPung"
     },
     "fonts": {
@@ -54,12 +55,9 @@
         "expo-build-properties",
         {
           "android": {
-            "newArchEnabled": true,
             "kotlinVersion": "1.9.0",
-            "gradlePluginVersion": "8.1.2"
-          },
-          "ios": {
-            "newArchEnabled": true
+            "gradlePluginVersion": "8.1.2",
+            "usesCleartextTraffic": true
           }
         }
       ],

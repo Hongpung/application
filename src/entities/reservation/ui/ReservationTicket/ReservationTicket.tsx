@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { Color } from '@hongpung/src/common';
 import { Reservation } from '@hongpung/src/entities/reservation';
-import { useRecoilValue } from 'recoil';
+import { useAtomValue } from 'jotai';
 import { UserStatusState } from '@hongpung/src/entities/member';
 
 interface ReservationTicketProps {
@@ -14,7 +14,7 @@ export const ReservationTicket: React.FC<ReservationTicketProps> = ({
   reservation,
   onPressTicket,
 }) => {
-  const loginUser = useRecoilValue(UserStatusState);
+  const loginUser = useAtomValue(UserStatusState);
   const isCreator = reservation.creatorId === loginUser?.memberId;
 
   return (

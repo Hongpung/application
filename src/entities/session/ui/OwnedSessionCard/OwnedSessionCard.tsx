@@ -4,7 +4,7 @@ import { Color, Icons } from "@hongpung/src/common";
 import { Session } from "@hongpung/src/entities/session";
 import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
 import { UserStatusState } from "@hongpung/src/entities/member";
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 
 interface OwnedSessionCardProps {
   session: Session;
@@ -13,7 +13,7 @@ interface OwnedSessionCardProps {
 export const OwnedSessionCard: React.FC<OwnedSessionCardProps> = ({
   session,
 }) => {
-  const loginUser = useRecoilValue(UserStatusState);
+  const loginUser = useAtomValue(UserStatusState);
   const isOwned = session.creatorId === loginUser?.memberId;
 
   return (

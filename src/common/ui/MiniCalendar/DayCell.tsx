@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, Text, View, StyleSheet } from "react-native";
-import { Color } from "@hongpung/src/common";
+import { Color } from "../../constant/color";
 
 interface DayCellProps {
   day: number;

@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, FlatList, Pressable, Image } from "react-native";
-import { Color } from "@hongpung/src/common";
-import { PhotoFileFormat } from "@hongpung/src/common/types/PhotoFileFormat";
+import { Color } from "../../constant/color";
+import { PhotoFileFormat } from "../../types/PhotoFileFormat";
 
 interface ThumbnailListProps {
   photos: PhotoFileFormat[];

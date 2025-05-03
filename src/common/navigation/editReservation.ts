@@ -1,4 +1,5 @@
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { MainStackNavigationProp } from "./mainStack";
 
 export type EditReservationStackParamList = {
   EditReservationForm: undefined;
@@ -11,4 +12,7 @@ export type EditReservationStackParamList = {
 
 export type EditReservationStackScreenProps<
   T extends keyof EditReservationStackParamList
-> = NativeStackScreenProps<EditReservationStackParamList, T>;
+> = {
+  navigation: MainStackNavigationProp;
+  route:  NativeStackScreenProps<EditReservationStackParamList, T>
+};

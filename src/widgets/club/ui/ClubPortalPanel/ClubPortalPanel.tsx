@@ -1,6 +1,6 @@
 import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
 
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 
 import { Color } from "@hongpung/src/common";
 import { UserStatusState } from "@hongpung/src/entities/member";
@@ -12,7 +12,7 @@ interface ClubPortalPanelProps {
 export const ClubPortalPanel: React.FC<ClubPortalPanelProps> = ({
   navigateToClubHome,
 }) => {
-  const loginUser = useRecoilValue(UserStatusState);
+  const loginUser = useAtomValue(UserStatusState);
 
   return (
     <TouchableOpacity

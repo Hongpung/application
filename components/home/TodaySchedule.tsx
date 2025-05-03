@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { Color } from "@hongpung/src/common";
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 
 import {
   myTodayReservationState,
@@ -17,7 +17,7 @@ const TodaySchedule: React.FC<TodayScheduleProps> = ({
   navigateToReservationDetail,
   navigateToReservationCalendar,
 }) => {
-  const todayReservationsData = useRecoilValue(myTodayReservationState);
+  const todayReservationsData = useAtomValue(myTodayReservationState);
 
   return (
     <View

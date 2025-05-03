@@ -1,10 +1,10 @@
 import { ThisSessionState } from "@hongpung/src/entities/session";
 import { useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 
 export const useCalculateTime = () => {
 
-    const usingSession = useRecoilValue(ThisSessionState);
+    const usingSession = useAtomValue(ThisSessionState);
 
     const [remainingHour, setRemainingHour] = useState("00시간");
     const [remainingMinute, setRemainingMinute] = useState("00분");

@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
-import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+
 import { useCheckIn } from "@hongpung/src/features/session/checkInRoom/model/useCheckIn";
 import { CheckInButton } from "@hongpung/src/features/session/checkInRoom/ui/CheckInButton/CheckInButton";
 import { ErrorModal } from "@hongpung/src/common/ui/ErrorModal/ErrorModal";
@@ -36,15 +36,15 @@ const CheckInPage: React.FC = () => {
     );
   }
 
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <SkeletonPlaceholder>
-          <View style={styles.skeletonContainer}></View>
-        </SkeletonPlaceholder>
-      </View>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <View style={styles.loadingContainer}>
+  //       <SkeletonPlaceholder>
+  //         <View style={styles.skeletonContainer}></View>
+  //       </SkeletonPlaceholder>
+  //     </View>
+  //   );
+  // }
 
   if (!sessionData || !checkinStatus) {
     return (

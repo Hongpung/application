@@ -1,5 +1,5 @@
 import { SubMenu } from "@hongpung/src/common";
-import { MainStackParamList } from "@hongpung/src/navigation/MainStackNavigation";
+import { MainStackParamList } from "@hongpung/src/common/navigation";
 
 export const MY_ACTIVITIE_MENUS: SubMenu<MainStackParamList>[] = [
   { name: "다가오는 일정", link: "UpComingReservation" },

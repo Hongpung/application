@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable } from 'react-native';
 import { Image } from 'expo-image'
 
-import { Banner } from '@hongpung/src/entities/banner'
+import { Banner } from '../model/type'
 
 interface BannerItemProps {
     banner: Banner;

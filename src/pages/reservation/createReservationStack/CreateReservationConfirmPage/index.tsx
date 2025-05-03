@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
 
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 
 import { Color, Icons, Header, daysOfWeek } from "@hongpung/src/common";
 
@@ -17,7 +17,7 @@ const CreateReservationConfirmPage: React.FC<
 > = ({ navigation }) => {
   const { reservation, isValidReservation } = useCreateReservation();
 
-  const loginUser = useRecoilValue(UserStatusState);
+  const loginUser = useAtomValue(UserStatusState);
 
   if (!isValidReservation) {
     Alert.alert("오류", "잘못된 접근입니다.");

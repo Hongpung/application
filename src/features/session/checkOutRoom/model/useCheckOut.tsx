@@ -4,7 +4,7 @@ import { uploadImageListRequest } from "@hongpung/src/common/api/uploadImageApi"
 import { StackActions, useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { Alert } from "react-native";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useAtomValue, useAtom } from "jotai";
 import { CheckOutStep } from "./types";
 import { useEndSessionRequest } from "../api/checkInApi";
 import { parsePhotoToFile } from "@hongpung/src/entities/session/lib/parsePhotoToFile";
@@ -16,8 +16,8 @@ export const useCheckOut = () => {
   const [onStep, setStep] = useState<CheckOutStep>("CheckOutConfirm");
   const [photos, setPhotos] = useState<PhotoFileFormat[]>([]);
 
-  const usingSession = useRecoilValue(ThisSessionState);
-  const [useRoomState, setUseRoomState] = useRecoilState(UseRoomState);
+  const usingSession = useAtomValue(ThisSessionState);
+  const [useRoomState, setUseRoomState] = useAtom(UseRoomState);
 
   const { request: endSessionRequest, isLoading } = useEndSessionRequest();
 

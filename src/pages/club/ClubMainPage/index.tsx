@@ -6,14 +6,15 @@ import { ClubMenuSection } from "@hongpung/src/widgets/club/ui/ClubMenuSection/C
 import { ClubFooterSection } from "@hongpung/src/widgets/club/ui/ClubFooterSection/ClubFooterSection";
 import { useLoadClubInfoFetch } from "@hongpung/src/entities/club/api/clubApi";
 import { UserStatusState } from "@hongpung/src/entities/member";
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 import {
   ClubStackProps,
-} from "@hongpung/src/navigation/ClubStackNavigation";
+} from "@hongpung/src/common/navigation";
 import { ClubParamList } from "@hongpung/src/common/navigation";
+
 const ClubMainPage: React.FC<ClubStackProps<"ClubMain">> = ({ navigation }) => {
   const { data, isLoading, error } = useLoadClubInfoFetch();
-  const loginUser = useRecoilValue(UserStatusState);
+  const loginUser = useAtomValue(UserStatusState);
 
   const handleMenuPress = (link: keyof ClubParamList) => {
     navigation.push("Club", { screen: link });

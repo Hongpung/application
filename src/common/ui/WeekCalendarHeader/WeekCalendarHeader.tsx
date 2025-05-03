@@ -8,9 +8,8 @@ type WeekCalendarHeaderProps = {
   selectedDate: Date;
   changeDate: (selectedDate: Date) => void;
   onPressBackButton: () => void;
-  rightButton?: React.ReactNode;
   isLimit?: boolean;
-  navigateToCreateReservation: () => void;
+  RightButton?: React.ReactNode;
 };
 
 const { width } = Dimensions.get("window");
@@ -19,15 +18,11 @@ export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({
   selectedDate,
   changeDate,
   onPressBackButton,
-  rightButton,
   isLimit = false,
-  navigateToCreateReservation,
+  RightButton,
 }) => {
   const navigation = useNavigation();
   const today = new Date();
-  const isCreatePossible = useMemo(() => {
-    return selectedDate.getTime() + 13 * 60 * 60 * 1000 >= today.getTime();
-  }, [selectedDate]);
 
   const datesOfWeek = useMemo(() => {
     const day = selectedDate.getDay() == 0 ? 7 : selectedDate.getDay();
@@ -120,17 +115,11 @@ export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({
             alignItems: "center",
             justifyContent: "center",
             position: "absolute",
-            top: 11,
             right: 22,
-            width: 28,
             height: 28,
           }}
         >
-          {isCreatePossible && (
-            <Pressable onPress={navigateToCreateReservation}>
-              <Text>추가</Text>
-            </Pressable>
-          )}
+          {RightButton}
         </View>
       </View>
       <View

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { StackActions } from "@react-navigation/native";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useAtomValue, useAtom } from "jotai";
 import { UserStatusState } from "@hongpung/src/entities/member";
 import { UseRoomState } from "@hongpung/src/entities/session";
 import { CheckInAttendStatus, CheckInStartStatus } from "@hongpung/src/features/session/checkInRoom/model/type";
@@ -15,8 +15,8 @@ import { Alert } from "react-native";
 export const useCheckIn = () => {
     const navigation = useNavigation();
 
-    const loginUser = useRecoilValue(UserStatusState);
-    const [usingRoom,setUseRoom] = useRecoilState(UseRoomState);
+    const loginUser = useAtomValue(UserStatusState);
+    const [usingRoom,setUseRoom] = useAtom(UseRoomState);
     const [isCheckin, setIsCheckin] = useState(false);
 
     const [checkinStatus, setCheckinStatus] = useState<CheckInAttendStatus | CheckInStartStatus | null>(null);

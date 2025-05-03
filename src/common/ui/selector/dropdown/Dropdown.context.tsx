@@ -1,5 +1,4 @@
-// Dropdown/DropdownContext.tsx
-import React, { createContext, useContext, useState, ReactNode, FC } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 
 interface DropdownContextProps<T extends string> {
   isOpen: boolean;

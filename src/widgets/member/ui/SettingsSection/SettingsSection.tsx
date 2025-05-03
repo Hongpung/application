@@ -2,7 +2,7 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Color } from "@hongpung/src/common";
 import { Icons } from "@hongpung/src/common";
 import { SETTING_MENUS } from "@hongpung/src/entities/member/constants/settingSubMenu";
-import { MainStackParamList } from "@hongpung/src/navigation/MainStackNavigation";
+import { MainStackParamList } from "@hongpung/src/common/navigation";
 
 interface SettingsSectionProps {
   onPress: (link: keyof MainStackParamList) => void;

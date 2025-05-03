@@ -8,7 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 import { ThisSessionState } from "@hongpung/src/entities/session";
 import { Color, ErrorModal, Header, Icons } from "@hongpung/src/common";
 import MemberList from "@hongpung/src/widgets/member/ui/MemberList/MemberList";
@@ -28,7 +28,7 @@ import { SessionManagementScreenProps } from "@hongpung/src/common/navigation";
 const UsingManageScreen: React.FC<
   SessionManagementScreenProps<"SessionManage">
 > = ({ navigation }) => {
-  const usingSession = useRecoilValue(ThisSessionState);
+  const usingSession = useAtomValue(ThisSessionState);
 
   const { canExtand, canReturn } = useCalculateTime();
   const { request: extendRequest, isLoading } = useExtendSessionRequest();

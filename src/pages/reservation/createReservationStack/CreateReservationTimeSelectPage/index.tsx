@@ -26,6 +26,7 @@ const CreateReservationTimeSelectScreen: React.FC<
     date: selectedDate,
   });
   const { toggleTimeBlock } = useSelectTimes({
+    date: selectedDate,
     occupiedTimes,
     startTime,
     endTime,

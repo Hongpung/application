@@ -15,10 +15,10 @@ import {
 } from "@hongpung/src/entities/reservation";
 import { ReservationTypeViewer } from "@hongpung/src/entities/reservation/ui/ReservationTypeViewer/ReservationTypeViewer";
 import { Header } from "@hongpung/src/common";
-import { useRecoilValue } from "recoil";
+import { useAtomValue } from "jotai";
 import { UserStatusState } from "@hongpung/src/entities/member";
 import { Color } from "@hongpung/src/common";
-import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+
 import { DeleteReservationButton } from "@hongpung/src/features/reservation/deleteReservation/ui/DeleteReservationButton/DeleteReservationButton";
 import { isEditible } from "@hongpung/src/entities/reservation/lib/isEditible";
 import { LeaveReservationButton } from "@hongpung/src/features/reservation/leaveReservation/ui/LeaveReservationButton/LeaveReservationButton";
@@ -37,69 +37,14 @@ const ReservationDetailPage: React.FC<ReservationStackScreenProps<"ReservationDe
     error,
   } = useLoadReservationDetailFetch({ reservationId });
 
-  const loginUser = useRecoilValue(UserStatusState);
+  const loginUser = useAtomValue(UserStatusState);
 
   if (isLoading) {
     return (
       <View>
         <Header leftButton={"close"} headerName="예약 상세 정보" />
         <ScrollView contentContainerStyle={styles.scrollView}>
-          <SkeletonPlaceholder>
-            <View>
-              {/* 날짜 및 시간 */}
-              <View
-                style={[
-                  { flexDirection: "column", gap: 16, paddingVertical: 24 },
-                ]}
-              >
-                <View
-                  style={{
-                    height: 100,
-                    marginHorizontal: 40,
-                    backgroundColor: Color["grey100"],
-                    borderRadius: 10,
-                  }}
-                />
-              </View>
-
-              <View style={styles.placeholderRow}>
-                <View style={styles.placeholderLabel} />
-                <View style={styles.placeholderValue} />
-              </View>
-
-              {/* 예약자 */}
-              <View style={styles.placeholderRow}>
-                <View style={styles.placeholderLabel} />
-                <View style={styles.placeholderValue} />
-              </View>
-
-              {/* 예약명 */}
-              <View style={styles.placeholderRow}>
-                <View style={styles.placeholderLabel} />
-                <View style={styles.placeholderValue} />
-              </View>
-
-              {/* 예약 유형 */}
-              <View style={styles.placeholderRow}>
-                <View style={styles.placeholderLabel} />
-                <View style={styles.placeholderValue} />
-              </View>
-
-              {/* 참여자 */}
-              <View style={styles.placeholderSection}>
-                <View style={styles.placeholderLabel} />
-                <View style={styles.placeholderListItem} />
-                <View style={styles.placeholderListItem} />
-              </View>
-
-              {/* 대여 악기 */}
-              <View style={styles.placeholderSection}>
-                <View style={styles.placeholderLabel} />
-                <View style={styles.placeholderListItem} />
-                <View style={styles.placeholderListItem} />
-              </View>
-            </View>
-          </SkeletonPlaceholder>
+          
         </ScrollView>
       </View>
     );
@@ -145,7 +90,6 @@ const ReservationDetailPage: React.FC<ReservationStackScreenProps<"ReservationDe
                 gap: 24,
                 backgroundColor: "#FFF",
                 paddingVertical: 24,
-                backgroundClip: "border-box",
                 paddingHorizontal: 12,
               }}
             >
@@ -211,7 +155,6 @@ const ReservationDetailPage: React.FC<ReservationStackScreenProps<"ReservationDe
               gap: 24,
               backgroundColor: "#FFF",
               paddingVertical: 24,
-              backgroundClip: "border-box",
               paddingHorizontal: 12,
             }}
           >
@@ -237,7 +180,6 @@ const ReservationDetailPage: React.FC<ReservationStackScreenProps<"ReservationDe
               gap: 24,
               backgroundColor: "#FFF",
               paddingVertical: 24,
-              backgroundClip: "border-box",
               paddingHorizontal: 12,
             }}
           >
