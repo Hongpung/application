@@ -1,20 +1,18 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { ReservationStackScreenProps } from "@hongpung/src/common/navigation";
-import CreateReservationConfirmPage from "../pages/reservation/createReservationStack/CreateReservationConfirmPage";
-import ReservationCreatePage from "../pages/reservation/createReservationStack/ReservationCreatePage";
-import CreateReservationDateSelectScreen from "../pages/reservation/createReservationStack/CreateReservationDateSelectPage";
-import CreateReservationTimeSelectScreen from "../pages/reservation/createReservationStack/CreateReservationTimeSelectPage";
-import CreateReservationParticipatorsSelectScreen from "../pages/reservation/createReservationStack/CreateReservationParticipatorsSelectPage";
-import CreateReservationBorrowInstrumentsSelectScreen from "../pages/reservation/createReservationStack/CreateReservationInstrumentsSelectPage";
-import { EditReservationStackParamList } from "../common/navigation/editReservation";
-import EditReservationConfirmPage from "../pages/reservation/editReservationStack/EditReservationConfirmPage";
-import ReservationEditPage from "../pages/reservation/editReservationStack/ReservationEditPage";
-import { EditReservationContextProvider } from "../features/reservation/editReservation/model/useEditReservation.context";
+import CreateReservationDateSelectScreen from "@hongpung/src/pages/reservation/createReservationStack/CreateReservationDateSelectPage";
+import CreateReservationTimeSelectScreen from "@hongpung/src/pages/reservation/createReservationStack/CreateReservationTimeSelectPage";
+import CreateReservationParticipatorsSelectScreen from "@hongpung/src/pages/reservation/createReservationStack/CreateReservationParticipatorsSelectPage";
+import CreateReservationBorrowInstrumentsSelectScreen from "@hongpung/src/pages/reservation/createReservationStack/CreateReservationInstrumentsSelectPage";
+import { EditReservationStackParamList } from "@hongpung/src/common/navigation/editReservation";
+import EditReservationConfirmPage from "@hongpung/src/pages/reservation/editReservationStack/EditReservationConfirmPage";
+import ReservationEditPage from "@hongpung/src/pages/reservation/editReservationStack/ReservationEditPage";
+import { EditReservationContextProvider } from "@hongpung/src/features/reservation/editReservation/model/useEditReservation.context";
 import {
   ReservationForm,
   useLoadReservationDetailFetch,
-} from "../entities/reservation";
+} from "@hongpung/src/entities/reservation";
 import { View } from "react-native";
 import { ErrorModal, FullScreenLoadingModal } from "@hongpung/src/common";
 

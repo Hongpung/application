@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useAtom, useSetAtom, WritableAtom } from "jotai";
 import { getToken } from "../lib/TokenHandler";
-import {
-  StackActions,
-  useNavigation,
-} from "@react-navigation/native";
+import { StackActions, useNavigation } from "@react-navigation/native";
 
 type RequestMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -116,7 +113,7 @@ const buildApi = async <T>({
         throw new Error("Forbidden");
       }
     }
-    if(!response.ok){
+    if (!response.ok) {
       throw new Error("Errored");
     }
     const data = await response.json();
@@ -160,7 +157,11 @@ const useRequest = <T, P>() => {
       return transformResponse ? transformResponse(result) : result;
     } catch (err) {
       setError(err as Error);
-      if (err instanceof Error && err.message === "Unauthorized" && requestParams.withAuthorize) {
+      if (
+        err instanceof Error &&
+        err.message === "Unauthorized" &&
+        requestParams.withAuthorize
+      ) {
         navigation.setOptions({ animation: "none" });
         navigation.dispatch(StackActions.replace("LoginStack"));
       }
@@ -175,12 +176,12 @@ const useRequest = <T, P>() => {
 };
 
 const useRequestWithRecoil = <T, P>({
-  recoilState,
+  stateKey,
 }: {
-  recoilState: WritableAtom<T | null, [T | null], void>;
+  stateKey: WritableAtom<T | null, [T | null], void>;
 }) => {
   const navigation = useNavigation();
-  const setData = useSetAtom(recoilState);
+  const setData = useSetAtom(stateKey);
   const [isLoading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -211,7 +212,11 @@ const useRequestWithRecoil = <T, P>({
       } catch (err) {
         setError(err as Error);
         setData(null); // 요청 실패 시 데이터 초기화
-        if (err instanceof Error && err.message === "Unauthorized"&& requestParams.withAuthorize) {
+        if (
+          err instanceof Error &&
+          err.message === "Unauthorized" &&
+          requestParams.withAuthorize
+        ) {
           navigation.setOptions({ animation: "none" });
           navigation.dispatch(StackActions.replace("LoginStack"));
         }
@@ -221,12 +226,11 @@ const useRequestWithRecoil = <T, P>({
         clearTimeout(timeoutId);
       }
     },
-    [recoilState]
+    [stateKey]
   );
 
   return { isLoading, error, request };
 };
-
 
 const useFetch = <T>({
   url,
@@ -260,7 +264,11 @@ const useFetch = <T>({
       setError(null);
     } catch (err) {
       setError(err as Error);
-      if (err instanceof Error && err.message === "Unauthorized" && withAuthorize) {
+      if (
+        err instanceof Error &&
+        err.message === "Unauthorized" &&
+        withAuthorize
+      ) {
         navigation.setOptions({ animation: "none" });
         navigation.dispatch(StackActions.replace("LoginStack"));
       }
@@ -284,48 +292,54 @@ const useFetchWithRecoil = <T>({
   params,
   transformResponse,
   options,
-  recoilState,
+  stateKey,
   withAuthorize = true,
-}: FetchParams<T> & { recoilState: WritableAtom<T | null, [T | null], void> }) => {
-  const [data, setData] = useAtom(recoilState);
+}: FetchParams<T> & {
+  stateKey: WritableAtom<T | null, [T | null], void>;
+}) => {
+  const [data, setData] = useAtom(stateKey);
   const [isLoading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const navigation = useNavigation();
 
   const fetchData = useCallback(async () => {
     const controller = new AbortController();
-      const signal = controller.signal;
-      const timeoutId = setTimeout(
-        () => controller.abort(),
-        options?.timeout ? options.timeout : 5000
-      );
-      try {
-        setLoading(true);
-        const result = await buildApi<T>({
-          url,
-          params,
-          method: "GET",
-          options: { ...options, signal },
-        });
-        setData(transformResponse ? transformResponse(result) : result);
-      } catch (err) {
-        setError(err as Error);
-        if (err instanceof Error && err.message === "Unauthorized" && withAuthorize) {
-          navigation.setOptions({ animation: "none" });
-          navigation.dispatch(StackActions.replace("LoginStack"));
-        }
-        throw err;
-      } finally {
-        setLoading(false);
-        clearTimeout(timeoutId);
+    const signal = controller.signal;
+    const timeoutId = setTimeout(
+      () => controller.abort(),
+      options?.timeout ? options.timeout : 5000
+    );
+    try {
+      setLoading(true);
+      const result = await buildApi<T>({
+        url,
+        params,
+        method: "GET",
+        options: { ...options, signal },
+      });
+      setData(transformResponse ? transformResponse(result) : result);
+    } catch (err) {
+      setError(err as Error);
+      if (
+        err instanceof Error &&
+        err.message === "Unauthorized" &&
+        withAuthorize
+      ) {
+        navigation.setOptions({ animation: "none" });
+        navigation.dispatch(StackActions.replace("LoginStack"));
       }
-  }, [url, JSON.stringify(params), transformResponse]);
+      throw err;
+    } finally {
+      setLoading(false);
+      clearTimeout(timeoutId);
+    }
+  }, [url, JSON.stringify(params), transformResponse, stateKey]);
 
   useEffect(() => {
-    fetchData()
+    fetchData();
   }, [fetchData]); // url과 params가 변경되면 다시 실행
 
-  return { data, isLoading, error, refetch:fetchData };
+  return { data, isLoading, error, refetch: fetchData };
 };
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
@@ -342,7 +356,11 @@ type RequestReturn<Response, Params> = {
 type Build = {
   fetch: <Response, Params>(config: {
     // R, P에 any 비허용
-    recoilState?: WritableAtom<Validate<Response> | null, [Validate<Response> | null], void>;
+    stateKey?: WritableAtom<
+      Validate<Response> | null,
+      [Validate<Response> | null],
+      void
+    >;
     query: (params: Validate<Params>) => Omit<RequestOptions, "method">;
     transformResponse?: (data: any) => Validate<Response>;
   }) => {
@@ -353,7 +371,11 @@ type Build = {
   };
 
   request: <Response, Params>(config: {
-    recoilState?: WritableAtom<Validate<Response> | null, [Validate<Response> | null], void>;
+    stateKey?: WritableAtom<
+      Validate<Response> | null,
+      [Validate<Response> | null],
+      void
+    >;
     query: (params: Validate<Params>) => Omit<RequestOptions, "method"> & {
       method: Exclude<RequestMethod, "GET">;
     };
@@ -411,11 +433,15 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
   const build = (): Build => {
     return {
       fetch: <R, P>({
-        recoilState,
+        stateKey,
         query,
         transformResponse,
       }: {
-        recoilState?: WritableAtom<Validate<R> | null, [Validate<R> | null], void>;
+        stateKey?: WritableAtom<
+          Validate<R> | null,
+          [Validate<R> | null],
+          void
+        >;
         query: (params: Validate<P>) => Omit<RequestOptions, "method">;
         transformResponse?: (data: any) => Validate<R>;
       }) => {
@@ -424,12 +450,12 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
           Fn: (params: Validate<P>) => {
             const { url, params: queryParams } = query(params);
             const finalUrl = `${baseUrl}${url}`;
-            if (recoilState) {
+            if (stateKey) {
               return useFetchWithRecoil<Validate<R>>({
                 params: queryParams,
                 url: finalUrl,
                 transformResponse,
-                recoilState,
+                stateKey,
               });
             } else {
               return useFetch<Validate<R>>({
@@ -443,11 +469,15 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
       },
 
       request: <R, P>({
-        recoilState,
+        stateKey,
         query,
         transformResponse,
       }: {
-        recoilState?: WritableAtom<Validate<R> | null, [Validate<R> | null], void>;
+        stateKey?: WritableAtom<
+          Validate<R> | null,
+          [Validate<R> | null],
+          void
+        >;
         query: (params: Validate<P>) => Omit<RequestOptions, "method"> & {
           method: Exclude<RequestMethod, "GET">;
         };
@@ -456,8 +486,8 @@ export const createBaseApi = ({ baseUrl }: ApiConfig) => {
         return {
           type: "request",
           Fn: () => {
-            const { isLoading, error, request } = recoilState
-              ? useRequestWithRecoil<Validate<R>, Validate<P>>({ recoilState })
+            const { isLoading, error, request } = stateKey
+              ? useRequestWithRecoil<Validate<R>, Validate<P>>({ stateKey })
               : useRequest<Validate<R>, Validate<P>>();
 
             const executeRequest = async (data: Validate<P>) => {

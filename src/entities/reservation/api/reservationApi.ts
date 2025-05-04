@@ -192,7 +192,7 @@ const reservationApi = baseApi.addEndpoints({
     }),
 
     loadMyTodayReservation: builder.fetch<DailyReservationDto[], void>({
-      recoilState: myTodayReservationState,
+      stateKey: myTodayReservationState,
       query: () => ({
         url: "/reservation/today",
         withAuthorize: true,

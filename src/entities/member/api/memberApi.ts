@@ -5,7 +5,7 @@ import { UserStatusState } from "../model/UserStatusState";
 const memberApi = baseApi.addEndpoints({
   endpoints: (build) => ({
     loadMyStatus: build.fetch<Member, void>({
-      recoilState: UserStatusState,
+      stateKey: UserStatusState,
       query: () => {
         return {
           url: "/member/my-status",

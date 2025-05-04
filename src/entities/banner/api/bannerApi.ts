@@ -6,7 +6,7 @@ import { type BannerDto, type Banner } from "@hongpung/src/entities/banner";
 const bannerApi = baseApi.addEndpoints({
   endpoints: (build) => ({
     loadBanners: build.fetch<Banner[], void>({
-      recoilState: bannersState,
+      stateKey: bannersState,
       query: () => ({
         url: "/banners/on-post",
       }),
