@@ -1,52 +1,19 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useMemo } from "react";
 import { Alert } from "react-native";
 
-import { useNavigation } from "@react-navigation/native";
-
 import { isEqual } from "lodash";
+
+import { ReservationStackScreenProps } from "@hongpung/src/common/navigation";
 
 import {
   type ReservationForm,
   useEditReservationRequest,
   getReservationEditRequestBody,
 } from "@hongpung/src/entities/reservation";
-import { ReservationStackScreenProps } from "@hongpung/src/common/navigation";
 
-interface EditReservationContextProps {
-  prevReservation: ReservationForm & { reservationId: number };
-  reservation: ReservationForm & { reservationId: number };
+import useReservationForm from "../../configureReservation/model/useReservationForm";
 
-  setDate: (date: ReservationForm["date"]) => void;
-  setStartTime: (time: ReservationForm["startTime"]) => void;
-  setEndTime: (time: ReservationForm["endTime"]) => void;
-
-  setTitle: (time: ReservationForm["title"]) => void;
-
-  setParticipationAvailable: (
-    participationAvailable: ReservationForm["participationAvailable"]
-  ) => void;
-  setReservationType: (
-    reservationType: ReservationForm["reservationType"]
-  ) => void;
-
-  setParticipators: (participators: ReservationForm["participators"]) => void;
-  setBorrowInstruments: (
-    borrowInstruments: ReservationForm["borrowInstruments"]
-  ) => void;
-
-  verifyEditReservation: (onVerfyied: () => void) => Promise<void>;
-  differentKeys: (keyof ReservationForm)[];
-
-  requestEditReservation: () => Promise<void>;
-
-  isLoading: boolean;
-}
+import { EditReservationContextProps } from "./type";
 
 const EditReservationContext = createContext<
   EditReservationContextProps | undefined
@@ -60,47 +27,20 @@ const EditReservationContextProvider: React.FC<
     children: React.ReactNode;
   }
 > = ({ navigation, prevReservation, children }) => {
-  const [reservation, setReservationState] = useState<
-    ReservationForm & { reservationId: number }
-  >(prevReservation);
+  const { reservationForm, setForm, isCompleteReservation } =
+    useReservationForm();
 
   const { request, isLoading, error } = useEditReservationRequest();
-
   // setReservation을 업데이트 함수로 개선
-  const setReservation = (update: Partial<ReservationForm>) => {
-    setReservationState((prev) => ({
-      ...prev,
-      ...update,
-    }));
-  };
 
-  // 각 필드에 대한 setter들을 묶어서 반환
-  const setters = useMemo(
-    () => ({
-      setDate: (date: ReservationForm["date"]) => setReservation({ date }),
-      setStartTime: (startTime: ReservationForm["startTime"]) =>
-        setReservation({ startTime }),
-      setEndTime: (endTime: ReservationForm["endTime"]) =>
-        setReservation({ endTime }),
-      setTitle: (title: ReservationForm["title"]) => setReservation({ title }),
-      setParticipators: (participators: ReservationForm["participators"]) =>
-        setReservation({ participators }),
-      setBorrowInstruments: (
-        borrowInstruments: ReservationForm["borrowInstruments"]
-      ) => setReservation({ borrowInstruments }),
-      setParticipationAvailable: (
-        available: ReservationForm["participationAvailable"]
-      ) => setReservation({ participationAvailable: available }),
-      setReservationType: (type: ReservationForm["reservationType"]) =>
-        setReservation({ reservationType: type }),
-    }),
-    [setReservation]
+  const isValidReservation = useMemo(
+    () => isCompleteReservation(reservationForm),
+    [reservationForm]
   );
-
   // 예약 생성 API 요청 함수 (더미 함수로 예시)
   const verifyEditReservation = useCallback(
     async (onVerfyied: () => void) => {
-      if (isEqual(prevReservation, reservation)) {
+      if (isEqual(prevReservation, reservationForm)) {
         Alert.alert(
           "예약 오류", // 타이틀
           "기존 예약과 동일합니다."
@@ -109,36 +49,38 @@ const EditReservationContextProvider: React.FC<
         onVerfyied();
       }
     },
-    [reservation]
+    [reservationForm]
   );
 
   const differenceKey = useMemo(() => {
-    if (!reservation) return [];
+    if (!reservationForm) return [];
 
     if (!prevReservation) return []; // 초기 상태면 전체 반환
-
     const diff: (keyof ReservationForm)[] = [];
 
-    for (const key of Object.keys(reservation) as (keyof ReservationForm)[]) {
-      if (reservation[key] !== prevReservation[key]) {
+    for (const key of Object.keys(
+      reservationForm
+    ) as (keyof ReservationForm)[]) {
+      if (reservationForm[key] !== prevReservation[key]) {
         diff.push(key);
       }
     }
 
     return diff;
-  }, [reservation]);
+  }, [reservationForm]);
 
   const requestEditReservation = async () => {
     try {
-      if (isEqual(prevReservation, reservation))
+      if (!isValidReservation) throw Error("예약을 완벽히 작성해주세요.");
+
+      if (isEqual(prevReservation, reservationForm))
         throw new Error("기존 예약과 동일합니다.");
 
       await request(
-        getReservationEditRequestBody(prevReservation, reservation)
+        getReservationEditRequestBody(prevReservation, reservationForm)
       );
-      navigation.navigate("Reservation", {
-        screen: "ReservationDetail",
-        params: { reservationId: prevReservation.reservationId },
+      navigation.navigate("ReservationDetail", {
+        reservationId: prevReservation.reservationId,
       });
     } catch (e) {
       if (e instanceof Error) {
@@ -161,13 +103,14 @@ const EditReservationContextProvider: React.FC<
     <EditReservationContext.Provider
       value={{
         prevReservation,
-        reservation,
+        reservation: reservationForm,
         differentKeys: differenceKey,
-        ...setters,
+        ...setForm,
 
         isLoading,
         verifyEditReservation,
         requestEditReservation,
+        isValidReservation,
       }}
     >
       {children}

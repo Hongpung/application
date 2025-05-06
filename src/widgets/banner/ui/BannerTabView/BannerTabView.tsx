@@ -1,8 +1,11 @@
 import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
-import { type BannerBookMarkProps } from './type'
 import { Color } from '@hongpung/src/common'
-import { BannerItem } from '@hongpung/src/entities/banner'
+import { Banner, BannerItem } from '@hongpung/src/entities/banner'
+
+type BannerBookMarkProps = {
+    banners: Banner[]
+}
 
 export const BannerTabView: React.FC<BannerBookMarkProps> = ({ banners }) => {
 

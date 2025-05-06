@@ -13,3 +13,4 @@ export * from "./lib/useFonts";
 export * from "./lib/useMiniCalendar";
 
 export * from "./api";
+export { defaultSkeletonConfig } from "./config/skeleton.config";

@@ -12,8 +12,8 @@ export type StepFormProps<T extends SignUpStep> = T extends "EmailConfirm"
   : never;
 
 export interface EmailValidateFormProps {
-  emailRef: React.RefObject<TextInput>;
-  verificationCodeRef: React.RefObject<TextInput>;
+  emailRef: React.RefObject<TextInput | null>;
+  verificationCodeRef: React.RefObject<TextInput | null>;
 
   email: string;
   setEmail: (email: string) => void;
@@ -54,9 +54,9 @@ export interface PersonalInfoFormProps {
   validateNickname: (nickname: string) => void;
   validateClub: (club: ClubName) => void;
   validateEnrollmentNumber: (enrollmentNumber: string) => void;
-  nameRef: React.RefObject<TextInput>;
-  nicknameRef: React.RefObject<TextInput>;
-  enrollmentNumberRef: React.RefObject<TextInput>;
+  nameRef: React.RefObject<TextInput | null>;
+  nicknameRef: React.RefObject<TextInput | null>;
+  enrollmentNumberRef: React.RefObject<TextInput | null>;
   isClubOptionsVisible: boolean;
   setIsClubOptionsVisible: (visible: boolean) => void;
   isSignUpError: Error | null;
@@ -76,8 +76,8 @@ export interface SetPasswordFormProps {
   validateConfirmPassword: (text: string) => void;
   validatePassword: (text: string) => void;
 
-  passwordRef: React.RefObject<TextInput>;
-  confirmPasswordRef: React.RefObject<TextInput>;
+  passwordRef: React.RefObject<TextInput | null>;
+  confirmPasswordRef: React.RefObject<TextInput | null>;
 
   nextStep: () => void;
 }

@@ -1,40 +1,18 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext } from "react";
 import { Alert } from "react-native";
 
-import { CommonActions, useNavigation } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
+
+import { CreateReservationStackScreenProps } from "@hongpung/src/common/navigation/createReservation";
 
 import {
-  type ReservationForm,
   parseReservationCreateRequestBody,
-  useCreateReservationRequest
+  useCreateReservationRequest,
 } from "@hongpung/src/entities/reservation";
 
-interface CreateReservationContextProps {
-  reservation: ReservationForm;
+import useReservationForm from "../../configureReservation/model/useReservationForm";
+import { CreateReservationContextProps } from "./type";
 
-  setDate: (date: ReservationForm["date"]) => void;
-  setStartTime: (time: ReservationForm["startTime"]) => void;
-  setEndTime: (time: ReservationForm["endTime"]) => void;
-
-  setTitle: (time: ReservationForm["title"]) => void;
-
-  setParticipationAvailable: (
-    participationAvailable: ReservationForm["participationAvailable"]
-  ) => void;
-  setReservationType: (
-    reservationType: ReservationForm["reservationType"]
-  ) => void;
-
-  setParticipators: (participators: ReservationForm["participators"]) => void;
-  setBorrowInstruments: (
-    borrowInstruments: ReservationForm["borrowInstruments"]
-  ) => void;
-
-  isValidReservation: boolean;
-  requestCreateReservation: () => Promise<void>;
-
-  isLoading: boolean;
-}
 
 const CreateReservationContext = createContext<
   CreateReservationContextProps | undefined
@@ -45,79 +23,30 @@ const CreateReservationContextProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [reservation, setReservationState] = useState<ReservationForm>({
-    title: "",
-    reservationType: "REGULAR",
-    participationAvailable: false,
-    borrowInstruments: [],
-    participators: [],
-  });
-
-  const isCompleteReservation = (
-    reservation: ReservationForm
-  ): reservation is Required<ReservationForm> => {
-    return Object.values(reservation).every((value) => value !== null);
-  };
-
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<
+      CreateReservationStackScreenProps<"CreateReservationForm">["navigation"]
+    >();
 
   const { request, error, isLoading } = useCreateReservationRequest();
 
-  // setReservation을 업데이트 함수로 개선
-  const setReservation = (update: Partial<ReservationForm>) => {
-    setReservationState((prev) => ({
-      ...prev,
-      ...update,
-    }));
-  };
+  const { reservationForm, isCompleteReservation, setForm } =
+    useReservationForm();
 
-  // 각 필드에 대한 setter들을 묶어서 반환
-  const setters = useMemo(
-    () => ({
-      setDate: (date: ReservationForm["date"]) =>
-        setReservation({ date, startTime: undefined, endTime: undefined }),
-      setStartTime: (startTime: ReservationForm["startTime"]) =>
-        setReservation({ startTime }),
-      setEndTime: (endTime: ReservationForm["endTime"]) =>
-        setReservation({ endTime }),
-      setTitle: (title: ReservationForm["title"]) => setReservation({ title }),
-      setParticipators: (participators: ReservationForm["participators"]) =>
-        setReservation({ participators }),
-      setBorrowInstruments: (
-        borrowInstruments: ReservationForm["borrowInstruments"]
-      ) => setReservation({ borrowInstruments }),
-      setParticipationAvailable: (
-        available: ReservationForm["participationAvailable"]
-      ) => setReservation({ participationAvailable: available }),
-      setReservationType: (type: ReservationForm["reservationType"]) =>
-        setReservation({ reservationType: type }),
-    }),
-    [setReservation]
-  );
-
-  const isValidReservation = isCompleteReservation(reservation);
-
+  const isValidReservation = isCompleteReservation(reservationForm);
   // 예약 생성 API 요청 함수 (더미 함수로 예시)
   const requestCreateReservation = async () => {
     try {
       if (!isValidReservation) throw Error("예약을 완벽히 작성해주세요.");
 
       const { reservationId } = await request(
-        parseReservationCreateRequestBody(reservation)
+        parseReservationCreateRequestBody(reservationForm)
       );
 
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 2, // 마지막 화면의 인덱스 (0부터 시작)
-          routes: [
-            { name: "HomeScreen" },
-            { name: "Screen1" },
-            { name: "Screen2" }, // 마지막에 보여질 화면
-          ],
-        })
-      );
-      navigation.navigate("ReservationDetail", { reservationId });
-      console.log("예약 생성 요청:", reservation);
+      navigation.replace("Reservation", {
+        screen: "ReservationDetail",
+        params: { reservationId },
+      });
       // 실제 API 요청을 추가할 것
     } catch (e) {
       if (error instanceof Error) {
@@ -145,9 +74,8 @@ const CreateReservationContextProvider = ({
   return (
     <CreateReservationContext.Provider
       value={{
-        reservation,
-
-        ...setters,
+        reservation: reservationForm,
+        ...setForm,
 
         isValidReservation,
         requestCreateReservation,

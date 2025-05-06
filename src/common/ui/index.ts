@@ -13,3 +13,4 @@ export { NeedCameraPermssionPanel } from './NeedCameraPermssionPanel/NeedCameraP
 export { MainFooter } from './MainFooter/MainFooter'
 export { AlertButton } from './AlertButton/AlertButton'
 export { FullScreenLoadingModal } from './LoadingModal/FullScreenLoadingModal'
+export { BasicInput } from './inputs/BasicInput'

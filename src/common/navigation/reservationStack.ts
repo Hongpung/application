@@ -1,4 +1,4 @@
-import { RouteProp } from "@react-navigation/native";
+import { NavigatorScreenParams, RouteProp } from "@react-navigation/native";
 import { MainStackNavigationProp } from "./mainStack";
 import { EditReservationStackParamList } from "./editReservation";
 import { CreateReservationStackParamList } from "./createReservation";
@@ -9,8 +9,8 @@ export type ReservationParamList = {
   ReservationDetail: { reservationId: number };
   EditReservation: {
     reservationId: number;
-  } & ScreenParams<EditReservationStackParamList>;
-  CreateReservation?: ScreenParams<CreateReservationStackParamList>;
+  } & NavigatorScreenParams<EditReservationStackParamList>;
+  CreateReservation?: NavigatorScreenParams<CreateReservationStackParamList>;
 };
 
 export type ReservationStackScreenProps<T extends keyof ReservationParamList> =

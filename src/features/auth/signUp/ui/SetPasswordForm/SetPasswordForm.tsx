@@ -1,6 +1,6 @@
-import { LongButton } from "@hongpung/src/common";
-import { BasicInput } from "@hongpung/src/common/ui/inputs/BasicInput";
 import { View } from "react-native";
+
+import { LongButton, BasicInput } from "@hongpung/src/common";
 
 import { SetPasswordFormProps } from "../../model/type";
 

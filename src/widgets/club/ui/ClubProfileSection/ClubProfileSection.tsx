@@ -1,12 +1,15 @@
 import { View, Text, Image, StyleSheet } from "react-native";
+
 import { Color } from "@hongpung/src/common";
+
 import { Member } from "@hongpung/src/entities/member/@x/club";
-import { Skeleton } from "moti/skeleton";
+
+import { ClubProfileSectionSkeleton } from "../ClubProfileSectionSkeleton/ClubProfileSectionSkeleton";
 
 type ClubProfileProps =
   | {
       profileImageUrl: null;
-      clubName?: ClubName;
+      clubName?: Exclude<ClubName, "기타">;
       roleData: null;
       isLoading: true;
     }
@@ -26,79 +29,11 @@ export const ClubProfileSection: React.FC<ClubProfileProps> = ({
   roleData,
   isLoading,
 }) => {
-  const infoSekeleton = {
-    transition: {
-      type: "spring",
-      duration: 400,
-      delay: 100,
-    },
-    radius: 4,
-    colors: [Color["grey100"], Color["grey300"]]
-  };
+
 
   if (isLoading && roleData === null) {
     return (
-      <Skeleton.Group show>
-        <View style={[styles.profileImageContainer, { position: "relative" }]}>
-          <View style={styles.profileImage}>
-            <Skeleton
-              transition={{
-                type: "spring",
-                duration: 400,
-                delay: 100,
-              }}
-              width={"100%"}
-              height={"100%"}
-              colors={[Color["grey100"], Color["grey300"]]}
-            />
-          </View>
-        </View>
-
-        <View style={styles.infoContainer}>
-          <View style={styles.info}>
-            <Text style={styles.infoLabel}>동아리</Text>
-            <Skeleton
-              transition={{
-                type: "spring",
-                duration: 400,
-                delay: 100,
-              }}
-              width={120}
-              height={24}
-              radius={4}
-              colors={[Color["grey100"], Color["grey300"]]}
-            />
-          </View>
-          <View style={styles.info}>
-            <Text style={styles.infoLabel}>패짱</Text>
-            <Skeleton
-              transition={{
-                type: "spring",
-                duration: 400,
-                delay: 100,
-              }}
-              width={120}
-              height={24}
-              radius={4}
-              colors={[Color["grey100"], Color["grey300"]]}
-            />
-          </View>
-          <View style={styles.info}>
-            <Text style={styles.infoLabel}>상쇠</Text>
-            <Skeleton
-              transition={{
-                type: "spring",
-                duration: 400,
-                delay: 100,
-              }}
-              width={120}
-              height={24}
-              radius={4}
-              colors={[Color["grey100"], Color["grey300"]]}
-            />
-          </View>
-        </View>
-      </Skeleton.Group>
+      <ClubProfileSectionSkeleton/>
     );
   }
 
@@ -196,15 +131,5 @@ const styles = StyleSheet.create({
     color: Color["grey700"],
     fontFamily: "NanumSquareNeo-Regular",
     textAlign: "right",
-  },
-  skeletonLabel: {
-    width: 40,
-    height: 16,
-    borderRadius: 4,
-  },
-  skeletonValue: {
-    width: 120,
-    height: 16,
-    borderRadius: 4,
   },
 });

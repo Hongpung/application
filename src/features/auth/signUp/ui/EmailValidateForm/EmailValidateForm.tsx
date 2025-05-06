@@ -1,10 +1,15 @@
-import { ErrorModal, LongButton } from "@hongpung/src/common";
-import { BasicInput } from "@hongpung/src/common/ui/inputs/BasicInput";
-import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
 import { View, StyleSheet, Pressable, Text } from "react-native";
+
+import {
+  ErrorModal,
+  LongButton,
+  BasicInput,
+  FullScreenLoadingModal,
+} from "@hongpung/src/common";
+
 import { EmailValidateFormProps } from "../../model/type";
 
-const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
+export const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
   //이메일
   const {
     email,
@@ -106,8 +111,6 @@ const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
     </View>
   );
 };
-
-export default EmailValidateForm;
 
 const styles = StyleSheet.create({
   inputGroup: {

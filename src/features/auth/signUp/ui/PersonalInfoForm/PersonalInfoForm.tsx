@@ -1,13 +1,17 @@
+import { View, Pressable } from "react-native";
+
 import {
   Selector,
   LongButton,
   ErrorModal,
+
+  FullScreenLoadingModal,
+  BasicInput,
 } from "@hongpung/src/common";
-import { BasicInput } from "@hongpung/src/common/ui/inputs/BasicInput";
+
 import { clubNames } from "@hongpung/src/entities/club";
-import { View, Pressable } from "react-native";
-import { ClubSelectorLabel } from "./ClubSelctorLabel";
-import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
+
+import { ClubSelectorLabel } from "../ClubSelectorLabel/ClubSelctorLabel";
 import { PersonalInfoFormProps } from "../../model/type";
 
 export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = (props) => {

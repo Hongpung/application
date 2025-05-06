@@ -19,14 +19,14 @@ type LoginFormValidation = {
 };
 
 interface LoginFormProps {
-  emailRef: React.RefObject<TextInput>;
+  emailRef: React.RefObject<TextInput | null>;
   formData: LoginFormValue;
   formValidation: LoginFormValidation;
   onBlurValidateAllInput: () => void;
   onChangeFormData: (field: keyof LoginFormValue, value: string) => void;
   onLogin: () => void;
   options: { saveID: boolean; autoLogin: boolean };
-  passwordRef: React.RefObject<TextInput>;
+  passwordRef: React.RefObject<TextInput | null>;
   setAutoLogin: (value: boolean) => void;
   setSaveID: (value: boolean) => void;
   isLoading: boolean;

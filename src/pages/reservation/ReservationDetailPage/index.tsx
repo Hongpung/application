@@ -7,22 +7,24 @@ import {
   Pressable,
 } from "react-native";
 
-import { DateTimeViewer } from "@hongpung/src/entities/reservation/ui/DateTimeViewer/DateTimeViewer";
 import {
   BorrowInstrumentsViewer,
   ParticipatorsViewer,
   useLoadReservationDetailFetch,
+  DateTimeViewer,
+  ReservationTypeViewer,
+
+  isEditible
 } from "@hongpung/src/entities/reservation";
-import { ReservationTypeViewer } from "@hongpung/src/entities/reservation/ui/ReservationTypeViewer/ReservationTypeViewer";
-import { Header } from "@hongpung/src/common";
+
+import { Header, Color } from "@hongpung/src/common";
 import { useAtomValue } from "jotai";
 import { UserStatusState } from "@hongpung/src/entities/member";
-import { Color } from "@hongpung/src/common";
 
 import { DeleteReservationButton } from "@hongpung/src/features/reservation/deleteReservation/ui/DeleteReservationButton/DeleteReservationButton";
-import { isEditible } from "@hongpung/src/entities/reservation/lib/isEditible";
 import { LeaveReservationButton } from "@hongpung/src/features/reservation/leaveReservation/ui/LeaveReservationButton/LeaveReservationButton";
 import { EnterEditButton } from "@hongpung/src/features/reservation/editReservation/ui/EnterEditButton/EnterEditButton";
+
 import { ReservationStackScreenProps } from "@hongpung/src/common/navigation";
 
 const ReservationDetailPage: React.FC<ReservationStackScreenProps<"ReservationDetail">> = ({
@@ -44,7 +46,7 @@ const ReservationDetailPage: React.FC<ReservationStackScreenProps<"ReservationDe
       <View>
         <Header leftButton={"close"} headerName="예약 상세 정보" />
         <ScrollView contentContainerStyle={styles.scrollView}>
-          
+          <View style={styles.placeholderRow}></View>
         </ScrollView>
       </View>
     );

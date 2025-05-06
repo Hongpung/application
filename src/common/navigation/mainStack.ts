@@ -3,19 +3,19 @@ import { ClubParamList } from "./clubStack";
 import { MainTabParamList } from "./mainTab";
 import { ReservationParamList } from "./reservationStack";
 import { SessionManagementParamList } from "./sessionManageMent";
-import { RouteProp } from "@react-navigation/native";
+import { NavigatorScreenParams, RouteProp } from "@react-navigation/native";
 
 export type MainStackParamList = {
-  MainTab: ScreenParams<MainTabParamList>;
+  MainTab: NavigatorScreenParams<MainTabParamList>;
   Notification: undefined;
 
   WebView: { url: string; title?: string };
 
-  Club: ScreenParams<ClubParamList>;
+  Club: NavigatorScreenParams<ClubParamList>;
 
-  Reservation: ScreenParams<ReservationParamList>;
+  Reservation: NavigatorScreenParams<ReservationParamList>;
   CheckIn: undefined;
-  SessionManagement: ScreenParams<SessionManagementParamList>;
+  SessionManagement: NavigatorScreenParams<SessionManagementParamList>;
 
   UpComingReservation: undefined;
   MyLog: undefined;

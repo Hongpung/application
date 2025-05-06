@@ -20,7 +20,7 @@ export const DeleteReservationButton: React.FC<DeleteReservationButtonProps> = (
     const onButtonPressed = async () => {
 
         if (!isEditible(date)) {
-            Alert.alert('오류', '수정 가능한 시간이 아닙니다.');
+            Alert.alert('오류', '취소 가능한 시간이 아닙니다.');
             return;
         }
 

@@ -3,8 +3,12 @@ import { NativeSyntheticEvent, StyleSheet, View, Image } from "react-native";
 
 import PagerView from "react-native-pager-view";
 
-import { BannerItem, BlankBanner } from "@hongpung/src/entities/banner";
-import { BannerSliderProps } from "./type";
+import { Banner, BannerItem, BlankBanner } from "@hongpung/src/entities/banner";
+
+type BannerSliderProps = {
+  banners: Banner[]
+}
+
 
 const BannerSlider: React.FC<BannerSliderProps> = ({ banners }) => {
   const [bannerCount, setBannerCount] = useState(0);
@@ -107,7 +111,3 @@ const BannerSlider: React.FC<BannerSliderProps> = ({ banners }) => {
 };
 
 export { BannerSlider };
-
-const styles = StyleSheet.create({
-  bannerContainer: {},
-});

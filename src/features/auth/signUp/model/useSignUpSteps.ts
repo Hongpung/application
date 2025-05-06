@@ -13,7 +13,7 @@ import { Alert, BackHandler, TextInput } from "react-native";
 import { clubNames } from "@hongpung/src/entities/club";
 import { SignUpStep } from "./type";
 
-const useSignUpSteps = () => {
+export const useSignUpSteps = () => {
   const navigation = useNavigation();
   const [step, setStep] = useState<SignUpStep>("EmailConfirm");
   const [isSendingCode, setIsSendingCode] = useState(false);
@@ -541,5 +541,3 @@ const useSignUpSteps = () => {
     signUp: onSignUp,
   };
 };
-
-export default useSignUpSteps;
