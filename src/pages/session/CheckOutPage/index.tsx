@@ -8,11 +8,10 @@ import { CheckOutConfirmPhotosWidget } from "@hongpung/src/widgets/session/ui/Ch
 import { CheckOutCompleteWidget } from "@hongpung/src/widgets/session/ui/CheckOutCompleteWidget";
 
 import { useCheckOut } from "@hongpung/src/features/session/checkOutRoom/model/useCheckOut";
-import { SessionManagementScreenProps } from "@hongpung/src/navigation/SessionManagementStackNavigation";
+import { SessionManagementScreenProps } from "@hongpung/src/common/navigation";
 import {
   StepContainer,
   StepScreen,
-  useStep,
 } from "@hongpung/src/common/lib/useSteps";
 import { useCameraPermission } from "@hongpung/src/common/lib/useCameraPermission";
 import { ErrorModal } from "@hongpung/src/common";

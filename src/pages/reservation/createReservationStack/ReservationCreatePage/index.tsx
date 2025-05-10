@@ -1,14 +1,11 @@
 import { useCallback, useState } from "react";
-import { ScrollView, View } from "react-native";
-
-import { useNavigation } from "@react-navigation/native";
+import { View } from "react-native";
 
 import { Checkbox, Header, LongButton } from "@hongpung/src/common";
 
 import { useCreateReservation } from "@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context";
-import { CreateReservationButton } from "@hongpung/src/features/reservation/createReservation/ui/CreateReservationButton/CreateReservationButton";
 
-import { ReservationForm } from "@hongpung/src/widgets/reservation/ui/ReservationForm/ReservationForm";
+import { ReservationForm } from "@hongpung/src/features/reservation/configureReservation";
 import { CreateReservationStackScreenProps } from "@hongpung/src/common/navigation/createReservation";
 
 const ReservationCreatePage: React.FC<

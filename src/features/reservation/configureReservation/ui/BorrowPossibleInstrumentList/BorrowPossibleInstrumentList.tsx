@@ -13,7 +13,7 @@ type BorrowPossibleInstrumentListProps = {
   isLoading: boolean;
 };
 
-const BorrowPossibleInstrumentList: React.FC<
+export const BorrowPossibleInstrumentList: React.FC<
   BorrowPossibleInstrumentListProps
 > = ({ instrumentList, selectedInstruments, toggleInstrument, isLoading }) => {
   const { isOpen, toggleAccordion, orderInstruments } =
@@ -116,5 +116,3 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
 });
-
-export default BorrowPossibleInstrumentList;

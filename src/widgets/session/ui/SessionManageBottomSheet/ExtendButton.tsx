@@ -1,4 +1,3 @@
-import { Color } from "@hongpung/ColorSet";
 import { Pressable, Text, StyleSheet } from "react-native";
 import { debounce } from "lodash";
 

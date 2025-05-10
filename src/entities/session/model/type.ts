@@ -17,7 +17,7 @@ interface BaseSession {
     participators?: Member[] | null;           // 참여자 목록 (optional)
     participatorIds?: Member[] | null;           // 참여자 목록 (optional)
     borrowInstruments?: Instrument[] | null; // 대여 악기 목록 (optional)
-    attendanceList: { Member: Member, status: '참가' | '출석' | '결석' | '지각' }[]
+    attendanceList: { user: Member, status: '참가' | '출석' | '결석' | '지각' }[]
 }
 
 export type Session = RealtimeSession | ReservationSession;
@@ -27,7 +27,7 @@ export interface RealtimeSession extends BaseSession {
     participators?: null;           // 실시간 생성 세션은 참여자, 대여 악기가 없읍
     participatorIds?: Member[] | null;           // 참여자 목록 (optional)
     borrowInstruments?: null;
-    attendanceList: { Member: Member, status: '참가' }[]
+    attendanceList: { user: Member, status: '참가' }[]
 }
 
 export interface ReservationSession extends BaseSession {
@@ -37,7 +37,7 @@ export interface ReservationSession extends BaseSession {
     participationAvailable: boolean;  // 참여 가능 여부
     participators: Member[]
     borrowInstruments: Instrument[]
-    attendanceList: { Member: Member, status: '출석' | '결석' | '지각' }[]
+    attendanceList: { user: Member, status: '출석' | '결석' | '지각' }[]
 }
 
 

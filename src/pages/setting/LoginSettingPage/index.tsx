@@ -7,7 +7,7 @@ import { LogoutButton } from "@hongpung/src/features/auth/logout/ui/LogoutButton
 import useLogout from "@hongpung/src/features/auth/logout/model/useLogout";
 import useAutoLogin from "@hongpung/src/features/auth/setAutoLogin/model/useAutoLogin";
 
-const LoginSettingPage: React.FC = () => {
+export const LoginSettingPage: React.FC = () => {
   const [autoLogin, setAutoLogin] = useAutoLogin();
   const { LogOutHandler, isLoading } = useLogout();
 
@@ -39,5 +39,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-export default LoginSettingPage;

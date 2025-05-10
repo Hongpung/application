@@ -6,13 +6,13 @@ import { Header } from "@hongpung/src/common";
 import { Color } from "@hongpung/src/common";
 
 import { useBorrowPossibleInstrumentsFetch } from "@hongpung/src/entities/reservation";
-import { BorrowInstrumentsConfirmButton } from "@hongpung/src/features/reservation/configureReservation/ui/BorrowInstrumentsConfirmButton/BorrowInstrumentsConfirmButton";
+import { BorrowInstrumentsConfirmButton } from "@hongpung/src/widgets/reservation/ui/BorrowInstrumentsConfirmButton/BorrowInstrumentsConfirmButton";
 import BorrowPossibleInstrumentList from "@hongpung/src/widgets/instrument/ui/BorrowPossibleInstrumentList/BorrowPossibleInstrumentList";
 import { useEditReservation } from "@hongpung/src/features/reservation/editReservation/model/useEditReservation.context";
-import { MainStackScreenProps } from "@hongpung/src/common/navigation";
+import { EditReservationStackScreenProps } from "@hongpung/src/common/navigation";
 
 const BorrowInstrumentSelectScreen: React.FC<
-  MainStackScreenProps<"Reservation">
+  EditReservationStackScreenProps<"EditReservationBorrowInstrumentsSelect">
 > = ({ navigation }) => {
   const { data, isLoading } = useBorrowPossibleInstrumentsFetch();
   const { reservation, setBorrowInstruments } = useEditReservation();

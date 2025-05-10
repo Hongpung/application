@@ -11,9 +11,7 @@ import {
   Keyboard,
   StyleSheet,
   Platform,
-  Pressable,
 } from "react-native";
-import { AlertButton } from "@hongpung/src/common/ui/AlertButton/AlertButton";
 import { FindAccountActionsSection } from "@hongpung/src/widgets/auth/ui/FindAccountActionsSection/FindAccountActionsSection";
 
 const LoginPage: React.FC<LoginStackScreenProps<"Login">> = ({

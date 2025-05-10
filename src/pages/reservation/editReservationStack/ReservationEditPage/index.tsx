@@ -2,7 +2,7 @@ import { Checkbox, LongButton } from "@hongpung/src/common"
 
 import { useCallback, useState } from "react"
 import { ScrollView, View } from "react-native"
-import { ReservationForm } from "@hongpung/src/widgets/reservation/ui/ReservationForm/ReservationForm"
+import { ReservationForm } from "@hongpung/src/features/reservation/configureReservation/ui/ReservationForm/ReservationForm"
 import { useEditReservation } from "@hongpung/src/features/reservation/editReservation/model/useEditReservation.context"
 import { useNavigation } from "@react-navigation/native"
 import { EditReservationButton } from "@hongpung/src/features/reservation/editReservation/ui/EditReservationButton/EditReservationButton"

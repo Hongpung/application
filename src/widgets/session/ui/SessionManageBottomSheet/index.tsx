@@ -68,17 +68,11 @@ export const SessionManageBottomSheet: React.FC<
     >
       <Header isSlideUp={isSlideUp} toggleBottomSheet={toggleBottomSheet} />
       <View style={styles.infoContainer}>
-        {/* <TimeInfo
+        <TimeInfo
           startTime={usingSession.startTime}
           endTime={usingSession.endTime}
           remainingHour={remainingHour}
           remainingMinute={remainingMinute}
-        /> */}
-        <TimeInfo
-          startTime={"10:00"}
-          endTime={"12:00"}
-          remainingHour={"2시간"}
-          remainingMinute={"20분"}
         />
         <ExtendButton navigateToUsingManage={navigateToUsingManage} />
       </View>

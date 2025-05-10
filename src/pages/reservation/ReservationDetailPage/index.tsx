@@ -13,8 +13,7 @@ import {
   useLoadReservationDetailFetch,
   DateTimeViewer,
   ReservationTypeViewer,
-
-  isEditible
+  isEditible,
 } from "@hongpung/src/entities/reservation";
 
 import { Header, Color } from "@hongpung/src/common";
@@ -26,18 +25,19 @@ import { LeaveReservationButton } from "@hongpung/src/features/reservation/leave
 import { EnterEditButton } from "@hongpung/src/features/reservation/editReservation/ui/EnterEditButton/EnterEditButton";
 
 import { ReservationStackScreenProps } from "@hongpung/src/common/navigation";
+import { useDeleteReservation } from "@hongpung/src/features/reservation/deleteReservation/model/useDeleteReservation";
 
-const ReservationDetailPage: React.FC<ReservationStackScreenProps<"ReservationDetail">> = ({
-  navigation,
-  route,
-}) => {
-
+const ReservationDetailPage: React.FC<
+  ReservationStackScreenProps<"ReservationDetail">
+> = ({ navigation, route }) => {
   const { reservationId } = route.params;
   const {
     data: reservation,
     isLoading,
     error,
   } = useLoadReservationDetailFetch({ reservationId });
+
+  const { onDeleteReservation } = useDeleteReservation();
 
   const loginUser = useAtomValue(UserStatusState);
 
@@ -218,8 +218,7 @@ const ReservationDetailPage: React.FC<ReservationStackScreenProps<"ReservationDe
         {creatorId === loginUser?.memberId && isEditible(date) && (
           <View>
             <DeleteReservationButton
-              reservationId={reservationId}
-              date={date}
+              onButtonPressed={() => onDeleteReservation(reservation)}
             />
           </View>
         )}

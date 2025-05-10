@@ -3,7 +3,7 @@ import { RouteProp } from "@react-navigation/native";
 
 export type SessionManagementParamList = {
   SessionManage: undefined;
-  CheckOutSession: { sessionId: number };
+  CheckOutSession: undefined;
 };
 
 export type SessionManagementScreenProps<

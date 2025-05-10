@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, View, Alert, Linking } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,13 +9,13 @@ import {
   Header,
   registerForPushNotificationsAsync,
   Switch,
+  FullScreenLoadingModal
 } from "@hongpung/src/common";
 
 
 import { useUpdateNotificationStatusRequest } from "@hongpung/src/features/notification/manageNotificationToken/api/notificationTokenApi";
 import { notificationOffSuccessToast } from "@hongpung/src/features/notification/manageNotificationToken/lib/notificationOffSuccessToast";
 import { notificationOnSuccessToast } from "@hongpung/src/features/notification/manageNotificationToken/lib/notificationOnSuccessToast";
-import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
 
 const NotificationSettingPage: React.FC = () => {
   const { request: updateNotificationStatusRequest, isLoading } =

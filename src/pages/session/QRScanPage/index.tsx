@@ -5,12 +5,15 @@ import { useQRScanner } from "@hongpung/src/features/session/qr/lib/useQRScanner
 import QRScanFailedModal from "@hongpung/src/widgets/session/ui/QRScanFailedModal/QRScanFailedModal";
 import QRScanner from "@hongpung/src/features/session/qr/ui/QRScanner/QRScanner";
 import React from "react";
-import { MainTabScreenProps } from "@hongpung/src/navigation/MainTabNavigation";
+import { MainTabScreenProps } from "@hongpung/src/common/navigation";
 import { NeedCameraPermssionPanel } from "@hongpung/src/common";
 
 const QRScanPage: React.FC<MainTabScreenProps<"QRCode">> = ({ navigation }) => {
-  const handleScanSuccess = () => {
-    navigation.push("CheckIn");
+  const handleScanSuccess = (data: string) => {
+    if (data === "https://app.hongpung.com/qr") {
+      navigation.jumpTo("Home");
+      navigation.push("CheckIn");
+    }
   };
 
   const { hasPermission } = useCameraPermission();

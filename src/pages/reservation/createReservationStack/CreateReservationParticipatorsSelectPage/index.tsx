@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
 
 import { Header, Color, Icons } from "@hongpung/src/common";
-import { ParticipatorsConfirmButton } from "@hongpung/src/features/reservation/configureReservation/ui/ParticipatorsConfirmButton/ParticipatorsConfirmButton";
+import { ParticipatorsConfirmButton } from "@hongpung/src/widgets/reservation/ui/ParticipatorsConfirmButton/ParticipatorsConfirmButton";
 
 import SelectedParticipatorList from "@hongpung/src/widgets/reservation/ui/SelectedParticipatorHList/SelectedParticipatorHList";
 import OptionsModal from "@hongpung/src/widgets/reservation/ui/OptionsModal/OptionsModal";

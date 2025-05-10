@@ -1,13 +1,12 @@
+import { ScrollView } from "react-native";
 import React, { useCallback } from "react";
-import { TitleInput } from "@hongpung/src/features/reservation/configureReservation/ui/TitleInput/TitleInput";
-
-import { ReservationTypeSelector } from "@hongpung/src/features/reservation/configureReservation/ui/ReservationTypeSelector/ReservationTypeSelector";
-import { ParticipatorsSelector } from "@hongpung/src/features/reservation/configureReservation/ui/ParticipatorsSelector/ParticipatorsSelector";
-import BorrowInstrumentsSelector from "@hongpung/src/features/reservation/configureReservation/ui/BorrowInstrumentsSelector/BorrowInstrumentsSelector";
-
 import { type ReservationForm as ReservationFormType } from "@hongpung/src/entities/reservation";
-import { DateTimeSelector } from "@hongpung/src/features/reservation/configureReservation/ui/DateTimeSelector/DateTimeSelector";
-import { ScrollView, View } from "react-native";
+
+import { ReservationTypeSelector } from "../ReservationTypeSelector/ReservationTypeSelector";
+import { ParticipatorsSelector } from "../ParticipatorsSelector/ParticipatorsSelector";
+import BorrowInstrumentsSelector from "../BorrowInstrumentsSelector/BorrowInstrumentsSelector";
+import { TitleInput } from "../TitleInput/TitleInput";
+import { DateTimeSelector } from "../DateTimeSelector/DateTimeSelector";
 
 type ReservationFormProps = {
   reservation: ReservationFormType;

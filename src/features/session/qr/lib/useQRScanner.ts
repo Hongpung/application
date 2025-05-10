@@ -8,8 +8,11 @@ const { width } = Dimensions.get("window");
 
 type ScanStatus = "IDLE" | "PROCESSING" | "COMPLETE" | "FAILED";
 
-export const useQRScanner = ({ onSuccess }: { onSuccess: () => void }) => {
-
+export const useQRScanner = ({
+  onSuccess,
+}: {
+  onSuccess: (data: string) => void;
+}) => {
   const isFocusing = useIsFocused();
 
   const [scanStatus, setScanStatus] = useState<ScanStatus>("IDLE");
@@ -47,6 +50,8 @@ export const useQRScanner = ({ onSuccess }: { onSuccess: () => void }) => {
     ({ type, data, bounds }: BarcodeScanningResult) => {
       if (scanStatus !== "IDLE" || type !== "qr") return;
 
+      console.log("handleScanned", data);
+
       const { origin, size } = bounds;
 
       if (Platform.OS === "ios") {
@@ -55,7 +60,8 @@ export const useQRScanner = ({ onSuccess }: { onSuccess: () => void }) => {
 
         if (isInCenter(centerX, centerY)) {
           setScanStatus("PROCESSING");
-          return data;
+          onSuccess(data);
+          return;
         }
       } else if (Platform.OS === "android") {
         const centerX = origin.y + size.height / 2;
@@ -63,7 +69,8 @@ export const useQRScanner = ({ onSuccess }: { onSuccess: () => void }) => {
 
         if (isInCenter(centerX, centerY)) {
           setScanStatus("PROCESSING");
-          return data;
+          onSuccess(data);
+          return;
         }
       }
       return null;
@@ -83,4 +90,4 @@ export const useQRScanner = ({ onSuccess }: { onSuccess: () => void }) => {
     toggleFlash,
     onScanned,
   };
-}; 
+};

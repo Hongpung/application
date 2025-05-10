@@ -1,30 +1,37 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import { useUserUseRoomFetch } from "@hongpung/src/entities/session";
+
 import { MainStackParamList } from "@hongpung/src/common/navigation";
 import { useLoadMyStatusFetch } from "@hongpung/src/entities/member";
 
-import LoginSettingPage from "@hongpung/src/pages/setting/LoginSettingPage";
+import { LoginSettingPage } from "@hongpung/src/pages/setting/LoginSettingPage";
 import NotificationSettingPage from "@hongpung/src/pages/setting/NotificationSettingPage";
-import UpComingReservationPage from "@hongpung/src/pages/member/UpcommingSchedulePage";
-import MyLogPage from "@hongpung/src/pages/member/MySessionLogPage";
-import CheckInPage from "@hongpung/src/pages/session/CheckInPage";
+
 import ChangePasswordPage from "@hongpung/src/pages/auth/ChangePasswordPage";
 import NotificationPage from "@hongpung/src/pages/notification/NotificationPage";
-import ReservationInstrumentsViewScreen from "@hongpung/src/pages/reservation/BorrowInstrumentListViewPage";
+
+import UpComingReservationPage from "@hongpung/src/pages/member/UpcommingSchedulePage";
+import MyLogPage from "@hongpung/src/pages/member/MySessionLogPage";
+
+import { BorrowInstrumentListPage } from "@hongpung/src/pages/reservation/BorrowInstrumentListPage";
 import ParticipatorListViewPage from "@hongpung/src/pages/reservation/ParticipatorListViewPage";
+
+import { InstrumentDetailPage } from "@hongpung/src/pages/instrument/InstrumentDetailPage";
+import { CheckInPage } from "@hongpung/src/pages/session/CheckInPage";
+
 import WebViewPage from "@hongpung/src/pages/webview/WebViewPage";
 
-import { MainTabNavigation } from "./MainTabNavigation";
+import { MainTabNavigation as MainTab } from "./MainTabNavigation";
 import { ClubStackNavigation as ClubStack } from "./ClubStackNavigation";
 import { ReservationStackNavigation as ReservationStack } from "./ReservationNavigation";
 import { SessionManagementStackNavigation as SessionManagementStack } from "./SessionManagementStackNavigation";
-import InstrumentDetailPage from "../pages/instrument/InstrumentDetailPage";
 
 const MainStack = createNativeStackNavigator<MainStackParamList>();
 
 export const MainStackNavigation = () => {
-
   useLoadMyStatusFetch();
+  useUserUseRoomFetch();
 
   return (
     <MainStack.Navigator
@@ -34,7 +41,7 @@ export const MainStackNavigation = () => {
     >
       <MainStack.Screen
         name="MainTab"
-        component={MainTabNavigation}
+        component={MainTab}
         options={{
           headerShown: false,
         }}
@@ -47,6 +54,7 @@ export const MainStackNavigation = () => {
       <MainStack.Screen
         name="SessionManagement"
         component={SessionManagementStack}
+        options={{ presentation: "modal", animation: "slide_from_bottom" }}
       />
 
       <MainStack.Screen name="Club" component={ClubStack} />
@@ -68,7 +76,7 @@ export const MainStackNavigation = () => {
 
       <MainStack.Screen
         name="BorrowInstrumentList"
-        component={ReservationInstrumentsViewScreen}
+        component={BorrowInstrumentListPage}
       />
 
       <MainStack.Screen

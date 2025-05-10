@@ -13,16 +13,16 @@ import {
 import React, { useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 
-import { Color } from "@hongpung/src/common";
+import { Color,Header } from "@hongpung/src/common";
 import { UserStatusState } from "@hongpung/src/entities/member";
-import { Header } from "@hongpung/src/common";
+
 import { useLoadInstrumentDetailFetch } from "@hongpung/src/entities/instrument/api/instrumentApi";
 
 import { MainStackScreenProps } from "@hongpung/src/common/navigation";
 
 const { width } = Dimensions.get("window");
 
-const InstrumentDetailPage: React.FC<
+export const InstrumentDetailPage: React.FC<
   MainStackScreenProps<"InstrumentDetail">
 > = ({ navigation, route }) => {
   const { instrumentId } = route.params;
@@ -333,5 +333,3 @@ const styles = StyleSheet.create({
     color: Color["grey400"],
   },
 });
-
-export default InstrumentDetailPage;

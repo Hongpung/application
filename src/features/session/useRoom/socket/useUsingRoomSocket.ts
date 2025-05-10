@@ -60,6 +60,7 @@ export const useUsingRoomSocket = () => {
     const handleFetchSessionUpdate = (data: string) => {
         console.log('fetchSessionUpdate')
         const changedSession = JSON.parse(data) as Session
+        console.log('changedSession', changedSession)
         setSessionState(changedSession)
     }
 

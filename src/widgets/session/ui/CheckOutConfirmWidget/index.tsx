@@ -4,7 +4,8 @@ import { OwnedSessionCard } from '@hongpung/src/entities/session/ui/OwnedSession
 import { Checkbox } from '@hongpung/src/common';
 import { LongButton } from '@hongpung/src/common';
 import { Color } from '@hongpung/src/common';
-import { Session } from '@hongpung/src/entities/session';
+import { Session, ThisSessionState } from '@hongpung/src/entities/session';
+import { useAtomValue } from 'jotai';
 
 interface CheckOutConfirmWidgetProps {
   session: Session;
@@ -12,11 +13,13 @@ interface CheckOutConfirmWidgetProps {
 }
 
 export const CheckOutConfirmWidget: React.FC<CheckOutConfirmWidgetProps> = ({
-  session,
   onNext,
 }) => {
 
+  const  session  = useAtomValue(ThisSessionState);
   const [isAgree, setIsAgree] = useState(false);
+
+  if (!session) return null;
 
   return (
     <View style={styles.container}>

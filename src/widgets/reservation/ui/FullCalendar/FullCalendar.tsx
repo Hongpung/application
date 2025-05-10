@@ -1,7 +1,6 @@
 import { View, Text, Alert, Pressable, StyleSheet } from "react-native";
 
 import { Color, Icons } from "@hongpung/src/common";
-import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 type FullCalendarProps = {
   onClickDate: (date: Date) => void;

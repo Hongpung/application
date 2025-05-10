@@ -6,7 +6,7 @@ import { Instrument } from "@hongpung/src/entities/instrument";
 import { useBorrowPossibleInstrumentsFetch } from "@hongpung/src/entities/reservation";
 
 import { useCreateReservation } from "@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context";
-import { BorrowInstrumentsConfirmButton } from "@hongpung/src/features/reservation/configureReservation/ui/BorrowInstrumentsConfirmButton/BorrowInstrumentsConfirmButton";
+import { BorrowInstrumentsConfirmButton } from "@hongpung/src/widgets/reservation/ui/BorrowInstrumentsConfirmButton/BorrowInstrumentsConfirmButton";
 
 import BorrowPossibleInstrumentList from "@hongpung/src/widgets/instrument/ui/BorrowPossibleInstrumentList/BorrowPossibleInstrumentList";
 

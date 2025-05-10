@@ -10,13 +10,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Color, Header } from "@hongpung/src/common";
 
 import { NotificationList } from "@hongpung/src/widgets/notification/ui/NotificationList/NotificationList";
-import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
+
 import {
   useDeleteAllNotificationsRequest,
-  useDeleteNotificationRequest,
   useLoadNotificationsFetch,
   useReadAllNotificationsRequest,
 } from "@hongpung/src/features/notification/manageNotification/api/notificationApi";
+import { useDeleteNotificationRequest } from "@hongpung/src/entities/notification";
 import { NotificationType } from "@hongpung/src/entities/notification/model/type";
 
 const NotificationScreen: React.FC = () => {

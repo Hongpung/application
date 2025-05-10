@@ -44,7 +44,9 @@ const MemberList: React.FC<MemberListProps> = ({
       <FlatList
         style={{ flex: 1 }}
         data={members}
-        keyExtractor={(member) => member.memberId.toString()}
+        keyExtractor={(member, index) =>
+          member.memberId ? member.memberId.toString() : index.toString() + "member"
+        }
         renderItem={renderItem}
         ListEmptyComponent={
           !!EmptyComponent ? (

@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  Text,
-  View,
-  ScrollView,
-  FlatList,
-  Alert,
-  StyleSheet,
-} from "react-native";
+import { Text, View, FlatList, Alert, StyleSheet } from "react-native";
 
 import { useAtomValue } from "jotai";
 import { ThisSessionState } from "@hongpung/src/entities/session";
@@ -17,7 +10,7 @@ import {
   BorrowInstrumentCard,
   Instrument,
 } from "@hongpung/src/entities/instrument";
-import { useExtendSessionRequest } from "@hongpung/src/features/session/useRoom/api/manageRoomApi";
+import { useExtendSessionRequest } from "@hongpung/src/entities/session";
 import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
 import { extendSessionSuccessToast } from "@hongpung/src/features/session/useRoom/lib/toast";
 import { SessionControlButton } from "@hongpung/src/features/session/useRoom/ui/SessionControlButton/SessionControlButton";
@@ -37,11 +30,13 @@ const UsingManageScreen: React.FC<
 
   const [instrument, setInstrument] = useState<Instrument | null>(null);
 
+  console.log("usingSession", usingSession);
+
   const handleExtendSession = async () => {
     try {
       if (!canExtand) throw new Error("세션 연장 불가능");
       const { message } = await extendRequest();
-      if (message === "success") {
+      if (message === "Success") {
         extendSessionSuccessToast();
         navigation.goBack();
       } else {
@@ -73,10 +68,7 @@ const UsingManageScreen: React.FC<
       <FullScreenLoadingModal isLoading={isLoading} />
       <Header leftButton={"close"} />
       <InstrumentModal instrument={instrument} />
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+      <View style={styles.container}>
         <View style={styles.headerSpacing} />
         <Text style={styles.title}>연습 예정 시간</Text>
         <View style={styles.headerSpacing} />
@@ -141,15 +133,14 @@ const UsingManageScreen: React.FC<
           )}
           <View style={styles.headerSpacing} />
         </View>
-      </ScrollView>
+      </View>
       <SessionControlButton
         canExtand={canExtand}
         canReturn={canReturn}
         handleExtendSession={handleExtendSession}
         handleReturnSession={() => {
           navigation.replace("SessionManagement", {
-            screen: "CheckOutSession",
-            params: { sessionId: usingSession.sessionId },
+            screen: "CheckOutSession"
           });
         }}
       />
@@ -159,10 +150,6 @@ const UsingManageScreen: React.FC<
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#FFF",
-  },
-  scrollView: {
     flex: 1,
     backgroundColor: "#FFF",
   },

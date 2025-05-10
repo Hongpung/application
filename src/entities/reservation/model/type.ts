@@ -55,29 +55,24 @@ export type ReservationDetail =
       creatorName: string;
 
       reservationType: "EXTERNAL";
-      participationAvailable: boolean;
     };
 
-    
 export type ReservationForm = {
+  title: string; // 예약 제목
 
-  title: string // 예약 제목
+  date?: string; // 예약 날짜 yyyy-mm-dd 형식
 
-  date?: string // 예약 날짜 yyyy-mm-dd 형식
+  startTime?: TimeFormat; // 시작 시간 hh:mm 형식
+  endTime?: TimeFormat; // 시작 시간 hh:mm 형식
 
-  startTime?: TimeFormat// 시작 시간 hh:mm 형식
-  endTime?: TimeFormat// 시작 시간 hh:mm 형식
+  reservationType: Exclude<ReservationType, "EXTERNAL">;
 
-  reservationType: Exclude<ReservationType, 'EXTERNAL'>
+  participationAvailable: boolean;
 
-  participationAvailable: boolean
+  participators: Member[];
 
-  participators: Member[]
-
-  borrowInstruments: Instrument[]
-
-}
-
+  borrowInstruments: Instrument[];
+};
 
 export interface DailyReservation {
   reservationId: number;

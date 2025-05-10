@@ -5,10 +5,9 @@ import {
   Platform,
   TouchableWithoutFeedback,
   View,
-  Text,
   StyleSheet,
 } from "react-native";
-import { Color, Header, DescriptionBox } from "@hongpung/src/common";
+import { Header, DescriptionBox } from "@hongpung/src/common";
 
 import { ChangePasswordSection } from "@hongpung/src/widgets/auth/ui/ChangePasswordSection/ChangePasswordSection";
 
@@ -33,7 +32,10 @@ const ChangePasswordScreen: React.FC = () => {
             height: 40,
           }}
         ></View>
-        <DescriptionBox descriptions={descriptions} style={styles.descriptionContainer} />
+        <DescriptionBox
+          descriptions={descriptions}
+          style={styles.descriptionContainer}
+        />
         <ChangePasswordSection />
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>

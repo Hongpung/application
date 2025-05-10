@@ -1,10 +1,10 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { ReservationStackScreenProps } from "@hongpung/src/common/navigation";
-import CreateReservationDateSelectScreen from "@hongpung/src/pages/reservation/createReservationStack/CreateReservationDateSelectPage";
-import CreateReservationTimeSelectScreen from "@hongpung/src/pages/reservation/createReservationStack/CreateReservationTimeSelectPage";
-import CreateReservationParticipatorsSelectScreen from "@hongpung/src/pages/reservation/createReservationStack/CreateReservationParticipatorsSelectPage";
-import CreateReservationBorrowInstrumentsSelectScreen from "@hongpung/src/pages/reservation/createReservationStack/CreateReservationInstrumentsSelectPage";
+import EditReservationDateSelectScreen from "@hongpung/src/pages/reservation/editReservationStack/EditReservationDateSelectPage";
+import EditReservationTimeSelectScreen from "@hongpung/src/pages/reservation/editReservationStack/EditReservationTimeSelectPage";
+import EditReservationParticipatorsSelectScreen from "@hongpung/src/pages/reservation/editReservationStack/EditReservationParticipatorsSelectPage";
+import EditReservationBorrowInstrumentsSelectScreen from "@hongpung/src/pages/reservation/editReservationStack/EditReservationInstrumentsSelectPage";
 import { EditReservationStackParamList } from "@hongpung/src/common/navigation/editReservation";
 import EditReservationConfirmPage from "@hongpung/src/pages/reservation/editReservationStack/EditReservationConfirmPage";
 import ReservationEditPage from "@hongpung/src/pages/reservation/editReservationStack/ReservationEditPage";
@@ -81,19 +81,19 @@ export const EditReservationNavigation: React.FC<
         />
         <EditReservationStack.Screen
           name="EditReservationDateSelect"
-          component={CreateReservationDateSelectScreen}
+          component={EditReservationDateSelectScreen}
         />
         <EditReservationStack.Screen
           name="EditReservationTimeSelect"
-          component={CreateReservationTimeSelectScreen}
+          component={EditReservationTimeSelectScreen}
         />
         <EditReservationStack.Screen
           name="EditReservationParticipatorsSelect"
-          component={CreateReservationParticipatorsSelectScreen}
+          component={EditReservationParticipatorsSelectScreen}
         />
         <EditReservationStack.Screen
           name="EditReservationBorrowInstrumentsSelect"
-          component={CreateReservationBorrowInstrumentsSelectScreen}
+          component={EditReservationBorrowInstrumentsSelectScreen}
         />
         <EditReservationStack.Screen
           name="EditReservationConfirm"

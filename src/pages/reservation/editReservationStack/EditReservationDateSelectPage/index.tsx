@@ -1,11 +1,11 @@
 import React from 'react'
 
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 
 import ReservationTypeTable from '@hongpung/src/entities/reservation/ui/ReservationTypeTable';
 
 import { FullCalendar } from '@hongpung/src/widgets/reservation/ui/FullCalendar/FullCalendar';
-import { useReservationCalendar } from '@hongpung/src/features/reservation/figureReservation/model/useReservationCalendar';
+import { useReservationCalendar } from '@hongpung/src/features/reservation/configureReservation';
 import { useEditReservation } from '@hongpung/src/features/reservation/editReservation/model/useEditReservation.context';
 
 

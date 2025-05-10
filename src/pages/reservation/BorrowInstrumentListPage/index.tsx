@@ -6,7 +6,7 @@ import BorrowInstrumentList from "@hongpung/src/widgets/instrument/ui/BorrowInst
 import { StackActions } from "@react-navigation/native";
 import { MainStackScreenProps } from "@hongpung/src/common/navigation";
 
-const ReservationInstrumentsViewScreen: React.FC<
+export const BorrowInstrumentListPage: React.FC<
   MainStackScreenProps<"BorrowInstrumentList">
 > = ({ navigation, route }) => {
   const { borrowInstruments } = route.params;
@@ -31,8 +31,6 @@ const ReservationInstrumentsViewScreen: React.FC<
     </View>
   );
 };
-
-export default ReservationInstrumentsViewScreen;
 
 const styles = StyleSheet.create({
   container: {

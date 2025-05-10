@@ -1,3 +1,3 @@
 import { atom } from "jotai";
 
-export const UseRoomState = atom<boolean>(false);
+export const UseRoomState = atom<boolean | null>(null);
