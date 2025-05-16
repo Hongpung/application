@@ -2,8 +2,9 @@ import { View, Pressable, Text, Image, StyleSheet } from "react-native";
 
 import { Color } from "@hongpung/src/common";
 import { Member } from "@hongpung/src/entities/member";
-import React from "react";
+import React, { useState } from "react";
 import { RoleTag } from "../RoleTag/RoleTag";
+import { Skeleton } from "moti/skeleton";
 
 interface ParticipatorCardProps {
 
@@ -15,16 +16,44 @@ interface ParticipatorCardProps {
 
 const ParticipatorCard: React.FC<ParticipatorCardProps> = ({ member, isPicked, onPress }) => {
 
+    const hasImage = member.profileImageUrl !== null && member.profileImageUrl !== undefined && member.profileImageUrl !== '';
+    const [isProfileImageLoading, setIsProfileImageLoading] = useState(true);
+    const [isImageError, setIsImageError] = useState(false);
     return (
         <Pressable style={[styles.ProfileContainer, isPicked && styles.PickedProfile]} onPress={() => { onPress(member) }}>
             <View style={{ flexDirection: 'row', flex: 1, alignItems: 'center' }}>
-                {member.profileImageUrl ?
-                    <Image
-                        source={{ uri: member.profileImageUrl }}
-                        style={styles.ProfilePhoto} /> :
+                {hasImage ? (
+                    <>
+                        <Image
+                            source={{ uri: member.profileImageUrl }}
+                            style={styles.ProfilePhoto}
+                            onLoadEnd={() => setIsProfileImageLoading(false)}
+                            onError={()=> setIsImageError(true)}
+                        />
+                        {isProfileImageLoading && (
+                            <View style={styles.SkeletonOverlay}>
+                                <Skeleton
+                                    transition={{
+                                        type: "spring",
+                                        duration: 400,
+                                        delay: 100,
+                                    }}
+                                    width={"100%"}
+                                    height={"100%"}
+                                    colors={[Color["grey100"], Color["grey300"]]}
+                                />
+                            </View>
+                        )}
+                        {isImageError && (
+                            <View style={[styles.SkeletonOverlay, {
+                                borderWidth: 1,
+                                borderColor: Color['grey300'],
+                                backgroundColor: Color['grey200'],
+                            }]} />
+                        )}
+                    </>
+                ) :
                     <View style={[styles.ProfilePhoto, {
-                        borderWidth: 1,
-                        borderColor: Color['grey300'],
                         backgroundColor: Color['grey200'],
                     }]} />}
                 <View style={{ height: 44, display: 'flex', gap: 2 }}>
@@ -55,7 +84,7 @@ const ParticipatorCard: React.FC<ParticipatorCardProps> = ({ member, isPicked, o
 export default React.memo(ParticipatorCard);
 
 const styles = StyleSheet.create({
-    
+
     ProfileContainer: {
         position: 'relative',
         height: 112,
@@ -64,7 +93,13 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: Color['grey200']
     },
-
+    SkeletonOverlay: {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        borderRadius: 5,
+        overflow: "hidden",
+    },
     PickedProfile: {
         backgroundColor: Color['blue100'],
         borderColor: Color['blue600'],

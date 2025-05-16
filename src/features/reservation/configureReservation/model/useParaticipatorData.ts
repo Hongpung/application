@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
+import { Alert } from "@hongpung/src/common";
 import { useSearchInvitePossibleMembersFetch } from "@hongpung/src/entities/reservation";
 import { Member } from "@hongpung/src/entities/member";
-import { Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { throttle } from "lodash";
 
@@ -35,11 +35,15 @@ export const useInvitePossibleMemberData = (searchParams: FindOptions) => {
       }
       // setPage(prev => prev + 1)
     } else if (error) {
-      Alert.alert("오류", "오류가 발생했어요.\n다시 시도해주세요.");
-      const isCanGoBack = navigation.canGoBack();
-      if (isCanGoBack) {
-        navigation.goBack();
-      }
+      Alert.alert("오류", "오류가 발생했어요.\n다시 시도해주세요.", {
+        onConfirm: () => {
+          const isCanGoBack = navigation.canGoBack();
+          if (isCanGoBack) {
+            navigation.goBack();
+          }
+        }
+      });
+
     }
   }, [fetchData]);
 

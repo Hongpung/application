@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Text, View, FlatList, Alert, StyleSheet } from "react-native";
+import { Text, View, FlatList, StyleSheet } from "react-native";
 
 import { useAtomValue } from "jotai";
 import { ThisSessionState } from "@hongpung/src/entities/session";
-import { Color, ErrorModal, Header, Icons } from "@hongpung/src/common";
+import { Alert, Color, ErrorModal, Header, Icons } from "@hongpung/src/common";
 import MemberList from "@hongpung/src/widgets/member/ui/MemberList/MemberList";
 import { useCalculateTime } from "@hongpung/src/features/session/useRoom/model/useCalculateTime";
 import {

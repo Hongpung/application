@@ -5,6 +5,7 @@ export * from "./lib/deepEqual";
 export * from "./lib/useValidatedForm";
 export * from "./lib/jotaiStroe";
 export * from "./atom/alertAtom";
+export * from "./api/uploadImageApi"
 export * from "./ui";
 export * from "./lib/NotificationToken";
 export { TimeLineArray, TimeArray } from "./constant/timeArray";

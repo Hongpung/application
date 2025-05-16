@@ -11,7 +11,6 @@ import { CreateReservationStackScreenProps } from "@hongpung/src/common/navigati
 const ReservationCreatePage: React.FC<
   CreateReservationStackScreenProps<"CreateReservationForm">
 > = ({ navigation }) => {
-  const [isAgree, setAgree] = useState(false);
 
   const {
     reservation,
@@ -21,6 +20,8 @@ const ReservationCreatePage: React.FC<
     setBorrowInstruments,
     setParticipationAvailable,
     setReservationType,
+
+    isValidReservation
   } = useCreateReservation();
 
   const resetParticipators = useCallback(
@@ -73,7 +74,7 @@ const ReservationCreatePage: React.FC<
         resetBorrowInstruments={resetBorrowInstruments}
         navigateToBorrowInstrumentsPickerPage={goToBorrowInstrumentsSelect}
         submitButtonText="예약하기"
-        canSubmit={isAgree}
+        canSubmit={isValidReservation}
         onSubmit={goToReservationCreateComplete}
       />
 

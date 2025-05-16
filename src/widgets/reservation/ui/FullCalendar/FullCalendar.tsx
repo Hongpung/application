@@ -1,6 +1,6 @@
-import { View, Text, Alert, Pressable, StyleSheet } from "react-native";
+import { View, Text,  Pressable, StyleSheet } from "react-native";
 
-import { Color, Icons } from "@hongpung/src/common";
+import { Alert, Color, Icons } from "@hongpung/src/common";
 
 type FullCalendarProps = {
   onClickDate: (date: Date) => void;
@@ -32,9 +32,7 @@ export const FullCalendar: React.FC<FullCalendarProps> = (props) => {
   } = props;
 
   if (error) {
-    Alert.alert("오류", error?.message || "알 수 없는 오류입니다.", [
-      { text: "확인", onPress: () => {} },
-    ]);
+    Alert.alert("오류", error?.message || "알 수 없는 오류입니다.");
 
     return (
       <View>

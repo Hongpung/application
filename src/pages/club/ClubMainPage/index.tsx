@@ -2,11 +2,11 @@ import {
   ScrollView,
   View,
   StyleSheet,
-  Alert,
-  InteractionManager,
 } from "react-native";
 import React from "react";
-import { Color, Header } from "@hongpung/src/common";
+import {
+  Alert, Color, Header
+} from "@hongpung/src/common";
 import { ClubProfileSection } from "@hongpung/src/widgets/club/ui/ClubProfileSection/ClubProfileSection";
 import { ClubMenuSection } from "@hongpung/src/widgets/club/ui/ClubMenuSection/ClubMenuSection";
 import { ClubFooterSection } from "@hongpung/src/widgets/club/ui/ClubFooterSection/ClubFooterSection";
@@ -32,7 +32,7 @@ const ClubMainPage: React.FC<ClubStackProps<"ClubMain">> = ({ navigation }) => {
     Alert.alert(
       "오류",
       "잘못된 접근입니다.\n동아리원에게만 지원하는 페이지예요.",
-      [{ onPress: () => navigation.goBack() }]
+      { onConfirm: () => navigation.goBack() }
     );
     return <View></View>;
   }
@@ -41,7 +41,7 @@ const ClubMainPage: React.FC<ClubStackProps<"ClubMain">> = ({ navigation }) => {
     Alert.alert(
       "오류",
       "오류가 발생했어요.\n다시 시도해주세요.\n" + error.message,
-      [{ onPress: () => navigation.goBack() }]
+      { onConfirm: () => navigation.goBack() }
     );
     return <View></View>;
   }

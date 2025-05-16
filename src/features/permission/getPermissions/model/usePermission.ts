@@ -1,10 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import { Camera } from "expo-camera";
-import { Alert, Platform } from "react-native";
+import { Linking, Platform } from "react-native";
 import * as Notifications from 'expo-notifications';
 import * as MediaLibrary from 'expo-media-library';
 
+import { Alert } from "@hongpung/src/common";
 
 const usePermission = () => {
     const navigation = useNavigation();
@@ -20,7 +21,11 @@ const usePermission = () => {
             await AsyncStorage.setItem('isLaunched', 'true');
 
         } else {
-            Alert.alert('권한 획득 실패', '앱 사용에 필요한 권한을 획득해주세요.');
+            Alert.alert('권한 획득 실패', '앱 사용에 필요한 권한을 획득해주세요.',{
+                onConfirm: () => {
+                    Linking.openSettings();
+                }
+            });
         }
         //관계 없이 넘어가야함 appstore 심사에 걸림
         navigation.dispatch(StackActions.replace('Login'));

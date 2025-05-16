@@ -1,5 +1,4 @@
 import {
-  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -7,7 +6,9 @@ import {
 } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 
-import { Color, Header } from "@hongpung/src/common";
+import {
+  Alert, Color, Header
+} from "@hongpung/src/common";
 
 import { NotificationList } from "@hongpung/src/widgets/notification/ui/NotificationList/NotificationList";
 
@@ -73,16 +74,14 @@ const NotificationScreen: React.FC = () => {
           {notificationData && notificationData.length > 0 && (
             <Pressable
               onPress={() => {
-                Alert.alert("확인", "알림을 모두 삭제할까요?", [
-                  { text: "닫기" },
-                  {
-                    text: "삭제",
-                    onPress: () => {
-                      handleDeleteAll();
-                      setNotificationList([]);
-                    },
+                Alert.confirm("확인", "알림을 모두 삭제할까요?", {
+                  cancelText: "아니오",
+                  confirmText: "예",
+                  onConfirm: () => {
+                    handleDeleteAll();
+                    setNotificationList([]);
                   },
-                ]);
+                })
               }}
             >
               <Text

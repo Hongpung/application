@@ -1,8 +1,10 @@
 // entities/common/ui/CustomAlertModal.tsx
-import { View, Text, Modal, TouchableOpacity } from "react-native";
+import { View, Text, Modal, TouchableOpacity, Pressable, BackHandler } from "react-native";
 import { useAtom } from "jotai";
 import { alertAtom } from "../../atom/alertAtom";
 import { LongButton, ShortButton } from "../buttons";
+import { useEffect } from "react";
+import { Color } from "../../constant/color";
 
 export const AlertModal: React.FC = () => {
   const [alertState, setAlertState] = useAtom(alertAtom);
@@ -23,9 +25,25 @@ export const AlertModal: React.FC = () => {
     close();
   };
 
+  useEffect(() => {
+    if (!alertState.isVisible) return;
+
+    const onBackPress = () => {
+      handleCancel(); // or close();
+      return true; // 기본 백버튼 동작 막기
+    };
+
+    const backHandlerSubscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+
+    return () => {
+      backHandlerSubscription.remove();
+    };
+  }, [alertState.isVisible]);
+
   return (
     <Modal visible={alertState.isVisible} transparent>
-      <View
+      <Pressable
+        onPress={handleCancel}
         style={{
           flex: 1,
           backgroundColor: "rgba(0,0,0,0.2)",
@@ -33,10 +51,13 @@ export const AlertModal: React.FC = () => {
           justifyContent: "center",
         }}
       >
-        <View
+        <Pressable
+          onPress={(e) => {
+            e.stopPropagation();
+          }}
           style={{
             marginHorizontal: 24,
-            paddingVertical: 16,
+            paddingVertical: 8,
             backgroundColor: "#FFF",
             display: "flex",
             gap: 16,
@@ -45,21 +66,20 @@ export const AlertModal: React.FC = () => {
         >
           <Text
             style={{
-              paddingHorizontal: 24,
-              paddingVertical: 8,
-              width: "100%",
+              paddingHorizontal: 28,
+              paddingTop: 16,
+              paddingBottom: 8,
               fontFamily: "NanumSquareNeo-Bold",
-              fontSize: 16,
+              fontSize: 18,
             }}
           >
             {alertState.title}
           </Text>
           <Text
             style={{
-              width: "100%",
               fontFamily: "NanumSquareNeo-Regular",
               textAlign: "left",
-              paddingHorizontal: 24,
+              paddingHorizontal: 28,
               paddingVertical: 8,
               lineHeight: 20,
               fontSize: 14,
@@ -68,10 +88,14 @@ export const AlertModal: React.FC = () => {
             {alertState.message}
           </Text>
           {alertState.type === "alert" ? (
-            <View style={{ paddingHorizontal: 24, paddingVertical: 8 }}>
+            <View style={{ paddingVertical: 8 }}>
               <LongButton
-                color="blue"
-                innerContent="확인"
+                color={alertState.confirmButtonColor}
+                innerContent={<Text style={{
+                  fontFamily: "NanumSquareNeo-Bold",
+                  fontSize: 16,
+                  color: "#FFF",
+                }}>{alertState.confirmText}</Text>}
                 isAble
                 onPress={handleConfirm}
               />
@@ -79,7 +103,6 @@ export const AlertModal: React.FC = () => {
           ) : (
             <View
               style={{
-                paddingHorizontal: 24,
                 paddingVertical: 8,
                 flexDirection: "row",
                 gap: 12,
@@ -88,21 +111,29 @@ export const AlertModal: React.FC = () => {
               }}
             >
               <ShortButton
-                innerContent={alertState.cancelText}
+                innerContent={<Text style={{
+                  fontFamily: "NanumSquareNeo-Bold",
+                  fontSize: 16,
+                  color: Color[alertState.confirmButtonColor + "600"],
+                }}>{alertState.cancelText}</Text>}
                 onPress={handleCancel}
                 isFilled={false}
-                color={"blue"}
+                color={alertState.cancelButtonColor}
               />
               <ShortButton
-                innerContent={alertState.confirmText}
+                innerContent={<Text style={{
+                  fontFamily: "NanumSquareNeo-Bold",
+                  fontSize: 16,
+                  color: "#FFF"
+                }}>{alertState.confirmText}</Text>}
                 onPress={handleConfirm}
                 isFilled={true}
-                color={"blue"}
+                color={alertState.confirmButtonColor}
               />
             </View>
           )}
-        </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 };

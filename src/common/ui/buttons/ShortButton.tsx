@@ -3,7 +3,7 @@ import React from "react";
 import { Color } from "../../constant/color";
 
 type ShortButtonProps = {
-  innerContent: string;
+  innerContent: string | React.ReactNode;
   onPress: () => void;
   isFilled: boolean;
   color: string;
@@ -19,19 +19,24 @@ export const ShortButton: React.FC<ShortButtonProps> = React.memo(
           styles.basic,
           {
             backgroundColor: isFilled ? Color[colorKey] : Color[subColor],
+            opacity: isFilled ? 1 : 0.75,
             borderColor: Color[colorKey],
           },
         ]}
         onPress={() => onPress()}
       >
-        <Text
-          style={[
-            styles.basicText,
-            { color: !isFilled ? Color[colorKey] : "white" },
-          ]}
-        >
-          {innerContent}
-        </Text>
+        {typeof innerContent === "string" ? (
+          <Text
+            style={[
+              styles.basicText,
+              { color: "#FFF" },
+            ]}
+          >
+            {innerContent}
+          </Text>
+        ) : (
+          innerContent
+        )}
       </Pressable>
     );
   }

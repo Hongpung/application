@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 import {
-  Alert,
   FlatList,
   Pressable,
   StyleSheet,
@@ -8,7 +7,9 @@ import {
   View,
 } from "react-native";
 import { Member } from "@hongpung/src/entities/member";
-import { Color, Icons } from "@hongpung/src/common";
+import {
+  Alert, Color, Icons
+} from "@hongpung/src/common";
 
 interface SelectedParticipatorListProps {
   newParticipators: Member[];
@@ -48,19 +49,16 @@ const SelectedParticipatorList: React.FC<SelectedParticipatorListProps> = ({
         </Text>
         <Pressable
           onPress={() => {
-            Alert.alert(
+            Alert.confirm(
               "확인",
               "선택한 인원을 전부 취소할까요?",
-              [
-                { text: "취소", style: "cancel" },
-                {
-                  text: "확인",
-                  onPress: () => {
-                    setNewParticipators([]);
-                  },
-                },
-              ],
-              { cancelable: true }
+              {
+                cancelText: "취소",
+                confirmText: "확인",
+                onConfirm:()=>{
+                  setNewParticipators([]);
+                }
+              }
             );
           }}
           style={{ flexDirection: "row", alignItems: "center", gap: 4 }}

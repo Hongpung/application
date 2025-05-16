@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Alert, AppState, AppStateStatus } from "react-native";
+import { AppState, AppStateStatus } from "react-native";
 
 import { useAtom } from "jotai";
 import { StackActions, useNavigation } from "@react-navigation/native";
@@ -7,7 +7,7 @@ import { StackActions, useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import { io } from "socket.io-client";
 
-import { getToken } from "@hongpung/src/common";
+import { Alert, getToken } from "@hongpung/src/common";
 
 import { UseRoomState, ThisSessionState } from "@hongpung/src/entities/session";
 import { Session } from "@hongpung/src/entities/session";
@@ -71,7 +71,7 @@ export const useUsingRoomSocket = () => {
     }
 
     const handleForceEnded = () => {
-        Alert.alert('세션 강제 종료');
+        Alert.alert("알림", "세션이 강제 종료 되었어요.");
         setUseRoom(false);
         setSessionState(null);
     }
@@ -88,7 +88,7 @@ export const useUsingRoomSocket = () => {
     }
 
     const handleInvalidUser = () => {
-        Alert.alert('권한이 없습니다.');
+        Alert.alert("오류", "권한이 없습니다.");
         navigation.dispatch(StackActions.replace('HomeStack'));
         socketRef.current?.disconnect();
         setUseRoom(false);

@@ -1,9 +1,9 @@
 import React from "react";
-import { Alert } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
 
 import {
+  Alert,
   ErrorModal,
   FullScreenLoadingModal,
   LongButton,
@@ -32,25 +32,22 @@ export const LeaveReservationButton: React.FC<LeaveReservationButtonProps> = ({
       return;
     }
 
-    Alert.alert(
+    Alert.confirm(
       "확인",
       "정말 예약에서 나가시겠습니까?",
-      [
-        { text: "아니오", style: "cancel" },
-        {
-          text: "예",
-          onPress: async () => {
-            try {
-              await request({ reservationId });
-              navigation.goBack();
-            } catch {
-              Alert.alert("오류", "오류가 발생했습니다.");
-            }
-          },
+      {
+        cancelText: "아니오",
+        confirmText: "예",
+        onConfirm: async () => {
+          try {
+            await request({ reservationId });
+            navigation.goBack();
+          } catch {
+            Alert.alert("오류", "오류가 발생했습니다.");
+          }
         },
-      ],
-      { cancelable: true }
-    );
+      },
+    )
   };
 
   return (

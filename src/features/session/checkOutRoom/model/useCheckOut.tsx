@@ -1,14 +1,16 @@
-import { ThisSessionState } from "@hongpung/src/entities/session";
-import { UseRoomState } from "@hongpung/src/entities/session";
-import { uploadImageListRequest } from "@hongpung/src/common/api/uploadImageApi";
-import { StackActions, useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import { Alert } from "react-native";
+
+import { StackActions, useNavigation } from "@react-navigation/native";
 import { useAtomValue, useAtom } from "jotai";
-import { CheckOutStep } from "./types";
-import { useEndSessionRequest } from "../api/checkInApi";
+
+import { PhotoFileFormat, Alert, uploadImageListRequest } from "@hongpung/src/common";
+
+import { ThisSessionState, UseRoomState } from "@hongpung/src/entities/session";
+
 import { parsePhotoToFile } from "@hongpung/src/entities/session/lib/parsePhotoToFile";
-import { PhotoFileFormat } from "@hongpung/src/common/types/PhotoFileFormat";
+
+import { useEndSessionRequest } from "../api/checkInApi";
+import { CheckOutStep } from "./types";
 
 export const useCheckOut = () => {
   const navigation = useNavigation();
@@ -44,12 +46,16 @@ export const useCheckOut = () => {
       if (e instanceof Error) {
         if (e.message == "진행 중인 세션 정보가 없습니다.") {
           {
-            Alert.alert(e.message);
-            navigation.dispatch(StackActions.replace("HomeStack"));
+            Alert.alert("오류", e.message, {
+              onConfirm: () => {
+                navigation.dispatch(StackActions.replace("HomeStack"));
+              }
+            });
+
           }
         }
       }
-      Alert.alert("종료 중 오류가 발생했어요.\n다시 시도해주세요.");
+      Alert.alert("오류", "종료 중 오류가 발생했어요.\n다시 시도해주세요.");
       setStep("ConfirmPhotos");
     }
   };

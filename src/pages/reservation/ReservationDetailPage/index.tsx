@@ -2,7 +2,6 @@ import {
   ScrollView,
   View,
   Text,
-  Alert,
   StyleSheet,
   Pressable,
 } from "react-native";
@@ -16,7 +15,9 @@ import {
   isEditible,
 } from "@hongpung/src/entities/reservation";
 
-import { Header, Color } from "@hongpung/src/common";
+import {
+  Alert, Header, Color
+} from "@hongpung/src/common";
 import { useAtomValue } from "jotai";
 import { UserStatusState } from "@hongpung/src/entities/member";
 

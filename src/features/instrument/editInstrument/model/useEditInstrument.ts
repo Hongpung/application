@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native'
 import { Instrument } from '@hongpung/src/entities/instrument'
 import { useEditInstrumentRequest } from '../api/editInstrumentApi'
 
-import { Alert } from 'react-native'
+import { Alert } from '@hongpung/src/common'
 import { showEditInstrumentCompleteToast } from '../constant/toastAction'
 import { parseInstrumentEditBody } from '../lib/parseInstrumentEditBody'
 

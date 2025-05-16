@@ -5,20 +5,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TextInput } from "react-native-gesture-handler";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
-import { debounce, set } from "lodash";
+import { debounce } from "lodash";
 import { useLoginRequest } from "@hongpung/src/entities/auth";
-import { saveToken, ValidationState } from "@hongpung/src/common";
+import { saveToken } from "@hongpung/src/common";
 import { useValidatedForm } from "@hongpung/src/common/lib/useValidatedForm";
-import { LoginFormData, LoginSchema } from "./LoginSchema";
+import { LoginSchema } from "./LoginSchema";
 
 interface LoginFormValue {
   email: string;
   password: string;
-}
-
-interface LoginFormValidation {
-  email: ValidationState;
-  password: ValidationState;
 }
 
 export const useLoginForm = () => {
@@ -30,6 +25,9 @@ export const useLoginForm = () => {
       email: "",
       password: "",
     },
+    initialValidation:{
+      email:{state:"ERROR", errorText:"이메일을 입력해주세요"},
+    }
   });
 
   const {
@@ -38,7 +36,6 @@ export const useLoginForm = () => {
     emailValidation,
     passwordValidation,
     setEmail,
-    setPassword,
     validateEmail,
     validatePassword,
     setEmailValidation,

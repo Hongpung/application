@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View, Alert, Linking } from "react-native";
+import { StyleSheet, Text, View, Linking } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
 
 import {
+  Alert,
   Color,
   Header,
   registerForPushNotificationsAsync,
@@ -36,32 +37,32 @@ const NotificationSettingPage: React.FC = () => {
   useEffect(() => {
     isEnabledRef.current = isEnabled;
   }, [isEnabled]);
-  
+
   useEffect(() => {
     return () => {
       if (isChangedRef.current) {
         const handleNotificationStatus = async () => {
           try {
             if (isEnabledRef.current) {
-            const NToken = await registerForPushNotificationsAsync();
-            await updateNotificationStatusRequest({
-              pushEnable: true,
-              notificationToken: NToken,
-            });
-            notificationOnSuccessToast();
-          } else {
-            await updateNotificationStatusRequest({
-              pushEnable: false,
-              notificationToken: null,
-            });
-            notificationOffSuccessToast();
+              const NToken = await registerForPushNotificationsAsync();
+              await updateNotificationStatusRequest({
+                pushEnable: true,
+                notificationToken: NToken,
+              });
+              notificationOnSuccessToast();
+            } else {
+              await updateNotificationStatusRequest({
+                pushEnable: false,
+                notificationToken: null,
+              });
+              notificationOffSuccessToast();
+            }
+          } catch (e) {
+            Alert.alert("오류", "알림 설정 변경에 실패했어요.\n다시 시도해주세요.");
           }
-        } catch (e) {
-          Alert.alert("오류", "알림 설정 변경에 실패했어요.\n다시 시도해주세요.");
-        }
-      };
-  
-      // cleanup 함수에서는 async 직접 못 쓰니까 바로 실행
+        };
+
+        // cleanup 함수에서는 async 직접 못 쓰니까 바로 실행
         handleNotificationStatus();
       }
     };
@@ -73,9 +74,9 @@ const NotificationSettingPage: React.FC = () => {
     const { status } = await Notifications.requestPermissionsAsync();
     if (status !== "granted") {
       Alert.alert(
-        "알림 권한 거부",
+        "권한 거부",
         "알림 권한이 거부되었습니다. 시스템 설정에서 권한을 부여해야 알림을 받을 수 있습니다.",
-        [{ text: "확인", onPress: () => Linking.openSettings() }]
+        { confirmText: "확인", onConfirm: () => Linking.openSettings() }
       );
       return;
     }

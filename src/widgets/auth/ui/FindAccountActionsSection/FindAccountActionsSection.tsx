@@ -1,7 +1,5 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Alert, Color } from "@hongpung/src/common";
-import { useAtomValue } from "jotai";
-import { alertAtom } from "@hongpung/src/common/atom/alertAtom";
 
 interface FindAccountActionsSectionProps {
   onPressResetPassword: () => void;

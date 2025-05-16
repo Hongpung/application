@@ -1,9 +1,9 @@
 import { createContext, useContext } from "react";
-import { Alert } from "react-native";
 
 import { useNavigation } from "@react-navigation/native";
 
-import { CreateReservationStackScreenProps } from "@hongpung/src/common/navigation/createReservation";
+import { Alert } from "@hongpung/src/common";
+import { CreateReservationStackScreenProps } from "@hongpung/src/common/navigation";
 
 import {
   parseReservationCreateRequestBody,

@@ -6,13 +6,13 @@ import {
   useResetPasswordRequest,
   useIsRegisteredEmailRequest,
 } from "@hongpung/src/entities/auth";
-import { deleteToken, getToken, ValidationState } from "@hongpung/src/common";
+import { Alert, deleteToken, getToken, ValidationState } from "@hongpung/src/common";
 import {
   resetPasswordSchema,
   type ResetPasswordFormData,
 } from "./resetPaswordSchema";
 import * as z from "zod";
-import { Alert, BackHandler, TextInput } from "react-native";
+import {  BackHandler, TextInput } from "react-native";
 import { ResetPasswordStep } from "./type";
 import {
   showEmailVirificationCompleteToast,
@@ -58,22 +58,7 @@ const useResetPasswordSteps = () => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        // 뒤로가기 막기
-        Alert.alert(
-          "확인",
-          "비밀번호 재설정을 취소하시겠습니까?",
-          [
-            { text: "닫기" },
-            {
-              text: "취소",
-              style: "destructive",
-              onPress: () => {
-                navigation.goBack();
-              },
-            },
-          ],
-          { cancelable: true }
-        );
+        onClose();
         return true; // true를 리턴하면 뒤로가기가 막힘
       }
     );
@@ -111,22 +96,20 @@ const useResetPasswordSteps = () => {
   };
 
   const onClose = () => {
-    Alert.alert(
-      "확인",
-      "비밀번호 재설정을 취소하시겠습니까?",
-      [
-        { text: "닫기" },
+      Alert.confirm(
+        "확인",
+        "비밀번호 재설정을 취소하고 뒤로 돌아갈까요?",
         {
-          text: "취소",
-          style: "destructive",
-          onPress: () => {
+          cancelText: "아니오",
+          confirmText: "네",
+          confirmButtonColor:"green",
+          cancelButtonColor:"green",
+          onConfirm: () => {
             navigation.goBack();
           },
-        },
-      ],
-      { cancelable: true }
-    );
-  };
+        }
+      );
+    };
 
   
 

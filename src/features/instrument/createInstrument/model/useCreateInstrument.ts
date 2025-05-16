@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { Alert } from "react-native"
+import { Alert } from "@hongpung/src/common"
 
 import { StackActions, useNavigation } from "@react-navigation/native"
 

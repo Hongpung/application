@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { StackActions } from "@react-navigation/native";
 import { useAtomValue, useAtom } from "jotai";
+
+import { Alert } from "@hongpung/src/common";
+
 import { UserStatusState } from "@hongpung/src/entities/member";
 import { UseRoomState } from "@hongpung/src/entities/session";
 import {
@@ -13,8 +15,6 @@ import {
   useStartSessionRequest,
   useAttendSessionRequest,
 } from "@hongpung/src/features/session/checkInRoom/api/checkInApi";
-import { Alert } from "react-native";
-import { isLoading } from "expo-font";
 import AttendSessionCompleteWidget from "@hongpung/src/widgets/session/ui/AttendSessionCompleteWidget/AttendSessionCompleteWidget";
 import { AttendSessionConfirmWidget } from "@hongpung/src/widgets/session/ui/AttendSessionConfirmWidget/AttendSessionConfirmWidget";
 import { CreateSessionConfirmWidget } from "@hongpung/src/widgets/session/ui/CreateSessionConfirmWidget/CreateSessionConfirmWidget";

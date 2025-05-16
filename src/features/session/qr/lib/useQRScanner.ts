@@ -1,7 +1,7 @@
 import { BarcodeScanningResult } from "expo-camera";
 import { useState, useCallback, useEffect } from "react";
 import { debounce } from "lodash";
-import { Platform, Dimensions, Alert } from "react-native";
+import { Platform, Dimensions } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");

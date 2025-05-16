@@ -8,12 +8,13 @@ import {
   Modal,
   Pressable,
   Dimensions,
-  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useAtomValue } from "jotai";
 
-import { Color,Header } from "@hongpung/src/common";
+import {
+  Alert, Color, Header
+} from "@hongpung/src/common";
 import { UserStatusState } from "@hongpung/src/entities/member";
 
 import { useLoadInstrumentDetailFetch } from "@hongpung/src/entities/instrument/api/instrumentApi";
@@ -106,7 +107,7 @@ export const InstrumentDetailPage: React.FC<
           leftButton="close"
           headerName="악기 상세"
           RightButton="수정"
-          rightAction={() =>{
+          rightAction={() => {
             // navigation.push("InstrumentEdit", {
             //   instrument: JSON.stringify(data),
             // })

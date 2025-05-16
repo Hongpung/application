@@ -2,7 +2,7 @@ import { type ReservationForm } from "@hongpung/src/entities/reservation";
 import { useCallback, useMemo, useState } from "react";
 
 const useReservationForm = (initialReservationForm?: ReservationForm) => {
-  const [reservationForm, setReservationForm] = useState<ReservationForm>({
+  const [reservationForm, setReservationForm] = useState<ReservationForm>(initialReservationForm ||{
     title: "",
     reservationType: "REGULAR",
     participationAvailable: false,
@@ -14,7 +14,11 @@ const useReservationForm = (initialReservationForm?: ReservationForm) => {
     (
       reservationForm: ReservationForm
     ): reservationForm is Required<ReservationForm> => {
-      return Object.values(reservationForm).every((value) => value !== null);
+      return Object.entries(reservationForm).every(([key, value]) => {
+        const typedKey = key as keyof ReservationForm;
+        if (typedKey === 'title') { return (value !== null) }
+        else { return true }
+      });
     },
     []
   );

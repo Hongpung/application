@@ -5,7 +5,7 @@ import {
 } from "@hongpung/src/entities/reservation";
 import { useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
-import { Alert } from "react-native";
+import { Alert } from "@hongpung/src/common";
 import Toast from "react-native-toast-message";
 
 export const useDeleteReservation = () => {
@@ -25,33 +25,30 @@ export const useDeleteReservation = () => {
         return;
       }
 
-      Alert.alert(
+      Alert.confirm(
         "확인",
         "정말 취소하시겠습니까?",
-        [
-          { text: "아니오", style: "cancel" },
-          {
-            text: "예",
-            onPress: async () => {
-              try {
-                if (reservation.reservationId === undefined) {
-                  Alert.alert("오류", "예약 정보를 찾을 수 없습니다.");
-                  navigation.goBack();
-                  return;
-                }
-                await request({ reservationId: reservation.reservationId });
-                Toast.show({
-                  text1: "예약이 취소되었습니다.",
-                  type: "success",
-                });
+        {
+          cancelText: "아니오",
+          confirmText: "예",
+          onConfirm: async () => {
+            try {
+              if (reservation.reservationId === undefined) {
+                Alert.alert("오류", "예약 정보를 찾을 수 없습니다.");
                 navigation.goBack();
-              } catch {
-                Alert.alert("오류", "오류가 발생했습니다.");
+                return;
               }
-            },
-          },
-        ],
-        { cancelable: true }
+              await request({ reservationId: reservation.reservationId });
+              Toast.show({
+                text1: "예약이 취소되었습니다.",
+                type: "success",
+              });
+              navigation.goBack();
+            } catch {
+              Alert.alert("오류", "오류가 발생했습니다.");
+            }
+          }
+        }
       );
     },
     [request, navigation]

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { StackActions, useNavigation } from '@react-navigation/native'
 import { useDeleteInstrumentRequest } from '../api/deleteInstrumentApi'
-import { Alert } from 'react-native'
+import { Alert } from '@hongpung/src/common'
 import { showDeleteInstrumentCompleteToast } from '../constant/toastAction'
 
 export const useDeleteInstrument = () => {

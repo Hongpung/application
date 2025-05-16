@@ -38,26 +38,41 @@ export const ParticipatorsViewer: React.FC<ParticipatorsViewerProps> = (
                 paddingHorizontal: 12,
               }}
             >
-              {participators.slice(0, 5).map((user, index, array) =>
-                user.profileImageUrl ? (
-                  <Image
-                    source={{ uri: user.profileImageUrl }}
+              {participators.slice(0, 5).map((member, index, array) =>
+                member.profileImageUrl ? (
+                  <View
+                    key={member.memberId}
                     style={{
                       width: 42,
                       height: 56,
-                      borderRadius: 5,
                       marginLeft:
                         index === 0
                           ? 0
                           : array.length === 4
-                          ? -12
-                          : array.length === 5
-                          ? -16
-                          : -8,
+                            ? -12
+                            : array.length === 5
+                              ? -16
+                              : -8,
+                      borderRadius: 5,
+                      overflow: "hidden",
+                      backgroundColor: Color["grey300"],
+                      borderColor: Color["grey200"],
+                      borderWidth: 1,
                     }}
-                  />
+                  >
+                    <Image
+                      key={member.memberId}
+                      source={{ uri: member.profileImageUrl }}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        zIndex: 5
+                      }}
+                    />
+                  </View>
                 ) : (
                   <View
+                    key={member.memberId}
                     style={{
                       width: 42,
                       height: 56,
@@ -65,13 +80,15 @@ export const ParticipatorsViewer: React.FC<ParticipatorsViewerProps> = (
                         index === 0
                           ? 0
                           : array.length === 4
-                          ? -12
-                          : array.length === 5
-                          ? -16
-                          : -8,
+                            ? -12
+                            : array.length === 5
+                              ? -16
+                              : -8,
+                              
+                      overflow: "hidden",
                       backgroundColor: Color["grey300"],
-                      borderColor: Color["grey400"],
-                      borderWidth: 0.5,
+                      borderColor: Color["grey200"],
+                      borderWidth: 1,
                       borderRadius: 5,
                     }}
                   />

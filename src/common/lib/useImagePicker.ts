@@ -1,6 +1,7 @@
 import { useState } from "react";
 import * as ImagePicker from 'expo-image-picker';
-import { Alert } from "react-native";
+import { Alert } from "../atom/alertAtom";
+import { Linking } from "react-native";
 
 export const useImagePicker = () => {
     const [selectedImage, setImageFile] = useState<File | null>(null);
@@ -10,7 +11,11 @@ export const useImagePicker = () => {
         // 권한 요청
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
-            Alert.alert('권한 필요', '앨범 접근 권한이 필요합니다.');
+            Alert.alert('권한 필요', '앨범 접근 권한이 필요합니다.', {
+                onConfirm: () => {
+                    Linking.openSettings();
+                }
+            });
             return;
         }
         // 앨범에서 이미지 선택

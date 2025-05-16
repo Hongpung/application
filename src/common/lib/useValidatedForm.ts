@@ -13,10 +13,10 @@ export function createFieldSetters<T extends Record<string, any>>(
 ): {
   [K in keyof T as `set${Capitalize<string & K>}`]: (v: T[K]) => void;
 } & {
-  [K in keyof T as `set${Capitalize<string & K>}Validation`]: (
-    newValidation: ValidationState
-  ) => void;
-} {
+    [K in keyof T as `set${Capitalize<string & K>}Validation`]: (
+      newValidation: ValidationState
+    ) => void;
+  } {
   const setterMap = {} as {
     [K in keyof T as `set${Capitalize<string & K>}`]: (v: T[K]) => void;
   };
@@ -27,20 +27,18 @@ export function createFieldSetters<T extends Record<string, any>>(
   };
 
   (Object.keys(initialFormData) as (keyof T)[]).forEach((key) => {
-    const methodName = `set${(key as string).charAt(0).toUpperCase()}${(
-      key as string
-    ).slice(1)}` as keyof typeof setterMap;
-
-    const validationName = `validate${(key as string)
+    const methodName = `set${(key as string)
       .charAt(0)
-      .toUpperCase()}${(key as string).slice(
-      1
-    )}` as keyof typeof validationSetterMap;
+      .toUpperCase()}${(key as string).slice(1)}` as keyof typeof setterMap;
+
+    const validationName = `set${(key as string)
+      .charAt(0)
+      .toUpperCase()}${(key as string).slice(1)}Validation` as keyof typeof validationSetterMap;
 
     setterMap[methodName] = ((value: T[typeof key]) => {
       setFormValidation((prev) => ({
         ...prev,
-        [key]: { state: "PENDING" },
+        [`${key as string}Validation`]: { state: "PENDING" },
       }));
       setFormData((prev) => ({
         ...prev,
@@ -51,7 +49,7 @@ export function createFieldSetters<T extends Record<string, any>>(
     validationSetterMap[validationName] = ((newValidation: ValidationState) => {
       setFormValidation((prev) => ({
         ...prev,
-        [key]: newValidation,
+        [`${key as string}Validation`]: newValidation,
       }));
     }) as (typeof validationSetterMap)[typeof validationName];
   });
@@ -62,9 +60,11 @@ export function createFieldSetters<T extends Record<string, any>>(
 export function useValidatedForm<S extends ZodObject<ZodRawShape>>({
   schema,
   defaultValues,
+  initialValidation = {},
 }: {
   schema: S;
   defaultValues: TypeOf<S>;
+  initialValidation?: Partial<Record<keyof TypeOf<S>, ValidationState>>
 }) {
   type InputFormType = TypeOf<S>;
 
@@ -72,10 +72,10 @@ export function useValidatedForm<S extends ZodObject<ZodRawShape>>({
   const [formValidation, setFormValidation] = useState<
     ValidationMap<InputFormType>
   >(
-    Object.keys(defaultValues).reduce((acc, key) => {
+    Object.entries(defaultValues).reduce((acc, [key]) => {
       return {
         ...acc,
-        [`${key}Validation`]: {
+        [`${key}Validation`]: initialValidation?.[key as keyof InputFormType] ?? {
           state: "BEFORE",
         },
       };
@@ -106,12 +106,12 @@ export function useValidatedForm<S extends ZodObject<ZodRawShape>>({
         if (result.success) {
           setFormValidation((prev) => ({
             ...prev,
-            [key]: { state: "VALID" },
+            [`${key as string}Validation`]: { state: "VALID" },
           }));
         } else {
           setFormValidation((prev) => ({
             ...prev,
-            [key]: {
+            [`${key as string}Validation`]: {
               state: "ERROR",
               errorText: result.error.errors[0].message,
             },
@@ -122,6 +122,8 @@ export function useValidatedForm<S extends ZodObject<ZodRawShape>>({
 
     return validators;
   }, [formData, schema]);
+
+  console.log(formData, formValidation);
 
   return {
     ...formData,

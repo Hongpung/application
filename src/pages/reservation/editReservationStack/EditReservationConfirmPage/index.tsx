@@ -2,14 +2,15 @@ import {
   View,
   Text,
   StyleSheet,
-  Alert,
   TouchableOpacity,
   ScrollView,
 } from "react-native";
 
 import { useAtomValue } from "jotai";
 
-import { Color, Icons } from "@hongpung/src/common";
+import {
+  Alert, Color, Icons
+} from "@hongpung/src/common";
 import { Header } from "@hongpung/src/common";
 
 import { UserStatusState } from "@hongpung/src/entities/member";
@@ -136,11 +137,10 @@ const DifferenceData = ({
                   <Text style={EditReservationConfirmStyles.rightText}>
                     {reservation.title.length > 0
                       ? reservation.title
-                      : `${
-                          loginUser?.nickname
-                            ? loginUser.nickname
-                            : loginUser?.name
-                        }의 연습`}
+                      : `${loginUser?.nickname
+                        ? loginUser.nickname
+                        : loginUser?.name
+                      }의 연습`}
                   </Text>
                 </View>
               );

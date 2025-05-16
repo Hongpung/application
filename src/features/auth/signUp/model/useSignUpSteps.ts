@@ -6,10 +6,10 @@ import {
   useSignUpRequest,
   useVerifySignUpVerificationCodeRequest as useVerifyCodeRequest,
 } from "@hongpung/src/entities/auth";
-import { ValidationState } from "@hongpung/src/common";
+import { Alert, ValidationState } from "@hongpung/src/common";
 import { signUpSchema, type SignUpFormData } from "./signUpSchema";
 import * as z from "zod";
-import { Alert, BackHandler, TextInput } from "react-native";
+import { BackHandler, TextInput } from "react-native";
 import { clubNames } from "@hongpung/src/entities/club";
 import { SignUpStep } from "./type";
 
@@ -42,21 +42,7 @@ export const useSignUpSteps = () => {
       "hardwareBackPress",
       () => {
         // 뒤로가기 막기
-        Alert.alert(
-          "확인",
-          "회원가입을 취소하시겠습니까?",
-          [
-            { text: "닫기" },
-            {
-              text: "취소",
-              style: "destructive",
-              onPress: () => {
-                navigation.goBack();
-              },
-            },
-          ],
-          { cancelable: true }
-        );
+        onClose();
         return true; // true를 리턴하면 뒤로가기가 막힘
       }
     );
@@ -119,20 +105,18 @@ export const useSignUpSteps = () => {
   };
 
   const onClose = () => {
-    Alert.alert(
+    Alert.confirm(
       "확인",
-      "회원가입을 취소하시겠습니까?",
-      [
-        { text: "닫기" },
-        {
-          text: "취소",
-          style: "destructive",
-          onPress: () => {
-            navigation.goBack();
-          },
+      "회원가입을 취소하고 뒤로 돌아갈까요?",
+      {
+        cancelText: "아니오",
+        confirmText: "네",
+        cancelButtonColor:"green",
+        confirmButtonColor: "green",
+        onConfirm: () => {
+          navigation.goBack();
         },
-      ],
-      { cancelable: true }
+      }
     );
   };
 
@@ -421,7 +405,7 @@ export const useSignUpSteps = () => {
           // 전체 폼 검증 실패 시 에러 처리
           console.error("폼 검증 실패:", error.errors);
         } else if (error instanceof Error) {
-          Alert.alert("회원가입 실패", error.message, [{ text: "확인" }]);
+          Alert.alert("회원가입 실패", error.message);
         } else {
           Alert.alert("회원가입 실패:", "알 수 없는 오류가 발생했어요.");
         }

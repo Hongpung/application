@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Text, Alert } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { CameraView } from "expo-camera";
 import { Session } from "@hongpung/src/entities/session";
 import { PhotoFileFormat } from "@hongpung/src/common/types/PhotoFileFormat";
