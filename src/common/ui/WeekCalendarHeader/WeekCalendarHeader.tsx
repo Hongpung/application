@@ -94,7 +94,7 @@ export const WeekCalendarHeader: React.FC<WeekCalendarHeaderProps> = ({
             height: 28,
           }}
         >
-          <Icons name="arrow-back" size={24} color={Color["blue500"]} />
+          <Icons name="calendar-outline" size={24} color={Color["blue500"]} />
         </Pressable>
         <View style={styles.MonthRow}>
           <Pressable style={styles.MonthBtn} onPress={decrementMonth}>

@@ -3,7 +3,7 @@ import { FlatList } from "react-native";
 import { isOpen, timeToDate } from "@hongpung/src/entities/session";
 import type { ScheduleCard, Session } from "@hongpung/src/entities/session";
 
-const useScheduleCardList = (sessionList: Session[] | null) => {
+export const useScheduleCardList = (sessionList: Session[] | null) => {
   const [isOnAir, setOnAir] = useState<
     "PREPARING" | "ON_AIR" | "CLOSED" | "AVAILABLE"
   >("AVAILABLE");
@@ -143,5 +143,3 @@ const useScheduleCardList = (sessionList: Session[] | null) => {
     return timeGap > 40 * 60 * 1000;
   }
 };
-
-export { useScheduleCardList };

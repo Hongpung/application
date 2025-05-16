@@ -1,24 +1,51 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, Pressable, Linking } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Pressable,
+  Linking,
+} from "react-native";
 import { Color } from "@hongpung/src/common";
 import { Icons } from "@hongpung/src/common";
 import { type Member } from "@hongpung/src/entities/member/model/type";
 import { RoleText } from "../RoleText/RoleText";
+import { Skeleton } from "moti/skeleton";
 
 interface ProfileBoxProps {
   member: Member;
 }
 
 export const ProfileBox: React.FC<ProfileBoxProps> = ({ member }) => {
-    
-  if (!member) return null;
+  const hasImage = !!member.profileImageUrl;
+  const [isProfileImageLoading, setIsProfileImageLoading] = useState(true);
 
-  console.log(member)
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
-        {member.profileImageUrl ? (
-          <Image source={{ uri: member.profileImageUrl }} style={styles.profilePhoto} />
+        {hasImage ? (
+          <View style={styles.profilePhoto}>
+            <Image
+              source={{ uri: member.profileImageUrl }}
+              style={styles.profilePhoto}
+              onLoadEnd={() => setIsProfileImageLoading(false)}
+            />
+            {isProfileImageLoading && (
+              <View style={styles.SkeletonOverlay}>
+                <Skeleton
+                  transition={{
+                    type: "spring",
+                    duration: 400,
+                    delay: 100,
+                  }}
+                  width={"100%"}
+                  height={"100%"}
+                  colors={[Color["grey100"], Color["grey300"]]}
+                />
+              </View>
+            )}
+          </View>
         ) : (
           <View style={[styles.profilePhoto, styles.profilePhotoPlaceholder]} />
         )}
@@ -36,14 +63,18 @@ export const ProfileBox: React.FC<ProfileBoxProps> = ({ member }) => {
               <Pressable
                 style={styles.icon}
                 onPress={() => {
-                  Linking.openURL("https://www.instagram.com/" + member.instagramUrl).catch(
-                    (err) => {
-                      console.error("Failed to open URL:", err);
-                    }
-                  );
+                  Linking.openURL(
+                    "https://www.instagram.com/" + member.instagramUrl
+                  ).catch((err) => {
+                    console.error("Failed to open URL:", err);
+                  });
                 }}
               >
-                <Icons name="logo-instagram" size={24} color={Color["grey400"]} />
+                <Icons
+                  name="logo-instagram"
+                  size={24}
+                  color={Color["grey400"]}
+                />
               </Pressable>
             )}
 
@@ -51,11 +82,11 @@ export const ProfileBox: React.FC<ProfileBoxProps> = ({ member }) => {
               <Pressable
                 style={styles.icon}
                 onPress={() => {
-                  Linking.openURL("https://blog.naver.com/" + member.blogUrl).catch(
-                    (err) => {
-                      console.error("Failed to open URL:", err);
-                    }
-                  );
+                  Linking.openURL(
+                    "https://blog.naver.com/" + member.blogUrl
+                  ).catch((err) => {
+                    console.error("Failed to open URL:", err);
+                  });
                 }}
               >
                 <Icons name="chatbox" size={24} color={Color["green500"]} />
@@ -85,7 +116,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    marginHorizontal: 36,
+    marginHorizontal: 32,
     gap: 24,
     marginVertical: 16,
   },
@@ -96,14 +127,20 @@ const styles = StyleSheet.create({
   profilePhoto: {
     width: 90,
     height: 120,
-    borderRadius: 5,
-    marginRight: 16,
-    alignSelf:'center'
+    borderRadius: 10,
+    marginRight: 24,
+    position: "relative",
+    overflow: "hidden",
   },
   profilePhotoPlaceholder: {
     backgroundColor: Color["grey200"],
-    borderWidth: 1,
-    borderColor: Color["grey300"],
+  },
+  SkeletonOverlay: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    borderRadius: 5,
+    overflow: "hidden",
   },
   infoContainer: {
     flexDirection: "column",
@@ -159,4 +196,4 @@ const styles = StyleSheet.create({
     fontFamily: "NanumSquareNeo-Bold",
     textAlign: "right",
   },
-}); 
+});

@@ -14,8 +14,11 @@ import InvitePossibleMemberList from "@hongpung/src/widgets/reservation/ui/Invit
 import { useParticipatorsFilters } from "@hongpung/src/features/reservation/configureReservation/model/useParticipatorsFilters";
 import { useInvitePossibleMemberData } from "@hongpung/src/features/reservation/configureReservation/model/useParaticipatorData";
 import { useSelectParticipators } from "@hongpung/src/features/reservation/configureReservation/model/useSelectParticipators";
+import { CreateReservationStackScreenProps } from "@hongpung/src/common/navigation";
 
-const CreateReservationParticipatorsSelectScreen: React.FC = () => {
+const CreateReservationParticipatorsSelectScreen: React.FC<
+  CreateReservationStackScreenProps<"CreateReservationParticipatorsSelect">
+> = ({ navigation }) => {
   const {
     findOptions,
     setFindOptions,
@@ -56,60 +59,61 @@ const CreateReservationParticipatorsSelectScreen: React.FC = () => {
         }
         rightAction={() => setSearchBarVisible(true)}
       />
-      <>
-        <OptionsModal
-          visible={optionsSelectState}
-          selectedClubs={selectedClubs}
-          setClubsOption={setClubsOption}
-          selectedEnrollmentNumberRange={selectedEnrollmentNumberRange}
-          setEnrollmentNumberRange={setEnrollmentNumberRange}
-          onClose={handleResetFilters}
-          onApply={handleApplyFilters}
-        />
+      <OptionsModal
+        visible={optionsSelectState}
+        selectedClubs={selectedClubs}
+        setClubsOption={setClubsOption}
+        selectedEnrollmentNumberRange={selectedEnrollmentNumberRange}
+        setEnrollmentNumberRange={setEnrollmentNumberRange}
+        onClose={() => {
+          handleResetFilters();
+          setOptionSelectState(false);
+        }}
+        onApply={() => {
+          handleApplyFilters();
+          setOptionSelectState(false);
+        }}
+      />
 
-        <SearchMemberNameBar
-          searchBarVisible={searchBarVisible}
-          setSearchBarVisible={setSearchBarVisible}
-          setFindOptions={setFindOptions}
-          debounceKeyword={debounceKeyword}
-        />
+      <SearchMemberNameBar
+        searchBarVisible={searchBarVisible}
+        setSearchBarVisible={setSearchBarVisible}
+        setFindOptions={setFindOptions}
+        debounceKeyword={debounceKeyword}
+      />
 
+      <View>
         <FilterHList
           descendingOrder={descendingOrder}
           setDescendingOrder={setDescendingOrder}
           findOptions={findOptions}
           setOptionSelectState={setOptionSelectState}
         />
+      </View>
 
-        {data?.length === 0 ? (
-          <View style={styles.noParticipantsContainer}>
-            <Text style={styles.noParticipantsText}>
-              함께 할 수 있는 인원이 없습니다.
-            </Text>
-          </View>
-        ) : (
-          <View style={styles.participantsListContainer}>
-            <InvitePossibleMemberList
-              invitePossibleMembers={data}
-              onEndReached={loadNewPage}
-              isLoading={isLoading}
-              selectedMembers={newParticipators}
-              toggleMember={toggleParticipator}
-            />
-          </View>
-        )}
+      <View style={styles.participantsListContainer}>
+        <InvitePossibleMemberList
+          invitePossibleMembers={data}
+          onEndReached={loadNewPage}
+          isLoading={isLoading}
+          selectedMembers={newParticipators}
+          toggleMember={toggleParticipator}
+        />
+      </View>
 
-        {newParticipators.length > 0 && (
-          <View style={styles.selectedParticipantsContainer}>
-            <SelectedParticipatorList {...participatorsData} />
+      {newParticipators.length > 0 && (
+        <View style={styles.selectedParticipantsContainer}>
+          <SelectedParticipatorList {...participatorsData} />
 
-            <ParticipatorsConfirmButton
-              participatorsLength={newParticipators.length}
-              onPress={() => setParticipators([...newParticipators])}
-            />
-          </View>
-        )}
-      </>
+          <ParticipatorsConfirmButton
+            participatorsLength={newParticipators.length}
+            onPress={() => {
+              setParticipators([...newParticipators]);
+              navigation.navigate("CreateReservationForm");
+            }}
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -120,57 +124,6 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFF",
-  },
-  searchBarContainer: {
-    backgroundColor: Color["grey100"],
-    paddingHorizontal: 24,
-    paddingVertical: 8,
-  },
-  searchBar: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  searchInput: {
-    paddingHorizontal: 12,
-    fontSize: 16,
-    height: 32,
-    flex: 1,
-  },
-  searchCloseButton: {
-    height: 36,
-    width: 36,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  filterBarContainer: {
-    height: 32,
-    marginTop: 8,
-    marginHorizontal: 24,
-    gap: 8,
-    alignItems: "flex-start",
-    paddingHorizontal: 4,
-  },
-  filterBox: {
-    height: 32,
-    paddingHorizontal: 10,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: Color["grey200"],
-    justifyContent: "center",
-    backgroundColor: "#FFF",
-  },
-  filterText: {
-    fontFamily: "NanumSquareNeo-Regular",
-    fontSize: 14,
-  },
-  filterButton: {
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    backgroundColor: Color["grey100"],
-    height: 32,
-    justifyContent: "center",
   },
   noParticipantsContainer: {
     backgroundColor: "#FFF",

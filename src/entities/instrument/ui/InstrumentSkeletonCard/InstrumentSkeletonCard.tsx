@@ -1,55 +1,46 @@
 import { Skeleton } from "moti/skeleton";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, InteractionManager } from "react-native";
 import { Color } from "@hongpung/src/common";
+import { useEffect, useState } from "react";
+import { MotiTransitionProp } from "moti/build/core";
 
 export const InstrumentSkeletonCard = () => {
+  const [showSkeleton, setShowSkeleton] = useState(false);
+
+  useEffect(() => {
+    InteractionManager.runAfterInteractions(() => {
+      setShowSkeleton(true);
+    });
+  }, []);
+
+  const skeletonProps = {
+    transition: {
+      type: "spring",
+      duration: 400,
+      delay: 100,
+    } satisfies MotiTransitionProp,
+    colors: [Color["grey100"], Color["grey300"]],
+  };
+
+  if (!showSkeleton) return null;
+
   return (
-    <Skeleton.Group show>
+    <Skeleton.Group show={true}>
       <View style={[styles.card, { height: 156 }]}>
         <View>
           {/* 이미지 영역 */}
           <View style={styles.imageContainer}>
-            <Skeleton
-              transition={{
-                type: "spring",
-                duration: 400,
-                delay: 100,
-              }}
-              width={132}
-              height={88}
-              radius={5}
-              colors={[Color["grey100"], Color["grey300"]]}
-            />
+            <Skeleton width={132} height={88} radius={5} {...skeletonProps} />
           </View>
 
           {/* 태그 영역 */}
           <View style={styles.tagContainer}>
-            <Skeleton
-              transition={{
-                type: "spring",
-                duration: 400,
-                delay: 100,
-              }}
-              width={40}
-              height={18}
-              radius={4}
-              colors={[Color["grey100"], Color["grey300"]]}
-            />
+            <Skeleton width={40} height={18} radius={4} {...skeletonProps} />
           </View>
 
           {/* 이름 영역 */}
           <View style={styles.nameContainer}>
-            <Skeleton
-              transition={{
-                type: "spring",
-                duration: 400,
-                delay: 100,
-              }}
-              width={80}
-              height={18}
-              radius={4}
-              colors={[Color["grey100"], Color["grey300"]]}
-            />
+            <Skeleton width={80} height={18} radius={4} {...skeletonProps} />
           </View>
         </View>
       </View>

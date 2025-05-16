@@ -1,15 +1,17 @@
 import { StyleSheet, Modal, Pressable } from "react-native";
-import { Icons } from "@hongpung/src/common";
+import { Color, Icons } from "@hongpung/src/common";
 import { Member } from "@hongpung/src/entities/member";
 import { ProfileBox } from "../ProfileBox/ProfileBox";
 import { useEffect, useState } from "react";
 
 interface MemberDetailModalProps {
   selectedMember: Member | null;
+  resetMember: () => void;
 }
 
 export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
   selectedMember,
+  resetMember,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(true);
 
@@ -28,18 +30,22 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
         onPress={(event) => {
           event.stopPropagation();
           setIsModalVisible(false);
+          resetMember();
         }}
       >
         <Pressable
           style={styles.modalContainer}
           onPress={(event) => event.stopPropagation()}
         >
-          <ProfileBox member={selectedMember!} />
+          <ProfileBox member={selectedMember} />
           <Pressable
             style={styles.closeButton}
-            onPress={() => setIsModalVisible(false)}
+            onPress={() => {
+              setIsModalVisible(false);
+              resetMember();
+            }}
           >
-            <Icons name="close" color="#000" size={32} />
+            <Icons name="close" color={Color["grey400"]} size={32} />
           </Pressable>
         </Pressable>
       </Pressable>

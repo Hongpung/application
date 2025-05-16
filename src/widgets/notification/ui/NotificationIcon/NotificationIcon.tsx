@@ -1,13 +1,13 @@
 import { Icons, Color } from "@hongpung/src/common";
 
 import { StyleSheet, Pressable, View } from "react-native";
-import { useGetNotReadNotificationFetch } from "@hongpung/src/features/notification/notReadNotification/api/notReadNotificationApi";
+import { useGetNotReadNotificationFetch } from "@hongpung/src/features/notification/notReadNotification";
 
 type NotificationIconProps = {
   navigateToNotificationPage: () => void;
 };
 
-export const NotificationIcon = ({
+export const NotificationIcon: React.FC<NotificationIconProps> = ({
   navigateToNotificationPage,
 }: NotificationIconProps) => {
   const { data: isNotRead } = useGetNotReadNotificationFetch();

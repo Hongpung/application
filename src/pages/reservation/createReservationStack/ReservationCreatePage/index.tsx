@@ -72,29 +72,11 @@ const ReservationCreatePage: React.FC<
         navigateToParticipatorsPickerPage={goToParticipatorsSelect}
         resetBorrowInstruments={resetBorrowInstruments}
         navigateToBorrowInstrumentsPickerPage={goToBorrowInstrumentsSelect}
+        submitButtonText="예약하기"
+        canSubmit={isAgree}
+        onSubmit={goToReservationCreateComplete}
       />
 
-      <View
-        style={{
-          flexDirection: "column",
-          gap: 8,
-          paddingVertical: 16,
-          paddingHorizontal: 24,
-        }}
-      >
-        <Checkbox
-          isChecked={isAgree}
-          onCheck={setAgree}
-          innerText="예약 전날 오후10시까지 수정*취소할 수 있어요"
-        />
-
-        <LongButton
-          innerContent="예약하기"
-          color="blue"
-          isAble={isAgree}
-          onPress={goToReservationCreateComplete}
-        />
-      </View>
     </View>
   );
 };

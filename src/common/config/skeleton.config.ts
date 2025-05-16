@@ -7,6 +7,5 @@ export const defaultSkeletonConfig = {
     duration: 400,
     delay: 100,
   } satisfies MotiTransitionProp,
-  radius: 4,
   colors: [Color["grey100"], Color["grey300"]],
 };

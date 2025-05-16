@@ -8,15 +8,16 @@ import React from "react";
 import { MainTabScreenProps } from "@hongpung/src/common/navigation";
 import { NeedCameraPermssionPanel } from "@hongpung/src/common";
 
+const EXPECTED_QR_URL = "https://app.hongpung.com/qr";
 const QRScanPage: React.FC<MainTabScreenProps<"QRCode">> = ({ navigation }) => {
   const handleScanSuccess = (data: string) => {
-    if (data === "https://app.hongpung.com/qr") {
+    if (data === EXPECTED_QR_URL) {
       navigation.jumpTo("Home");
       navigation.push("CheckIn");
     }
   };
 
-  const { hasPermission } = useCameraPermission();
+  const { hasPermission, isLoading } = useCameraPermission();
   const { scanStatus, resetScanStatus, flash, toggleFlash, onScanned } =
     useQRScanner({ onSuccess: handleScanSuccess });
 
@@ -28,7 +29,9 @@ const QRScanPage: React.FC<MainTabScreenProps<"QRCode">> = ({ navigation }) => {
         leftAction={() => navigation.jumpTo("Home")}
       />
       <View style={styles.container}>
-        {hasPermission ? (
+        {isLoading ? (
+          <View style={{ backgroundColor: "#000" }} />
+        ) : hasPermission ? (
           <QRScanner
             flash={flash}
             onToggleFlash={toggleFlash}

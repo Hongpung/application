@@ -5,7 +5,7 @@ import {
   type Instrument,
 } from "@hongpung/src/entities/instrument";
 import { Color, Icons } from "@hongpung/src/common";
-import { useInstrumentList } from "@hongpung/src/entities/instrument/model/useInstrumentList";
+import { useInstrumentAccordionList } from "@hongpung/src/entities/instrument/model/useInstrumentAccordionList";
 
 interface BorrowInstrumentListProps {
   instrumentList: Instrument[];
@@ -16,13 +16,10 @@ const BorrowInstrumentList: React.FC<BorrowInstrumentListProps> = ({
   instrumentList,
   navigateToInstrumentDetail
 }) => {
-  const { isOpen, toggleAccordion, orderInstruments } =
-    useInstrumentList({ instrumentList });
+  const { isOpen, toggleAccordion, orderedInstrumentData } =
+    useInstrumentAccordionList({ instrumentList });
 
-  const data = Object.entries(orderInstruments).map(([type, instruments]) => ({
-    type,
-    instruments,
-  }));
+  const data = orderedInstrumentData;
 
   const renderItem = ({ item }: { item: typeof data[0] }) => {
     if (item.instruments.length === 0) return null;

@@ -1,5 +1,12 @@
-import React from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import React, { useEffect, useRef } from "react";
+import {
+  Alert,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { Member } from "@hongpung/src/entities/member";
 import { Color, Icons } from "@hongpung/src/common";
 
@@ -12,9 +19,25 @@ const SelectedParticipatorList: React.FC<SelectedParticipatorListProps> = ({
   newParticipators,
   setNewParticipators,
 }) => {
+  const scrollRef = useRef<FlatList>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollToOffset({
+      offset: (newParticipators.length - 1) * 500,
+      animated: true,
+    });
+  }, [newParticipators]);
+
   return (
     <>
-      <View style={{ paddingHorizontal: 28 }}>
+      <View
+        style={{
+          paddingHorizontal: 28,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
         <Text
           style={{
             paddingHorizontal: 4,
@@ -23,14 +46,46 @@ const SelectedParticipatorList: React.FC<SelectedParticipatorListProps> = ({
         >
           선택한 인원
         </Text>
+        <Pressable
+          onPress={() => {
+            Alert.alert(
+              "확인",
+              "선택한 인원을 전부 취소할까요?",
+              [
+                { text: "취소", style: "cancel" },
+                {
+                  text: "확인",
+                  onPress: () => {
+                    setNewParticipators([]);
+                  },
+                },
+              ],
+              { cancelable: true }
+            );
+          }}
+          style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+        >
+          <Text
+            style={{
+              fontFamily: "NanumSquareNeo-Regular",
+              color: Color["grey400"],
+            }}
+          >
+            전체 해제
+          </Text>
+          <Icons name="close" size={24} color={Color["grey400"]} />
+        </Pressable>
       </View>
 
       <FlatList
+        ref={scrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{ paddingHorizontal: 28, paddingVertical: 12, gap: 4 }}
+        style={{ paddingHorizontal: 28, paddingVertical: 12 }}
+        contentContainerStyle={{ gap: 8 }}
         data={newParticipators}
         keyExtractor={(_, index) => "selected-member-" + index}
+        ListFooterComponent={<View style={{ width: 24 }} />}
         renderItem={({ item: participator }) => (
           <View style={styles.participantContainer}>
             <Text style={[styles.participantText, { color: Color["grey500"] }]}>

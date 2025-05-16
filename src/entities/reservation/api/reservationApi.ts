@@ -17,7 +17,7 @@ import {
 import { mapReservationDetail } from "../lib/mapReservationDetail";
 import { myTodayReservationState } from "../model/myTodayReservationState";
 import { TimeArray, TimeFormat } from "@hongpung/src/common";
-import { colorDefine } from "../lib/colorDefine";
+import { getReservationColor } from "../lib/getReservationColor";
 import type { Member } from "@hongpung/src/entities/member/@x/reservation";
 import { Instrument } from "../../instrument/@x/reservation";
 
@@ -104,11 +104,11 @@ const reservationApi = baseApi.addEndpoints({
         data.map((reservation) => {
           const reservedDate = new Date(reservation.date).getDate();
           if (!reservedDates[reservedDate])
-            reservedDates[reservedDate] = [{ color: colorDefine(reservation) }];
+            reservedDates[reservedDate] = [{ color: getReservationColor(reservation) }];
           else
             reservedDates[reservedDate] = [
               ...reservedDates[reservedDate],
-              { color: colorDefine(reservation) },
+              { color: getReservationColor(reservation) },
             ];
         });
 

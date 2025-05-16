@@ -15,7 +15,7 @@ type PasswordFormValidation = {
   [key in keyof PasswordValue]: ValidationState;
 };
 
-export const useChangePassword = (): {
+export const useChangePasswordForm = (): {
   currentPassword: string;
   setCurrentPassword: (text: string) => void;
   newPassword: string;
@@ -24,13 +24,9 @@ export const useChangePassword = (): {
   setConfirmPassword: (text: string) => void;
   onChangePassword: () => Promise<void>;
   passwordValidation: PasswordFormValidation;
-  validateConfirmPassword: (
-    text: PasswordValue["confirmPassword"]
-  ) => ValidationState;
-  validateNewPassword: (text: PasswordValue["newPassword"]) => ValidationState;
-  validateCurrentPassword: (
-    text: PasswordValue["currentPassword"]
-  ) => ValidationState;
+  onCurrentPasswordBlur: () => void;
+  onNewPasswordBlur: () => void;
+  onConfirmPasswordBlur: () => void;
   currentPasswordRef: React.RefObject<TextInput>;
   newPasswordRef: React.RefObject<TextInput>;
   confirmPasswordRef: React.RefObject<TextInput>;
@@ -125,6 +121,32 @@ export const useChangePassword = (): {
     [formData]
   );
 
+  const handleBlur = useMemo(() => ({
+    onCurrentPasswordBlur: () => {
+      const validationState = validateForm.validateCurrentPassword(formData.currentPassword);
+      setFormValidation((prev) => ({
+        ...prev,
+        currentPassword: validationState,
+      }));
+    },
+    onNewPasswordBlur: () => {
+      const validationState = validateForm.validateNewPassword(formData.newPassword);
+      setFormValidation((prev) => ({
+        ...prev,
+        newPassword: validationState,
+      }));
+    },
+    onConfirmPasswordBlur: () => {
+      const validationState = validateForm.validateConfirmPassword(formData.confirmPassword);
+      setFormValidation((prev) => ({
+        ...prev,
+        confirmPassword: validationState,
+      }));
+      },
+    }),
+    [validateForm, formData]
+  );
+
   const handleChangePassword = async () => {
     try {
       await passwordSchema.parseAsync(formData);
@@ -163,7 +185,7 @@ export const useChangePassword = (): {
     newPassword: formData.newPassword,
     confirmPassword: formData.confirmPassword,
     ...setForm,
-    ...validateForm,
+    ...handleBlur,
     currentPasswordRef,
     newPasswordRef,
     confirmPasswordRef,

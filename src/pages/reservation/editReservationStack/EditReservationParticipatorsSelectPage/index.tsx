@@ -15,8 +15,9 @@ import { Color } from "@hongpung/src/common";
 import { useInvitePossibleMemberData } from "@hongpung/src/features/reservation/configureReservation/model/useParaticipatorData";
 import { useEditReservation } from "@hongpung/src/features/reservation/editReservation/model/useEditReservation.context";
 import InvitePossibleMemberList from "@hongpung/src/widgets/reservation/ui/InvitePossibleMemberList/InvitePossibleMemberList";
+import { EditReservationStackScreenProps } from "@hongpung/src/common/navigation";
 
-const ParticipantsSelectScreen: React.FC = () => {
+const ParticipantsSelectScreen: React.FC<EditReservationStackScreenProps<"EditReservationParticipatorsSelect">> = ({ navigation }) => {
   const {
     findOptions,
     setFindOptions,
@@ -57,7 +58,7 @@ const ParticipantsSelectScreen: React.FC = () => {
         }
         rightAction={() => setSearchBarVisible(true)}
       />
-      <>
+      <View style={{ flex: 1 }}>
         <OptionsModal
           visible={optionsSelectState}
           selectedClubs={selectedClubs}
@@ -74,13 +75,14 @@ const ParticipantsSelectScreen: React.FC = () => {
           setFindOptions={setFindOptions}
           debounceKeyword={debounceKeyword}
         />
-
-        <FilterHList
-          descendingOrder={descendingOrder}
-          setDescendingOrder={setDescendingOrder}
-          findOptions={findOptions}
-          setOptionSelectState={setOptionSelectState}
-        />
+        <View>
+          <FilterHList
+            descendingOrder={descendingOrder}
+            setDescendingOrder={setDescendingOrder}
+            findOptions={findOptions}
+            setOptionSelectState={setOptionSelectState}
+          />
+        </View>
 
         {!data || data?.length === 0 ? (
           <View style={styles.noParticipantsContainer}>
@@ -106,11 +108,14 @@ const ParticipantsSelectScreen: React.FC = () => {
 
             <ParticipatorsConfirmButton
               participatorsLength={newParticipators.length}
-              onPress={() => setParticipators([...newParticipators])}
+              onPress={() => {
+                setParticipators([...newParticipators]);
+                navigation.navigate("EditReservationForm")
+              }}
             />
           </View>
         )}
-      </>
+      </View>
     </View>
   );
 };

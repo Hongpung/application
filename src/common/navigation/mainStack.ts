@@ -4,6 +4,7 @@ import { MainTabParamList } from "./mainTab";
 import { ReservationParamList } from "./reservationStack";
 import { SessionManagementParamList } from "./sessionManageMent";
 import { NavigatorScreenParams, RouteProp } from "@react-navigation/native";
+import { NoticeParamList } from "./noticeStack";
 
 export type MainStackParamList = {
   MainTab: NavigatorScreenParams<MainTabParamList>;
@@ -27,6 +28,8 @@ export type MainStackParamList = {
   InstrumentDetail: { instrumentId: number };
   BorrowInstrumentList: { borrowInstruments: string };
   ParticipatorList: { participators: string };
+
+  Notice: NavigatorScreenParams<NoticeParamList>;
 };
 
 export type MainStackNavigationProp = NativeStackNavigationProp<MainStackParamList>;

@@ -118,8 +118,6 @@ const buildApi = async <T>({
     }
     const data = await response.json();
 
-    console.log("data", data);
-
     return transformResponse ? transformResponse(data) : (data as T);
   } catch (err) {
     throw err;

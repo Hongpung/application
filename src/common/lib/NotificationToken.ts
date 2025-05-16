@@ -10,7 +10,9 @@ Notifications.setNotificationHandler({
     const appState = AppState.currentState;
     const receive = await AsyncStorage.getItem('receive-push')
     return {
+      shouldShowBanner: appState !== 'active' && receive == 'true',
       shouldShowAlert: appState !== 'active' && receive == 'true',
+      shouldShowList: appState !== 'active' && receive == 'true',
       shouldPlaySound: true,
       shouldSetBadge: false,
     }

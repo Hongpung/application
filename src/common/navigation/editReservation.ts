@@ -4,7 +4,7 @@ import { RouteProp } from "@react-navigation/native";
 
 export type EditReservationStackParamList = {
   EditReservationForm: undefined;
-  EditReservationDateSelect: undefined;
+  EditReservationDateSelect?: {date: string};
   EditReservationTimeSelect: undefined;
   EditReservationParticipatorsSelect: undefined;
   EditReservationBorrowInstrumentsSelect: undefined;

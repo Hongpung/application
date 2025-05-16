@@ -1,18 +1,14 @@
-import {
-  Color,
-  toastConfig,
-  useFirstPage,
-  useFonts,
-} from "@hongpung/src/common";
+import { Color, toastConfig } from "@hongpung/src/common";
 import { View, Text, ImageBackground, Platform } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 import { SafeZone } from "./SafeZone";
 import { RootStackNavigation } from "@hongpung/src/navigation";
 import Toast from "react-native-toast-message";
 import { useMemo } from "react";
+import { useFonts } from "./lib/useFonts";
+import { useFirstPage } from "./lib/useFirstPage";
 
 export const AppContainer: React.FC = () => {
-  
   const { firstScreen } = useFirstPage();
   const { fontLoaded } = useFonts();
 

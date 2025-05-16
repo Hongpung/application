@@ -1,17 +1,12 @@
-import { Checkbox, LongButton } from "@hongpung/src/common"
+import { Header } from "@hongpung/src/common"
 
 import { useCallback, useState } from "react"
-import { ScrollView, View } from "react-native"
+import { View } from "react-native"
 import { ReservationForm } from "@hongpung/src/features/reservation/configureReservation/ui/ReservationForm/ReservationForm"
 import { useEditReservation } from "@hongpung/src/features/reservation/editReservation/model/useEditReservation.context"
-import { useNavigation } from "@react-navigation/native"
-import { EditReservationButton } from "@hongpung/src/features/reservation/editReservation/ui/EditReservationButton/EditReservationButton"
+import { EditReservationStackScreenProps } from "@hongpung/src/common/navigation"
 
-const ReservationEditPage: React.FC = () => {
-
-    const [isAgree, setAgree] = useState(false)
-
-    const navigation = useNavigation()
+const ReservationEditPage: React.FC<EditReservationStackScreenProps<"EditReservationForm">> = ({ navigation, route }) => {
 
     const {
         reservation,
@@ -22,85 +17,72 @@ const ReservationEditPage: React.FC = () => {
         setParticipators,
         setBorrowInstruments,
 
-        verifyEditReservation
+        verifyEditReservation,
+        isValidReservation
 
     } = useEditReservation()
 
 
     const resetParticipators = useCallback(
-        () => setParticipators([]), 
+        () => setParticipators([]),
         [setParticipators]
     );
 
     const resetBorrowInstruments = useCallback(
-        () => setBorrowInstruments([]), 
+        () => setBorrowInstruments([]),
         [setBorrowInstruments]
     );
 
     const goToDateSelect = useCallback(
-        () => navigation.navigate('EditReservationDateSelectPage'),
+        () => navigation.push('EditReservationDateSelect'),
         []
     );
     const goToTimeSelect = useCallback(
-        () => navigation.navigate('EditReservationDateSelectPage'),
+        () => navigation.push('EditReservationTimeSelect'),
         []
     );
     const goToParticipatorsSelect = useCallback(
-        () => navigation.navigate('EditParticipatorsPickerPage'),
+        () => navigation.push('EditReservationParticipatorsSelect'),
         []
     );
     const goToBorrowInstrumentsSelect = useCallback(
-        () => navigation.navigate('EditBorrowInstrumentsPickerPage'),
+        () => navigation.push('EditReservationBorrowInstrumentsSelect'),
         []
     );
 
     const goToEditReservationConfirmPage = useCallback(
-        () => navigation.navigate('EditReservationConfirmPage'),
+        () => navigation.push('EditReservationConfirm'),
         []
     );
 
 
     return (
-        <View>
+        <View style={{ flex: 1, backgroundColor: "#FFF" }}>
+            <Header leftButton={'close'} headerName="예약 내용 변경" />
+            <ReservationForm
 
-            <ScrollView contentContainerStyle={{ flex: 1 }}>
+                reservation={reservation}
 
-                <ReservationForm
-                
-                    reservation={reservation}
+                navigateDatePickerPage={goToDateSelect}
+                navigateTimePickerPage={goToTimeSelect}
 
-                    navigateDatePickerPage={goToDateSelect}
-                    navigateTimePickerPage={goToTimeSelect}
+                setTitle={setTitle}
 
-                    setTitle={setTitle}
+                setParticipationAvailable={setParticipationAvailable}
+                setReservationType={setReservationType}
 
-                    setParticipationAvailable={setParticipationAvailable}
-                    setReservationType={setReservationType}
+                resetParticipators={resetParticipators}
+                navigateToParticipatorsPickerPage={goToParticipatorsSelect}
 
-                    resetParticipators={resetParticipators}
-                    navigateToParticipatorsPickerPage={goToParticipatorsSelect}
-                    
-                    resetBorrowInstruments={resetBorrowInstruments}
-                    navigateToBorrowInstrumentsPickerPage={goToBorrowInstrumentsSelect}
+                resetBorrowInstruments={resetBorrowInstruments}
+                navigateToBorrowInstrumentsPickerPage={goToBorrowInstrumentsSelect}
+                submitButtonText={"변경하기"}
+                canSubmit={isValidReservation}
+                onSubmit={() => verifyEditReservation(goToEditReservationConfirmPage)}
+            />
 
-                />
 
-            </ScrollView>
 
-            <View>
-
-                <Checkbox
-                    isChecked={isAgree}
-                    onCheck={setAgree}
-                    innerText="예약 전날 오후10시까지 수정·취소할 수 있어요"
-                />
-
-                <EditReservationButton
-                    isAgree={isAgree}
-                    onPress={() => verifyEditReservation(goToEditReservationConfirmPage)}
-                />
-
-            </View>
         </View>
     )
 }

@@ -162,9 +162,8 @@ const ReservationDetailPage: React.FC<
           >
             <View style={styles.row}>
               <Text style={styles.label}>예약자</Text>
-              <Text style={styles.value}>{`${creatorName}${
-                !!creatorNickname ? ` (${creatorNickname})` : ""
-              }`}</Text>
+              <Text style={styles.value}>{`${creatorName}${!!creatorNickname ? ` (${creatorNickname})` : ""
+                }`}</Text>
             </View>
 
             <View style={styles.row}>
@@ -189,10 +188,13 @@ const ReservationDetailPage: React.FC<
               <Text style={styles.label}>참가 인원</Text>
             </View>
             <Pressable
+              style={{ paddingHorizontal: 24 }}
               onPress={() => {
-                navigation.navigate("ParticipatorList", {
-                  participators: JSON.stringify(participators),
-                });
+                if (participators.length > 0) {
+                  navigation.navigate("ParticipatorList", {
+                    participators: JSON.stringify(participators),
+                  });
+                }
               }}
             >
               <ParticipatorsViewer participators={participators} />
@@ -215,21 +217,23 @@ const ReservationDetailPage: React.FC<
 
         {/* 삭제하기 버튼 */}
 
-        {creatorId === loginUser?.memberId && isEditible(date) && (
-          <View>
+        {
+          // creatorId === loginUser?.memberId && isEditible(date) && 
+          (
             <DeleteReservationButton
               onButtonPressed={() => onDeleteReservation(reservation)}
             />
-          </View>
-        )}
+          )}
 
         {/* 나가기 버튼 */}
 
-        {creatorId !== loginUser?.memberId &&
-          isEditible(date) &&
-          participators.some(
-            (participator) => participator.memberId === loginUser?.memberId
-          ) && (
+        {
+          // creatorId !== loginUser?.memberId &&
+          //   isEditible(date) &&
+          //   participators.some(
+          //     (participator) => participator.memberId === loginUser?.memberId
+          //   ) && 
+          (
             <LeaveReservationButton reservationId={reservationId} date={date} />
           )}
 
@@ -237,18 +241,20 @@ const ReservationDetailPage: React.FC<
       </ScrollView>
 
       {/* 수정하기 버튼 */}
-      {creatorId !== loginUser?.memberId && isEditible(date) && (
-        <View style={styles.bottomButton}>
-          <EnterEditButton
-            navigateToEditReservationPage={() => {
-              //   navigation.push("ReservationStack", {
-              //     screen: "inReservation",
-              //     params: { reservationId, date },
-              //   })
-            }}
-          />
-        </View>
-      )}
+      {
+        creatorId !== loginUser?.memberId && isEditible(date) &&
+        (
+          <View style={styles.bottomButton}>
+            <EnterEditButton
+              navigateToEditReservationPage={() => {
+                navigation.push("EditReservation", {
+                  screen: "EditReservationForm",
+                  reservationId,
+                })
+              }}
+            />
+          </View>
+        )}
     </View>
   );
 };
@@ -275,12 +281,12 @@ const styles = StyleSheet.create({
     textAlign: "right",
   },
   bottomButton: {
-    flexDirection: "column",
+    flexShrink: 0,
+    backgroundColor: "#FFF",
     gap: 8,
-    paddingVertical: 8,
+    paddingTop: 12,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
-    paddingHorizontal: 12,
   },
   placeholderRow: {
     flexDirection: "row",

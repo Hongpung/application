@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
 import { ManageInstrumentCard } from "@hongpung/src/entities/instrument/ui/ManageInstrumentCard/ManageInstrumentCard";
 import { type Instrument } from "@hongpung/src/entities/instrument";
 import { Color, Icons } from "@hongpung/src/common";
-import { useInstrumentList } from "@hongpung/src/entities/instrument/model/useInstrumentList";
+import { useInstrumentAccordionList } from "@hongpung/src/entities/instrument";
 import { InstrumentSkeletonCard } from "@hongpung/src/entities/instrument/ui/InstrumentSkeletonCard/InstrumentSkeletonCard";
 
 interface InstrumentViewListProps {
@@ -17,16 +17,15 @@ const InstrumentViewList: React.FC<InstrumentViewListProps> = ({
   onInstrumentClick,
   isLoading,
 }) => {
-  const { isOpen, toggleAccordion, orderInstruments } = useInstrumentList({
+  const { isOpen, toggleAccordion, orderedInstrumentData } = useInstrumentAccordionList({
     instrumentList,
   });
 
-  const data = Object.entries(orderInstruments).map(([type, instruments]) => ({
-    type,
-    instruments,
-  }));
-
-  const renderItem = ({ item }: { item: (typeof data)[0] }) => {
+  const renderItem = ({
+    item,
+  }: {
+    item: { type: InstrumentType; instruments: Instrument[] };
+  }) => {
     if (item.instruments.length === 0) return null;
 
     return (
@@ -43,7 +42,7 @@ const InstrumentViewList: React.FC<InstrumentViewListProps> = ({
             size={24}
           />
         </Pressable>
-        <View style={styles.instrumentContainer}>
+        <View style={styles.instrumentSkeletonContainer}>
           {item.instruments.map((instrument, index) => (
             <ManageInstrumentCard
               key={`${instrument.name}-${index}`}
@@ -58,24 +57,46 @@ const InstrumentViewList: React.FC<InstrumentViewListProps> = ({
 
   if (isLoading)
     return (
-      <View
+      <FlatList
+        data={Array.from({ length: 6 })}
+        keyExtractor={(item, index) => index + "skeleton"}
         style={[
-          styles.instrumentContainer,
-          { marginHorizontal: 24, paddingTop: 36 },
+          styles.container,
+          { marginHorizontal: 24, paddingVertical: 12 },
         ]}
-      >
-        {Array.from({ length: 8 }).map((_, index) => (
-          <InstrumentSkeletonCard key={index + "skeleton"} />
-        ))}
-      </View>
+        contentContainerStyle={styles.instrumentSkeletonContainer}
+        initialNumToRender={4}
+        windowSize={5}
+        renderItem={() => <InstrumentSkeletonCard />}
+      />
     );
+
+  // Object 배열이라 empty 체크가 별도로 필요함
+
   return (
     <FlatList
-      data={data}
+      data={orderedInstrumentData}
       renderItem={renderItem}
       keyExtractor={(item) => item.type}
       style={styles.container}
+      contentContainerStyle={{ flex: 1 }}
       showsVerticalScrollIndicator={false}
+      ListEmptyComponent={
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
+          <Text
+            style={{
+              fontFamily: "NanumSquareNeo-Regular",
+              fontSize: 18,
+              color: Color["grey400"],
+              paddingBottom: 60
+            }}
+          >
+            사용할 수 있는 악기가 없어요
+          </Text>
+        </View>
+      }
     />
   );
 };
@@ -97,7 +118,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: Color["grey500"],
   },
-  instrumentContainer: {
+  instrumentSkeletonContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",

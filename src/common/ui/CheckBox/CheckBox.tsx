@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Pressable } from 'react-native'
+import { StyleSheet, Text, View, Pressable, StyleProp, TextStyle } from 'react-native'
 import React from 'react'
 import { Color } from '../../constant/color';
 
@@ -23,8 +23,8 @@ const CheckBox: React.FC<{ isChecked: boolean }> = ({ isChecked }) => {
     )
 }
 
-const CheckBoxComment: React.FC<{ innerText: string }> = ({ innerText }) => {
-    return (<Text style={styles.innerText}>{innerText}</Text>)
+const CheckBoxComment: React.FC<{ innerText: string, style?: StyleProp<TextStyle> }> = ({ innerText, style }) => {
+    return (<Text style={style} > {innerText}</Text >)
 }
 
 const CheckboxComponent: React.FC<CheckBoxProps> = ({ isChecked, onCheck, innerText }) => {
@@ -36,7 +36,7 @@ const CheckboxComponent: React.FC<CheckBoxProps> = ({ isChecked, onCheck, innerT
             onPress={toggleCheck}
         >
             <CheckBox isChecked={isChecked} />
-            {innerText && <CheckBoxComment innerText={innerText} />}
+            {innerText && <CheckBoxComment style={[styles.innerText, { color: isChecked ? Color['grey800'] : Color['grey400'] }]} innerText={innerText} />}
         </Pressable>
     )
 }
@@ -45,7 +45,7 @@ export { CheckboxComponent }
 
 const styles = StyleSheet.create({
     container: {
-        display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 12
+        display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8
     },
     checkboxBorder: {
         height: 24,

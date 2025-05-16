@@ -30,7 +30,6 @@ export function mapReservationDetail(dto: ReservationDto): ReservationDetail {
       endTime: dto.endTime,
       creatorName: dto.creatorName,
       reservationType: dto.reservationType,
-      participationAvailable: dto.participationAvailable,
     };
   }
 }

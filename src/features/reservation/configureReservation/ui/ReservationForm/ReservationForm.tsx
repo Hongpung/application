@@ -1,5 +1,5 @@
-import { ScrollView } from "react-native";
-import React, { useCallback } from "react";
+import { ScrollView, View } from "react-native";
+import React, { useCallback, useState } from "react";
 import { type ReservationForm as ReservationFormType } from "@hongpung/src/entities/reservation";
 
 import { ReservationTypeSelector } from "../ReservationTypeSelector/ReservationTypeSelector";
@@ -7,6 +7,7 @@ import { ParticipatorsSelector } from "../ParticipatorsSelector/ParticipatorsSel
 import BorrowInstrumentsSelector from "../BorrowInstrumentsSelector/BorrowInstrumentsSelector";
 import { TitleInput } from "../TitleInput/TitleInput";
 import { DateTimeSelector } from "../DateTimeSelector/DateTimeSelector";
+import { Checkbox, LongButton } from "@hongpung/src/common";
 
 type ReservationFormProps = {
   reservation: ReservationFormType;
@@ -24,6 +25,10 @@ type ReservationFormProps = {
 
   navigateDatePickerPage: () => void;
   navigateTimePickerPage: () => void;
+
+  submitButtonText: string;
+  canSubmit: boolean;
+  onSubmit: (reservation: ReservationFormType) => void;
 };
 
 export const ReservationForm: React.FC<ReservationFormProps> = (props) => {
@@ -42,7 +47,13 @@ export const ReservationForm: React.FC<ReservationFormProps> = (props) => {
 
     navigateToParticipatorsPickerPage,
     navigateToBorrowInstrumentsPickerPage,
+
+    submitButtonText,
+    canSubmit,
+    onSubmit,
   } = props;
+
+  const [isAgree, setAgree] = useState(false);
 
   const {
     startTime,
@@ -65,37 +76,60 @@ export const ReservationForm: React.FC<ReservationFormProps> = (props) => {
   }, [date]);
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: "#FFF" }}
-      contentContainerStyle={{ flexGrow: 1, backgroundColor: "#FFF", gap: 24 }}
-    >
-      <DateTimeSelector
-        date={date}
-        startTime={startTime}
-        endTime={endTime}
-        onPress={onDateTimePress}
-      />
+    <View style={{ flex: 1, backgroundColor: "#FFF" }}>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: "#FFF" }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          backgroundColor: "#FFF",
+          gap: 24,
+        }}
+      >
+        <DateTimeSelector
+          date={date}
+          startTime={startTime}
+          endTime={endTime}
+          onPress={onDateTimePress}
+        />
 
-      <TitleInput title={title} setTitle={setTitle} />
+        <TitleInput title={title} setTitle={setTitle} />
 
-      <ReservationTypeSelector
-        participationAvailable={participationAvailable}
-        reservationType={reservationType}
-        setParticipationAvailable={setParticipationAvailable}
-        setReservationType={setReservationType}
-      />
+        <ReservationTypeSelector
+          participationAvailable={participationAvailable}
+          reservationType={reservationType}
+          setParticipationAvailable={setParticipationAvailable}
+          setReservationType={setReservationType}
+        />
 
-      <ParticipatorsSelector
-        onPress={navigateToParticipatorsPickerPage}
-        participators={participators}
-        resetParticipator={resetParticipators}
-      />
+        <ParticipatorsSelector
+          onPress={navigateToParticipatorsPickerPage}
+          participators={participators}
+          resetParticipator={resetParticipators}
+        />
 
-      <BorrowInstrumentsSelector
-        onPress={navigateToBorrowInstrumentsPickerPage}
-        borrowInstruments={borrowInstruments}
-        resetBorrowInstruments={resetBorrowInstruments}
-      />
-    </ScrollView>
+        <BorrowInstrumentsSelector
+          onPress={navigateToBorrowInstrumentsPickerPage}
+          borrowInstruments={borrowInstruments}
+          resetBorrowInstruments={resetBorrowInstruments}
+        />
+
+
+      </ScrollView>
+      <View style={{ paddingVertical: 16, gap: 12, borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: "#FFF" }}>
+        <View style={{ paddingHorizontal: 32 }}>
+          <Checkbox
+            isChecked={isAgree}
+            onCheck={setAgree}
+            innerText="예약 전날 오후10시까지 수정*취소할 수 있어요"
+          />
+        </View>
+        <LongButton
+          onPress={() => onSubmit(reservation)}
+          innerContent={submitButtonText}
+          isAble={canSubmit&&isAgree}
+          color="blue"
+        />
+      </View>
+    </View>
   );
 };

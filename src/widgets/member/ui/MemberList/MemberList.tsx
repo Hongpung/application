@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { View, StyleSheet, FlatList, Text } from "react-native";
 import { type Member } from "@hongpung/src/entities/member";
 import MemberCard from "@hongpung/src/entities/member/ui/MemberCard/MemberCard";
 import MemberCardSkeleton from "@hongpung/src/entities/member/ui/MemberCardSkeleton/MemberCardSkeleton";
 import { MemberDetailModal } from "@hongpung/src/entities/member/ui/MemberDetailModal/MemberDetailModal";
 import { Color } from "@hongpung/src/common";
-import { Skeleton } from "moti/skeleton";
 
 interface MemberListProps {
   members: Member[] | null;
@@ -20,32 +19,44 @@ const MemberList: React.FC<MemberListProps> = ({
 }) => {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
-  const renderItem = ({ item: member }: { item: Member }) => (
-    <View style={styles.cardContainer}>
-      <MemberCard
-        member={member}
-        onPress={() => {
-          setSelectedMember(member);
-        }}
-      />
-    </View>
+  const renderItem = useCallback(
+    ({ item: member }: { item: Member }) => (
+      <View style={styles.cardContainer}>
+        <MemberCard
+          member={member}
+          onPress={() => {
+            setSelectedMember(member);
+          }}
+        />
+      </View>
+    ),
+    []
   );
   if (isLoading)
     return (
-      <>
-        {Array.from({ length: 10 }).map((_, index) => (
-          <MemberCardSkeleton key={index} />
-        ))}
-      </>
+      <FlatList
+        data={Array.from({ length: 6 })}
+        keyExtractor={(_, i) => i.toString()}
+        renderItem={() => <MemberCardSkeleton />}
+        initialNumToRender={4}
+        windowSize={5}
+      />
     );
   return (
     <>
-      <MemberDetailModal selectedMember={selectedMember} />
+      {selectedMember && (
+        <MemberDetailModal
+          selectedMember={selectedMember}
+          resetMember={() => setSelectedMember(null)}
+        />
+      )}
       <FlatList
         style={{ flex: 1 }}
         data={members}
         keyExtractor={(member, index) =>
-          member.memberId ? member.memberId.toString() : index.toString() + "member"
+          member.memberId
+            ? member.memberId.toString()
+            : index.toString() + "member"
         }
         renderItem={renderItem}
         ListEmptyComponent={

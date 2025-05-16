@@ -26,6 +26,7 @@ import { MainTabNavigation as MainTab } from "./MainTabNavigation";
 import { ClubStackNavigation as ClubStack } from "./ClubStackNavigation";
 import { ReservationStackNavigation as ReservationStack } from "./ReservationNavigation";
 import { SessionManagementStackNavigation as SessionManagementStack } from "./SessionManagementStackNavigation";
+import { NoticeStackNavigation as NoticeStack } from "./NoticeStackNavigation";
 
 const MainStack = createNativeStackNavigator<MainStackParamList>();
 
@@ -90,6 +91,8 @@ export const MainStackNavigation = () => {
         name="InstrumentDetail"
         component={InstrumentDetailPage}
       />
+
+      <MainStack.Screen name="Notice" component={NoticeStack} />
     </MainStack.Navigator>
   );
 };

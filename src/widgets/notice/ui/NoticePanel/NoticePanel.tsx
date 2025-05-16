@@ -1,38 +1,50 @@
 import { StyleSheet, Text, View, Pressable } from "react-native";
 import React from "react";
-import { Color } from "@hongpung/src/common";
-import { Icons } from "@hongpung/src/common";
-import { BriefNotice } from "@hongpung/src/entities/notice/model/type";
-import NoticeItem from "@hongpung/src/entities/notice/ui/NoticeItem/NoticeItem";
-import SkeletonPlaceholder from "react-native-skeleton-placeholder";
+import { Color, Icons } from "@hongpung/src/common";
+
+import { useNoticePanel } from "../../model/useNoticePanel";
+import { NoticeItem } from "@hongpung/src/entities/notice";
+import { Skeleton } from "moti/skeleton";
 
 type NoticePanelProps = {
-  noticeList?: BriefNotice[];
-  isLoading: boolean;
   navigateToNoticeDetail: (noticeId: number) => void;
   navigateToNoticeList: () => void;
 };
 
-const NoticePanel: React.FC<NoticePanelProps> = (props) => {
-  const {
-    noticeList,
-    isLoading,
-    navigateToNoticeDetail,
-    navigateToNoticeList,
-  } = props;
+export const NoticePanel: React.FC<NoticePanelProps> = (props) => {
+  const { navigateToNoticeDetail, navigateToNoticeList } = props;
+  
+  const { noticeList = [], isLoading } = useNoticePanel();
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Icons name="megaphone" size={16} color={Color["grey400"]} />
-        <Text style={styles.title}>공지사항</Text>
-      </View>
-      {!noticeList ? (
-        <View style={styles.noticeList}>
-          <View style={{ width: 60, height: 60, borderRadius: 50 }} />
+        <View style={styles.titleContainer}>
+          <Icons name="megaphone" size={16} color={Color["grey400"]} />
+          <Text style={styles.title}>공지사항</Text>
         </View>
-      ) : isLoading ? (
-        <View style={{ width: 60, height: 60, borderRadius: 50 }} />
+        <Pressable style={styles.moreButton} onPress={navigateToNoticeList}>
+          <Text style={styles.moreText}>더 보기</Text>
+          <Icons name="add" size={16} color={Color["grey300"]} />
+        </Pressable>
+      </View>
+      {isLoading ? (
+        <View style={[styles.noticeList, { gap: 8 }]}>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <Skeleton
+              key={index}
+              transition={{
+                type: "spring",
+                duration: 400,
+                delay: 100,
+              }}
+              width="100%"
+              height={28}
+              radius={50}
+              colors={[Color["grey100"], Color["grey300"]]}
+            />
+          ))}
+        </View>
       ) : (
         <View style={styles.noticeList}>
           {noticeList && noticeList.length > 0 ? (
@@ -56,28 +68,11 @@ const NoticePanel: React.FC<NoticePanelProps> = (props) => {
               </Text>
             </View>
           )}
-          {noticeList && noticeList.length > 4 && (
-            <Pressable
-              style={styles.moreButton}
-              onPress={() => {
-                navigateToNoticeList();
-              }}
-            >
-              <Text style={styles.moreText}>더 보기</Text>
-              <Icons
-                name="chevron-forward"
-                size={18}
-                color={Color["grey400"]}
-              />
-            </Pressable>
-          )}
         </View>
       )}
     </View>
   );
 };
-
-export default NoticePanel;
 
 const styles = StyleSheet.create({
   container: {
@@ -90,12 +85,19 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     gap: 4,
   },
   title: {
     fontSize: 18,
     fontFamily: "NanumSquareNeo-Bold",
     height: 20,
+  },
+  titleContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
   },
   noticeList: {
     display: "flex",
@@ -131,17 +133,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     display: "flex",
     flexDirection: "row",
-    gap: 4,
-    alignSelf: "center",
-    paddingHorizontal: 12,
+    gap: 2,
+    paddingHorizontal: 4,
     paddingVertical: 8,
-    borderRadius: 50,
-    borderWidth: 1,
-    borderColor: Color["grey400"],
   },
   moreText: {
     fontSize: 16,
     fontFamily: "NanumSquareNeo-Regular",
-    color: Color["grey400"],
+    color: Color["grey300"],
   },
 });

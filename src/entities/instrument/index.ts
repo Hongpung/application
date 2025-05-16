@@ -7,4 +7,4 @@ export { mapInstrument } from './lib/mapInstrument'
 export { BorrowInstrumentCard } from './ui/BorrowInstrumentCard/BorrowInstrumentCard'
 export { ManageInstrumentCard } from './ui/ManageInstrumentCard/ManageInstrumentCard'
 
-export { useInstrumentList } from './model/useInstrumentList'
+export { useInstrumentAccordionList } from './model/useInstrumentAccordionList'

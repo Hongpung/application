@@ -1,4 +1,10 @@
-import { ScrollView, View, StyleSheet, Alert } from "react-native";
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  Alert,
+  InteractionManager,
+} from "react-native";
 import React from "react";
 import { Color, Header } from "@hongpung/src/common";
 import { ClubProfileSection } from "@hongpung/src/widgets/club/ui/ClubProfileSection/ClubProfileSection";
@@ -7,9 +13,7 @@ import { ClubFooterSection } from "@hongpung/src/widgets/club/ui/ClubFooterSecti
 import { useLoadClubInfoFetch } from "@hongpung/src/entities/club/api/clubApi";
 import { UserStatusState } from "@hongpung/src/entities/member";
 import { useAtomValue } from "jotai";
-import {
-  ClubStackProps,
-} from "@hongpung/src/common/navigation";
+import { ClubStackProps } from "@hongpung/src/common/navigation";
 import { ClubParamList } from "@hongpung/src/common/navigation";
 
 const ClubMainPage: React.FC<ClubStackProps<"ClubMain">> = ({ navigation }) => {

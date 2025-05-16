@@ -1,49 +1,39 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, InteractionManager } from "react-native";
 import { Skeleton } from "moti/skeleton";
 import { Color } from "@hongpung/src/common";
+import { MotiTransitionProp } from "moti/build/core";
 
 const MemberCardSkeleton: React.FC = () => {
+  const [showSkeleton, setShowSkeleton] = useState(false);
+
+  useEffect(() => {
+    InteractionManager.runAfterInteractions(() => {
+      setShowSkeleton(true);
+    });
+  }, []);
+
+  const skeletonProps = {
+    transition: {
+      type: "spring",
+      duration: 400,
+      delay: 100,
+    } satisfies MotiTransitionProp,
+    colors: [Color["grey100"], Color["grey300"]],
+  };
+
+  if (!showSkeleton) return null;
+
   return (
     <Skeleton.Group show>
       <View style={styles.container}>
         {/* 프로필 사진 */}
-        <Skeleton
-          transition={{
-            type: "spring",
-            duration: 400,
-            delay: 100,
-          }}
-          width={60}
-          height={80}
-          radius={5}
-          colors={[Color["grey100"], Color["grey300"]]}
-        />
+        <Skeleton {...skeletonProps} width={60} height={80} radius={5} />
 
         {/* 텍스트 부분 */}
         <View style={styles.textContainer}>
-          <Skeleton
-            transition={{
-              type: "spring",
-              duration: 400,
-              delay: 100,
-            }}
-            width="40%"
-            height={16}
-            radius={4}
-            colors={[Color["grey100"], Color["grey300"]]}
-          />
-          <Skeleton
-            transition={{
-              type: "spring",
-              duration: 400,
-              delay: 100,
-            }}  
-            width="60%"
-            height={14}
-            radius={4}
-            colors={[Color["grey100"], Color["grey300"]]}
-          />
+          <Skeleton {...skeletonProps} width="40%" height={16} radius={4} />
+          <Skeleton {...skeletonProps} width="60%" height={14} radius={4} />
         </View>
       </View>
     </Skeleton.Group>
@@ -78,4 +68,4 @@ const styles = StyleSheet.create({
   nicknamePlaceholder: {},
 });
 
-export default MemberCardSkeleton;
+export default React.memo(MemberCardSkeleton);

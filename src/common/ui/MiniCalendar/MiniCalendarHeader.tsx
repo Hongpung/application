@@ -12,7 +12,6 @@ const MiniCalendarHeader: React.FC<MiniCalendarHeaderProps> = ({
   currentMonth,
   onMonthChange,
 }) => {
-    
   const handlePrevMonth = () => {
     const newDate = new Date(currentMonth);
     newDate.setMonth(newDate.getMonth() - 1);
@@ -27,35 +26,47 @@ const MiniCalendarHeader: React.FC<MiniCalendarHeaderProps> = ({
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={handlePrevMonth} style={styles.button}>
-        <Icons name="chevron-back" size={24} color={Color['grey400']} />
-      </Pressable>
-      <Text style={styles.monthText}>
-        {currentMonth.getFullYear()}. {(currentMonth.getMonth() + 1).toString().padStart(2, '0')}
-      </Text>
-      <Pressable onPress={handleNextMonth} style={styles.button}>
-        <Icons name="chevron-forward" size={24} color={Color['grey400']} />
-      </Pressable>
+      <Text style={styles.yearText}>{currentMonth.getFullYear()}년</Text>
+      <View style={styles.monthContainer}>
+        <Pressable onPress={handlePrevMonth} style={styles.button}>
+          <Icons name="chevron-back" size={24} color={Color["blue500"]} />
+        </Pressable>
+        <Text style={styles.monthText}>{currentMonth.getMonth() + 1}월</Text>
+        <Pressable onPress={handleNextMonth} style={styles.button}>
+          <Icons name="chevron-forward" size={24} color={Color["blue500"]} />
+        </Pressable>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 8,
     paddingVertical: 16,
-    marginHorizontal: 32
+    marginHorizontal: 32,
   },
   button: {
-    padding: 8,
+    padding: 4,
+  },
+  yearText: {
+    fontSize: 16,
+    fontFamily: "NanumSquareNeo-Bold",
+    color: Color["grey400"],
+    paddingHorizontal: 12,
   },
   monthText: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: "NanumSquareNeo-Bold",
-    color: Color.grey800,
+    color: Color["grey800"],
     marginHorizontal: 8,
+  },
+  monthContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

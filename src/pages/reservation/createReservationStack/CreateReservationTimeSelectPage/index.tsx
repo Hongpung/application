@@ -1,7 +1,7 @@
 import { ScrollView, View } from "react-native";
 
 import { TimeSelector } from "@hongpung/src/features/reservation/configureReservation/ui/TimeSelector/TimeSelector";
-import TimeSelectorHeader from "@hongpung/src/features/reservation/configureReservation/ui/TimeSelectorHeader/TimeSelectorHeader";
+import { TimeSelectorHeader } from "@hongpung/src/features/reservation/configureReservation/ui/TimeSelectorHeader/TimeSelectorHeader";
 
 import { useCreateReservation } from "@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context";
 import { LongButton, TimeArray, TimeFormat } from "@hongpung/src/common";
@@ -42,27 +42,26 @@ const CreateReservationTimeSelectScreen: React.FC<
         selectedDate={selectedDate}
         setDate={setDate}
       />
-      <ScrollView>
-        <TimeSelector
-          occupiedTimes={occupiedTimes}
-          isLoading={isLoading}
-          error={error}
-          selectedTimeBlocks={selectedTimeBlocks}
-          toggleTimeBlock={toggleTimeBlock}
-        />
-      </ScrollView>
+      <TimeSelector
+        occupiedTimes={occupiedTimes}
+        isLoading={isLoading}
+        error={error}
+        selectedTimeBlocks={selectedTimeBlocks}
+        toggleTimeBlock={toggleTimeBlock}
+      />
       {selectedTimeBlocks.length > 0 && (
-        <LongButton
-          innerContent={`${selectedTimeBlocks[0]} ~ ${
-            TimeArray[TimeArray.indexOf(selectedTimeBlocks[selectedTimeBlocks.length - 1]) + 1]
-          }`}
-          color="blue"
-          onPress={() => {
-            navigation.navigate("CreateReservationForm");
-            setStartTime(selectedTimeBlocks[0]);
-            setEndTime(TimeArray[TimeArray.indexOf(selectedTimeBlocks[selectedTimeBlocks.length - 1]) + 1]);
-          }}
-        />
+        <View style={{paddingTop:16, borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: "#FFF"}}>
+          <LongButton
+            innerContent={`${selectedTimeBlocks[0]} ~ ${TimeArray[TimeArray.indexOf(selectedTimeBlocks[selectedTimeBlocks.length - 1]) + 1]
+              }`}
+            color="blue"
+            onPress={() => {
+              navigation.navigate("CreateReservationForm");
+              setStartTime(selectedTimeBlocks[0]);
+              setEndTime(TimeArray[TimeArray.indexOf(selectedTimeBlocks[selectedTimeBlocks.length - 1]) + 1]);
+            }}
+          />
+        </View>
       )}
     </View>
   );

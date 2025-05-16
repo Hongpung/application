@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
-import { Pressable, View, Text } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Pressable, View, Text, ScrollView } from "react-native";
 import { ReservationStackScreenProps } from "@hongpung/src/common/navigation";
 import { WeekCalendarHeader } from "@hongpung/src/common/ui/WeekCalendarHeader/WeekCalendarHeader";
 
@@ -7,7 +7,7 @@ import { useLoadDailyReservationsFetch } from "@hongpung/src/entities/reservatio
 import { ReservationCard } from "@hongpung/src/entities/reservation/ui/ReservationCard/ReservationCard";
 
 import { TimeLine } from "@hongpung/src/widgets/reservation/ui/TimeLine/TimeLine";
-import { Color } from "@hongpung/src/common";
+import { Color, FullScreenLoadingModal } from "@hongpung/src/common";
 
 const DailyReservationListPage: React.FC<
   ReservationStackScreenProps<"DailyReserveList">
@@ -16,6 +16,12 @@ const DailyReservationListPage: React.FC<
   const [selectedDate, selectDate] = useState<Date>(
     date ? new Date(date) : new Date()
   );
+  const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ y: 0, animated: false });
+  }, [selectedDate]);
+
   const {
     data: reservations,
     isLoading,
@@ -33,14 +39,15 @@ const DailyReservationListPage: React.FC<
       params: { date: selectedDate.toISOString() },
     });
   }, [navigation, selectedDate]);
+
   return (
     <View style={{ flex: 1, backgroundColor: "#FFF" }}>
+      <FullScreenLoadingModal isLoading={isLoading} />
       <WeekCalendarHeader
         changeDate={(newDate) => {
           selectDate(newDate);
         }}
         onPressBackButton={() => {
-          //이전 화면으로 이동
           if (navigation.canGoBack()) navigation.goBack();
         }}
         selectedDate={selectedDate}
@@ -66,10 +73,10 @@ const DailyReservationListPage: React.FC<
           )
         }
       />
-      <TimeLine>
-        {reservations?.map((reservation) => (
+      <TimeLine ref={scrollRef}>
+        {reservations?.map((reservation, index) => (
           <ReservationCard
-            key={reservation.reservationId}
+            key={reservation.reservationId + "rCard" + index}
             reservation={reservation}
             onPress={() => {
               //예약 화면으로 이동

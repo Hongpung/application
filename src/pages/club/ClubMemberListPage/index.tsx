@@ -10,7 +10,7 @@ const ClubMemberListPage: React.FC<ClubStackProps<"ClubMembers">> = ({
   route,
 }) => {
   const { data: members, isLoading } = useLoadMyClubMembersFetch();
-
+  
   return (
     <View style={styles.container}>
       <Header leftButton={"close"} headerName="동아리원 목록" />

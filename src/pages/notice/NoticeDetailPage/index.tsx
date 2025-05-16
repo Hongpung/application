@@ -1,40 +1,19 @@
-import { Color } from "@hongpung/ColorSet";
-import { Header } from "@hongpung/src/common";
-import { useLoadNoticeDetailFetch } from "@hongpung/src/entities/notice/api/noticeApi";
-import { View, ActivityIndicator, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+
+import { Header, Color } from "@hongpung/src/common";
+import { NoticeStackProps } from "@hongpung/src/common/navigation";
+
+import NoticeDetail from "@hongpung/src/widgets/notice/ui/NoticeDetail/NoticeDetail";
 
 const NoticeDetailPage: React.FC<NoticeStackProps<"NoticeDetail">> = ({
   route,
 }) => {
   const { noticeId } = route.params;
-  const { data, isLoading } = useLoadNoticeDetailFetch({ noticeId });
-
-  if (isLoading)
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator color={Color["blue500"]} size={"large"} />
-      </View>
-    );
 
   return (
     <View style={styles.container}>
       <Header leftButton={"arrow-back"} headerName="공지사항" />
-      <View style={styles.contentContainer}>
-        <View style={styles.noticeCard}>
-          <Text style={styles.noticeTitle}>
-            {data?.title}
-          </Text>
-          <Text style={styles.noticeDate}>
-            {data?.createdAt.split("T")[0]}{" "}
-            {data?.createdAt.split("T")[1].slice(0, 2)}시
-            {data?.createdAt.split("T")[1].slice(3, 5)}분
-          </Text>
-          <View style={styles.separator}></View>
-          <Text style={styles.noticeContent}>
-            {data?.content}
-          </Text>
-        </View>
-      </View>
+      <NoticeDetail noticeId={noticeId} />
     </View>
   );
 };

@@ -7,7 +7,7 @@ export const useSelectParticipators = (initialParticipators: Member[]) => {
     const [newParticipators, setNewParticipators] = useState<Member[]>(initialParticipators);
 
     const toggleParticipator = useCallback((member: Member) => {
-        if (newParticipators.includes(member)) {
+        if (newParticipators.some(participator => participator.memberId === member.memberId)) {
             setNewParticipators(prev => prev.filter(participator => participator.memberId !== member.memberId))
         } else {
             setNewParticipators(prev => [...prev, member])

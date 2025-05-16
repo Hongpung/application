@@ -4,7 +4,7 @@ import { Pressable, View, Text, Dimensions } from "react-native"
 import { Color, Icons } from "@hongpung/src/common"
 
 import { DailyReservation } from "../../model/type"
-import { colorDefine } from "../../lib/colorDefine"
+import { getReservationColor } from "../../lib/getReservationColor"
 import { style } from "./ReservationCard.module"
 
 
@@ -25,7 +25,7 @@ export const ReservationCard: React.FC<ReservationCardProps> = ({ reservation, o
     const cardTopPosition = 12 + (Number(startHour) - 10) * 80 + (startMinnute > 0 ? 40 : 0);
     const cardHeight = 40 * (timeGap / 30);
 
-    const color = colorDefine(reservation) + '500'
+    const color = getReservationColor(reservation) + '500'
 
     return (
 

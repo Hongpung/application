@@ -18,7 +18,7 @@ const InvitePossibleMemberList: React.FC<InvitePossibleMemberListProps> = ({ inv
     <View style={styles.cardContainer}>
       <ParticipatorCard
         member={member}
-        isPicked={selectedMembers.includes(member)}
+        isPicked={selectedMembers.some(selectedMember => selectedMember.memberId === member.memberId)}
         onPress={() => { toggleMember(member) }}
       />
     </View>
@@ -27,18 +27,22 @@ const InvitePossibleMemberList: React.FC<InvitePossibleMemberListProps> = ({ inv
   return (
     <FlatList
       data={invitePossibleMembers}
-      keyExtractor={(member) => member.memberId.toString()}
+      keyExtractor={(member, index) => member.memberId.toString() + "member" + index}
       renderItem={renderItem}
+      style={{ flex: 1 }}
       contentContainerStyle={styles.listContainer}
       onEndReached={onEndReached} // 리스트 끝에 도달했을 때 호출
       onEndReachedThreshold={0.2} // 리스트 끝에서 50% 남았을 때 호출
       ListFooterComponent={
         isLoading ? (
           <>
-            <MemberCardSkeleton />
-            <MemberCardSkeleton />
-            <MemberCardSkeleton />
+            <MemberCardSkeleton key={"skeleton1"} />
+            <MemberCardSkeleton key={"skeleton2"} />
+            <MemberCardSkeleton key={"skeleton3"} />
+            <MemberCardSkeleton key={"skeleton4"} />
+            <MemberCardSkeleton key={"skeleton5"} />
           </>
+
         ) : null
       }
     />
@@ -49,7 +53,7 @@ const InvitePossibleMemberList: React.FC<InvitePossibleMemberListProps> = ({ inv
 
 const styles = StyleSheet.create({
   listContainer: {
-    flex: 1,
+    // flex: 1,
   },
   cardContainer: {
     marginVertical: 8,

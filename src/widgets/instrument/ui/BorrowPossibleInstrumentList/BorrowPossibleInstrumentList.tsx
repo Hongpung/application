@@ -4,7 +4,7 @@ import {
   Instrument,
 } from "@hongpung/src/entities/instrument";
 import { Pressable, FlatList, View, Text, StyleSheet } from "react-native";
-import { useInstrumentList } from "@hongpung/src/entities/instrument";
+import { useInstrumentAccordionList } from "@hongpung/src/entities/instrument";
 
 type BorrowPossibleInstrumentListProps = {
   instrumentList: Instrument[] | null;
@@ -16,9 +16,10 @@ type BorrowPossibleInstrumentListProps = {
 const BorrowPossibleInstrumentList: React.FC<
   BorrowPossibleInstrumentListProps
 > = ({ instrumentList, selectedInstruments, toggleInstrument, isLoading }) => {
-  const { isOpen, toggleAccordion, orderInstruments } = useInstrumentList({
-    instrumentList,
-  });
+  const { isOpen, toggleAccordion, orderedInstrumentData } =
+    useInstrumentAccordionList({
+      instrumentList,
+    });
 
   if (isLoading) {
     return (
@@ -28,74 +29,62 @@ const BorrowPossibleInstrumentList: React.FC<
     );
   }
 
-  const data =
-    instrumentList && instrumentList.length > 0
-      ? Object.entries(orderInstruments).map(([type, instruments]) => {
-          return {
-            type,
-            instruments,
-            selectedCount: instruments.filter((instrument) =>
-              selectedInstruments.includes(instrument)
-            ).length,
-          };
-        })
-      : [];
-
-  const renderItem = ({ item }: { item: (typeof data)[0] }) => {
-    if (item.instruments.length === 0) return null;
-
-    const hasSelected = item.selectedCount > 0;
-
-    return (
-      <View>
-        <Pressable
-          onPress={() => toggleAccordion(item.type)}
-          style={styles.container}
-        >
-          <Text
-            style={[
-              styles.typeText,
-              hasSelected ? styles.typeTextSelected : styles.typeTextUnselected,
-            ]}
-          >
-            {item.type}
-            {item.selectedCount > 0 && ` (${item.selectedCount})`}
-          </Text>
-
-          <Icons
-            name={isOpen(item.type) ? "chevron-up" : "chevron-down"}
-            color={Color["grey800"]}
-            size={24}
-          />
-        </Pressable>
-
-        {isOpen(item.type) && (
-          <View style={styles.instrumentsContainer}>
-            {item.instruments.map((instrument, index) => (
-              <BorrowInstrumentCard
-                key={index}
-                instrument={instrument}
-                isPicked={selectedInstruments.includes(instrument)}
-                onClickInstrument={toggleInstrument}
-              />
-            ))}
-          </View>
-        )}
-      </View>
-    );
-  };
-
-  console.log("data", data);
-
   return (
     <FlatList
-      data={data}
-      renderItem={renderItem}
+      data={orderedInstrumentData}
       keyExtractor={(item) => item.type}
       showsVerticalScrollIndicator={false}
       ListEmptyComponent={
-          <Text style={styles.emptyText}>대여 할 수 있는 악기가 없습니다.</Text>
+        <Text style={styles.emptyText}>대여 할 수 있는 악기가 없습니다.</Text>
       }
+      renderItem={({ item }) => {
+        if (item.instruments.length === 0) return null;
+
+        const hasSelected =
+          item.instruments.filter((instrument) =>
+            selectedInstruments.includes(instrument)
+          ).length > 0;
+
+        return (
+          <View>
+            <Pressable
+              onPress={() => toggleAccordion(item.type)}
+              style={styles.container}
+            >
+              <Text
+                style={[
+                  styles.typeText,
+                  hasSelected
+                    ? styles.typeTextSelected
+                    : styles.typeTextUnselected,
+                ]}
+              >
+                {item.type}
+                {hasSelected && ` (${item.instruments.length})`}
+              </Text>
+
+              <Icons
+                name={isOpen(item.type) ? "chevron-up" : "chevron-down"}
+                color={Color["grey800"]}
+                size={24}
+              />
+            </Pressable>
+
+            {isOpen(item.type) && (
+              <View style={styles.instrumentsContainer}>
+                {item.instruments.map((instrument, index) => (
+                  <BorrowInstrumentCard
+                    key={index}
+                    instrument={instrument}
+                    isPicked={selectedInstruments.includes(instrument)}
+                    onClickInstrument={toggleInstrument}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
+        );
+      }}
     />
   );
 };

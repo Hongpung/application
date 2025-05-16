@@ -8,13 +8,14 @@ import {
   StyleSheet,
 } from "react-native";
 import { DescriptionBox, Header } from "@hongpung/src/common";
-import useSignUpSteps from "@hongpung/src/features/auth/signUp/model/useSignUpSteps";
+import { useSignUpSteps } from "@hongpung/src/features/auth/signUp/model/useSignUpSteps";
 import React from "react";
 import { SignUpForms } from "@hongpung/src/widgets/auth/ui/SignUpForm/SignUpForm";
 import { SignUpDescriptions } from "./constant/descriptions";
 
 const SignUpPage: React.FC = () => {
-  const { onClose, step, dissmissClubOptions, ...signUpSteps } = useSignUpSteps();
+  const { onClose, step, dissmissClubOptions, ...signUpSteps } =
+    useSignUpSteps();
   const StepForm = SignUpForms[step];
 
   return (

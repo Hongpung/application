@@ -1,5 +1,5 @@
-import { type Member } from "@hongpung/src/entities/member/@x/reservation";
-import { Instrument } from "../../instrument/@x/reservation";
+import type { Member } from "@hongpung/src/entities/member/@x/reservation";
+import type { Instrument } from "@hongpung/src/entities/instrument/@x/reservation";
 import { TimeFormat } from "@hongpung/src/common";
 
 export interface Reservation {

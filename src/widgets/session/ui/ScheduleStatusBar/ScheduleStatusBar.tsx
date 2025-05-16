@@ -6,7 +6,7 @@ type ScheduleStatusBarProps = {
     isParticipatible: boolean
 }
 
-const ScheduleStatusBar: React.FC<ScheduleStatusBarProps> = ({ isOnAir, isParticipatible }) => {
+export const ScheduleStatusBar: React.FC<ScheduleStatusBarProps> = ({ isOnAir, isParticipatible }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.title}>연습실 이용상태</Text>
@@ -27,8 +27,6 @@ const ScheduleStatusBar: React.FC<ScheduleStatusBarProps> = ({ isOnAir, isPartic
         </View>
     );
 };
-
-export default ScheduleStatusBar;
 
 const styles = StyleSheet.create({
     container: {

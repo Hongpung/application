@@ -22,13 +22,9 @@ interface ChangePasswordFormProps {
   setConfirmPassword: (text: string) => void;
   onChangePassword: () => Promise<void>;
   passwordValidation: PasswordFormValidation;
-  validateConfirmPassword: (
-    text: PasswordValue["confirmPassword"]
-  ) => ValidationState;
-  validateNewPassword: (text: PasswordValue["newPassword"]) => ValidationState;
-  validateCurrentPassword: (
-    text: PasswordValue["currentPassword"]
-  ) => ValidationState;
+  onCurrentPasswordBlur: () => void;
+  onNewPasswordBlur: () => void;
+  onConfirmPasswordBlur: () => void;
   currentPasswordRef: React.RefObject<TextInput>;
   newPasswordRef: React.RefObject<TextInput>;
   confirmPasswordRef: React.RefObject<TextInput>;
@@ -50,9 +46,9 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = (
     currentPasswordRef,
     newPasswordRef,
     confirmPasswordRef,
-    validateConfirmPassword,
-    validateNewPassword,
-    validateCurrentPassword,
+    onCurrentPasswordBlur,
+    onNewPasswordBlur,
+    onConfirmPasswordBlur,
     isCanChangePassword,
   } = props;
 
@@ -68,9 +64,7 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = (
             inputValue={currentPassword}
             setInputValue={setCurrentPassword}
             validationCondition={passwordValidation.currentPassword}
-            onBlur={() => {
-              validateCurrentPassword(currentPassword);
-            }}
+            onBlur={onCurrentPasswordBlur}
           />
           <BasicInput
             ref={newPasswordRef}
@@ -80,9 +74,7 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = (
             inputValue={newPassword}
             setInputValue={setNewPassword}
             validationCondition={passwordValidation.newPassword}
-            onBlur={() => {
-              validateNewPassword(newPassword);
-            }}
+            onBlur={onNewPasswordBlur}
           />
           <BasicInput
             ref={confirmPasswordRef}
@@ -92,9 +84,7 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = (
             inputValue={confirmPassword}
             setInputValue={setConfirmPassword}
             validationCondition={passwordValidation.confirmPassword}
-            onBlur={() => {
-              validateConfirmPassword(confirmPassword);
-            }}
+            onBlur={onConfirmPasswordBlur}
           />
         </View>
       </View>

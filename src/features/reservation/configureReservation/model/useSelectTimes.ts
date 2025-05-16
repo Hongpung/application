@@ -15,8 +15,13 @@ export const useSelectTimes = ({
   endTime?: TimeFormat;
   selectedTimeBlocks: TimeFormat[];
   setTimeBlocks: (newBlocks: TimeFormat[]) => void;
-  date: string;
+  date?: string;
 }) => {
+  
+  if(!date){
+    throw new Error("date is required");
+  }
+
   const initialTimeBlock = useMemo((): TimeFormat[] => {
     if (!startTime || !endTime) return [];
 

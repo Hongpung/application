@@ -8,7 +8,10 @@ interface NoticeItemProps {
   onNoticePress: (noticeId: number) => void;
 }
 
-const NoticeItem: React.FC<NoticeItemProps> = ({ notice, onNoticePress }) => {
+export const NoticeItem: React.FC<NoticeItemProps> = ({
+  notice,
+  onNoticePress,
+}) => {
   const { noticeId, title, createdAt } = notice;
   return (
     <TouchableOpacity
@@ -16,7 +19,9 @@ const NoticeItem: React.FC<NoticeItemProps> = ({ notice, onNoticePress }) => {
       style={styles.container}
       onPress={() => onNoticePress(noticeId)}
     >
-      <Text numberOfLines={1} style={styles.title}>{title}</Text>
+      <Text numberOfLines={1} style={styles.title}>
+        {title}
+      </Text>
       <Text style={styles.date}>{createdAt.split("T")[0]}</Text>
     </TouchableOpacity>
   );
@@ -25,8 +30,6 @@ const NoticeItem: React.FC<NoticeItemProps> = ({ notice, onNoticePress }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Color["grey200"],
   },
   title: {
     fontSize: 18,
@@ -37,5 +40,3 @@ const styles = StyleSheet.create({
     color: Color["grey300"],
   },
 });
-
-export default NoticeItem;

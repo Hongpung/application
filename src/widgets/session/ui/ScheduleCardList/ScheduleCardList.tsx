@@ -15,7 +15,7 @@ type ScheduleCardListProps = {
   navigateToDetail: (reservationId: number) => void;
 };
 
-const ScheduleCardList = forwardRef<
+export const ScheduleCardList = forwardRef<
   FlatList<ScheduleCard>,
   ScheduleCardListProps
 >((props, ref) => {

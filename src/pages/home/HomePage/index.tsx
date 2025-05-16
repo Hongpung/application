@@ -1,5 +1,11 @@
-import { ScrollView, View, StyleSheet, Text } from "react-native";
-import { NotificationIcon } from "@hongpung/src/features/notification/notReadNotification/ui/NotificationIcon/NotificationIcon";
+import {
+  ScrollView,
+  View,
+  StyleSheet,
+  Text,
+  InteractionManager,
+} from "react-native";
+import { NotificationIcon } from "@hongpung/src/widgets/notification";
 import { SessionManageBottomSheet } from "@hongpung/src/widgets/session/ui/SessionManageBottomSheet";
 import { UseRoomState } from "@hongpung/src/entities/session";
 import { useAtom, useAtomValue } from "jotai";
@@ -9,8 +15,8 @@ import { UserStatusState } from "@hongpung/src/entities/member";
 import { myTodayReservationState } from "@hongpung/src/entities/reservation";
 import { Color, MainFooter } from "@hongpung/src/common";
 import { BannerSlider } from "@hongpung/src/widgets/banner/ui/BannerSlider/BannerSlider";
-import { ClubPortalPanel } from "@hongpung/src/widgets/club/ui/ClubPortalPanel/ClubPortalPanel";
-import NoticePanel from "@hongpung/src/widgets/notice/ui/NoticePanel/NoticePanel";
+import { ClubPortalPanel } from "@hongpung/src/widgets/club";
+import { NoticePanel } from "@hongpung/src/widgets/notice";
 import { useNoticePanel } from "@hongpung/src/widgets/notice/model/useNoticePanel";
 import { MainTabScreenProps } from "@hongpung/src/common/navigation";
 
@@ -25,8 +31,102 @@ const HomePage: React.FC<MainTabScreenProps<"Home">> = ({ navigation }) => {
     myTodayReservationState
   );
   const [isSlideUp, setIsSlideUp] = useState(false);
+  
   const navigateToNotificationPage = () => {
+    const start = Date.now();
     navigation.navigate("Notification");
+    InteractionManager.runAfterInteractions(() => {
+      const duration = Date.now() - start;
+      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
+    });
+  };
+
+  const navigateToNoticeList = () => {
+    const start = Date.now();
+    navigation.navigate("Notice", {
+      screen: "NoticeList",
+    });
+    InteractionManager.runAfterInteractions(() => {
+      const duration = Date.now() - start;
+      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
+    });
+  };
+
+  const navigateToNoticeDetail = (noticeId: number) => {
+    const start = Date.now();
+    navigation.navigate("Notice", {
+      screen: "NoticeDetail",
+      params: { noticeId },
+    });
+    InteractionManager.runAfterInteractions(() => {
+      const duration = Date.now() - start;
+      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
+    });
+  };
+
+  const navigateToClubHome = () => {
+    const start = Date.now();
+    navigation.push("Club", { screen: "ClubMain" });
+    InteractionManager.runAfterInteractions(() => {
+      const duration = Date.now() - start;
+      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
+    });
+  };
+  const navigateToReservationDetail = (reservationId: number) => {
+    const start = Date.now();
+    navigation.navigate("Reservation", {
+      screen: "ReservationDetail",
+      params: { reservationId },
+    });
+    InteractionManager.runAfterInteractions(() => {
+      const duration = Date.now() - start;
+      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
+    });
+  };
+
+  const navigateToReservationCalendar = () => {
+    const start = Date.now();
+    navigation.push("Reservation", { screen: "ReservationCalendar" });
+    InteractionManager.runAfterInteractions(() => {
+      const duration = Date.now() - start;
+      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
+    });
+  };
+
+  const navigateToServiceTerms = () => {
+    const start = Date.now();
+    navigation.push("WebView", {
+      title: "서비스 이용약관",
+      url: "https://storage.hongpung.com/terms/%EC%84%9C%EB%B9%84%EC%8A%A4+%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80.html",
+    });
+    InteractionManager.runAfterInteractions(() => {
+      const duration = Date.now() - start;
+      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
+    });
+  };
+
+  const navigateToPrivacyPolicy = () => {
+    const start = Date.now();
+    navigation.push("WebView", {
+      title: "개인정보 처리방침",
+      url: "https://storage.hongpung.com/terms/%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4+%EC%B2%98%EB%A6%AC%EB%B0%A9%EC%B9%A8.html",
+    });
+    InteractionManager.runAfterInteractions(() => {
+      const duration = Date.now() - start;
+      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
+    });
+  };
+
+  const navigateToUsingManage = () => {
+    const start = Date.now();
+    navigation.navigate("SessionManagement", {
+      screen: "SessionManage",
+    });
+    InteractionManager.runAfterInteractions(() => {
+      const duration = Date.now() - start;
+      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
+    });
+
   };
 
   return (
@@ -73,48 +173,19 @@ const HomePage: React.FC<MainTabScreenProps<"Home">> = ({ navigation }) => {
             />
           </View>
           <TodaySchedule
-            navigateToReservationDetail={(reservationId: number) => {
-              navigation.navigate("Reservation", {
-                screen: "ReservationDetail",
-                params: { reservationId },
-              });
-            }}
-            navigateToReservationCalendar={() => {
-              navigation.push("Reservation", {
-                screen: "ReservationCalendar",
-              });
-            }}
+            navigateToReservationDetail={navigateToReservationDetail}
+            navigateToReservationCalendar={navigateToReservationCalendar}
           />
           <BannerSlider banners={[]} />
-          <ClubPortalPanel
-            navigateToClubHome={() => {
-              navigation.push("Club", { screen: "ClubMain" });
-            }}
-          />
+          <ClubPortalPanel navigateToClubHome={navigateToClubHome} />
           <NoticePanel
-            noticeList={noticeList ?? []}
-            isLoading={isLoading}
-            navigateToNoticeDetail={function (noticeId: number): void {
-              throw new Error("Function not implemented.");
-            }}
-            navigateToNoticeList={function (): void {
-              throw new Error("Function not implemented.");
-            }}
+            navigateToNoticeDetail={navigateToNoticeDetail}
+            navigateToNoticeList={navigateToNoticeList}
           />
         </View>
         <MainFooter
-          navigateToServiceTerms={(): void => {
-            navigation.push("WebView", {
-              title: "서비스 이용약관",
-              url: "https://storage.hongpung.com/terms/%EC%84%9C%EB%B9%84%EC%8A%A4+%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80.html",
-            });
-          }}
-          navigateToPrivacyPolicy={(): void => {
-            navigation.push("WebView", {
-              title: "개인정보 처리방침",
-              url: "https://storage.hongpung.com/terms/%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4+%EC%B2%98%EB%A6%AC%EB%B0%A9%EC%B9%A8.html",
-            });
-          }}
+          navigateToServiceTerms={navigateToServiceTerms}
+          navigateToPrivacyPolicy={navigateToPrivacyPolicy}
         />
       </ScrollView>
       {isUsingSession && (
@@ -123,11 +194,7 @@ const HomePage: React.FC<MainTabScreenProps<"Home">> = ({ navigation }) => {
             setIsSlideUp(!isSlideUp);
           }}
           isSlideUp={isSlideUp}
-          navigateToUsingManage={() => {
-            navigation.navigate("SessionManagement", {
-              screen: "SessionManage",
-            });
-          }}
+          navigateToUsingManage={navigateToUsingManage}
         />
       )}
     </View>
