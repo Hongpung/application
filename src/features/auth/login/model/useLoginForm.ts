@@ -5,9 +5,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TextInput } from "react-native-gesture-handler";
 import { StackActions, useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
-import { debounce } from "lodash";
+import { debounce, set } from "lodash";
 import { useLoginRequest } from "@hongpung/src/entities/auth";
 import { saveToken, ValidationState } from "@hongpung/src/common";
+import { useValidatedForm } from "@hongpung/src/common/lib/useValidatedForm";
+import { LoginFormData, LoginSchema } from "./LoginSchema";
 
 interface LoginFormValue {
   email: string;
@@ -22,19 +24,29 @@ interface LoginFormValidation {
 export const useLoginForm = () => {
   const navigation = useNavigation();
 
-  const [formData, setFormData] = useState<LoginFormValue>({
-    email: "",
-    password: "",
+  const formDatas = useValidatedForm({
+    schema: LoginSchema,
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
-  const [formValidation, setFormValidation] = useState<LoginFormValidation>({
-    email: { state: "BEFORE" },
-    password: { state: "BEFORE" },
-  });
+
+  const {
+    email,
+    password,
+    emailValidation,
+    passwordValidation,
+    setEmail,
+    setPassword,
+    validateEmail,
+    validatePassword,
+    setEmailValidation,
+    setPasswordValidation,
+  } = formDatas;
 
   //formData는 로그인 정보를 담는 상태관리 변수
   const { request: login, isLoading, error } = useLoginRequest();
-
-  //formValidation은 로그인 정보의 상태를 담는 상태관리 변수
 
   //emailRef, passwordRef는 InputBaseComponent의의 ref를 담는 변수
   const emailRef = useRef<TextInput>(null);
@@ -61,7 +73,8 @@ export const useLoginForm = () => {
           }
 
           setOptions((prev) => ({ ...prev, saveID: true }));
-          setFormData((prev) => ({ ...prev, email: loadedEmail }));
+          setEmail(loadedEmail);
+          setEmailValidation({ state: "VALID" });
         }
 
         return;
@@ -83,57 +96,17 @@ export const useLoginForm = () => {
     else setOptions((prev) => ({ ...prev, autoLogin: false }));
   };
 
-  //onChangeFormData는 로그인 정보를 입력하는 함수
-  const onChangeFormData = (key: keyof LoginFormValue, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-
-    setFormValidation((prev) => ({
-      ...prev,
-      [key]: { state: "PENDING" },
-    }));
-  };
-
-  const validateEmail = useCallback(() => {
-    const emailFormRegex: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    console.log("called email validate");
-    if (emailFormRegex.test(formData.email)) {
-      setFormValidation((prev) => ({ ...prev, email: { state: "VALID" } }));
-      return;
-    }
-
-    setFormValidation((prev) => ({
-      ...prev,
-      email: { state: "ERROR", errorText: "이메일 형식이 올바르지 않습니다." },
-    }));
-  }, [formData.email]);
-
-  const validatePassword = useCallback(() => {
-    const regex: RegExp = /^[A-Za-z\d@$!%*?&]{8,12}$/;
-    console.log("called Password validate", regex.test(formData.password));
-    if (regex.test(formData.password)) {
-      setFormValidation((prev) => ({ ...prev, password: { state: "VALID" } }));
-      return;
-    }
-    setFormValidation((prev) => ({
-      ...prev,
-      password: { state: "ERROR", errorText: "비밀번호는 8~12자 입니다." },
-    }));
-  }, [formData.password]);
-
   //onBlurValidateAllInput은 모든 input에 대해 유효성 검사를 하는 함수
   //이 함수는 onBlur 이벤트가 발생할 때 실행됨
   const onBlurValidateAllInput = useCallback(() => {
-    if (formValidation.password.state != "BEFORE") {
+    if (passwordValidation.state != "BEFORE") {
       validatePassword();
     }
 
-    if (formValidation.email.state != "BEFORE") {
+    if (emailValidation.state != "BEFORE") {
       validateEmail();
     }
-  }, [formData, formValidation]);
+  }, [formDatas]);
 
   const saveLoginOptions = useCallback(
     async ({
@@ -179,43 +152,30 @@ export const useLoginForm = () => {
   //tryLogin은 로그인을 시도하는 함수
   const tryLogin = useCallback(async () => {
     Keyboard.dismiss();
-    if (formData.email.length == 0) {
-      setFormValidation((prev) => ({
-        ...prev,
-        email: { state: "ERROR", errorText: "이메일을 입력해주세요." },
-      }));
-      emailRef.current?.focus();
-      return;
-    }
-    if (formData.password.length == 0) {
-      setFormValidation((prev) => ({
-        ...prev,
-        password: { state: "ERROR", errorText: "비밀번호를 입력해주세요." },
-      }));
-      passwordRef.current?.focus();
-      return;
-    }
-    if (formValidation.email.state == "ERROR") {
+    validateEmail();
+    validatePassword();
+    if (emailValidation.state == "ERROR") {
       emailRef.current?.focus();
       return;
     }
 
-    if (formValidation.password.state == "ERROR") {
+    if (passwordValidation.state == "ERROR") {
       passwordRef.current?.focus();
       return;
     }
 
     try {
-      const { email } = formData;
-
       const { autoLogin, saveID } = options;
-
+      const formData: LoginFormValue = {
+        email,
+        password,
+      };
       const { token } = await login(formData);
 
       if (!token) {
         throw new Error("로그인 실패");
       }
-      
+
       await saveToken("token", token);
       saveLoginOptions({ email, autoLogin, saveID });
       navigation.dispatch(StackActions.replace("Main"));
@@ -225,12 +185,10 @@ export const useLoginForm = () => {
           e.message == "Check Email Or Password!" ||
           e.message == "로그인 정보 불일치"
         ) {
-          setFormValidation({
-            email: { state: "ERROR", errorText: "" },
-            password: {
-              state: "ERROR",
-              errorText: "비밀번호가 틀리거나 가입되지 않은 이메일이에요.",
-            },
+          setEmailValidation({ state: "ERROR", errorText: "" });
+          setPasswordValidation({
+            state: "ERROR",
+            errorText: "비밀번호가 틀리거나 가입되지 않은 이메일이에요.",
           });
         }
         if (e.message == "You're not accepted") {
@@ -245,21 +203,20 @@ export const useLoginForm = () => {
       }
       // else console.error(e)
     }
-  }, [formData, formValidation, options]);
+  }, [formDatas,options]);
 
   //onLogin은 로그인을 시도하는 함수를 디바운스 처리한 함수
   const onLogin = debounce(tryLogin, 500, { leading: true, trailing: false });
 
   return {
-    formData,
-    onChangeFormData,
 
     emailRef,
     passwordRef,
 
-    formValidation,
     onBlurValidateAllInput,
 
+    ...formDatas,
+    
     options,
     setSaveID,
     setAutoLogin,

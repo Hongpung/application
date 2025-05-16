@@ -1,5 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Color, AlertButton } from "@hongpung/src/common";
+import { Alert, Color } from "@hongpung/src/common";
+import { useAtomValue } from "jotai";
+import { alertAtom } from "@hongpung/src/common/atom/alertAtom";
 
 interface FindAccountActionsSectionProps {
   onPressResetPassword: () => void;
@@ -11,11 +13,9 @@ export const FindAccountActionsSection: React.FC<FindAccountActionsSectionProps>
   return (
     <View style={styles.actionContainer}>
       <View style={{ flex: 1, alignItems: "center" }}>
-        <AlertButton
-          triggerNode={<Text style={styles.actionText}>ID 찾기</Text>}
-          title="이메일 찾기 안내"
-          content={`이메일은 관리자에게 문의하여 찾을 수 있어요.\n관리자 연락처: admin@gmail.com`}
-        />
+        <Pressable onPress={() => Alert.alert("이메일 찾기 안내",`이메일은 관리자에게 문의하여 찾을 수 있어요.\n관리자 연락처: admin@gmail.com`)}>
+          <Text style={styles.actionText}>ID 찾기</Text>
+        </Pressable>
       </View>
       <Pressable
         style={{ flex: 1, alignItems: "center" }}

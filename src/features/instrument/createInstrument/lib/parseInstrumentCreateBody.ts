@@ -1,8 +1,8 @@
 import { uploadImageRequest } from "@hongpung/src/common/api/uploadImageApi";
 import { InstrumentCreateBody } from "../api/type";
-import { InstrumentCreateData } from "../model/type";
+import { InstrumentCreateForm } from "../model/type";
 
-export const parseInstrumentCreateBody = async (instrumentCreateData: InstrumentCreateData): Promise<InstrumentCreateBody> => {
+export const parseInstrumentCreateBody = async (instrumentCreateData: InstrumentCreateForm): Promise<InstrumentCreateBody> => {
 
     if (instrumentCreateData.instrumentType === null) { throw new Error('악기 종류를 선택해주세요.') }
     if (!!instrumentCreateData.selectedImage) {
@@ -19,7 +19,6 @@ export const parseInstrumentCreateBody = async (instrumentCreateData: Instrument
             instrumentType: instrumentCreateData.instrumentType,
             name: instrumentCreateData.name,
             imageUrl
-
         }
     }
     else {

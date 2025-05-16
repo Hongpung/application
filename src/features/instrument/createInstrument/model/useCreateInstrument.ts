@@ -1,18 +1,18 @@
 import { useEffect, useMemo, useState } from "react"
-import { InstrumentCreateData } from "./type"
-import { parseInstrumentCreateBody } from "../lib/parseInstrumentCreateBody"
-import { InstrumentType } from "@hongpung/src/entities/instrument"
 import { Alert } from "react-native"
-import { useCreateInsrumentRequest } from "../api/createInstrumentApi"
-import { showCreateInstrumentCompleteToast } from "../constant/toastAction"
+
 import { StackActions, useNavigation } from "@react-navigation/native"
 
+import { parseInstrumentCreateBody } from "../lib/parseInstrumentCreateBody"
+import { useCreateInsrumentRequest } from "../api/createInstrumentApi"
+import { showCreateInstrumentCompleteToast } from "../constant/toastAction"
 
+import { InstrumentCreateForm } from "./type"
 
 export const useCreateInstrument = (selectedFile: File | null) => {
 
     const navigation = useNavigation();
-    const [createInstrumentData, setCreateInstrumentData] = useState<InstrumentCreateData>({
+    const [createInstrumentData, setCreateInstrumentData] = useState<InstrumentCreateForm>({
         instrumentType: null,
         name: '',
         selectedImage: null

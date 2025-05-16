@@ -9,21 +9,19 @@ import {
 } from "@hongpung/src/common";
 import { TextInput } from "react-native-gesture-handler";
 
-interface LoginFormValue {
-  email: string;
-  password: string;
-}
-
-type LoginFormValidation = {
-  [key in keyof LoginFormValue]: ValidationState;
-};
 
 interface LoginFormProps {
   emailRef: React.RefObject<TextInput | null>;
-  formData: LoginFormValue;
-  formValidation: LoginFormValidation;
+  emailValidation: ValidationState;
+  passwordValidation: ValidationState;
+  email: string;
+  password: string;
+
   onBlurValidateAllInput: () => void;
-  onChangeFormData: (field: keyof LoginFormValue, value: string) => void;
+
+  setPassword: (password: string) => void;
+  setEmail: (email: string) => void;
+
   onLogin: () => void;
   options: { saveID: boolean; autoLogin: boolean };
   passwordRef: React.RefObject<TextInput | null>;
@@ -36,13 +34,19 @@ interface LoginFormProps {
 const LoginForm: React.FC<LoginFormProps> = (props) => {
   const {
     emailRef,
-    formData,
-    formValidation,
+
+    passwordRef,
+    emailValidation,
+    passwordValidation,
+    email,
+    password,
+    setEmail,
+    setPassword,
     onBlurValidateAllInput,
-    onChangeFormData,
+
     onLogin,
     options,
-    passwordRef,
+
     setAutoLogin,
     setSaveID,
     isLoading,
@@ -54,11 +58,11 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
       <View style={styles.inputContainer}>
         <Input
           ref={emailRef}
-          inputValue={formData.email}
-          setInputValue={(email) => onChangeFormData("email", email)}
+          inputValue={email}
+          setInputValue={setEmail}
           label="이메일"
           keyboardType={"email-address"}
-          validationCondition={formValidation.email}
+          validationCondition={emailValidation}
           onBlur={onBlurValidateAllInput}
         />
       </View>
@@ -66,11 +70,11 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
       <View style={styles.inputContainer}>
         <Input
           ref={passwordRef}
-          inputValue={formData.password}
-          setInputValue={(password) => onChangeFormData("password", password)}
+          inputValue={password}
+          setInputValue={setPassword}
           label="비밀번호"
           isEncryption={true}
-          validationCondition={formValidation.password}
+          validationCondition={passwordValidation}
           onBlur={onBlurValidateAllInput}
         />
       </View>

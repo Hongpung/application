@@ -1,10 +1,15 @@
-import { Color, toastConfig } from "@hongpung/src/common";
-import { View, Text, ImageBackground, Platform } from "react-native";
-import * as SplashScreen from "expo-splash-screen";
-import { SafeZone } from "./SafeZone";
-import { RootStackNavigation } from "@hongpung/src/navigation";
-import Toast from "react-native-toast-message";
 import { useMemo } from "react";
+import { View, Text, ImageBackground, Platform } from "react-native";
+import Toast from "react-native-toast-message";
+
+import * as SplashScreen from "expo-splash-screen";
+import { Provider as JotaiProvider } from "jotai";
+
+import { Color, toastConfig, AlertModal, store } from "@hongpung/src/common";
+
+import { RootStackNavigation } from "@hongpung/src/navigation";
+
+import { SafeZone } from "./SafeZone";
 import { useFonts } from "./lib/useFonts";
 import { useFirstPage } from "./lib/useFirstPage";
 
@@ -45,9 +50,12 @@ export const AppContainer: React.FC = () => {
   }
 
   return (
-    <SafeZone style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <RootStackNavigation startDomain={firstScreen} />
-      <Toast config={toastConfig} />
-    </SafeZone>
+    <JotaiProvider store={store}>
+      <SafeZone style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
+        <AlertModal />
+        <RootStackNavigation startDomain={firstScreen} />
+        <Toast config={toastConfig} />
+      </SafeZone>
+    </JotaiProvider>
   );
 };
