@@ -11,15 +11,11 @@ import { Color, Header } from "@hongpung/src/common";
 const ReservationCalendarPage: React.FC<
   ReservationStackScreenProps<"ReservationCalendar">
 > = ({ navigation }) => {
-  const calendarform = useReservationCalendar();
+  const calendar = useReservationCalendar();
 
   const navigateToCreateReservation = useCallback(() => {
-    navigation.push("Reservation", {
-      screen: "CreateReservation",
-      params: {
-        screen: "CreateReservationForm",
-        params: undefined,
-      },
+    navigation.push("CreateReservation", {
+      screen: "CreateReservationForm",
     });
   }, [navigation]);
 
@@ -55,9 +51,9 @@ const ReservationCalendarPage: React.FC<
         <FullCalendar
           onClickDate={(date) => {
             const dateString = date.toISOString().split("T")[0];
-            navigation.push("DailyReserveList", { date: dateString });
+            navigation.push("DailyReservationList", { date: dateString });
           }}
-          {...calendarform}
+          {...calendar}
         />
       </View>
     </View>

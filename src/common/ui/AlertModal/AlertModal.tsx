@@ -1,5 +1,12 @@
 // entities/common/ui/CustomAlertModal.tsx
-import { View, Text, Modal, TouchableOpacity, Pressable, BackHandler } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  TouchableOpacity,
+  Pressable,
+  BackHandler,
+} from "react-native";
 import { useAtom } from "jotai";
 import { alertAtom } from "../../atom/alertAtom";
 import { LongButton, ShortButton } from "../buttons";
@@ -33,7 +40,10 @@ export const AlertModal: React.FC = () => {
       return true; // 기본 백버튼 동작 막기
     };
 
-    const backHandlerSubscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+    const backHandlerSubscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress
+    );
 
     return () => {
       backHandlerSubscription.remove();
@@ -43,7 +53,7 @@ export const AlertModal: React.FC = () => {
   return (
     <Modal visible={alertState.isVisible} transparent>
       <Pressable
-        onPress={handleCancel}
+        onPress={alertState.cancelable ? handleCancel : undefined}
         style={{
           flex: 1,
           backgroundColor: "rgba(0,0,0,0.2)",
@@ -69,8 +79,9 @@ export const AlertModal: React.FC = () => {
               paddingHorizontal: 28,
               paddingTop: 16,
               paddingBottom: 8,
-              fontFamily: "NanumSquareNeo-Bold",
-              fontSize: 18,
+              color: Color["grey600"],
+              fontFamily: "NanumSquareNeo-ExtraBold",
+              fontSize: 20,
             }}
           >
             {alertState.title}
@@ -82,7 +93,7 @@ export const AlertModal: React.FC = () => {
               paddingHorizontal: 28,
               paddingVertical: 8,
               lineHeight: 20,
-              fontSize: 14,
+              fontSize: 16,
             }}
           >
             {alertState.message}
@@ -91,11 +102,17 @@ export const AlertModal: React.FC = () => {
             <View style={{ paddingVertical: 8 }}>
               <LongButton
                 color={alertState.confirmButtonColor}
-                innerContent={<Text style={{
-                  fontFamily: "NanumSquareNeo-Bold",
-                  fontSize: 16,
-                  color: "#FFF",
-                }}>{alertState.confirmText}</Text>}
+                innerContent={
+                  <Text
+                    style={{
+                      fontFamily: "NanumSquareNeo-Bold",
+                      fontSize: 16,
+                      color: "#FFF",
+                    }}
+                  >
+                    {alertState.confirmText}
+                  </Text>
+                }
                 isAble
                 onPress={handleConfirm}
               />
@@ -111,21 +128,33 @@ export const AlertModal: React.FC = () => {
               }}
             >
               <ShortButton
-                innerContent={<Text style={{
-                  fontFamily: "NanumSquareNeo-Bold",
-                  fontSize: 16,
-                  color: Color[alertState.confirmButtonColor + "600"],
-                }}>{alertState.cancelText}</Text>}
+                innerContent={
+                  <Text
+                    style={{
+                      fontFamily: "NanumSquareNeo-Bold",
+                      fontSize: 16,
+                      color: Color[alertState.confirmButtonColor + "600"],
+                    }}
+                  >
+                    {alertState.cancelText}
+                  </Text>
+                }
                 onPress={handleCancel}
                 isFilled={false}
                 color={alertState.cancelButtonColor}
               />
               <ShortButton
-                innerContent={<Text style={{
-                  fontFamily: "NanumSquareNeo-Bold",
-                  fontSize: 16,
-                  color: "#FFF"
-                }}>{alertState.confirmText}</Text>}
+                innerContent={
+                  <Text
+                    style={{
+                      fontFamily: "NanumSquareNeo-Bold",
+                      fontSize: 16,
+                      color: "#FFF",
+                    }}
+                  >
+                    {alertState.confirmText}
+                  </Text>
+                }
                 onPress={handleConfirm}
                 isFilled={true}
                 color={alertState.confirmButtonColor}

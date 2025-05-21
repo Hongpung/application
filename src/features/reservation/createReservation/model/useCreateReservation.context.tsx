@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-import { useNavigation } from "@react-navigation/native";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 
 import { Alert } from "@hongpung/src/common";
 import { CreateReservationStackScreenProps } from "@hongpung/src/common/navigation";
@@ -12,7 +12,6 @@ import {
 
 import useReservationForm from "../../configureReservation/model/useReservationForm";
 import { CreateReservationContextProps } from "./type";
-
 
 const CreateReservationContext = createContext<
   CreateReservationContextProps | undefined
@@ -42,11 +41,28 @@ const CreateReservationContextProvider = ({
       const { reservationId } = await request(
         parseReservationCreateRequestBody(reservationForm)
       );
+      console.log("예약 생성 성공:", reservationId);
 
-      navigation.replace("Reservation", {
-        screen: "ReservationDetail",
-        params: { reservationId },
-      });
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 2,
+          routes: [
+            {
+              name: "ReservationCalendar",
+            },
+            {
+              name: "DailyReservationList",
+              params: { date: reservationForm.date }, // CreateReservationForm에서 전달받은 date
+            },
+            {
+              name: "ReservationDetail",
+              params: { reservationId },
+            },
+          ],
+        })
+      );
+
+      console.log(navigation.getState());
       // 실제 API 요청을 추가할 것
     } catch (e) {
       if (error instanceof Error) {

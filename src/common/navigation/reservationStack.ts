@@ -5,7 +5,7 @@ import { CreateReservationStackParamList } from "./createReservation";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 export type ReservationParamList = {
   ReservationCalendar: undefined;
-  DailyReserveList: { date: string };
+  DailyReservationList: { date: string };
   ReservationDetail: { reservationId: number };
   EditReservation: {
     reservationId: number;

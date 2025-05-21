@@ -131,6 +131,7 @@ const UsingManageScreen: React.FC<
               )}
             </>
           )}
+
           <View style={styles.headerSpacing} />
         </View>
       </View>
@@ -139,8 +140,14 @@ const UsingManageScreen: React.FC<
         canReturn={canReturn}
         handleExtendSession={handleExtendSession}
         handleReturnSession={() => {
-          navigation.replace("SessionManagement", {
-            screen: "CheckOutSession"
+          navigation.reset({
+            index: 0,
+            routes: [
+              {
+                name: "SessionManagement",
+                params: { screen: "CheckOutSession" },
+              },
+            ],
           });
         }}
       />
@@ -177,8 +184,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   attendanceContainer: {
-    marginHorizontal: 24,
     display: "flex",
+    flex: 1,
     gap: 8,
   },
 

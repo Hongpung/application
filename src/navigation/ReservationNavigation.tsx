@@ -23,7 +23,7 @@ export const ReservationStackNavigation = () => {
         component={ReservationCalendarScreen}
       />
       <ReservationStack.Screen
-        name="DailyReserveList"
+        name="DailyReservationList"
         component={DailyReserveListScreen}
       />
       <ReservationStack.Screen

@@ -10,7 +10,7 @@ import { TimeLine } from "@hongpung/src/widgets/reservation/ui/TimeLine/TimeLine
 import { Color, FullScreenLoadingModal } from "@hongpung/src/common";
 
 const DailyReservationListPage: React.FC<
-  ReservationStackScreenProps<"DailyReserveList">
+  ReservationStackScreenProps<"DailyReservationList">
 > = ({ navigation, route }) => {
   const { date } = route.params;
   const [selectedDate, selectDate] = useState<Date>(

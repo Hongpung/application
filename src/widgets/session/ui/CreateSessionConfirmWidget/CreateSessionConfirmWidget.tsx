@@ -6,12 +6,14 @@ import { CheckInEmptySessionCard } from "@hongpung/src/entities/session/ui/Check
 import { ReservationSession } from "@hongpung/src/entities/session";
 
 interface CreateSessionConfirmWidgetProps {
-    nextSession: ReservationSession | null;
-    participationAvailable: boolean;
-    onParticipationAvailableChange: (value: boolean) => void;
-  }
+  nextSession: ReservationSession | null;
+  participationAvailable: boolean;
+  onParticipationAvailableChange: (value: boolean) => void;
+}
 
-export const CreateSessionConfirmWidget: React.FC<CreateSessionConfirmWidgetProps> = ({
+export const CreateSessionConfirmWidget: React.FC<
+  CreateSessionConfirmWidgetProps
+> = ({
   nextSession,
   participationAvailable,
   onParticipationAvailableChange,
@@ -23,9 +25,10 @@ export const CreateSessionConfirmWidget: React.FC<CreateSessionConfirmWidgetProp
       <View>
         <Text style={styles.availableTime}>
           {nextSession
-            ? `${nextSession.startTime.slice(0, 2)}시 ${nextSession.startTime.slice(
-                -2
-              )}분 까지 사용하실 수 있어요`
+            ? `${nextSession.startTime.slice(
+                0,
+                2
+              )}시 ${nextSession.startTime.slice(-2)}분 까지 사용하실 수 있어요`
             : "제한 없이 사용할 수 있어요"}
         </Text>
         <Text style={styles.question}>시작하시겠어요?</Text>
@@ -34,7 +37,9 @@ export const CreateSessionConfirmWidget: React.FC<CreateSessionConfirmWidgetProp
             style={[
               styles.switchText,
               {
-                color: participationAvailable ? Color['green500'] : Color['red500'],
+                color: participationAvailable
+                  ? Color["green500"]
+                  : Color["red500"],
               },
             ]}
           >
@@ -55,25 +60,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    gap:24
+    gap: 24,
   },
   title: {
     fontFamily: "NanumSquareNeo-Bold",
     fontSize: 22,
-    color: Color['grey700'],
+    color: Color["grey700"],
     textAlign: "center",
   },
   availableTime: {
     fontFamily: "NanumSquareNeo-Bold",
     fontSize: 18,
-    color: Color['green500'],
+    color: Color["blue500"],
     textAlign: "center",
     marginBottom: 4,
   },
   question: {
     fontFamily: "NanumSquareNeo-Bold",
-    fontSize: 22,
-    color: Color['grey700'],
+    fontSize: 18,
+    color: Color["grey700"],
     textAlign: "center",
   },
   switchContainer: {
@@ -87,4 +92,4 @@ const styles = StyleSheet.create({
     fontFamily: "NanumSquareNeo-Bold",
     fontSize: 14,
   },
-}); 
+});

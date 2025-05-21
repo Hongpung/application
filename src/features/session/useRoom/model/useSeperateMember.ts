@@ -35,5 +35,9 @@ export const useSeperateMember = (usingSession: Session | null) => {
     if (usingSession) seperateUser(usingSession?.attendanceList);
   }, [usingSession?.attendanceList]);
 
+  console.log("attendUsers", attendUsers);
+  console.log("lateUsers", lateUsers);
+  console.log("absentUsers", absentUsers);
+
   return { attendUsers, lateUsers, absentUsers };
 };

@@ -1,16 +1,10 @@
-import {
-  createNativeStackNavigator,
-} from "@react-navigation/native-stack";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SessionManagementScreen from "@hongpung/src/pages/session/UsingSessionManagePage";
 import CheckOutSessionScreen from "@hongpung/src/pages/session/CheckOutPage";
-import {
-  SessionManagementParamList,
-} from "@hongpung/src/common/navigation";
-
+import { SessionManagementParamList } from "@hongpung/src/common/navigation";
 
 const SessionManagementStack =
   createNativeStackNavigator<SessionManagementParamList>();
-
 
 export const SessionManagementStackNavigation: React.FC = () => {
   return (
@@ -25,6 +19,7 @@ export const SessionManagementStackNavigation: React.FC = () => {
         component={SessionManagementScreen}
       />
       <SessionManagementStack.Screen
+        options={{ presentation: "formSheet" }}
         name="CheckOutSession"
         component={CheckOutSessionScreen}
       />

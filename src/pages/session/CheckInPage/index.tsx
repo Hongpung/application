@@ -1,10 +1,10 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { View, StyleSheet } from "react-native";
 
 import { useCheckIn } from "@hongpung/src/features/session/checkInRoom/model/useCheckIn";
 import { CheckInButton } from "@hongpung/src/features/session/checkInRoom/ui/CheckInButton/CheckInButton";
 import { ErrorModal } from "@hongpung/src/common/ui/ErrorModal/ErrorModal";
-import { FullScreenLoadingModal } from "@hongpung/src/common";
+import { Alert, FullScreenLoadingModal, Header } from "@hongpung/src/common";
 
 export const CheckInPage: React.FC = () => {
   const {
@@ -14,31 +14,33 @@ export const CheckInPage: React.FC = () => {
     isLoading,
     isCheckin,
 
-    handleConfirm,
-    
     content,
-    errorMessage,
 
     buttonAction,
   } = useCheckIn();
+
+  console.log("CheckInPage sessionData", sessionData);
+
+  const onError = useCallback(() => {
+    Alert.alert(
+      "오류",
+      (sessionData?.status === "UNAVAILABLE" && sessionData?.errorMessage) ||
+        "잘못된 접근입니다."
+    );
+  }, [sessionData]);
 
   if (isLoading) {
     return <FullScreenLoadingModal isLoading />;
   }
 
   if (!sessionData || usingRoom || sessionData.status === "UNAVAILABLE") {
-    return (
-      <ErrorModal
-        visible
-        title="오류"
-        message={errorMessage}
-        onConfirm={handleConfirm}
-      />
-    );
+    onError();
+    return <View style={{ flex: 1, backgroundColor: "#FFF" }} />;
   }
 
   return (
     <View style={styles.container}>
+      <Header leftButton={"close"} />
       {content}
       <CheckInButton
         isCheckin={isCheckin}

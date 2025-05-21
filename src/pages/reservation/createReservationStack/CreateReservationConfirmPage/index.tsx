@@ -2,7 +2,14 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import { useAtomValue } from "jotai";
 
-import { Alert, Color, Icons, Header, daysOfWeek, LongButton } from "@hongpung/src/common";
+import {
+  Alert,
+  Color,
+  Icons,
+  Header,
+  daysOfWeek,
+  LongButton,
+} from "@hongpung/src/common";
 
 import { UserStatusState } from "@hongpung/src/entities/member";
 import { reservationFormSubTitle } from "@hongpung/src/entities/reservation";
@@ -14,7 +21,8 @@ import { CreateReservationStackScreenProps } from "@hongpung/src/common/navigati
 const CreateReservationConfirmPage: React.FC<
   CreateReservationStackScreenProps<"CreateReservationConfirm">
 > = ({ navigation }) => {
-  const { reservation, isValidReservation, requestCreateReservation } = useCreateReservation();
+  const { reservation, isValidReservation, requestCreateReservation } =
+    useCreateReservation();
 
   const loginUser = useAtomValue(UserStatusState);
 
@@ -49,25 +57,25 @@ const CreateReservationConfirmPage: React.FC<
           </View>
           <View style={CreateReservationStyles.rowItemContainer}>
             <Text style={CreateReservationStyles.leftText}>예약자</Text>
-            <Text style={CreateReservationStyles.rightText}>{`${loginUser?.nickname
-              ? `${loginUser?.name}(${loginUser.nickname})`
-              : loginUser?.name
-              }`}</Text>
+            <Text style={CreateReservationStyles.rightText}>{`${
+              loginUser?.nickname
+                ? `${loginUser?.name}(${loginUser.nickname})`
+                : loginUser?.name
+            }`}</Text>
           </View>
           <View style={CreateReservationStyles.rowItemContainer}>
             <Text style={CreateReservationStyles.leftText}>예약명</Text>
             <Text style={CreateReservationStyles.rightText}>
               {reservation.title.length > 0
                 ? reservation.title
-                : `${loginUser?.nickname ? loginUser.nickname : loginUser?.name
-                }의 연습`}
+                : `${
+                    loginUser?.nickname ? loginUser.nickname : loginUser?.name
+                  }의 연습`}
             </Text>
           </View>
         </View>
 
-        <View
-          style={CreateReservationStyles.blockContainer}
-        >
+        <View style={CreateReservationStyles.blockContainer}>
           <View style={CreateReservationStyles.rowItemContainer}>
             <Text style={CreateReservationStyles.leftText}>예약 유형</Text>
             <Text style={CreateReservationStyles.rightText}>
@@ -96,7 +104,6 @@ const CreateReservationConfirmPage: React.FC<
                   {reservation.participators.length > 3 &&
                     `외 ${reservation.participators.length - 3}명`}
                 </Text>
-                s
                 <TouchableOpacity
                   onPress={() =>
                     navigation.push("ParticipatorList", {
@@ -135,7 +142,17 @@ const CreateReservationConfirmPage: React.FC<
                     .filter((type) => type != "징")
                     .map((type) => {
                       const instCount = reservation.borrowInstruments.filter(
-                        (instrument) => instrument.instrumentType == type
+                        (instrument) => {
+                          if (
+                            type === "기타" &&
+                            instrument.instrumentType == "징"
+                          ) {
+                            return true;
+                          } else if (instrument.instrumentType == type) {
+                            return true;
+                          }
+                          return false;
+                        }
                       ).length;
                       if (instCount > 0) return `${type} ${instCount}`;
                     })
@@ -172,11 +189,19 @@ const CreateReservationConfirmPage: React.FC<
           </View>
         </View>
       </View>
-      <View style={{ paddingTop: 24, backgroundColor: "#FFF", borderTopLeftRadius: 24, borderTopRightRadius: 24 }}>
+      <View
+        style={{
+          paddingTop: 24,
+          backgroundColor: "#FFF",
+          borderTopLeftRadius: 24,
+          borderTopRightRadius: 24,
+        }}
+      >
         <LongButton
           color="blue"
           innerContent={"예약 만들기"}
-          onPress={requestCreateReservation} />
+          onPress={requestCreateReservation}
+        />
       </View>
     </View>
   );

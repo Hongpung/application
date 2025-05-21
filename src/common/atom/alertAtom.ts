@@ -1,30 +1,31 @@
 import { atom } from "jotai";
 import { store } from "../lib/jotaiStroe";
 
-
 type AlertProps =
   | {
-    title: string;
-    message: string;
-    onConfirm?: () => void;
-    onCancel?: () => void;
-    confirmText: string;
-    cancelText: string;
-    isVisible: boolean;
-    type: "confirm";
-    confirmButtonColor: "red" | "blue" | "green";
-    cancelButtonColor: "red" | "blue" | "green";
-  }
+      title: string;
+      message: string;
+      cancelable?: boolean;
+      onConfirm?: () => void;
+      onCancel?: () => void;
+      confirmText: string;
+      cancelText: string;
+      isVisible: boolean;
+      type: "confirm";
+      confirmButtonColor: "red" | "blue" | "green";
+      cancelButtonColor: "red" | "blue" | "green";
+    }
   | {
-    title: string;
-    message: string;
-    onConfirm?: () => void;
-    onCancel?: () => void;
-    confirmText: string;
-    isVisible: boolean;
-    type: "alert";
-    confirmButtonColor: "red" | "blue" | "green";
-  };
+      title: string;
+      message: string;
+      cancelable?: boolean;
+      onConfirm?: () => void;
+      onCancel?: () => void;
+      confirmText: string;
+      isVisible: boolean;
+      type: "alert";
+      confirmButtonColor: "red" | "blue" | "green";
+    };
 
 export const alertAtom = atom<AlertProps>({
   title: "확인",
@@ -32,14 +33,20 @@ export const alertAtom = atom<AlertProps>({
   isVisible: false,
   type: "alert",
   confirmText: "확인",
-  confirmButtonColor: "blue"
+  confirmButtonColor: "blue",
+  cancelable: true,
 });
 
 export const Alert = {
   alert: (
     title: string,
     message: string,
-    options?: { confirmText?: string; onConfirm?: () => void, confirmButtonColor?: "red" | "blue" | "green" }
+    options?: {
+      confirmText?: string;
+      onConfirm?: () => void;
+      confirmButtonColor?: "red" | "blue" | "green";
+      cancelable?: boolean;
+    }
   ) => {
     store.set(alertAtom, {
       title,
@@ -49,6 +56,7 @@ export const Alert = {
       confirmText: options?.confirmText ?? "확인",
       onConfirm: options?.onConfirm,
       confirmButtonColor: options?.confirmButtonColor ?? "blue",
+      cancelable: options?.cancelable ?? true,
     });
   },
 
@@ -62,6 +70,7 @@ export const Alert = {
       cancelText?: string;
       confirmButtonColor?: "red" | "blue" | "green";
       cancelButtonColor?: "red" | "blue" | "green";
+      cancelable?: boolean;
     }
   ) => {
     store.set(alertAtom, {
@@ -75,6 +84,7 @@ export const Alert = {
       onCancel: options?.onCancel,
       confirmButtonColor: options?.confirmButtonColor ?? "blue",
       cancelButtonColor: options?.cancelButtonColor ?? "blue",
+      cancelable: options?.cancelable ?? true,
     });
   },
 };

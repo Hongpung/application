@@ -25,31 +25,29 @@ export const useDeleteReservation = () => {
         return;
       }
 
-      Alert.confirm(
-        "확인",
-        "정말 취소하시겠습니까?",
-        {
-          cancelText: "아니오",
-          confirmText: "예",
-          onConfirm: async () => {
-            try {
-              if (reservation.reservationId === undefined) {
-                Alert.alert("오류", "예약 정보를 찾을 수 없습니다.");
-                navigation.goBack();
-                return;
-              }
-              await request({ reservationId: reservation.reservationId });
-              Toast.show({
-                text1: "예약이 취소되었습니다.",
-                type: "success",
-              });
+      Alert.confirm("확인", "정말 취소하시겠습니까?", {
+        cancelText: "아니오",
+        confirmText: "예",
+        onConfirm: async () => {
+          try {
+            if (reservation.reservationId === undefined) {
+              Alert.alert("오류", "예약 정보를 찾을 수 없습니다.");
               navigation.goBack();
-            } catch {
-              Alert.alert("오류", "오류가 발생했습니다.");
+              return;
             }
+
+            await request({ reservationId: reservation.reservationId });
+
+            Toast.show({
+              text1: "예약이 취소되었습니다.",
+              type: "success",
+            });
+            navigation.goBack();
+          } catch {
+            Alert.alert("오류", "오류가 발생했습니다.");
           }
-        }
-      );
+        },
+      });
     },
     [request, navigation]
   );

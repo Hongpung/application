@@ -34,7 +34,5 @@ const styles = StyleSheet.create({
   buttonContainer: {
     paddingVertical: 16,
     width: "100%",
-    paddingHorizontal: 16,
-    alignSelf: "center",
   },
 });

@@ -1,4 +1,4 @@
-import { ErrorModal } from "@hongpung/src/common";
+import { Alert } from "@hongpung/src/common";
 import { ThisSessionState } from "@hongpung/src/entities/session";
 import { useCalculateTime } from "@hongpung/src/features/session/useRoom/model/useCalculateTime";
 import { useUsingRoomSocket } from "@hongpung/src/features/session/useRoom/socket/useUsingRoomSocket";
@@ -28,7 +28,7 @@ export const SessionManageBottomSheet: React.FC<
 
   const moveUp = () => {
     Animated.timing(bottomAnim, {
-      toValue: -50+BottomSheetHeight, // 이동하고자 하는 bottom 값
+      toValue: -50 + BottomSheetHeight, // 이동하고자 하는 bottom 값
       duration: 300, // 애니메이션 시간 (ms)
       useNativeDriver: false, // layout 관련 속성은 false
     }).start();
@@ -36,7 +36,7 @@ export const SessionManageBottomSheet: React.FC<
 
   const moveDown = () => {
     Animated.timing(bottomAnim, {
-      toValue: -140+BottomSheetHeight,
+      toValue: -140 + BottomSheetHeight,
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -49,23 +49,15 @@ export const SessionManageBottomSheet: React.FC<
       moveDown();
     }
   }, [isSlideUp]);
-  if (!usingSession)
-    return (
-      <ErrorModal
-        visible={true}
-        title={"세션 종료"}
-        message={"세션이 존재하지 않아요."}
-        onConfirm={() => {}}
-      />
-    );
+
+  if (!usingSession) {
+    Alert.alert("오류", "세션 정보가 존재하지 않아요.");
+
+    return null;
+  }
 
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        { bottom: bottomAnim },
-      ]}
-    >
+    <Animated.View style={[styles.container, { bottom: bottomAnim }]}>
       <Header isSlideUp={isSlideUp} toggleBottomSheet={toggleBottomSheet} />
       <View style={styles.infoContainer}>
         <TimeInfo

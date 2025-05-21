@@ -17,7 +17,6 @@ import { Color, MainFooter } from "@hongpung/src/common";
 import { BannerSlider } from "@hongpung/src/widgets/banner/ui/BannerSlider/BannerSlider";
 import { ClubPortalPanel } from "@hongpung/src/widgets/club";
 import { NoticePanel } from "@hongpung/src/widgets/notice";
-import { useNoticePanel } from "@hongpung/src/widgets/notice/model/useNoticePanel";
 import { MainTabScreenProps } from "@hongpung/src/common/navigation";
 
 const HomePage: React.FC<MainTabScreenProps<"Home">> = ({ navigation }) => {
@@ -26,12 +25,11 @@ const HomePage: React.FC<MainTabScreenProps<"Home">> = ({ navigation }) => {
   const today = useMemo(() => {
     return new Date().toISOString().split("T")[0];
   }, []);
-  const { noticeList, isLoading } = useNoticePanel();
-  const [todayReservationsData, setTodayReservations] = useAtom(
-    myTodayReservationState
-  );
+
+  const todayReservationsData = useAtomValue(myTodayReservationState);
+
   const [isSlideUp, setIsSlideUp] = useState(false);
-  
+
   const navigateToNotificationPage = () => {
     const start = Date.now();
     navigation.navigate("Notification");
@@ -126,7 +124,6 @@ const HomePage: React.FC<MainTabScreenProps<"Home">> = ({ navigation }) => {
       const duration = Date.now() - start;
       console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
     });
-
   };
 
   return (

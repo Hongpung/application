@@ -134,14 +134,14 @@ export const useCheckIn = () => {
     if (!sessionData) return () => null;
 
     if (isCheckin) {
-      return handleConfirm;
+      return handleConfirm();
     }
 
     if (sessionData.status === "JOINABLE") {
-      return handleAttendSession;
+      return handleAttendSession();
     }
 
-    return handleStartSession;
+    return handleStartSession();
   };
 
   const errorMessage = useMemo(() => {
@@ -161,7 +161,7 @@ export const useCheckIn = () => {
 
     content,
     errorMessage,
-    
+
     buttonAction,
   };
 };
