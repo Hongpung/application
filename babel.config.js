@@ -13,12 +13,12 @@ module.exports = function (api) {
       [
         "module:react-native-dotenv",
         {
-          moduleName: "@env", // 환경 변수를 불러오는 경로 설정
-          path: ".env", // .env 파일 경로
+          moduleName: "@env",
+          path: ".env",
           blocklist: null,
           allowlist: null,
-          blacklist: null, // 이전 버전 호환
-          whitelist: null, // 이전 버전 호환
+          blacklist: null,
+          whitelist: null,
           safe: false,
           allowUndefined: true,
           verbose: false,
@@ -26,5 +26,12 @@ module.exports = function (api) {
       ],
       "react-native-reanimated/plugin",
     ],
+    env: {
+      test: {
+        plugins: [
+          '@babel/plugin-transform-modules-commonjs'
+        ]
+      }
+    }
   };
 };
