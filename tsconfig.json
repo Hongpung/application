@@ -12,14 +12,25 @@
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "paths": {
-      "@hongpung/*": ["./*"],
-      "@src/*":["./src/*"]
+      "@hongpung/step-flow": [
+        "./step-flow/index.ts"
+      ],
+      "@hongpung/*": [
+        "./*"
+      ],
+      "@src/*": [
+        "./src/*"
+      ],
+      "@step-flow/*": [
+        "./step-flow/*"
+      ],
     }
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx"
-, "src/widgets/auth/ui/CreateNewPaaswordSection"  ],
+    "**/*.tsx",
+    "jest.config.ts"
+  ],
   "exclude": [
     "node_modules"
   ],
