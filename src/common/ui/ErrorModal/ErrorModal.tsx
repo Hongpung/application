@@ -15,9 +15,8 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   message,
   onConfirm,
 }) => {
-
   const [visible, setVisible] = useState(externalVisible);
-  
+
   useEffect(() => {
     setVisible(externalVisible);
   }, [externalVisible]);

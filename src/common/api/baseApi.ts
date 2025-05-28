@@ -1,7 +1,9 @@
 import { createBaseApi } from "./createApi";
 
 // baseApi 인스턴스 생성
-export const baseApi = createBaseApi({ baseUrl: process.env.EXPO_PUBLIC_BASE_URL });
+export const baseApi = createBaseApi({
+  baseUrl: process.env.EXPO_PUBLIC_BASE_URL,
+});
 
 // const example = baseApi.addEndpoints({
 //     endpoints: (build) => ({
@@ -19,6 +21,5 @@ export const baseApi = createBaseApi({ baseUrl: process.env.EXPO_PUBLIC_BASE_URL
 //         })
 //     })
 // })
-
 
 // const { useSsRequest, useWrongExampleFetch } = example

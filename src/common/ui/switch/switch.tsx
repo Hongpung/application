@@ -7,7 +7,6 @@ export const Switch: React.FC<{
   onChange: (value: boolean) => void;
   value: boolean;
 }> = ({ onChange, value }) => {
-    
   const translateX = useRef(new Animated.Value(value ? 40 : 0)).current;
   const width = useRef(new Animated.Value(36)).current;
 
@@ -19,7 +18,7 @@ export const Switch: React.FC<{
     }).start(() => {
       onChange(!value);
     });
-  }, [value]);
+  }, [value, onChange, translateX]);
 
   return (
     <Pressable style={{ flexDirection: "row" }} onPress={onPressHandler}>

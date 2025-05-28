@@ -2,7 +2,6 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { ClubParamList } from "./clubStack";
 import { MainTabParamList } from "./mainTab";
 import { ReservationParamList } from "./reservationStack";
-import { SessionManagementParamList } from "./sessionManageMent";
 import { NavigatorScreenParams, RouteProp } from "@react-navigation/native";
 import { NoticeParamList } from "./noticeStack";
 
@@ -16,7 +15,9 @@ export type MainStackParamList = {
 
   Reservation: NavigatorScreenParams<ReservationParamList>;
   CheckIn: undefined;
-  SessionManagement: NavigatorScreenParams<SessionManagementParamList>;
+
+  SessionManage: undefined;
+  CheckOutSession: undefined;
 
   UpComingReservation: undefined;
   MyLog: undefined;
@@ -26,13 +27,23 @@ export type MainStackParamList = {
   ChangePassword: undefined;
 
   InstrumentDetail: { instrumentId: number };
+  EditInstrument: { instrument: string };
+  CreateInstrument: undefined;
+
   BorrowInstrumentList: { borrowInstruments: string };
   ParticipatorList: { participators: string };
 
+  SessionLogInfo: { sessionId: number };
   Notice: NavigatorScreenParams<NoticeParamList>;
+  Withdraw: undefined;
+
+  ChangeProfile: undefined;
+
+  BannerList: undefined;
 };
 
-export type MainStackNavigationProp = NativeStackNavigationProp<MainStackParamList>;
+export type MainStackNavigationProp =
+  NativeStackNavigationProp<MainStackParamList>;
 
 export type MainStackScreenProps<T extends keyof MainStackParamList> = {
   navigation: MainStackNavigationProp;

@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  forwardRef,
-  Ref,
-} from "react";
+import React, { useState, useEffect, useRef, forwardRef, Ref } from "react";
 import {
   View,
   Text,
@@ -30,6 +24,7 @@ type InputProps = {
   validationCondition: ValidationState;
   onBlur?: () => void;
   onFocus?: () => void;
+  placeholder?: string;
   isEditible?: boolean;
   isRequired?: boolean;
   isEncryption?: boolean;
@@ -51,12 +46,13 @@ export const BasicInput = forwardRef<TextInput, InputProps>(
       inputValue,
       setInputValue,
       keyboardType = "default",
+      placeholder = "",
       maxLength = undefined,
       validationCondition,
       onBlur,
       onFocus,
     },
-    ref
+    ref,
   ) => {
     // 암호화 상태일때 보이는지 안보이는지 판별
     const [isVisible, setIsVisible] = useState(!isEncryption);
@@ -83,7 +79,7 @@ export const BasicInput = forwardRef<TextInput, InputProps>(
         duration: 100,
         useNativeDriver: false,
       }).start();
-    }, [inputValue]);
+    }, [inputValue, labelAnimation]);
 
     return (
       <View style={[styles.inputGroup]}>
@@ -98,14 +94,15 @@ export const BasicInput = forwardRef<TextInput, InputProps>(
             styles.InputBox,
             {
               borderBottomColor:
-                validationCondition?.state != "ERROR"
+                validationCondition?.state !== "ERROR"
                   ? underlineColor
                   : Color["red500"],
             },
           ]}
           placeholder={
+            placeholder ||
             `${josa(label, "을/를")} 입력하세요` +
-            `${!isRequired ? " (없으면 빈칸)" : ``}`
+              `${!isRequired ? " (없으면 빈칸)" : ``}`
           }
           placeholderTextColor={Color["grey400"]}
           value={inputValue}
@@ -129,7 +126,7 @@ export const BasicInput = forwardRef<TextInput, InputProps>(
             <Icons name={isVisible ? "eye-outline" : "eye-off-outline"}></Icons>
           </Pressable>
         )}
-        {validationCondition?.state == "ERROR" &&
+        {validationCondition?.state === "ERROR" &&
           validationCondition.errorText.length > 0 && (
             <Text style={styles.errorText}>
               {validationCondition?.errorText}
@@ -137,8 +134,10 @@ export const BasicInput = forwardRef<TextInput, InputProps>(
           )}
       </View>
     );
-  }
+  },
 );
+
+BasicInput.displayName = "BasicInput";
 
 const styles = StyleSheet.create({
   inputGroup: {

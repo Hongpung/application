@@ -1,18 +1,23 @@
+import dayjs from "dayjs";
+
 export const getDaysInMonth = (date: Date): number[][] => {
   const year = date.getFullYear();
   const month = date.getMonth();
 
-  const firstDayOfMonth = new Date(year, month, 1);
-  const lastDayOfMonth = new Date(year, month + 1, 0);
+  const firstDayOfMonth = dayjs().year(year).month(month).date(1);
+  const lastDayOfMonth = dayjs()
+    .year(year)
+    .month(month + 1)
+    .date(0);
 
   const prevDays = (day: number) => (day === 0 ? 6 : day - 1);
   const emptyDays = Array.from(
-    { length: prevDays(firstDayOfMonth.getDay()) },
-    () => 0
+    { length: prevDays(firstDayOfMonth.day()) },
+    () => 0,
   );
   const monthDays = Array.from(
-    { length: lastDayOfMonth.getDate() },
-    (_, i) => i + 1
+    { length: lastDayOfMonth.date() },
+    (_, i) => i + 1,
   );
   const fullDaysArray = [...emptyDays, ...monthDays];
 

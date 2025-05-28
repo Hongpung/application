@@ -7,7 +7,7 @@ export type SessionManagementParamList = {
 };
 
 export type SessionManagementScreenProps<
-  T extends keyof SessionManagementParamList
+  T extends keyof SessionManagementParamList,
 > = {
   navigation: MainStackNavigationProp;
   route: RouteProp<SessionManagementParamList, T>;

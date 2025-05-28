@@ -12,7 +12,7 @@ export type CreateReservationStackParamList = {
 };
 
 export type CreateReservationStackScreenProps<
-  T extends keyof CreateReservationStackParamList
+  T extends keyof CreateReservationStackParamList,
 > = {
   navigation: MainStackNavigationProp &
     NativeStackNavigationProp<CreateReservationStackParamList, T>;

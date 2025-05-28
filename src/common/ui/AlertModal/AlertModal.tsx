@@ -1,22 +1,17 @@
-// entities/common/ui/CustomAlertModal.tsx
-import {
-  View,
-  Text,
-  Modal,
-  TouchableOpacity,
-  Pressable,
-  BackHandler,
-} from "react-native";
+import { View, Text, Modal, Pressable, BackHandler } from "react-native";
 import { useAtom } from "jotai";
 import { alertAtom } from "../../atom/alertAtom";
 import { LongButton, ShortButton } from "../buttons";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { Color } from "../../constant/color";
 
 export const AlertModal: React.FC = () => {
   const [alertState, setAlertState] = useAtom(alertAtom);
 
-  const close = () => setAlertState((prev) => ({ ...prev, isVisible: false }));
+  const close = useCallback(
+    () => setAlertState((prev) => ({ ...prev, isVisible: false })),
+    [setAlertState],
+  );
 
   const handleConfirm = () => {
     if (alertState.onConfirm !== undefined) {
@@ -25,12 +20,12 @@ export const AlertModal: React.FC = () => {
     close();
   };
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     if (alertState.onCancel !== undefined) {
       alertState.onCancel();
     }
     close();
-  };
+  }, [alertState, close]);
 
   useEffect(() => {
     if (!alertState.isVisible) return;
@@ -42,13 +37,13 @@ export const AlertModal: React.FC = () => {
 
     const backHandlerSubscription = BackHandler.addEventListener(
       "hardwareBackPress",
-      onBackPress
+      onBackPress,
     );
 
     return () => {
       backHandlerSubscription.remove();
     };
-  }, [alertState.isVisible]);
+  }, [alertState.isVisible, handleCancel]);
 
   return (
     <Modal visible={alertState.isVisible} transparent>
@@ -92,7 +87,7 @@ export const AlertModal: React.FC = () => {
               textAlign: "left",
               paddingHorizontal: 28,
               paddingVertical: 8,
-              lineHeight: 20,
+              lineHeight: 22,
               fontSize: 16,
             }}
           >
@@ -125,6 +120,7 @@ export const AlertModal: React.FC = () => {
                 gap: 12,
                 justifyContent: "center",
                 alignItems: "center",
+                paddingHorizontal: 16,
               }}
             >
               <ShortButton

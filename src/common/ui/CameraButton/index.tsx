@@ -1,12 +1,15 @@
 import React from "react";
-import { View, Pressable, StyleSheet ,Text} from "react-native";
+import { View, Pressable, StyleSheet, Text } from "react-native";
 
 interface CameraButtonProps {
   onPress: () => void;
   title?: string;
 }
 
-export const CameraButton: React.FC<CameraButtonProps> = ({ onPress, title }) => {
+export const CameraButton: React.FC<CameraButtonProps> = ({
+  onPress,
+  title,
+}) => {
   if (title) {
     return (
       <Pressable onPress={onPress} style={styles.button}>
@@ -52,4 +55,4 @@ const styles = StyleSheet.create({
     position: "absolute",
     borderRadius: 100,
   },
-}); 
+});

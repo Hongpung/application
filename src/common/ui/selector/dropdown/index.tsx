@@ -1,7 +1,7 @@
-import DropdownContainer from './Dropdown';
-import DropdownTrigger from './DropdownTrigger';
-import DropdownMenu from './DropdownMenu';
-import DropdownItem from './DropdownItem';
+import DropdownContainer from "./Dropdown";
+import DropdownTrigger from "./DropdownTrigger";
+import DropdownMenu from "./DropdownMenu";
+import DropdownItem from "./DropdownItem";
 
 type DropdownType = typeof DropdownContainer & {
   Trigger: typeof DropdownTrigger;

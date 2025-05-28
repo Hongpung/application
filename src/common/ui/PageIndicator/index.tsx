@@ -43,4 +43,4 @@ const styles = StyleSheet.create({
     backgroundColor: Color.blue500,
     borderRadius: 25,
   },
-}); 
+});

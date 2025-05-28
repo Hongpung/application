@@ -1,5 +1,5 @@
 export interface PageContent {
-    lottieSource: any;
-    description: string;
-    speed?: number;
-  }
+  lottieSource: any;
+  description: string;
+  speed?: number;
+}

@@ -1,22 +1,22 @@
-import * as SecureStore from 'expo-secure-store';
+import * as SecureStore from "expo-secure-store";
 
 // 토큰 저장
 export const saveToken = async (key: string, value: string) => {
-    await SecureStore.setItemAsync(key, value);
+  await SecureStore.setItemAsync(key, value);
 };
 
 // 토큰 가져오기
 export const getToken = async (key: string) => {
-    return await SecureStore.getItemAsync(key);
+  return await SecureStore.getItemAsync(key);
 };
 
 // 토큰 삭제
 export const deleteToken = async (key: string) => {
-    await SecureStore.deleteItemAsync(key);
+  await SecureStore.deleteItemAsync(key);
 };
 
 export const addTokenToHeader = (token: string) => {
-    return {
-        'Authorization': `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가    
-    }
-}
+  return {
+    Authorization: `Bearer ${token}`, // 토큰을 Authorization 헤더에 추가
+  };
+};

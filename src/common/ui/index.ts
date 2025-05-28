@@ -1,16 +1,18 @@
-export { Icons } from './Icons/Icons'
-export { LongButton, ShortButton } from './buttons'
-export { Switch } from './Switch/Switch'
-export { CheckboxComponent as Checkbox } from './CheckBox/CheckBox'
-export { WeekCalendarHeader } from './WeekCalendarHeader/WeekCalendarHeader'
-export { Selector } from './Selector'
-export { BasicInput as Input } from './inputs/BasicInput'
-export { NavigateCalendarButton } from './NavigateCalendarButton/NavigateCalendarButton'
-export { Header } from './header/Header'
-export { ErrorModal } from './ErrorModal/ErrorModal'
-export { DescriptionBox } from './DescriptionBox/DescriptionBox'
-export { NeedCameraPermssionPanel } from './NeedCameraPermssionPanel/NeedCameraPermssionPanel'
-export { MainFooter } from './MainFooter/MainFooter'
-export { AlertModal } from './AlertModal/AlertModal'
-export { FullScreenLoadingModal } from './LoadingModal/FullScreenLoadingModal'
-export { BasicInput } from './inputs/BasicInput'
+export { Icons } from "./Icons/Icons";
+export { LongButton, ShortButton } from "./buttons";
+export { Switch } from "./switch/Switch";
+export { CheckboxComponent as Checkbox } from "./CheckBox/CheckBox";
+export { WeekCalendarHeader } from "./WeekCalendarHeader/WeekCalendarHeader";
+export { Selector } from "./selector/Selector";
+export { BasicInput as Input } from "./inputs/BasicInput";
+export { NavigateCalendarButton } from "./NavigateCalendarButton/NavigateCalendarButton";
+export { Header } from "./header/Header";
+export { ErrorModal } from "./ErrorModal/ErrorModal";
+export { DescriptionBox } from "./DescriptionBox/DescriptionBox";
+export { NeedCameraPermssionPanel } from "./NeedCameraPermssionPanel/NeedCameraPermssionPanel";
+export { MainFooter } from "./MainFooter/MainFooter";
+export { AlertModal } from "./AlertModal/AlertModal";
+export { FullScreenLoadingModal } from "./LoadingModal/FullScreenLoadingModal";
+export { BasicInput } from "./inputs/BasicInput";
+export { ImageModal } from "./ImageModal/ImageModal";
+export { ImageWithSkeleton } from "./ImageWithSkeleton/ImageWithSkeleton";

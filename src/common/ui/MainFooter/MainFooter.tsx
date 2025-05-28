@@ -23,11 +23,18 @@ export const MainFooter: React.FC<MainFooterProps> = ({
           borderTopLeftRadius: 28,
           borderTopRightRadius: 28,
           paddingVertical: 16,
-          paddingBottom: tabBarHeight + 16,
+          paddingBottom: tabBarHeight + 56,
         },
       ]}
     >
-      <View style={{ flexDirection: "row", justifyContent: "center", gap: 48, paddingBottom:12 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          gap: 48,
+          paddingBottom: 12,
+        }}
+      >
         <Pressable style={{ flex: 1 }} onPress={navigateToServiceTerms}>
           <Text
             style={{

@@ -41,8 +41,10 @@ export const LongButton: React.FC<LongButtonProps> = React.memo(
         )}
       </Pressable>
     );
-  }
+  },
 );
+
+LongButton.displayName = "LongButton";
 
 const styles = StyleSheet.create({
   basic: {

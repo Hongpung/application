@@ -1,1 +1,2 @@
-export { baseApi } from './baseApi'
+export { baseApi } from "./baseApi";
+export { uploadImageListRequest, uploadImageRequest } from "./uploadImageApi";

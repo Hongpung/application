@@ -1,102 +1,103 @@
-import { getToken } from "@hongpung/src/common/lib/TokenHandler";
+import dayjs from "dayjs";
+import { buildApi } from "./apiBuilder";
 
-export async function uploadImageListRequest(imageFileList: File[], toUse: string): Promise<{ imageUrls: string[] }> {
+export async function uploadImageListRequest(
+  imageFileList: File[],
+  toUse: string,
+): Promise<{ imageUrls: string[] }> {
+  const controller = new AbortController();
+  const signal = controller.signal;
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+  try {
+    const formData = new FormData();
+    const photoFiles = imageFileList;
 
-    const controller = new AbortController();
-    const signal = controller.signal;
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
-    try {
-        console.log('진입')
-        const token = await getToken('token')
-        if (!token) throw Error('Invalid Token')
+    if (photoFiles.length === 0) throw new Error("이미지 파일이 없습니다.");
 
-        const formData = new FormData();
-        const photoFiles = imageFileList;
+    const todayString = dayjs().toISOString();
 
-        const todayString = new Date().toISOString();
+    photoFiles.forEach((photo, index) => {
+      formData.append("images", photo, `${photo.name}-${todayString}-${index}`); // React Native에서 FormData 파일 처리 방식
+    });
+    formData.append("path", toUse); // 업로드 경로
 
-        photoFiles.forEach((photo, index) => {
-            formData.append('images', photo, `${photo.name}-${todayString}-${index}-${(new Date).toISOString()}`); // React Native에서 FormData 파일 처리 방식
-        });
-        formData.append('path', toUse); // 업로드 경로
+    const pictureUpload = await buildApi<{
+      uploadUrls: { uploadUrl: string; imageUrl: string }[];
+    }>({
+      url: `${process.env.EXPO_PUBLIC_BASE_URL}/upload-s3/images`,
+      method: "POST",
+      withAuthorize: true,
+      body: formData,
+      options: { signal },
+    });
 
-        const pictureUpload = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/upload-s3/images`, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
-            },
-            body: formData,
-            signal
-        });
+    const {
+      uploadUrls,
+    }: { uploadUrls: { uploadUrl: string; imageUrl: string }[] } =
+      pictureUpload;
 
-        const { uploadUrls }: { uploadUrls: { uploadUrl: string; imageUrl: string }[] } = await pictureUpload.json()
-        console.log(uploadUrls)
-
-        for (let i = 0; i < imageFileList.length; i++) {
-            const { uploadUrl } = uploadUrls[i];
-            await fetch(uploadUrl, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'image/jpeg', // MIME 타입 지정
-                },
-                body: photoFiles[i],
-                signal
-            });
-        }
-
-        const imageUrls = uploadUrls.map(url => (url.imageUrl))
-        return { imageUrls }
-    } catch {
-        throw new Error('이미지 업로드 실패')
-    } finally {
-        clearTimeout(timeoutId)
+    for (let i = 0; i < imageFileList.length; i++) {
+      const { uploadUrl } = uploadUrls[i];
+      await buildApi({
+        url: uploadUrl,
+        method: "PUT",
+        body: photoFiles[i],
+        withAuthorize: false, // S3 pre-signed URL에는 Authorization 헤더가 필요하지 않음
+        options: { signal, headers: { "Content-Type": "image/jpeg" } },
+      });
     }
+
+    const imageUrls = uploadUrls.map((url) => url.imageUrl);
+    return { imageUrls };
+  } catch {
+    throw new Error("이미지 업로드 실패");
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
-export async function uploadImageRequest(imageFile: File, toUse: string): Promise<{ imageUrl: string }> {
+export async function uploadImageRequest(
+  imageFile: File,
+  toUse: string,
+): Promise<{ imageUrl: string }> {
+  const controller = new AbortController();
+  const signal = controller.signal;
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+  try {
+    const todayString = dayjs().toISOString();
+    const formData = new FormData();
+    formData.append("image", imageFile, `${imageFile.name}-${todayString}`);
+    formData.append("path", toUse);
 
-    const controller = new AbortController();
-    const signal = controller.signal;
-    const timeoutId = setTimeout(() => controller.abort(), 8000);
-    try {
-        console.log('진입')
-        const token = await getToken('token')
+    const uploadConfirm = await buildApi<{
+      uploadUrl: string;
+      imageUrl: string;
+    }>({
+      url: `${process.env.EXPO_PUBLIC_BASE_URL}/upload-s3/image`,
+      method: "POST",
+      withAuthorize: true,
+      body: formData,
+      options: { signal },
+    });
 
-        if (!token) throw Error('Invalid Token')
+    const { uploadUrl, imageUrl } = uploadConfirm;
 
-        const formData = new FormData();
-        formData.append('image', imageFile, `${imageFile.name}-${(new Date).toISOString()}`);
-        formData.append('path', toUse);
+    const uploadResponse = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": imageFile.type,
+      },
+      body: imageFile,
+      signal,
+    });
 
-        const uploadConfirm = await fetch(`${process.env.EXPO_PUBLIC_BASE_URL}/upload-s3/image`,
-            {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`,  // Authorization 헤더에 Bearer 토큰 추가
-                },
-                body: formData,
-                signal
-            })
+    if (!uploadResponse.ok) throw new Error("Failed to upload image to S3");
 
-        if (!uploadConfirm.ok) throw Error();
-
-        const { uploadUrl, imageUrl } = await uploadConfirm.json();
-
-        const uploadResponse = await fetch(uploadUrl, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': imageFile.type,
-            },
-            body: imageFile,
-            signal
-        })
-
-        if (!uploadResponse.ok) throw new Error('Failed to upload image to S3');
-
-        return { imageUrl };
-    } catch {
-        throw new Error('이미지 업로드 실패')
-    } finally {
-        clearTimeout(timeoutId)
-    }
+    return { imageUrl };
+  } catch (error) {
+    console.error(error);
+    throw new Error("이미지 업로드 실패");
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }

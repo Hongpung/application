@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Image, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Image } from "expo-image";
 import { Color } from "../../constant/color";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 
@@ -19,6 +20,7 @@ const NavigateCalendarButton: React.FC<NavigateCalendarButtonProps> = ({
       <Image
         source={require("@hongpung/assets/icons/ReservationIcon.png")}
         style={styles.reservationIcon}
+        cachePolicy="memory-disk"
       />
       <View style={styles.reservationBox}>
         <Text style={styles.reservationText}>연습실 예약</Text>
