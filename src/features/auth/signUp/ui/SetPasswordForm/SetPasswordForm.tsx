@@ -2,9 +2,15 @@ import { View } from "react-native";
 
 import { LongButton, BasicInput } from "@hongpung/src/common";
 
-import { SetPasswordFormProps } from "../../model/type";
+import { SignUpStepPropsList } from "../../model/type";
+import { StepProps } from "@hongpung/react-step-flow";
 
-export const SetPasswordForm: React.FC<SetPasswordFormProps> = (props) => {
+type SetPasswordFormProps = StepProps<SignUpStepPropsList, "SetPassword">;
+
+export const SetPasswordForm: React.FC<SetPasswordFormProps> = ({
+  stepProps: props,
+  goTo,
+}) => {
   const {
     passwordRef,
     password,
@@ -17,9 +23,16 @@ export const SetPasswordForm: React.FC<SetPasswordFormProps> = (props) => {
     setConfirmPassword,
     confirmPasswordValidation,
     validateConfirmPassword,
-
-    nextStep,
   } = props;
+
+  const nextStep = () => {
+    if (
+      confirmPasswordValidation.state === "VALID" &&
+      passwordValidation.state === "VALID"
+    ) {
+      goTo("PersonalInfo");
+    }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -33,9 +46,7 @@ export const SetPasswordForm: React.FC<SetPasswordFormProps> = (props) => {
             inputValue={password || ""}
             setInputValue={setPassword}
             validationCondition={passwordValidation}
-            onBlur={() => {
-              validatePassword(password || "");
-            }}
+            onBlur={validatePassword}
           />
         </View>
         <View style={{ marginHorizontal: 48 }}>
@@ -47,9 +58,7 @@ export const SetPasswordForm: React.FC<SetPasswordFormProps> = (props) => {
             inputValue={confirmPassword || ""}
             setInputValue={setConfirmPassword}
             validationCondition={confirmPasswordValidation}
-            onBlur={() => {
-              validateConfirmPassword(confirmPassword || "");
-            }}
+            onBlur={validateConfirmPassword}
           />
         </View>
       </View>
@@ -67,3 +76,5 @@ export const SetPasswordForm: React.FC<SetPasswordFormProps> = (props) => {
     </View>
   );
 };
+
+export default SetPasswordForm;

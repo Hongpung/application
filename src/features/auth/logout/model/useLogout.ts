@@ -4,22 +4,23 @@ import { showLogOutFailToast, showLogOutToast } from "../lib/toast";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const useLogout = () => {
-    const navigation = useNavigation();
-    const { request: logoutRequest, isLoading } = useLogoutRequest();
+  const navigation = useNavigation();
+  const { request: logoutRequest, isLoading } = useLogoutRequest();
 
-    const LogOutHandler = async () => {
-        try {
-            await logoutRequest();
-            await AsyncStorage.removeItem("autoLogin");
-            showLogOutToast();
-            navigation.dispatch(StackActions.replace("LoginStack", { screen: "Login" }));
-        } catch (e) {
-            showLogOutFailToast();
-        }
-    };
+  const LogOutHandler = async () => {
+    try {
+      await logoutRequest();
+      await AsyncStorage.removeItem("autoLogin");
+      showLogOutToast();
+      navigation.dispatch(
+        StackActions.replace("LoginStack", { screen: "Login" }),
+      );
+    } catch {
+      showLogOutFailToast();
+    }
+  };
 
-    return { LogOutHandler, isLoading };
+  return { LogOutHandler, isLoading };
 };
 
 export default useLogout;
-

@@ -6,11 +6,14 @@ export type ResetPasswordStepFormProps<T extends ResetPasswordStep> =
   T extends "EmailConfirm"
     ? EmailValidateFormProps
     : T extends "ResetPassword"
-    ? ResetPasswordFormProps
-    : never;
+      ? ResetPasswordFormProps
+      : never;
+
+export type ResetPasswordStepsProps = {
+  [K in ResetPasswordStep]: ResetPasswordStepFormProps<K>;
+};
 
 export interface EmailValidateFormProps {
-
   email: string;
   setEmail: (email: string) => void;
   emailValidation: ValidationState;
@@ -28,7 +31,7 @@ export interface EmailValidateFormProps {
   setVerificationCode: (code: string) => void;
   validateVerificationCode: (code: string) => void;
 
-  onVerifyCode: () => void;
+  onVerifyCode: ({ onSuccess }: { onSuccess: () => void }) => void;
   isVerifyingCodeLoading: boolean;
   isVerifyingCodeError: Error | null;
 }

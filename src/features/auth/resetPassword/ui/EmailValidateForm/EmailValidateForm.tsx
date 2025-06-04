@@ -2,9 +2,18 @@ import { ErrorModal, LongButton } from "@hongpung/src/common";
 import { BasicInput } from "@hongpung/src/common/ui/inputs/BasicInput";
 import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
 import { View, StyleSheet, Pressable, Text } from "react-native";
-import { EmailValidateFormProps } from "../../model/type";
+import { ResetPasswordStepsProps } from "../../model/type";
+import { StepProps } from "@hongpung/react-step-flow";
 
-const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
+type ValidateEmailSectionProps = StepProps<
+  ResetPasswordStepsProps,
+  "EmailConfirm"
+>;
+
+const EmailValidateForm: React.FC<ValidateEmailSectionProps> = ({
+  stepProps: props,
+  goTo,
+}) => {
   //이메일
   const {
     email,
@@ -94,7 +103,13 @@ const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
         <LongButton
           innerContent="이메일 인증"
           color="green"
-          onPress={onVerifyCode}
+          onPress={() =>
+            onVerifyCode({
+              onSuccess: () => {
+                goTo("ResetPassword");
+              },
+            })
+          }
           isAble={verificationCodeValidation.state === "VALID"}
         />
       </View>
@@ -147,6 +162,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: "100%",
+    backgroundColor: "#FFF",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     paddingHorizontal: 12,
   },
 });

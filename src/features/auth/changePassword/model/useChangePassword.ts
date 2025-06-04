@@ -1,19 +1,10 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useMemo } from "react";
 import { ValidationState } from "@hongpung/src/common";
 import { passwordSchema, type PasswordFormData } from "./passwordSchema";
 import * as z from "zod";
 import { useChangePasswordRequest } from "@hongpung/src/entities/auth";
 import { TextInput } from "react-native";
-
-interface PasswordValue {
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
-}
-
-type PasswordFormValidation = {
-  [key in keyof PasswordValue]: ValidationState;
-};
+import { useValidatedForm } from "@hongpung/src/common/lib/useValidatedForm";
 
 export const useChangePasswordForm = (): {
   currentPassword: string;
@@ -23,132 +14,84 @@ export const useChangePasswordForm = (): {
   confirmPassword: string;
   setConfirmPassword: (text: string) => void;
   onChangePassword: () => Promise<void>;
-  passwordValidation: PasswordFormValidation;
+  passwordValidation: {
+    currentPassword: ValidationState;
+    newPassword: ValidationState;
+    confirmPassword: ValidationState;
+  };
   onCurrentPasswordBlur: () => void;
   onNewPasswordBlur: () => void;
   onConfirmPasswordBlur: () => void;
-  currentPasswordRef: React.RefObject<TextInput>;
-  newPasswordRef: React.RefObject<TextInput>;
-  confirmPasswordRef: React.RefObject<TextInput>;
+  currentPasswordRef: React.RefObject<TextInput | null>;
+  newPasswordRef: React.RefObject<TextInput | null>;
+  confirmPasswordRef: React.RefObject<TextInput | null>;
   isCanChangePassword: boolean;
 } => {
   const { request: ChangePasswordRequest } = useChangePasswordRequest();
 
-  const currentPasswordRef = useRef<any | null>(null);
-  const newPasswordRef = useRef<any | null>(null);
-  const confirmPasswordRef = useRef<any | null>(null);
+  const currentPasswordRef = useRef<TextInput | null>(null);
+  const newPasswordRef = useRef<TextInput | null>(null);
+  const confirmPasswordRef = useRef<TextInput | null>(null);
 
-  const [formData, setFormData] = useState<PasswordFormData>({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
+  const formDatas = useValidatedForm({
+    schema: passwordSchema.innerType(),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
   });
 
-  const [formValidation, setFormValidation] = useState<{
-    [key in keyof PasswordFormData]: ValidationState;
-  }>({
-    currentPassword: { state: "BEFORE" },
-    newPassword: { state: "BEFORE" },
-    confirmPassword: { state: "BEFORE" },
-  });
+  const {
+    currentPassword,
+    newPassword,
+    confirmPassword,
+    currentPasswordValidation,
+    newPasswordValidation,
+    confirmPasswordValidation,
+    setCurrentPassword,
+    setNewPassword,
+    setConfirmPassword,
+    validateCurrentPassword,
+    validateNewPassword,
+    validateConfirmPassword,
+  } = formDatas;
 
-  const setForm = useMemo(
+  const onBlur = useMemo(
     () => ({
-      setCurrentPassword: (currentPassword: string) => {
-        setFormValidation((prev) => ({
-          ...prev,
-        currentPassword: { state: "PENDING" },
-      }));
-      setFormData((prev) => ({ ...prev, currentPassword }));
-    },
-    setNewPassword: (newPassword: string) => {
-      setFormValidation((prev) => ({
-        ...prev,
-        newPassword: { state: "PENDING" },
-      }));
-      setFormData((prev) => ({ ...prev, newPassword }));
-    },
-    setConfirmPassword: (confirmPassword: string) => {
-      setFormValidation((prev) => ({
-        ...prev,
-        confirmPassword: { state: "PENDING" },
-      }));
-        setFormData((prev) => ({ ...prev, confirmPassword }));
-      },
-    }),
-    [setFormValidation]
-  );
-
-  const validateForm = useMemo(
-    () => ({
-      validateCurrentPassword: (currentPassword: string): ValidationState => {
-        try {
-          passwordSchema.innerType().shape.currentPassword.parse(currentPassword);
-          return { state: "VALID" };
-        } catch (error) {
-          if (error instanceof z.ZodError) {
-            return { state: "ERROR", errorText: error.errors[0].message };
-          }
-          return { state: "ERROR", errorText: "알 수 없는 오류가 발생했습니다." };
+      onCurrentPasswordBlur: () => {
+        if (currentPasswordValidation.state !== "BEFORE") {
+          validateCurrentPassword();
         }
       },
-      validateNewPassword: (newPassword: string): ValidationState => {
-        try {
-          passwordSchema.innerType().shape.newPassword.parse(newPassword);
-          return { state: "VALID" };
-        } catch (error) {
-          if (error instanceof z.ZodError) {
-            return { state: "ERROR", errorText: error.errors[0].message };
-          }
-          return { state: "ERROR", errorText: "알 수 없는 오류가 발생했습니다." };
+      onNewPasswordBlur: () => {
+        if (newPasswordValidation.state !== "BEFORE") {
+          validateNewPassword();
         }
       },
-      validateConfirmPassword: (confirmPassword: string): ValidationState => {
-        try {
-          passwordSchema.innerType().shape.confirmPassword.parse(confirmPassword);
-          if (confirmPassword !== formData.newPassword) {
-            return { state: "ERROR", errorText: "비밀번호가 일치하지 않습니다." };
-          }
-          return { state: "VALID" };
-        } catch (error) {
-          if (error instanceof z.ZodError) {
-            return { state: "ERROR", errorText: error.errors[0].message };
-          }
-          return { state: "ERROR", errorText: "알 수 없는 오류가 발생했습니다." };
+      onConfirmPasswordBlur: () => {
+        if (confirmPasswordValidation.state !== "BEFORE") {
+          validateConfirmPassword();
         }
       },
     }),
-    [formData]
-  );
-
-  const handleBlur = useMemo(() => ({
-    onCurrentPasswordBlur: () => {
-      const validationState = validateForm.validateCurrentPassword(formData.currentPassword);
-      setFormValidation((prev) => ({
-        ...prev,
-        currentPassword: validationState,
-      }));
-    },
-    onNewPasswordBlur: () => {
-      const validationState = validateForm.validateNewPassword(formData.newPassword);
-      setFormValidation((prev) => ({
-        ...prev,
-        newPassword: validationState,
-      }));
-    },
-    onConfirmPasswordBlur: () => {
-      const validationState = validateForm.validateConfirmPassword(formData.confirmPassword);
-      setFormValidation((prev) => ({
-        ...prev,
-        confirmPassword: validationState,
-      }));
-      },
-    }),
-    [validateForm, formData]
+    [
+      currentPasswordValidation,
+      newPasswordValidation,
+      confirmPasswordValidation,
+      validateCurrentPassword,
+      validateNewPassword,
+      validateConfirmPassword,
+    ],
   );
 
   const handleChangePassword = async () => {
     try {
+      const formData: PasswordFormData = {
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      };
       await passwordSchema.parseAsync(formData);
       await ChangePasswordRequest(formData);
     } catch (error) {
@@ -163,34 +106,33 @@ export const useChangePasswordForm = (): {
           } else if (field === "confirmPassword") {
             confirmPasswordRef.current?.focus();
           }
-          setFormValidation((prev) => ({
-            ...prev,
-            [field]: { state: "ERROR", errorText: err.message },
-          }));
         });
       }
     }
   };
 
-  const isFormValid = useMemo(() => {
-    return (
-      formValidation.currentPassword.state === "VALID" &&
-      formValidation.newPassword.state === "VALID" &&
-      formValidation.confirmPassword.state === "VALID"
-    );
-  }, [formValidation]);
+  const isFormValid =
+    currentPasswordValidation.state === "VALID" &&
+    newPasswordValidation.state === "VALID" &&
+    confirmPasswordValidation.state === "VALID";
 
   return {
-    currentPassword: formData.currentPassword,
-    newPassword: formData.newPassword,
-    confirmPassword: formData.confirmPassword,
-    ...setForm,
-    ...handleBlur,
+    currentPassword,
+    newPassword,
+    confirmPassword,
+    setCurrentPassword,
+    setNewPassword,
+    setConfirmPassword,
+    onChangePassword: handleChangePassword,
+    passwordValidation: {
+      currentPassword: currentPasswordValidation,
+      newPassword: newPasswordValidation,
+      confirmPassword: confirmPasswordValidation,
+    },
+    ...onBlur,
     currentPasswordRef,
     newPasswordRef,
     confirmPasswordRef,
-    onChangePassword: handleChangePassword,
     isCanChangePassword: isFormValid,
-    passwordValidation: formValidation,
   };
 };

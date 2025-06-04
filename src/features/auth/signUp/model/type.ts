@@ -1,15 +1,19 @@
 import { ValidationState } from "@hongpung/src/common";
 import { TextInput } from "react-native";
 
-export type SignUpStep = "EmailConfirm" | "Password" | "PersonalInfo";
+export type SignUpStep = "EmailConfirm" | "SetPassword" | "PersonalInfo";
 
 export type StepFormProps<T extends SignUpStep> = T extends "EmailConfirm"
   ? EmailValidateFormProps
-  : T extends "Password"
-  ? SetPasswordFormProps
-  : T extends "PersonalInfo"
-  ? PersonalInfoFormProps
-  : never;
+  : T extends "SetPassword"
+    ? SetPasswordFormProps
+    : T extends "PersonalInfo"
+      ? PersonalInfoFormProps
+      : never;
+
+export type SignUpStepPropsList = {
+  [K in SignUpStep]: StepFormProps<K>;
+};
 
 export interface EmailValidateFormProps {
   emailRef: React.RefObject<TextInput | null>;
@@ -18,11 +22,10 @@ export interface EmailValidateFormProps {
   email: string;
   setEmail: (email: string) => void;
   emailValidation: ValidationState;
-  validateEmail: (email: string) => void;
+  validateEmail: () => void;
 
   //이메일 인증 코드 발송
   isSendingCode: boolean;
-  isSendingCodeError: Error | null;
 
   sendVerificationCode: () => void;
   isSendingCodeLoading: boolean;
@@ -32,9 +35,8 @@ export interface EmailValidateFormProps {
   setVerificationCode: (code: string) => void;
   validateVerificationCode: (code: string) => void;
 
-  verifyCode: () => void;
+  verifyCode: ({ onSuccess }: { onSuccess: () => void }) => void;
   isVerifyingCodeLoading: boolean;
-  isVerifyingCodeError: Error | null;
 }
 
 export interface PersonalInfoFormProps {
@@ -50,10 +52,10 @@ export interface PersonalInfoFormProps {
   nicknameValidation: ValidationState;
   clubValidation: ValidationState;
   enrollmentNumberValidation: ValidationState;
-  validateName: (name: string) => void;
-  validateNickname: (nickname: string) => void;
-  validateClub: (club: ClubName) => void;
-  validateEnrollmentNumber: (enrollmentNumber: string) => void;
+  validateName: () => void;
+  validateNickname: () => void;
+  validateClub: () => void;
+  validateEnrollmentNumber: () => void;
   nameRef: React.RefObject<TextInput | null>;
   nicknameRef: React.RefObject<TextInput | null>;
   enrollmentNumberRef: React.RefObject<TextInput | null>;
@@ -73,11 +75,9 @@ export interface SetPasswordFormProps {
   passwordValidation: ValidationState;
   confirmPasswordValidation: ValidationState;
 
-  validateConfirmPassword: (text: string) => void;
-  validatePassword: (text: string) => void;
+  validateConfirmPassword: () => void;
+  validatePassword: () => void;
 
   passwordRef: React.RefObject<TextInput | null>;
   confirmPasswordRef: React.RefObject<TextInput | null>;
-
-  nextStep: () => void;
 }

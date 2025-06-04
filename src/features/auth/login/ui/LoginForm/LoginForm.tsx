@@ -1,4 +1,4 @@
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View, TextInput } from "react-native";
 import React from "react";
 import {
   Checkbox,
@@ -7,8 +7,6 @@ import {
   LongButton,
   ValidationState,
 } from "@hongpung/src/common";
-import { TextInput } from "react-native-gesture-handler";
-
 
 interface LoginFormProps {
   emailRef: React.RefObject<TextInput | null>;
@@ -28,7 +26,6 @@ interface LoginFormProps {
   setAutoLogin: (value: boolean) => void;
   setSaveID: (value: boolean) => void;
   isLoading: boolean;
-  LoginError: Error | null;
 }
 
 const LoginForm: React.FC<LoginFormProps> = (props) => {
@@ -50,7 +47,6 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
     setAutoLogin,
     setSaveID,
     isLoading,
-    LoginError,
   } = props;
 
   return (
@@ -78,10 +74,6 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
           onBlur={onBlurValidateAllInput}
         />
       </View>
-
-      {LoginError && (
-        <Text style={styles.errorText}>{LoginError?.message === "Unauthorized" ? "이메일 또는 비밀번호가 올바르지 않습니다." : LoginError?.message}</Text>
-      )}
 
       <View style={styles.checkboxContainer}>
         <Checkbox
@@ -129,7 +121,7 @@ const styles = StyleSheet.create({
     color: Color["red500"],
     fontFamily: "NanumSquareNeo-Bold",
     paddingVertical: 4,
-    paddingHorizontal: 48+4,
+    paddingHorizontal: 48 + 4,
     fontSize: 14,
   },
   checkboxContainer: {

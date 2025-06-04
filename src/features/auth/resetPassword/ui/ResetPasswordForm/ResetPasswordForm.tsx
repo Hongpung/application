@@ -2,17 +2,24 @@ import { LongButton } from "@hongpung/src/common";
 import { BasicInput } from "@hongpung/src/common/ui/inputs/BasicInput";
 import { View } from "react-native";
 
-import { ResetPasswordFormProps } from "../../model/type";
+import { ResetPasswordStepsProps } from "../../model/type";
+import { StepProps } from "@hongpung/react-step-flow";
 
-const ResetPasswordForm: React.FC<ResetPasswordFormProps> = (props) => {
+type ResetPasswordFormProps = StepProps<
+  ResetPasswordStepsProps,
+  "ResetPassword"
+>;
+
+const ResetPasswordForm: React.FC<ResetPasswordFormProps> = ({
+  stepProps: props,
+  goTo,
+}) => {
   const {
-    newPasswordRef,
     newPassword,
     setNewPassword,
     newPasswordValidation,
     validateNewPassword,
 
-    confirmPasswordRef,
     confirmPassword,
     setConfirmPassword,
     confirmPasswordValidation,
@@ -25,7 +32,6 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = (props) => {
       <View style={{ flex: 1, gap: 24 }}>
         <View style={{ marginHorizontal: 48 }}>
           <BasicInput
-            ref={newPasswordRef}
             label="비밀번호"
             isEncryption
             color="green"
@@ -39,7 +45,6 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = (props) => {
         </View>
         <View style={{ marginHorizontal: 48 }}>
           <BasicInput
-            ref={confirmPasswordRef}
             label="비밀번호 확인"
             isEncryption
             color="green"
@@ -52,7 +57,14 @@ const ResetPasswordForm: React.FC<ResetPasswordFormProps> = (props) => {
           />
         </View>
       </View>
-      <View style={{ paddingHorizontal: 12 }}>
+      <View
+        style={{
+          paddingHorizontal: 12,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          backgroundColor: "#FFF",
+        }}
+      >
         <LongButton
           color={"green"}
           innerContent="비밀번호 재설정"
