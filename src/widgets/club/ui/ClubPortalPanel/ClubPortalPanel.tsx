@@ -1,4 +1,5 @@
-import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { Image } from "expo-image";
 
 import { useAtomValue } from "jotai";
 
@@ -20,12 +21,18 @@ export const ClubPortalPanel: React.FC<ClubPortalPanelProps> = ({
       style={styles.container}
       onPress={navigateToClubHome}
     >
-      <Text style={styles.title}>우리 동아리</Text>
       <Image
         source={require("@hongpung/assets/images/ClubBanner.png")}
-        style={styles.bannerImage}
+        style={{
+          position: "absolute",
+          width: "100%",
+          height: 120,
+          top: 0,
+          right: 0,
+        }}
+        cachePolicy="memory-disk"
       />
-
+      <Text style={styles.title}>우리 동아리</Text>
       <View style={styles.clubNameContainer}>
         <Text style={styles.clubName}>{loginUser?.club}</Text>
       </View>
@@ -44,26 +51,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 20,
     overflow: "hidden",
+    position: "relative",
   },
   title: {
     fontSize: 18,
     fontFamily: "NanumSquareNeo-Bold",
   },
-  bannerImage: {
-    position: "absolute",
-    top: 0,
-    right: 0,
-    zIndex: -1,
-  },
   clubNameContainer: {
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "flex-end",
-    zIndex: 5,
+    zIndex: 1,
   },
   clubName: {
     fontSize: 16,
     fontFamily: "NanumSquareNeo-Bold",
-    color: Color["grey300"],
+    color: Color["grey400"],
   },
 });

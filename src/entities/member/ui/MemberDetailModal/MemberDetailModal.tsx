@@ -6,12 +6,12 @@ import { useEffect, useState } from "react";
 
 interface MemberDetailModalProps {
   selectedMember: Member | null;
-  resetMember: () => void;
+  resetMember?: () => void;
 }
 
 export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
   selectedMember,
-  resetMember,
+  resetMember = () => {},
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(true);
 
@@ -27,8 +27,9 @@ export const MemberDetailModal: React.FC<MemberDetailModalProps> = ({
     <Modal transparent visible={isModalVisible && !!selectedMember}>
       <Pressable
         style={styles.overlay}
-        onPress={(event) => {
-          event.stopPropagation();
+        onPress={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
           setIsModalVisible(false);
           resetMember();
         }}

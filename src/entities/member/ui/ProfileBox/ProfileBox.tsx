@@ -1,17 +1,14 @@
 import React, { useState } from "react";
+import { View, Text, StyleSheet, Pressable, Linking } from "react-native";
+
 import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  Pressable,
-  Linking,
-} from "react-native";
-import { Color } from "@hongpung/src/common";
-import { Icons } from "@hongpung/src/common";
+  Color,
+  ImageModal,
+  ImageWithSkeleton,
+  Icons,
+} from "@hongpung/src/common";
 import { type Member } from "@hongpung/src/entities/member/model/type";
 import { RoleText } from "../RoleText/RoleText";
-import { Skeleton } from "moti/skeleton";
 
 interface ProfileBoxProps {
   member: Member;
@@ -19,96 +16,93 @@ interface ProfileBoxProps {
 
 export const ProfileBox: React.FC<ProfileBoxProps> = ({ member }) => {
   const hasImage = !!member.profileImageUrl;
-  const [isProfileImageLoading, setIsProfileImageLoading] = useState(true);
-
+  const [imageModalVisible, setImageModalVisible] = useState(false);
   return (
-    <View style={styles.container}>
-      <View style={styles.profileContainer}>
-        {hasImage ? (
-          <View style={styles.profilePhoto}>
-            <Image
-              source={{ uri: member.profileImageUrl }}
-              style={styles.profilePhoto}
-              onLoadEnd={() => setIsProfileImageLoading(false)}
+    <>
+      {hasImage && imageModalVisible && (
+        <ImageModal
+          isVisible={imageModalVisible}
+          setIsVisible={setImageModalVisible}
+          imageUrl={member.profileImageUrl!}
+        />
+      )}
+      <View style={styles.container}>
+        <View style={styles.profileContainer}>
+          {hasImage ? (
+            <Pressable onPress={() => setImageModalVisible(true)}>
+              <ImageWithSkeleton
+                imageSource={{ uri: member.profileImageUrl }}
+                style={styles.profilePhoto}
+                cachePolicy="memory-disk"
+                contentFit="cover"
+              />
+            </Pressable>
+          ) : (
+            <View
+              style={[styles.profilePhoto, styles.profilePhotoPlaceholder]}
             />
-            {isProfileImageLoading && (
-              <View style={styles.SkeletonOverlay}>
-                <Skeleton
-                  transition={{
-                    type: "spring",
-                    duration: 400,
-                    delay: 100,
+          )}
+
+          <View style={styles.infoContainer}>
+            <View style={styles.nameContainer}>
+              <Text style={styles.name}>{member.name}</Text>
+              {member?.nickname && (
+                <Text style={styles.nickname}>{member?.nickname}</Text>
+              )}
+            </View>
+
+            <View style={styles.socialContainer}>
+              {member?.instagramUrl && (
+                <Pressable
+                  style={styles.icon}
+                  onPress={() => {
+                    Linking.openURL(
+                      "https://www.instagram.com/" + member.instagramUrl,
+                    ).catch((err) => {
+                      console.error("Failed to open URL:", err);
+                    });
                   }}
-                  width={"100%"}
-                  height={"100%"}
-                  colors={[Color["grey100"], Color["grey300"]]}
-                />
-              </View>
-            )}
+                >
+                  <Icons
+                    name="logo-instagram"
+                    size={24}
+                    color={Color["grey400"]}
+                  />
+                </Pressable>
+              )}
+
+              {member?.blogUrl && (
+                <Pressable
+                  style={styles.icon}
+                  onPress={() => {
+                    Linking.openURL(
+                      "https://blog.naver.com/" + member.blogUrl,
+                    ).catch((err) => {
+                      console.error("Failed to open URL:", err);
+                    });
+                  }}
+                >
+                  <Icons name="chatbox" size={24} color={Color["green500"]} />
+                </Pressable>
+              )}
+            </View>
           </View>
-        ) : (
-          <View style={[styles.profilePhoto, styles.profilePhotoPlaceholder]} />
-        )}
+        </View>
 
-        <View style={styles.infoContainer}>
-          <View style={styles.nameContainer}>
-            <Text style={styles.name}>{member.name}</Text>
-            {member?.nickname && (
-              <Text style={styles.nickname}>{member?.nickname}</Text>
-            )}
+        <View style={styles.detailContainer}>
+          <View style={styles.detailItem}>
+            <Text style={styles.detailLabel}>동아리(학번)</Text>
+            <Text style={styles.detailValue}>
+              {`${member.club}` + ` (${member.enrollmentNumber})`}
+            </Text>
           </View>
-
-          <View style={styles.socialContainer}>
-            {member?.instagramUrl && (
-              <Pressable
-                style={styles.icon}
-                onPress={() => {
-                  Linking.openURL(
-                    "https://www.instagram.com/" + member.instagramUrl
-                  ).catch((err) => {
-                    console.error("Failed to open URL:", err);
-                  });
-                }}
-              >
-                <Icons
-                  name="logo-instagram"
-                  size={24}
-                  color={Color["grey400"]}
-                />
-              </Pressable>
-            )}
-
-            {member?.blogUrl && (
-              <Pressable
-                style={styles.icon}
-                onPress={() => {
-                  Linking.openURL(
-                    "https://blog.naver.com/" + member.blogUrl
-                  ).catch((err) => {
-                    console.error("Failed to open URL:", err);
-                  });
-                }}
-              >
-                <Icons name="chatbox" size={24} color={Color["green500"]} />
-              </Pressable>
-            )}
+          <View style={styles.detailItem}>
+            <Text style={styles.detailLabel}>역할</Text>
+            <RoleText roles={member.role} style={styles.detailValue} />
           </View>
         </View>
       </View>
-
-      <View style={styles.detailContainer}>
-        <View style={styles.detailItem}>
-          <Text style={styles.detailLabel}>동아리(학번)</Text>
-          <Text style={styles.detailValue}>
-            {`${member.club}` + ` (${member.enrollmentNumber})`}
-          </Text>
-        </View>
-        <View style={styles.detailItem}>
-          <Text style={styles.detailLabel}>역할</Text>
-          <RoleText roles={member.role} style={styles.detailValue} />
-        </View>
-      </View>
-    </View>
+    </>
   );
 };
 

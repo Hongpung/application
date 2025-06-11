@@ -4,28 +4,26 @@ import { Color } from "@hongpung/src/common";
 import { type ClubInfo } from "@hongpung/src/entities/club/model/type";
 
 interface ClubInfoViewProps {
-  info: ClubInfo;
+  clubName: ClubName;
+  roleData: ClubInfo["roleData"];
 }
 
-export const ClubInfoView: React.FC<ClubInfoViewProps> = ({ info }) => {
+export const ClubInfoView: React.FC<ClubInfoViewProps> = ({
+  clubName,
+  roleData,
+}) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.clubName}>{info.club}</Text>
-      
+      <Text style={styles.clubName}>{clubName}</Text>
       <View style={styles.infoContainer}>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>회장</Text>
-          <Text style={styles.infoValue}>
-            {info.leader ? info.leader.name : "미정"}
-          </Text>
-        </View>
-
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>상소</Text>
-          <Text style={styles.infoValue}>
-            {info.sangsoe ? info.sangsoe.name : "미정"}
-          </Text>
-        </View>
+        {roleData.map((role) => (
+          <View style={styles.infoItem} key={role.role}>
+            <Text style={styles.infoLabel}>{role.role}</Text>
+            <Text style={styles.infoValue}>
+              {role.member ? role.member.name : "미정"}
+            </Text>
+          </View>
+        ))}
       </View>
     </View>
   );
@@ -61,4 +59,4 @@ const styles = StyleSheet.create({
     color: Color["grey500"],
     fontFamily: "NanumSquareNeo-Regular",
   },
-}); 
+});

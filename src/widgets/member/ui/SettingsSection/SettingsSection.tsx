@@ -1,6 +1,5 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Color } from "@hongpung/src/common";
-import { Icons } from "@hongpung/src/common";
+import { Color, Icons } from "@hongpung/src/common";
 import { SETTING_MENUS } from "@hongpung/src/entities/member/constants/settingSubMenu";
 import { MainStackParamList } from "@hongpung/src/common/navigation";
 
@@ -8,7 +7,9 @@ interface SettingsSectionProps {
   onPress: (link: keyof MainStackParamList) => void;
 }
 
-export const SettingsSection: React.FC<SettingsSectionProps> = ({ onPress }) => {
+export const SettingsSection: React.FC<SettingsSectionProps> = ({
+  onPress,
+}) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -61,4 +62,4 @@ const styles = StyleSheet.create({
     fontFamily: "NanumSquareNeo-Regular",
     textAlign: "left",
   },
-}); 
+});

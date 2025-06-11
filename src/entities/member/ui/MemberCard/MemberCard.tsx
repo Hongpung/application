@@ -1,45 +1,28 @@
-import { View, Pressable, Text, Image, StyleSheet } from "react-native";
+import React from "react";
+import { View, Pressable, Text, StyleSheet } from "react-native";
 
-import { Color } from "@hongpung/src/common";
+import { Color, ImageWithSkeleton } from "@hongpung/src/common";
+
 import { Member } from "@hongpung/src/entities/member";
-import React, { useState } from "react";
+
 import { RoleTag } from "../RoleTag/RoleTag";
-import { Skeleton } from "moti/skeleton";
 
 interface MemberCardProps {
   member: Member;
   onPress: (user: Member) => void;
 }
 const MemberCard: React.FC<MemberCardProps> = ({ member, onPress }) => {
-  const hasImage = !!member.profileImageUrl;
-  const [isProfileImageLoading, setIsProfileImageLoading] = useState(true);
-
   return (
     <View style={styles.ProfileContainer}>
       <View style={{ flexDirection: "row", flex: 1, alignItems: "center" }}>
         <View style={styles.ProfilePhotoWrapper}>
-          {hasImage ? (
-            <>
-              <Image
-                source={{ uri: member.profileImageUrl }}
-                style={styles.ProfilePhoto}
-                onLoadEnd={() => setIsProfileImageLoading(false)}
-              />
-              {isProfileImageLoading && (
-                <View style={styles.SkeletonOverlay}>
-                  <Skeleton
-                    transition={{
-                      type: "spring",
-                      duration: 400,
-                      delay: 100,
-                    }}
-                    width={"100%"}
-                    height={"100%"}
-                    colors={[Color["grey100"], Color["grey300"]]}
-                  />
-                </View>
-              )}
-            </>
+          {!!member.profileImageUrl ? (
+            <ImageWithSkeleton
+              imageSource={{ uri: member.profileImageUrl }}
+              style={styles.ProfilePhoto}
+              cachePolicy="memory-disk"
+              contentFit="cover"
+            />
           ) : (
             <View
               style={[

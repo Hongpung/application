@@ -1,1 +1,1 @@
-export { type Member } from '../model/type'
+export { type Member } from "../model/type";

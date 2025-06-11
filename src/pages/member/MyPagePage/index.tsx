@@ -11,25 +11,48 @@ import {
   MainTabScreenProps,
   MainStackParamList,
 } from "@hongpung/src/common/navigation";
-import { Header } from "@hongpung/src/common";
+import { Header, Alert } from "@hongpung/src/common";
+import { debounce } from "lodash";
+import { StackActions } from "@react-navigation/native";
 
 const MyPageScreen: React.FC<MainTabScreenProps<"MyPage">> = ({
   navigation,
 }) => {
   const loginUser = useAtomValue(UserStatusState);
+  console.log(loginUser);
+  const handleMenuPress = debounce(
+    (link: keyof MainStackParamList) => {
+      navigation.push(link);
+    },
+    500,
+    {
+      leading: true,
+      trailing: false,
+    },
+  );
+  const handleNoUser = () => {
+    Alert.alert("세션 만료", "다시 로그인 해주세요.", {
+      confirmText: "확인",
+      onConfirm: () => {
+        navigation.dispatch(StackActions.replace("LoginStack"));
+      },
+      cancelable: false,
+    });
+  };
 
   if (!loginUser) {
+    handleNoUser();
     return <View />;
   }
 
-  const handleMenuPress = (link: keyof MainStackParamList) => {
-    navigation.push(link);
-  };
-
   return (
     <View style={{ flex: 1 }}>
-      <Header headerName="내 정보" leftButton={null} />
-      <ScrollView style={{ flex: 1 }} bounces={false}>
+      <Header headerName="내 정보" LeftButton={null} />
+      <ScrollView
+        style={{ flex: 1 }}
+        bounces={false}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.container}>
           <ProfileBox member={loginUser} />
 
@@ -39,11 +62,11 @@ const MyPageScreen: React.FC<MainTabScreenProps<"MyPage">> = ({
 
         <FooterSection
           onPressChangeInfo={() => {
-            // handleMenuPress("ChangeMyInfo");
+            handleMenuPress("ChangeProfile");
           }}
           onPressChangePassword={() => handleMenuPress("ChangePassword")}
           onPressWithdrawal={() => {
-            // handleMenuPress("WithdrawalAuth");
+            handleMenuPress("Withdraw");
           }}
         />
       </ScrollView>

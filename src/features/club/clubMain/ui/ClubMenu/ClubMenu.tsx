@@ -1,12 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { Color } from "@hongpung/src/common";
-import { Icons } from "@hongpung/src/common";
-import { type ClubMenu as ClubMenuType } from "@hongpung/src/entities/club/model/type";
+import { Color, Icons } from "@hongpung/src/common";
+import type { SubMenu } from "@hongpung/src/common";
+import { ClubParamList } from "@hongpung/src/common/navigation";
 
 interface ClubMenuProps {
-  menus: ClubMenuType[];
-  onMenuPress: (link: string) => void;
+  menus: SubMenu<ClubParamList>[];
+  onMenuPress: (link: keyof ClubParamList) => void;
 }
 
 export const ClubMenu: React.FC<ClubMenuProps> = ({ menus, onMenuPress }) => {
@@ -16,7 +16,7 @@ export const ClubMenu: React.FC<ClubMenuProps> = ({ menus, onMenuPress }) => {
         <Text style={styles.sectionTitle}>동아리 관리</Text>
       </View>
 
-      {menus.map((menu: ClubMenuType, index: number) => (
+      {menus.map((menu, index) => (
         <Pressable
           key={menu.name + index}
           style={styles.subMenu}
@@ -59,4 +59,4 @@ const styles = StyleSheet.create({
     fontFamily: "NanumSquareNeo-Regular",
     textAlign: "left",
   },
-}); 
+});

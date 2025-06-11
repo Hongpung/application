@@ -1,14 +1,14 @@
-import { Image, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { Image } from "expo-image";
 import React from "react";
 import { Color } from "@hongpung/src/common";
-import { type ClubProfile as ClubProfileType } from "@hongpung/src/entities/club/model/type";
+import { type ClubInfo as ClubProfileType } from "@hongpung/src/entities/club/model/type";
 
 interface ClubProfileProps {
   profile: ClubProfileType;
 }
 
 export const ClubProfile: React.FC<ClubProfileProps> = ({ profile }) => {
-    
   return (
     <View style={styles.container}>
       <View style={styles.profileImageContainer}>
@@ -26,7 +26,9 @@ export const ClubProfile: React.FC<ClubProfileProps> = ({ profile }) => {
         {profile.roleData.map((role, index) => (
           <View key={role.role + index} style={styles.roleItem}>
             <Text style={styles.roleTitle}>{role.role}</Text>
-            <Text style={styles.roleName}>{role.member.name}</Text>
+            <Text style={styles.roleName}>
+              {role.member ? role.member.name : "없음"}
+            </Text>
           </View>
         ))}
       </View>
@@ -77,4 +79,4 @@ const styles = StyleSheet.create({
     color: Color["grey500"],
     fontFamily: "NanumSquareNeo-Regular",
   },
-}); 
+});

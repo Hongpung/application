@@ -1,49 +1,25 @@
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
-import { Color } from "@hongpung/src/common";
+import { Color, ImageWithSkeleton } from "@hongpung/src/common";
 
-import { Member } from "@hongpung/src/entities/member/@x/club";
+import { useLoadMyStatusFetch } from "@hongpung/src/entities/member";
 
-import { ClubProfileSectionSkeleton } from "../ClubProfileSectionSkeleton/ClubProfileSectionSkeleton";
+import { useLoadClubInfoSuspenseFetch } from "@hongpung/src/entities/club/api/clubApi";
 
-type ClubProfileProps =
-  | {
-      profileImageUrl: null;
-      clubName?: Exclude<ClubName, "기타">;
-      roleData: null;
-      isLoading: true;
-    }
-  | {
-      profileImageUrl: string | null;
-      clubName: Exclude<ClubName, "기타">;
-      roleData: [
-        { role: "패짱"; member: Member | null },
-        { role: "상쇠"; member: Member | null }
-      ];
-      isLoading: false;
-    };
-
-export const ClubProfileSection: React.FC<ClubProfileProps> = ({
-  profileImageUrl,
-  clubName,
-  roleData,
-  isLoading,
-}) => {
-
-
-  if (isLoading && roleData === null) {
-    return (
-      <ClubProfileSectionSkeleton/>
-    );
-  }
+export const ClubProfileSection: React.FC = () => {
+  const { data: loginUser } = useLoadMyStatusFetch();
+  const { data } = useLoadClubInfoSuspenseFetch();
+  const { profileImageUrl, roleData } = data;
 
   return (
     <View style={styles.container}>
       <View style={styles.profileImageContainer}>
         {profileImageUrl ? (
-          <Image
-            source={{ uri: profileImageUrl }}
+          <ImageWithSkeleton
+            imageSource={{ uri: profileImageUrl }}
             style={styles.profileImage}
+            cachePolicy="memory-disk"
+            contentFit="cover"
           />
         ) : (
           <View style={styles.profileImagePlaceholder} />
@@ -53,7 +29,7 @@ export const ClubProfileSection: React.FC<ClubProfileProps> = ({
       <View style={styles.infoContainer}>
         <View style={styles.info}>
           <Text style={styles.infoLabel}>동아리</Text>
-          <Text style={styles.infoValue}>{clubName}</Text>
+          <Text style={styles.infoValue}>{loginUser?.club}</Text>
         </View>
 
         <View style={styles.info}>

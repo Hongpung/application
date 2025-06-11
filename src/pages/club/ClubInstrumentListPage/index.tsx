@@ -5,25 +5,45 @@ import { Header } from "@hongpung/src/common";
 import InstrumentViewList from "@hongpung/src/widgets/instrument/ui/InstrumentViewList/InstrumentViewList";
 import { useLoadClubInstrumentsFetch } from "@hongpung/src/entities/club";
 import { ClubStackProps } from "@hongpung/src/common/navigation";
+import { debounce } from "lodash";
 
 const ClubInstrumentListPage: React.FC<ClubStackProps<"ClubInstruments">> = ({
   navigation,
 }) => {
-  const {
-    data: instrumentList,
-    isLoading,
-    error,
-  } = useLoadClubInstrumentsFetch();
+  const { data: instrumentList, isLoading } = useLoadClubInstrumentsFetch();
 
-  const handleInstrumentClick = (instrument: Instrument) => {
-    navigation.push("InstrumentDetail", {
-      instrumentId: instrument.instrumentId,
-    });
-  };
+  const handleInstrumentClick = debounce(
+    (instrument: Instrument) => {
+      navigation.push("InstrumentDetail", {
+        instrumentId: instrument.instrumentId,
+      });
+    },
+    500,
+    {
+      leading: true,
+      trailing: false,
+    },
+  );
+
+  const navigateToCreateInstrument = debounce(
+    () => {
+      navigation.push("CreateInstrument");
+    },
+    500,
+    {
+      leading: true,
+      trailing: false,
+    },
+  );
 
   return (
     <View style={styles.container}>
-      <Header leftButton="close" headerName="악기 목록" />
+      <Header
+        LeftButton="close"
+        headerName="악기 목록"
+        RightButton="생성"
+        rightAction={navigateToCreateInstrument}
+      />
       <InstrumentViewList
         instrumentList={instrumentList ? instrumentList : []}
         isLoading={isLoading}
