@@ -5,36 +5,29 @@ import { Icons } from "../Icons/Icons";
 
 interface MiniCalendarHeaderProps {
   currentMonth: Date;
-  onMonthChange: (date: Date) => void;
+  incrementMonth: () => void;
+  decrementMonth: () => void;
 }
 
 const MiniCalendarHeader: React.FC<MiniCalendarHeaderProps> = ({
   currentMonth,
-  onMonthChange,
+
+  incrementMonth,
+  decrementMonth,
 }) => {
-  const handlePrevMonth = () => {
-    const newDate = new Date(currentMonth);
-    newDate.setMonth(newDate.getMonth() - 1);
-    onMonthChange(newDate);
-  };
-
-  const handleNextMonth = () => {
-    const newDate = new Date(currentMonth);
-    newDate.setMonth(newDate.getMonth() + 1);
-    onMonthChange(newDate);
-  };
-
   return (
     <View style={styles.container}>
-      <Text style={styles.yearText}>{currentMonth.getFullYear()}년</Text>
-      <View style={styles.monthContainer}>
-        <Pressable onPress={handlePrevMonth} style={styles.button}>
-          <Icons name="chevron-back" size={24} color={Color["blue500"]} />
-        </Pressable>
-        <Text style={styles.monthText}>{currentMonth.getMonth() + 1}월</Text>
-        <Pressable onPress={handleNextMonth} style={styles.button}>
-          <Icons name="chevron-forward" size={24} color={Color["blue500"]} />
-        </Pressable>
+      <View>
+        <Text style={styles.yearText}>{currentMonth.getFullYear()}년</Text>
+        <View style={styles.monthContainer}>
+          <Pressable onPress={decrementMonth} style={styles.button}>
+            <Icons name="chevron-back" size={24} color={Color["blue500"]} />
+          </Pressable>
+          <Text style={styles.monthText}>{currentMonth.getMonth() + 1}월</Text>
+          <Pressable onPress={incrementMonth} style={styles.button}>
+            <Icons name="chevron-forward" size={24} color={Color["blue500"]} />
+          </Pressable>
+        </View>
       </View>
     </View>
   );
@@ -42,11 +35,11 @@ const MiniCalendarHeader: React.FC<MiniCalendarHeaderProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
     paddingVertical: 16,
-    marginHorizontal: 32,
   },
   button: {
     padding: 4,

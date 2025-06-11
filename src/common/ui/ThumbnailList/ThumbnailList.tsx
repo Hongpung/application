@@ -1,5 +1,7 @@
 import React from "react";
-import { View, StyleSheet, FlatList, Pressable, Image } from "react-native";
+import { View, StyleSheet, FlatList, Pressable } from "react-native";
+
+import { Image } from "expo-image";
 import { Color } from "../../constant/color";
 import { PhotoFileFormat } from "../../types/PhotoFileFormat";
 
@@ -49,4 +51,4 @@ const styles = StyleSheet.create({
   separator: {
     width: 4,
   },
-}); 
+});

@@ -11,7 +11,12 @@ export const DescriptionPage: React.FC<PageContent> = ({
 }) => (
   <View style={styles.page}>
     <View style={styles.picture}>
-      <LottieView source={lottieSource} style={styles.lottie} autoPlay speed={speed} />
+      <LottieView
+        source={lottieSource}
+        style={styles.lottie}
+        autoPlay
+        speed={speed}
+      />
     </View>
     <Text style={styles.description}>{description}</Text>
   </View>
@@ -20,6 +25,7 @@ export const DescriptionPage: React.FC<PageContent> = ({
 const styles = StyleSheet.create({
   page: {
     flex: 1,
+    justifyContent: "center",
     alignItems: "center",
   },
   picture: {
@@ -36,4 +42,4 @@ const styles = StyleSheet.create({
     color: Color.grey700,
     textAlign: "center",
   },
-}); 
+});

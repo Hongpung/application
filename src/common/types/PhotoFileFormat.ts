@@ -1,5 +1,5 @@
-export type PhotoFileFormat = { 
-    uri: string; 
-    originHeight: number; 
-    originWidth: number;
-  };
+export type PhotoFileFormat = {
+  uri: string;
+  originHeight: number;
+  originWidth: number;
+};

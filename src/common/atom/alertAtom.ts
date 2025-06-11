@@ -46,18 +46,21 @@ export const Alert = {
       onConfirm?: () => void;
       confirmButtonColor?: "red" | "blue" | "green";
       cancelable?: boolean;
-    }
+    },
   ) => {
-    store.set(alertAtom, {
-      title,
-      message,
-      type: "alert",
-      isVisible: true,
-      confirmText: options?.confirmText ?? "확인",
-      onConfirm: options?.onConfirm,
-      confirmButtonColor: options?.confirmButtonColor ?? "blue",
-      cancelable: options?.cancelable ?? true,
-    });
+    // 렌더링 중 상태 변경 방지를 위해 setTimeout 사용
+    setTimeout(() => {
+      store.set(alertAtom, {
+        title,
+        message,
+        type: "alert",
+        isVisible: true,
+        confirmText: options?.confirmText ?? "확인",
+        onConfirm: options?.onConfirm,
+        confirmButtonColor: options?.confirmButtonColor ?? "blue",
+        cancelable: options?.cancelable ?? true,
+      });
+    }, 0);
   },
 
   confirm: (
@@ -71,20 +74,23 @@ export const Alert = {
       confirmButtonColor?: "red" | "blue" | "green";
       cancelButtonColor?: "red" | "blue" | "green";
       cancelable?: boolean;
-    }
+    },
   ) => {
-    store.set(alertAtom, {
-      title,
-      message,
-      type: "confirm",
-      isVisible: true,
-      confirmText: options?.confirmText ?? "확인",
-      cancelText: options?.cancelText ?? "취소",
-      onConfirm: options?.onConfirm,
-      onCancel: options?.onCancel,
-      confirmButtonColor: options?.confirmButtonColor ?? "blue",
-      cancelButtonColor: options?.cancelButtonColor ?? "blue",
-      cancelable: options?.cancelable ?? true,
-    });
+    // 렌더링 중 상태 변경 방지를 위해 setTimeout 사용
+    setTimeout(() => {
+      store.set(alertAtom, {
+        title,
+        message,
+        type: "confirm",
+        isVisible: true,
+        confirmText: options?.confirmText ?? "확인",
+        cancelText: options?.cancelText ?? "취소",
+        onConfirm: options?.onConfirm,
+        onCancel: options?.onCancel,
+        confirmButtonColor: options?.confirmButtonColor ?? "blue",
+        cancelButtonColor: options?.cancelButtonColor ?? "blue",
+        cancelable: options?.cancelable ?? true,
+      });
+    }, 0);
   },
 };

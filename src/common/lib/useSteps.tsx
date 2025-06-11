@@ -55,7 +55,7 @@ export const StepContainer = <T extends Record<string, unknown>>({
   }, [children]);
 
   const [current, setCurrent] = useState<string>(
-    initialStep || Object.keys(screens)[0]
+    initialStep || Object.keys(screens)[0],
   );
 
   const CurrentComponent = screens[current];

@@ -4,13 +4,14 @@ import { Color } from "../../constant/color";
 
 type ShortButtonProps = {
   innerContent: string | React.ReactNode;
+  isAble?: boolean;
   onPress: () => void;
   isFilled: boolean;
   color: string;
 };
 
 export const ShortButton: React.FC<ShortButtonProps> = React.memo(
-  ({ innerContent, onPress, isFilled, color }) => {
+  ({ innerContent, onPress, isFilled, color, isAble = true }) => {
     const colorKey: string = `${color}500`;
     const subColor: string = `${color}100`;
     return (
@@ -19,17 +20,21 @@ export const ShortButton: React.FC<ShortButtonProps> = React.memo(
           styles.basic,
           {
             backgroundColor: isFilled ? Color[colorKey] : Color[subColor],
-            opacity: isFilled ? 1 : 0.75,
+            opacity: isFilled ? (isAble ? 1 : 0.5) : 0.75,
             borderColor: Color[colorKey],
           },
         ]}
-        onPress={() => onPress()}
+        onPress={() => {
+          if (isAble) {
+            onPress();
+          }
+        }}
       >
         {typeof innerContent === "string" ? (
           <Text
             style={[
               styles.basicText,
-              { color: "#FFF" },
+              { color: isFilled ? "#FFF" : Color[colorKey] },
             ]}
           >
             {innerContent}
@@ -39,8 +44,10 @@ export const ShortButton: React.FC<ShortButtonProps> = React.memo(
         )}
       </Pressable>
     );
-  }
+  },
 );
+
+ShortButton.displayName = "ShortButton";
 
 const styles = StyleSheet.create({
   basic: {
@@ -48,7 +55,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 15,
-    width: 148,
+    flexGrow: 1,
+    flexShrink: 0,
+    minWidth: 100,
   },
   basicText: {
     fontSize: 16,

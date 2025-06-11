@@ -1,5 +1,5 @@
 import { NavigatorScreenParams, RouteProp } from "@react-navigation/native";
-import { NativeStackNavigationProp, } from "@react-navigation/native-stack";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { LoginStackParamList } from "./loginStack";
 import { MainStackParamList } from "./mainStack";

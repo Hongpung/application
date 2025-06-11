@@ -8,7 +8,7 @@ export type ReservationParamList = {
   DailyReservationList: { date: string };
   ReservationDetail: { reservationId: number };
   EditReservation: {
-    reservationId: number;
+    reservationJson: string;
   } & NavigatorScreenParams<EditReservationStackParamList>;
   CreateReservation?: NavigatorScreenParams<CreateReservationStackParamList>;
 };

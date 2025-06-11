@@ -1,5 +1,5 @@
-import React from "react";
-import { Pressable, Text, View, StyleSheet } from "react-native";
+import React, { useEffect, useRef } from "react";
+import { Pressable, Text, View, StyleSheet, Animated } from "react-native";
 import { Color } from "../../constant/color";
 
 interface DayCellProps {
@@ -17,32 +17,51 @@ export const DayCell: React.FC<DayCellProps> = ({
   reservationColors,
   onPress,
 }) => {
+  const scale = useRef(new Animated.Value(1)).current;
+  const yPosition = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(scale, {
+      toValue: isSelected ? 1.1 : 1,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+    Animated.timing(yPosition, {
+      toValue: isSelected ? -2 : 0,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  }, [isSelected, scale, yPosition]);
   return (
-    <Pressable
-      style={[styles.dayContainer, isSelected && styles.selectedDay]}
-      onPress={onPress}
+    <Animated.View
+      style={[
+        styles.dayContainer,
+        isSelected && styles.selectedDay,
+        { transform: [{ scale }, { translateY: yPosition }] },
+      ]}
     >
-      <Text
-        style={[
-          styles.calendarText,
-          hasReservation && styles.hasReservation,
-          isSelected && styles.selectedText,
-        ]}
-      >
-        {day}
-      </Text>
-      <View style={styles.reservationDots}>
-        {reservationColors.slice(0, 3).map((color, i) => (
-          <View
-            key={`dot-${i}`}
-            style={[
-              styles.reservationDot,
-              { backgroundColor: Color[`${color}500`] },
-            ]}
-          />
-        ))}
-      </View>
-    </Pressable>
+      <Pressable onPress={onPress}>
+        <Text
+          style={[
+            styles.calendarText,
+            hasReservation && styles.hasReservation,
+            isSelected && styles.selectedText,
+          ]}
+        >
+          {day}
+        </Text>
+        <View style={styles.reservationDots}>
+          {reservationColors.slice(0, 3).map((color, i) => (
+            <View
+              key={`dot-${i}`}
+              style={[
+                styles.reservationDot,
+                { backgroundColor: Color[`${color}500`] },
+              ]}
+            />
+          ))}
+        </View>
+      </Pressable>
+    </Animated.View>
   );
 };
 

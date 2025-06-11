@@ -35,6 +35,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: "NanumSquareNeo-Light",
     color: Color["grey500"],
-    lineHeight: 20,
+    lineHeight: 22,
   },
 });

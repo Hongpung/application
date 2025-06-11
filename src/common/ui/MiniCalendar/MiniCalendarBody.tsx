@@ -1,8 +1,9 @@
 import React, { useMemo } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
 import { WeekDaysRow } from "./WeekDaysRow";
-import { DayCell } from "./DayCell";
 import { getDaysInMonth } from "../../lib/getDaysInMonth";
+import dayjs from "dayjs";
+import { WeekRow } from "./WeekRow";
 
 const { width } = Dimensions.get("window");
 
@@ -11,6 +12,7 @@ interface MiniCalendarProps {
   selectedDate: Date | null;
   currentMonth: Date;
   onDateSelect: (date: Date | null) => void;
+  collapsed: boolean;
 }
 
 const MiniCalendarBody: React.FC<MiniCalendarProps> = ({
@@ -18,16 +20,16 @@ const MiniCalendarBody: React.FC<MiniCalendarProps> = ({
   currentMonth,
   selectedDate,
   onDateSelect,
+  collapsed,
 }) => {
   const datesInMonth = useMemo(
     () => getDaysInMonth(currentMonth),
-    [currentMonth]
+    [currentMonth],
   );
 
   const handleDatePress = (day: number) => {
     if (dateItems[day]) {
-      const newDate = new Date(currentMonth);
-      newDate.setDate(day);
+      const newDate = dayjs(currentMonth).date(day).toDate();
       onDateSelect(selectedDate?.getDate() === day ? null : newDate);
     }
   };
@@ -35,33 +37,17 @@ const MiniCalendarBody: React.FC<MiniCalendarProps> = ({
   return (
     <View style={styles.container}>
       <WeekDaysRow />
+
       {datesInMonth.map((week, weekIndex) => (
-        <View key={`week-${weekIndex}`} style={styles.weekRow}>
-          {week.map((date, dateIndex) => {
-            if (date === 0) {
-              return (
-                <View
-                  key={`empty-${weekIndex}/${dateIndex}`}
-                  style={styles.emptyDay}
-                />
-              );
-            }
-
-            const reservationData = dateItems[date];
-            const isSelected = selectedDate?.getDate() === date;
-
-            return (
-              <DayCell
-                key={`day-${date}`}
-                day={date}
-                isSelected={isSelected}
-                hasReservation={!!reservationData}
-                reservationColors={reservationData || []}
-                onPress={() => handleDatePress(date)}
-              />
-            );
-          })}
-        </View>
+        <WeekRow
+          collapsed={collapsed}
+          key={`week-${weekIndex}`}
+          week={week}
+          weekIndex={weekIndex}
+          dateItems={dateItems}
+          selectedDate={selectedDate}
+          onDatePress={handleDatePress}
+        />
       ))}
     </View>
   );
@@ -73,7 +59,6 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     paddingHorizontal: (width - 320) / 2,
-    gap: 4,
   },
   weekRow: {
     flexDirection: "row",
