@@ -1,31 +1,32 @@
 import { View, StyleSheet, Pressable, Text } from "react-native";
 
+import { StepProps } from "@hongpung/react-step-flow";
+
 import {
-  ErrorModal,
   LongButton,
   BasicInput,
   FullScreenLoadingModal,
 } from "@hongpung/src/common";
 
-import { EmailValidateFormProps } from "../../model/type";
+import { SignUpStepPropsList } from "../../model/type";
 
-export const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
+type EmailValidateFormProps = StepProps<SignUpStepPropsList, "EmailConfirm">;
+
+export const EmailValidateForm: React.FC<EmailValidateFormProps> = ({
+  stepProps: props,
+  goTo,
+}) => {
   //이메일
   const {
     email,
     setEmail,
     emailValidation,
-    validateEmail: valitateEmail,
+    validateEmail,
     emailRef: emailInputRef,
   } = props;
 
   //이메일 인증 코드 발송
-  const {
-    sendVerificationCode,
-    isSendingCode,
-    isSendingCodeLoading,
-    isSendingCodeError,
-  } = props;
+  const { sendVerificationCode, isSendingCode, isSendingCodeLoading } = props;
 
   //이메일 인증 코드 검증
   const {
@@ -37,7 +38,6 @@ export const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
     validateVerificationCode,
 
     isVerifyingCodeLoading,
-    isVerifyingCodeError,
 
     verifyCode,
   } = props;
@@ -46,21 +46,6 @@ export const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
     <View style={styles.container}>
       <FullScreenLoadingModal
         isLoading={isVerifyingCodeLoading || isSendingCodeLoading}
-      />
-      <ErrorModal
-        visible={isSendingCodeError !== null}
-        title={"오류"}
-        message={
-          "이메일 인증번호 전송에 실패했어요.\n인터넷 확인 후 다시 시도해주세요."
-        }
-      />
-
-      <ErrorModal
-        visible={isVerifyingCodeError !== null}
-        title={"오류"}
-        message={
-          "인증번호 검증에 실패했어요.\n인터넷 확인 후 다시 시도해주세요."
-        }
       />
 
       <View style={styles.inputContainer}>
@@ -75,7 +60,7 @@ export const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
               isEditible={!isSendingCode}
               keyboardType={"email-address"}
               validationCondition={emailValidation}
-              onBlur={() => valitateEmail(email)}
+              onBlur={validateEmail}
             />
           </View>
           <Pressable style={styles.button} onPress={sendVerificationCode}>
@@ -94,6 +79,7 @@ export const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
             setInputValue={setVerificationCode}
             validationCondition={verificationCodeValidation}
             onBlur={() => {
+              console.log(verificationCode);
               validateVerificationCode(verificationCode);
             }}
           />
@@ -104,7 +90,13 @@ export const EmailValidateForm: React.FC<EmailValidateFormProps> = (props) => {
         <LongButton
           innerContent="이메일 인증"
           color="green"
-          onPress={verifyCode}
+          onPress={() =>
+            verifyCode({
+              onSuccess: () => {
+                goTo("SetPassword");
+              },
+            })
+          }
           isAble={verificationCodeValidation.state === "VALID"}
         />
       </View>

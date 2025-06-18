@@ -37,7 +37,9 @@ const LoginPage: React.FC<LoginStackScreenProps<"Login">> = ({
           <LoginSection />
           <Text style={styles.interSectionText}>홍풍이 처음이시라면?</Text>
           <SignUpNavigationButton navigateToSignUp={navigateToSignUp} />
-          <FindAccountActionsSection onPressResetPassword={navigateToResetPassword} />
+          <FindAccountActionsSection
+            onPressResetPassword={navigateToResetPassword}
+          />
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>

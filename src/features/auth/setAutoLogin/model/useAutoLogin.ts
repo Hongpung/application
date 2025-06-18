@@ -21,7 +21,7 @@ const useAutoLogin = () => {
       try {
         const prevAutoLogin = (await AsyncStorage.getItem("autoLogin")) || null;
         setAutoLogin(!!prevAutoLogin || false);
-      } catch (e) {
+      } catch {
         setAutoLogin(false);
       }
     };
@@ -58,7 +58,7 @@ const useAutoLogin = () => {
         else turnOffAutoLogin();
       }
     };
-  }, []);
+  }, [turnOnAutoLogin, turnOffAutoLogin]);
 
   const toggleAutoLogin = useCallback(() => {
     isChangedRef.current = true;

@@ -25,14 +25,14 @@ interface ChangePasswordFormProps {
   onCurrentPasswordBlur: () => void;
   onNewPasswordBlur: () => void;
   onConfirmPasswordBlur: () => void;
-  currentPasswordRef: React.RefObject<TextInput>;
-  newPasswordRef: React.RefObject<TextInput>;
-  confirmPasswordRef: React.RefObject<TextInput>;
+  currentPasswordRef: React.RefObject<TextInput | null>;
+  newPasswordRef: React.RefObject<TextInput | null>;
+  confirmPasswordRef: React.RefObject<TextInput | null>;
   isCanChangePassword: boolean;
 }
 
 export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = (
-  props
+  props,
 ) => {
   const {
     currentPassword,

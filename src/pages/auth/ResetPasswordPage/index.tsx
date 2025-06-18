@@ -7,20 +7,31 @@ import {
   Platform,
   Text,
   StyleSheet,
-  ScrollView
+  ScrollView,
 } from "react-native";
 
-import { DescriptionBox, Header } from "@hongpung/src/common";
+import { useStepFlow } from "@hongpung/react-step-flow";
 
-import { useResetPasswordSteps } from "@hongpung/src/features/auth/resetPassword";
+import { Header } from "@hongpung/src/common";
 
-import { ResetPasswordForms } from "@hongpung/src/widgets/auth";
+import {
+  useResetPasswordSteps,
+  ResetPasswordStepsProps,
+} from "@hongpung/src/features/auth/resetPassword";
 
-import { ResetPasswordDescriptions } from "./constant/descriptions";
+import {
+  ValidateEmailSection,
+  ResetPasswordSection,
+} from "@hongpung/src/widgets/auth";
 
 const ResetPasswordPage: React.FC = () => {
   const { onClose, step, ...resetPasswordSteps } = useResetPasswordSteps();
-  const StepForm = ResetPasswordForms[step];
+
+  const { currentStep, ...ResetPasswordStep } =
+    useStepFlow<ResetPasswordStepsProps>({
+      initialStep: "EmailConfirm",
+      onStepChange: (step) => {},
+    });
 
   return (
     <TouchableWithoutFeedback
@@ -34,9 +45,11 @@ const ResetPasswordPage: React.FC = () => {
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
         <View style={{ flex: 1, backgroundColor: "#FFF" }}>
-          <Header leftButton={"close"} leftAction={onClose} />
+          <Header LeftButton={"close"} leftAction={onClose} />
           <Text style={styles.titleText}>비밀번호 재설정</Text>
           <ScrollView
+            bounces={false}
+            showsVerticalScrollIndicator={false}
             style={{
               flex: 1,
               backgroundColor: "#FFF",
@@ -46,8 +59,18 @@ const ResetPasswordPage: React.FC = () => {
               gap: 24,
             }}
           >
-            <DescriptionBox descriptions={ResetPasswordDescriptions[step]} />
-            <StepForm {...resetPasswordSteps} />
+            <ResetPasswordStep.Flow>
+              <ResetPasswordStep.Step
+                name="EmailConfirm"
+                component={ValidateEmailSection}
+                stepProps={resetPasswordSteps}
+              />
+              <ResetPasswordStep.Step
+                name="ResetPassword"
+                component={ResetPasswordSection}
+                stepProps={resetPasswordSteps}
+              />
+            </ResetPasswordStep.Flow>
           </ScrollView>
         </View>
       </KeyboardAvoidingView>

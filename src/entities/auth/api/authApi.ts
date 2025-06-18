@@ -3,7 +3,6 @@ import { RequestLoginBody, SignUpRequestBody } from "./type";
 
 const authApi = baseApi.addEndpoints({
   endpoints: (builder) => ({
-
     changePassword: builder.request<
       { message: string },
       { currentPassword: string; newPassword: string }
@@ -14,6 +13,9 @@ const authApi = baseApi.addEndpoints({
         options: { headers: { "Content-Type": "application/json" } },
         body: { currentPassword, newPassword },
       }),
+      queryOptions: {
+        mutationKey: ["changePassword"],
+      },
     }),
 
     login: builder.request<{ token: string }, RequestLoginBody>({
@@ -28,13 +30,19 @@ const authApi = baseApi.addEndpoints({
           },
         },
       }),
+      queryOptions: {
+        mutationKey: ["user-status", "token"],
+      },
     }),
-    
+
     logout: builder.request<void, void>({
       query: () => ({
         method: "POST",
         url: "/auth/logout",
       }),
+      queryOptions: {
+        mutationKey: ["user-status", "token"],
+      },
     }),
 
     isRegisteredEmail: builder.request<
@@ -51,10 +59,22 @@ const authApi = baseApi.addEndpoints({
           },
         },
       }),
+      queryOptions: {
+        mutationKey: ["isRegisteredEmail"],
+      },
     }),
 
     signUp: builder.request<void, SignUpRequestBody>({
-      query: (body) => ({ url: "/signup", method: "POST", body }),
+      query: (body) => ({
+        url: "/auth/signup",
+        method: "POST",
+        body,
+        options: {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      }),
     }),
 
     sendSignUpVerificationCode: builder.request<
@@ -71,6 +91,9 @@ const authApi = baseApi.addEndpoints({
           },
         },
       }),
+      queryOptions: {
+        mutationKey: ["sendSignUpVerificationCode"],
+      },
     }),
 
     verifySignUpVerificationCode: builder.request<
@@ -87,6 +110,9 @@ const authApi = baseApi.addEndpoints({
           },
         },
       }),
+      queryOptions: {
+        mutationKey: ["verifySignUpVerificationCode"],
+      },
     }),
 
     sendResetPasswordVerificationCode: builder.request<
@@ -104,6 +130,9 @@ const authApi = baseApi.addEndpoints({
         },
         body,
       }),
+      queryOptions: {
+        mutationKey: ["sendResetPasswordVerificationCode"],
+      },
     }),
 
     verifyResetPasswordVerificationCode: builder.request<
@@ -121,8 +150,11 @@ const authApi = baseApi.addEndpoints({
           },
         },
       }),
+      queryOptions: {
+        mutationKey: ["verifyResetPasswordVerificationCode"],
+      },
     }),
-    
+
     resetPassword: builder.request<
       void,
       { email: string; newPassword: string; oneTimeToken: string }
@@ -141,6 +173,26 @@ const authApi = baseApi.addEndpoints({
           },
         };
       },
+      queryOptions: {
+        mutationKey: ["resetPassword"],
+      },
+    }),
+
+    withdraw: builder.request<void, { password: string }>({
+      query: (body) => ({
+        url: "/auth/withdraw",
+        method: "POST",
+        body,
+        options: {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+        withAuthorize: true,
+      }),
+      queryOptions: {
+        mutationKey: ["withdraw"],
+      },
     }),
   }),
 });
@@ -156,4 +208,5 @@ export const {
   useSendResetPasswordVerificationCodeRequest,
   useVerifyResetPasswordVerificationCodeRequest,
   useResetPasswordRequest,
+  useWithdrawRequest,
 } = authApi;

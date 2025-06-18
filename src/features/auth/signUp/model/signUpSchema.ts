@@ -13,7 +13,7 @@ export const signUpSchema = z
       .min(8, "비밀번호는 8자 이상이어야 합니다.")
       .regex(
         /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-        "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다."
+        "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.",
       ),
 
     confirmPassword: z.string().min(1, "비밀번호 확인을 입력해주세요."),
@@ -26,19 +26,25 @@ export const signUpSchema = z
 
     nickname: z
       .string()
-      .regex(/^[가-힣]+$/, "닉네임은 한글만 입력 가능합니다.")
-      .optional(),
+      .transform((v) => (v === "" ? undefined : v))
+      .optional()
+      .refine((v) => v === undefined || /^[가-힣]+$/.test(v), {
+        message: "닉네임은 한글만 입력 가능합니다.",
+      }),
 
-    club: z.custom<ClubName|null>((val) => {
-      return typeof val === 'string' && clubNames.includes(val as ClubName);
-    }, {
-      message: "유효하지 않은 동아리입니다."
-    }),
+    club: z.custom<ClubName | null>(
+      (val) => {
+        return typeof val === "string" && clubNames.includes(val as ClubName);
+      },
+      {
+        message: "유효하지 않은 동아리입니다.",
+      },
+    ),
 
     enrollmentNumber: z
       .string()
       .length(2, "학번은 2자여야 합니다.")
-      .regex(/^\d{2}$/, "학번은 숫자로만 구성되어야 합니다.")
+      .regex(/^\d{2}$/, "학번은 숫자로만 구성되어야 합니다."),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "비밀번호가 일치하지 않습니다.",

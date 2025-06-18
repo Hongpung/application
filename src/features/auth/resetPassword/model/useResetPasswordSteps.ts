@@ -1,28 +1,39 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { BackHandler } from "react-native";
+
 import { useNavigation } from "@react-navigation/native";
+
+import * as z from "zod";
+
+import { Alert, deleteToken, getToken } from "@hongpung/src/common";
+
 import {
   useSendResetPasswordVerificationCodeRequest as useSendVerificationCodeRequest,
-  useVerifyResetPasswordVerificationCodeRequest as useVerifyCodeRequest,
   useResetPasswordRequest,
-  useIsRegisteredEmailRequest,
 } from "@hongpung/src/entities/auth";
-import { Alert, deleteToken, getToken, ValidationState } from "@hongpung/src/common";
-import {
-  resetPasswordSchema,
-  type ResetPasswordFormData,
-} from "./resetPaswordSchema";
-import * as z from "zod";
-import {  BackHandler, TextInput } from "react-native";
-import { ResetPasswordStep } from "./type";
+
 import {
   showEmailVirificationCompleteToast,
   showProblemToast,
   showResetPasswordCompleteToast,
 } from "../constant/toastActions";
-import useVerificationCodeFlow from "./useVerificationCodeFlow";
-import useResetPasswordForm from "./useResetPasswordForm";
 
-const useResetPasswordSteps = () => {
+import { resetPasswordSchema } from "./resetPasswordSchema";
+import {
+  EmailValidateFormProps,
+  ResetPasswordFormProps,
+  ResetPasswordStep,
+} from "./type";
+import { useVerificationCodeFlow } from "./useVerificationCodeFlow";
+import { useResetPasswordForm } from "./useResetPasswordForm";
+
+const useResetPasswordSteps = (): {
+  step: ResetPasswordStep;
+  setStep: (step: ResetPasswordStep) => void;
+  onClose: () => void;
+  isCanNextStep: boolean;
+} & EmailValidateFormProps &
+  ResetPasswordFormProps => {
   const navigation = useNavigation();
   const [step, setStep] = useState<ResetPasswordStep>("EmailConfirm");
   const [isSendingCode, setIsSendingCode] = useState(false);
@@ -40,7 +51,7 @@ const useResetPasswordSteps = () => {
     validateEmail,
     validateNewPassword,
     validateConfirmPassword,
-    setFormValidation,
+    setEmailValidation,
   } = useResetPasswordForm();
 
   const {
@@ -53,6 +64,17 @@ const useResetPasswordSteps = () => {
     isVerifyingCodeError,
   } = useVerificationCodeFlow(email);
 
+  const onClose = useCallback(() => {
+    Alert.confirm("확인", "비밀번호 재설정을 취소하고\n뒤로 돌아갈까요?", {
+      cancelText: "아니오",
+      confirmText: "네",
+      confirmButtonColor: "green",
+      cancelButtonColor: "green",
+      onConfirm: () => {
+        navigation.goBack();
+      },
+    });
+  }, [navigation]);
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -60,58 +82,21 @@ const useResetPasswordSteps = () => {
       () => {
         onClose();
         return true; // true를 리턴하면 뒤로가기가 막힘
-      }
+      },
     );
 
     return () => {
       // 컴포넌트 unmount 시 이벤트 제거
       backHandler.remove();
     };
-  }, []);
+  }, [onClose]);
 
-  
-  const {
-    request: resetPassword,
-    isLoading: isResetPasswordLoading,
-    error: isResetPasswordError,
-  } = useResetPasswordRequest();
+  const { request: resetPassword } = useResetPasswordRequest();
   const {
     request: sendVerificationCode,
     isLoading: isSendingCodeLoading,
     error: isSendingCodeError,
   } = useSendVerificationCodeRequest();
-
-  const nextStep = () => {
-    setStep((prev) => {
-      if (prev === "EmailConfirm") return "ResetPassword";
-      return prev;
-    });
-  };
-
-  const prevStep = () => {
-    setStep((prev) => {
-      if (prev === "ResetPassword") return "EmailConfirm";
-      return prev;
-    });
-  };
-
-  const onClose = () => {
-      Alert.confirm(
-        "확인",
-        "비밀번호 재설정을 취소하고 뒤로 돌아갈까요?",
-        {
-          cancelText: "아니오",
-          confirmText: "네",
-          confirmButtonColor:"green",
-          cancelButtonColor:"green",
-          onConfirm: () => {
-            navigation.goBack();
-          },
-        }
-      );
-    };
-
-  
 
   const isCanNextStep = useMemo(() => {
     if (step === "EmailConfirm") {
@@ -128,12 +113,18 @@ const useResetPasswordSteps = () => {
       );
     }
     return false;
-  }, [step, emailValidation, verificationCodeValidation]);
+  }, [
+    step,
+    emailValidation,
+    verificationCodeValidation,
+    newPasswordValidation,
+    confirmPasswordValidation,
+  ]);
 
   const onPressSendVerificationCode = async () => {
     if (email) {
-      const isEmailValid = await validateEmail(email);
-      if (isEmailValid === false) {
+      await validateEmail();
+      if (emailValidation.state !== "VALID") {
         return;
       }
       try {
@@ -146,34 +137,21 @@ const useResetPasswordSteps = () => {
       }
       setIsSendingCode(true);
     } else {
-      setFormValidation((prev) => ({
-        ...prev,
-        email: {
-          state: "ERROR",
-          errorText: "이메일을 입력해주세요.",
-        },
-      }));
+      setEmailValidation({
+        state: "ERROR",
+        errorText: "이메일을 입력해주세요.",
+      });
     }
   };
 
-  const onVerifyCode = async () => {
-    if (email) {
-      console.log("verificationCode", verificationCode);
-      try {
-        await verifyCode();
-        setStep("ResetPassword");
-        showEmailVirificationCompleteToast();
-      } catch (error) {
-        showProblemToast("인증 코드 검증에 실패했어요.");
-      }
-    } else {
-      setFormValidation((prev) => ({
-        ...prev,
-        email: {
-          state: "ERROR",
-          errorText: "이메일을 입력해주세요.",
-        },
-      }));
+  const onVerifyCode = async ({ onSuccess }: { onSuccess: () => void }) => {
+    console.log("verificationCode", verificationCode);
+    try {
+      await verifyCode({ onSuccess });
+      setStep("ResetPassword");
+      showEmailVirificationCompleteToast();
+    } catch {
+      showProblemToast("인증 코드 검증에 실패했어요.");
     }
   };
 
@@ -223,15 +201,14 @@ const useResetPasswordSteps = () => {
 
   return {
     step,
-    nextStep,
-    prevStep,
+    setStep,
     onClose,
-    
+
     email,
     setEmail,
     emailValidation,
     validateEmail,
-    
+
     isSendingCodeLoading,
     isSendingCodeError,
     isSendingCode,
@@ -240,29 +217,26 @@ const useResetPasswordSteps = () => {
     setNewPassword,
     newPasswordValidation,
     validateNewPassword,
-  
+
     confirmPassword,
     setConfirmPassword,
     confirmPasswordValidation,
     validateConfirmPassword,
-  
+
     sendVerificationCode: onPressSendVerificationCode,
-  
+
     verificationCode,
     setVerificationCode,
     verificationCodeValidation,
     validateVerificationCode,
-  
+
     onVerifyCode,
     isVerifyingCodeLoading,
     isVerifyingCodeError,
-  
+
     isCanNextStep,
 
     resetPassword: onSubmit,
-    isResetPasswordLoading,
-    isResetPasswordError,
-    
   };
 };
 

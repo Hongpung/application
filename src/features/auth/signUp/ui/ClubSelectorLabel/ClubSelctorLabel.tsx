@@ -1,5 +1,4 @@
-import { Color } from "@hongpung/src/common";
-import { Icons } from "@hongpung/src/common";
+import { Color, Icons } from "@hongpung/src/common";
 import { useRef, useEffect } from "react";
 import { Animated, Pressable, View, Text, StyleSheet } from "react-native";
 
@@ -34,7 +33,7 @@ export const ClubSelectorLabel: React.FC<SelectorLabelProps> = ({
       duration: 100,
       useNativeDriver: false,
     }).start();
-  }, [value]);
+  }, [value, labelAnimation]);
 
   return (
     <Pressable style={{ width: "100%" }} onPress={onPress}>
@@ -81,7 +80,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     position: "absolute",
-    top:"100%",
+    top: "100%",
     color: Color["red500"],
     fontFamily: "NanumSquareNeo-Bold",
     paddingTop: 8,

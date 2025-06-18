@@ -40,7 +40,9 @@ export const showEmailVirificationCompleteToast = () => {
   });
 };
 
-export const showProblemToast = (additionalText: string = "문제가 발생했어요. 잠시후에 시도해주세요") => {
+export const showProblemToast = (
+  additionalText: string = "문제가 발생했어요. 잠시후에 시도해주세요",
+) => {
   Toast.show({
     type: "error",
     text1: additionalText,

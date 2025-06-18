@@ -4,7 +4,6 @@ import {
   Selector,
   LongButton,
   ErrorModal,
-
   FullScreenLoadingModal,
   BasicInput,
 } from "@hongpung/src/common";
@@ -12,9 +11,14 @@ import {
 import { clubNames } from "@hongpung/src/entities/club";
 
 import { ClubSelectorLabel } from "../ClubSelectorLabel/ClubSelctorLabel";
-import { PersonalInfoFormProps } from "../../model/type";
+import { SignUpStepPropsList } from "../../model/type";
+import { StepProps } from "@hongpung/react-step-flow";
 
-export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = (props) => {
+type PersonalInfoFormProps = StepProps<SignUpStepPropsList, "PersonalInfo">;
+
+export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
+  stepProps: props,
+}) => {
   const {
     name,
     setName,
@@ -73,19 +77,18 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = (props) => {
               trigger={Pressable}
               color="green"
               options={clubNames}
-              children={
-                <ClubSelectorLabel
-                  onPress={() => setIsClubOptionsVisible(true)}
-                  value={club}
-                  isErrored={clubValidation.state === "ERROR"}
-                  errorText={
-                    clubValidation.state === "ERROR"
-                      ? clubValidation.errorText
-                      : ""
-                  }
-                />
-              }
-            />
+            >
+              <ClubSelectorLabel
+                onPress={() => setIsClubOptionsVisible(true)}
+                value={club}
+                isErrored={clubValidation.state === "ERROR"}
+                errorText={
+                  clubValidation.state === "ERROR"
+                    ? clubValidation.errorText
+                    : ""
+                }
+              />
+            </Selector>
           </View>
           <View style={{ flex: 1 }}>
             <BasicInput
@@ -95,7 +98,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = (props) => {
               inputValue={enrollmentNumber ?? ""}
               setInputValue={setEnrollmentNumber}
               color={"green"}
-              onBlur={() => validateEnrollmentNumber(enrollmentNumber)}
+              onBlur={validateEnrollmentNumber}
               validationCondition={enrollmentNumberValidation}
               isRequired
               keyboardType="number-pad"
@@ -116,7 +119,7 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = (props) => {
             requireMark={true}
             setInputValue={setName}
             validationCondition={nameValidation}
-            onBlur={() => validateName(name)}
+            onBlur={validateName}
           />
         </View>
 
@@ -133,12 +136,12 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = (props) => {
             setInputValue={setNickname}
             isEditible={true}
             isRequired={false}
-            onBlur={() => validateNickname(nickname || "")}
+            onBlur={validateNickname}
             validationCondition={nicknameValidation}
           />
         </View>
       </View>
-      <View style={{ paddingHorizontal: 12  }}>
+      <View style={{ paddingHorizontal: 12 }}>
         <LongButton
           innerContent="회원가입 하기"
           onPress={signUp}
@@ -154,3 +157,5 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = (props) => {
     </View>
   );
 };
+
+export default PersonalInfoForm;
