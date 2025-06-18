@@ -3,25 +3,26 @@ import {
   Text,
   View,
   ScrollView,
-  Image,
   ActivityIndicator,
-  Modal,
   Pressable,
-  Dimensions,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+
+import React, { useState } from "react";
 import { useAtomValue } from "jotai";
 
 import {
-  Alert, Color, Header
+  Alert,
+  Color,
+  Header,
+  ImageModal,
+  ImageWithSkeleton,
 } from "@hongpung/src/common";
 import { UserStatusState } from "@hongpung/src/entities/member";
 
 import { useLoadInstrumentDetailFetch } from "@hongpung/src/entities/instrument/api/instrumentApi";
 
 import { MainStackScreenProps } from "@hongpung/src/common/navigation";
-
-const { width } = Dimensions.get("window");
+import { debounce } from "lodash";
 
 export const InstrumentDetailPage: React.FC<
   MainStackScreenProps<"InstrumentDetail">
@@ -32,22 +33,24 @@ export const InstrumentDetailPage: React.FC<
   });
 
   const [imageModalVisible, setImageModalVisible] = useState(false);
-  const [aspectRatio, setAspectRatio] = useState<number | null>(null);
   const loginUser = useAtomValue(UserStatusState);
 
-  useEffect(() => {
-    if (!!data?.imageUrl) {
-      Image.getSize(
-        data.imageUrl,
-        (width, height) => {
-          setAspectRatio(width / height);
-        },
-        (error) => {
-          console.error(`Couldn't get the image size: ${error.message}`);
-        }
-      );
-    }
-  }, [data]);
+  const navigateToEditInstrument = () => {
+    navigation.navigate("EditInstrument", {
+      instrument: JSON.stringify(data),
+    });
+  };
+
+  const debouncedGoBack = debounce(
+    () => {
+      navigation.goBack();
+    },
+    500,
+    {
+      leading: true,
+      trailing: false,
+    },
+  );
 
   if (isLoading) {
     return (
@@ -59,7 +62,7 @@ export const InstrumentDetailPage: React.FC<
 
   if (error) {
     Alert.alert("오류", "악기 정보를 찾을 수 없습니다.");
-    navigation.goBack();
+    debouncedGoBack();
     return (
       <View>
         <Text>오류:기 정보를 찾을 수 없습니다.</Text>
@@ -77,44 +80,23 @@ export const InstrumentDetailPage: React.FC<
 
   return (
     <View style={styles.container}>
-      <Modal visible={imageModalVisible} transparent={true}>
-        <Pressable
-          onPress={() => setImageModalVisible(false)}
-          style={styles.modalContainer}
-        >
-          {data.imageUrl ? (
-            <Image
-              source={{ uri: data.imageUrl }}
-              style={[
-                styles.modalImage,
-                {
-                  width: width - 36,
-                  height: (width - 36) / aspectRatio!,
-                  borderRadius: 15,
-                },
-              ]}
-            />
-          ) : (
-            <View
-              style={[styles.modalImage, { backgroundColor: Color["grey200"] }]}
-            />
-          )}
-        </Pressable>
-      </Modal>
+      {data.imageUrl && (
+        <ImageModal
+          isVisible={imageModalVisible}
+          setIsVisible={setImageModalVisible}
+          imageUrl={data.imageUrl!}
+        />
+      )}
 
       {loginUser?.club === data.club && loginUser?.role.length !== 0 ? (
         <Header
-          leftButton="close"
+          LeftButton="close"
           headerName="악기 상세"
           RightButton="수정"
-          rightAction={() => {
-            // navigation.push("InstrumentEdit", {
-            //   instrument: JSON.stringify(data),
-            // })
-          }}
+          rightAction={navigateToEditInstrument}
         />
       ) : (
-        <Header leftButton="close" headerName="악기 상세" />
+        <Header LeftButton="close" headerName="악기 상세" />
       )}
 
       <ScrollView contentContainerStyle={styles.scrollView}>
@@ -127,7 +109,10 @@ export const InstrumentDetailPage: React.FC<
           }}
         >
           {data.imageUrl ? (
-            <Image source={{ uri: data.imageUrl }} style={styles.image} />
+            <ImageWithSkeleton
+              imageSource={{ uri: data.imageUrl }}
+              style={styles.image}
+            />
           ) : (
             <View
               style={[styles.image, { backgroundColor: Color["grey200"] }]}
