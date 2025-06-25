@@ -8,10 +8,7 @@ import {
 
 import { useAtomValue } from "jotai";
 
-import {
-  Alert, Color, Icons
-} from "@hongpung/src/common";
-import { Header } from "@hongpung/src/common";
+import { Alert, Checkbox, Color, Icons, Header } from "@hongpung/src/common";
 
 import { UserStatusState } from "@hongpung/src/entities/member";
 
@@ -19,16 +16,19 @@ import {
   ReservationForm,
   reservationFormSubTitle,
 } from "@hongpung/src/entities/reservation";
-import { daysOfWeek } from "@hongpung/src/common/constant/dayOfWeek";
+
 import { useNavigation } from "@react-navigation/native";
 import { useEditReservation } from "@hongpung/src/features/reservation/editReservation/model/useEditReservation.context";
 import { isEqual } from "lodash";
-import { useRef } from "react";
+import React, { useState } from "react";
 import { EditReservationButton } from "@hongpung/src/features/reservation/editReservation/ui/EditReservationButton/EditReservationButton";
 import { instrumentTypes } from "@hongpung/src/entities/instrument/constant/instrumentTypes";
 import { EditReservationStackScreenProps } from "@hongpung/src/common/navigation/editReservation";
+import dayjs from "dayjs";
 
-const EditReservationConfirmPage = () => {
+const EditReservationConfirmPage: React.FC<
+  EditReservationStackScreenProps<"EditReservationConfirm">
+> = ({ navigation }) => {
   const {
     reservation,
     prevReservation,
@@ -36,21 +36,32 @@ const EditReservationConfirmPage = () => {
     requestEditReservation,
   } = useEditReservation();
 
-  if (!isEqual(reservation, prevReservation)) {
-    Alert.alert("오류", "잘못된 접근입니다.");
+  const [isAgree, setAgree] = useState(false);
+
+  if (isEqual(reservation, prevReservation)) {
+    Alert.alert("오류", "잘못된 접근입니다.", {
+      onConfirm: () => {
+        navigation.goBack();
+      },
+    });
     return (
       <View>
-        <Header leftButton={"close"} headerName="예약 수정 정보 확인" />
+        <Header LeftButton={"close"} headerName="예약 수정 정보 확인" />
       </View>
     );
   }
 
   return (
     <View style={EditReservationConfirmStyles.container}>
-      <Header leftButton={"close"} headerName="예약 수정 정보 확인" />
+      <Header LeftButton={"close"} headerName="예약 수정 정보 확인" />
 
       <ScrollView
-        style={{ flexDirection: "column", gap: 24, paddingVertical: 24 }}
+        style={{
+          flexDirection: "column",
+          gap: 24,
+          paddingVertical: 24,
+          backgroundColor: Color["grey100"],
+        }}
       >
         <DifferenceData
           reservation={prevReservation}
@@ -58,7 +69,12 @@ const EditReservationConfirmPage = () => {
           textColor={"grey400"}
         />
 
-        <Icons name={"arrow-down"} color={Color["blue500"]} size={32} />
+        <Icons
+          name={"arrow-down"}
+          color={Color["blue500"]}
+          size={32}
+          style={{ alignSelf: "center", paddingVertical: 8 }}
+        />
 
         <DifferenceData
           reservation={reservation}
@@ -67,7 +83,19 @@ const EditReservationConfirmPage = () => {
         />
       </ScrollView>
 
-      <EditReservationButton isAgree={false} onPress={requestEditReservation} />
+      <View style={{ flexDirection: "column", gap: 16, paddingTop: 16 }}>
+        <View style={{ paddingHorizontal: 32 }}>
+          <Checkbox
+            isChecked={isAgree}
+            onCheck={setAgree}
+            innerText="작성하신 내용이 위와 같나요?"
+          />
+        </View>
+        <EditReservationButton
+          isAgree={isAgree}
+          onPress={requestEditReservation}
+        />
+      </View>
     </View>
   );
 };
@@ -77,16 +105,18 @@ export default EditReservationConfirmPage;
 const DifferenceData = ({
   reservation,
   keys,
-  textColor,
+  textColor = "grey100",
 }: {
   reservation: ReservationForm;
-  keys: (keyof ReservationForm)[];
-  textColor: keyof typeof Color;
+  keys: (keyof Omit<ReservationForm, "startTime" | "endTime"> | "time")[];
+  textColor?: keyof typeof Color & string;
 }) => {
   const loginUser = useAtomValue(UserStatusState);
-  const navigation = useNavigation<EditReservationStackScreenProps<"EditReservationConfirm">["navigation"]>();
+  const navigation =
+    useNavigation<
+      EditReservationStackScreenProps<"EditReservationConfirm">["navigation"]
+    >();
 
-  const timeRendered = useRef<boolean>(false);
   return (
     <View style={EditReservationConfirmStyles.blockContainer}>
       {(() => {
@@ -102,16 +132,17 @@ const DifferenceData = ({
                   <Text style={EditReservationConfirmStyles.leftText}>
                     {reservationFormSubTitle.date}
                   </Text>
-                  <Text style={EditReservationConfirmStyles.rightText}>
-                    {reservation.date} (
-                    {daysOfWeek[new Date(reservation.date!).getDay()]})
+                  <Text
+                    style={[
+                      EditReservationConfirmStyles.rightText,
+                      { color: Color[textColor] },
+                    ]}
+                  >
+                    {dayjs(reservation.date).format("YYYY.MM.DD (ddd)")}
                   </Text>
                 </View>
               );
-            case "startTime":
-            case "endTime":
-              if (timeRendered.current) return null; // 이미 렌더링했으면 무시
-              timeRendered.current = true; // 한 번만 렌더링
+            case "time":
               return (
                 <View
                   key="time"
@@ -121,7 +152,10 @@ const DifferenceData = ({
                     예약 시간
                   </Text>
                   <Text
-                    style={EditReservationConfirmStyles.rightText}
+                    style={[
+                      EditReservationConfirmStyles.rightText,
+                      { color: Color[textColor] },
+                    ]}
                   >{`${reservation.startTime} ~ ${reservation.endTime}`}</Text>
                 </View>
               );
@@ -134,13 +168,19 @@ const DifferenceData = ({
                   <Text style={EditReservationConfirmStyles.leftText}>
                     예약명
                   </Text>
-                  <Text style={EditReservationConfirmStyles.rightText}>
+                  <Text
+                    style={[
+                      EditReservationConfirmStyles.rightText,
+                      { color: Color[textColor] },
+                    ]}
+                  >
                     {reservation.title.length > 0
                       ? reservation.title
-                      : `${loginUser?.nickname
-                        ? loginUser.nickname
-                        : loginUser?.name
-                      }의 연습`}
+                      : `${
+                          loginUser?.nickname
+                            ? loginUser.nickname
+                            : loginUser?.name
+                        }의 연습`}
                   </Text>
                 </View>
               );
@@ -165,6 +205,7 @@ const DifferenceData = ({
                         style={[
                           EditReservationConfirmStyles.rightText,
                           { maxWidth: 156 },
+                          { color: Color[textColor] },
                         ]}
                         numberOfLines={1}
                       >
@@ -179,7 +220,7 @@ const DifferenceData = ({
                         onPress={() =>
                           navigation.navigate("ParticipatorList", {
                             participators: JSON.stringify(
-                              reservation.participators
+                              reservation.participators,
                             ),
                           })
                         }
@@ -192,7 +233,14 @@ const DifferenceData = ({
                       </TouchableOpacity>
                     </View>
                   ) : (
-                    <Text>없음</Text>
+                    <Text
+                      style={[
+                        EditReservationConfirmStyles.rightText,
+                        { color: Color[textColor] },
+                      ]}
+                    >
+                      없음
+                    </Text>
                   )}
                 </View>
               );
@@ -213,14 +261,19 @@ const DifferenceData = ({
                         alignItems: "center",
                       }}
                     >
-                      <Text style={EditReservationConfirmStyles.rightText}>
+                      <Text
+                        style={[
+                          EditReservationConfirmStyles.rightText,
+                          { color: Color[textColor] },
+                        ]}
+                      >
                         {instrumentTypes
-                          .filter((type) => type != "징")
+                          .filter((type) => type !== "징")
                           .map((type) => {
                             const instCount =
                               reservation.borrowInstruments.filter(
                                 (instrument) =>
-                                  instrument.instrumentType == type
+                                  instrument.instrumentType === type,
                               ).length;
                             if (instCount > 0) return `${type} ${instCount}`;
                           })
@@ -231,7 +284,7 @@ const DifferenceData = ({
                         onPress={() =>
                           navigation.navigate("BorrowInstrumentList", {
                             borrowInstruments: JSON.stringify(
-                              reservation.borrowInstruments
+                              reservation.borrowInstruments,
                             ),
                           })
                         }
@@ -247,12 +300,53 @@ const DifferenceData = ({
                     <Text
                       style={[
                         EditReservationConfirmStyles.rightText,
-                        { color: Color["grey300"] },
+                        { color: Color[textColor] },
                       ]}
                     >
                       없음
                     </Text>
                   )}
+                </View>
+              );
+            case "reservationType":
+              return (
+                <View
+                  key={key}
+                  style={EditReservationConfirmStyles.rowItemContainer}
+                >
+                  <Text style={EditReservationConfirmStyles.leftText}>
+                    정규 예약
+                  </Text>
+                  <Text
+                    style={[
+                      EditReservationConfirmStyles.rightText,
+                      { color: Color[textColor] },
+                    ]}
+                  >
+                    {reservation.reservationType === "REGULAR"
+                      ? "예"
+                      : "아니오"}
+                  </Text>
+                </View>
+              );
+
+            case "participationAvailable":
+              return (
+                <View
+                  key={key}
+                  style={EditReservationConfirmStyles.rowItemContainer}
+                >
+                  <Text style={EditReservationConfirmStyles.leftText}>
+                    열린 연습
+                  </Text>
+                  <Text
+                    style={[
+                      EditReservationConfirmStyles.rightText,
+                      { color: Color[textColor] },
+                    ]}
+                  >
+                    {reservation.participationAvailable ? "예" : "아니오"}
+                  </Text>
                 </View>
               );
             default:

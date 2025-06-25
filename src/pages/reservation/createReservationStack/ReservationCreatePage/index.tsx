@@ -1,7 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { View } from "react-native";
 
-import { Checkbox, Header, LongButton } from "@hongpung/src/common";
+import { Header } from "@hongpung/src/common";
 
 import { useCreateReservation } from "@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context";
 
@@ -10,8 +10,8 @@ import { CreateReservationStackScreenProps } from "@hongpung/src/common/navigati
 
 const ReservationCreatePage: React.FC<
   CreateReservationStackScreenProps<"CreateReservationForm">
-> = ({ navigation }) => {
-
+> = ({ navigation, route }) => {
+  const { date } = route.params || {};
   const {
     reservation,
 
@@ -20,48 +20,51 @@ const ReservationCreatePage: React.FC<
     setBorrowInstruments,
     setParticipationAvailable,
     setReservationType,
-
-    isValidReservation
+    setDate,
+    isValidReservation,
   } = useCreateReservation();
+
+  useEffect(() => {
+    if (date) {
+      setDate(date);
+    }
+  }, [date, setDate]);
 
   const resetParticipators = useCallback(
     () => setParticipators([]),
-    [setParticipators]
+    [setParticipators],
   );
 
   const resetBorrowInstruments = useCallback(
     () => setBorrowInstruments([]),
-    [setBorrowInstruments]
+    [setBorrowInstruments],
   );
 
   const goToDateSelect = useCallback(
     () => navigation.navigate("CreateReservationDateSelect"),
-    [navigation]
+    [navigation],
   );
   const goToTimeSelect = useCallback(
     () => navigation.navigate("CreateReservationTimeSelect"),
-    [navigation]
+    [navigation],
   );
   const goToParticipatorsSelect = useCallback(
     () => navigation.navigate("CreateReservationParticipatorsSelect"),
-    [navigation]
+    [navigation],
   );
   const goToBorrowInstrumentsSelect = useCallback(
     () => navigation.navigate("CreateReservationBorrowInstrumentsSelect"),
-    [navigation]
+    [navigation],
   );
 
   const goToReservationCreateComplete = useCallback(
     () => navigation.navigate("CreateReservationConfirm"),
-    [navigation]
+    [navigation],
   );
 
   return (
     <View style={{ flex: 1, backgroundColor: "#FFF" }}>
-      <Header
-        leftButton="close"
-        headerName="신규 예약 작성"
-      />
+      <Header LeftButton="close" headerName="신규 예약 작성" />
       <ReservationForm
         reservation={reservation}
         navigateDatePickerPage={goToDateSelect}
@@ -77,7 +80,6 @@ const ReservationCreatePage: React.FC<
         canSubmit={isValidReservation}
         onSubmit={goToReservationCreateComplete}
       />
-
     </View>
   );
 };

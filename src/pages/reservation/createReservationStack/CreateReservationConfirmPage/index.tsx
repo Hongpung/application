@@ -2,14 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 import { useAtomValue } from "jotai";
 
-import {
-  Alert,
-  Color,
-  Icons,
-  Header,
-  daysOfWeek,
-  LongButton,
-} from "@hongpung/src/common";
+import { Alert, Color, Icons, Header, LongButton } from "@hongpung/src/common";
 
 import { UserStatusState } from "@hongpung/src/entities/member";
 import { reservationFormSubTitle } from "@hongpung/src/entities/reservation";
@@ -17,6 +10,8 @@ import { instrumentTypes } from "@hongpung/src/entities/instrument";
 
 import { useCreateReservation } from "@hongpung/src/features/reservation/createReservation/model/useCreateReservation.context";
 import { CreateReservationStackScreenProps } from "@hongpung/src/common/navigation/createReservation";
+import dayjs from "dayjs";
+import { debounce } from "lodash";
 
 const CreateReservationConfirmPage: React.FC<
   CreateReservationStackScreenProps<"CreateReservationConfirm">
@@ -26,18 +21,31 @@ const CreateReservationConfirmPage: React.FC<
 
   const loginUser = useAtomValue(UserStatusState);
 
+  const navigateToParticipatorList = debounce(
+    () => {
+      navigation.push("ParticipatorList", {
+        participators: JSON.stringify(reservation.participators),
+      });
+    },
+    500,
+    {
+      leading: true,
+      trailing: false,
+    },
+  );
+
   if (!isValidReservation) {
     Alert.alert("오류", "잘못된 접근입니다.");
     return (
       <View>
-        <Header leftButton={"close"} headerName="작성 정보 확인" />
+        <Header LeftButton={"close"} headerName="작성 정보 확인" />
       </View>
     );
   }
 
   return (
     <View style={CreateReservationStyles.container}>
-      <Header leftButton={"close"} headerName="작성 정보 확인" />
+      <Header LeftButton={"close"} headerName="작성 정보 확인" />
       <View style={{ flex: 1, paddingTop: "10%", gap: 24 }}>
         <View style={CreateReservationStyles.blockContainer}>
           <View style={CreateReservationStyles.rowItemContainer}>
@@ -45,8 +53,7 @@ const CreateReservationConfirmPage: React.FC<
               {reservationFormSubTitle.date}
             </Text>
             <Text style={CreateReservationStyles.rightText}>
-              {reservation.date} (
-              {daysOfWeek[new Date(reservation.date!).getDay()]})
+              {dayjs(reservation.date).format("YYYY.MM.DD (ddd)")}
             </Text>
           </View>
           <View style={CreateReservationStyles.rowItemContainer}>
@@ -104,13 +111,7 @@ const CreateReservationConfirmPage: React.FC<
                   {reservation.participators.length > 3 &&
                     `외 ${reservation.participators.length - 3}명`}
                 </Text>
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.push("ParticipatorList", {
-                      participators: JSON.stringify(reservation.participators),
-                    })
-                  }
-                >
+                <TouchableOpacity onPress={navigateToParticipatorList}>
                   <Icons
                     size={16}
                     color={Color["grey300"]}
@@ -139,20 +140,20 @@ const CreateReservationConfirmPage: React.FC<
               >
                 <Text style={CreateReservationStyles.rightText}>
                   {instrumentTypes
-                    .filter((type) => type != "징")
+                    .filter((type) => type !== "징")
                     .map((type) => {
                       const instCount = reservation.borrowInstruments.filter(
                         (instrument) => {
                           if (
                             type === "기타" &&
-                            instrument.instrumentType == "징"
+                            instrument.instrumentType === "징"
                           ) {
                             return true;
-                          } else if (instrument.instrumentType == type) {
+                          } else if (instrument.instrumentType === type) {
                             return true;
                           }
                           return false;
-                        }
+                        },
                       ).length;
                       if (instCount > 0) return `${type} ${instCount}`;
                     })
@@ -164,7 +165,7 @@ const CreateReservationConfirmPage: React.FC<
                   onPress={() => {
                     navigation.navigate("BorrowInstrumentList", {
                       borrowInstruments: JSON.stringify(
-                        reservation.borrowInstruments
+                        reservation.borrowInstruments,
                       ),
                     });
                   }}

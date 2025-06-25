@@ -15,7 +15,7 @@ export function mapReservationDetail(dto: ReservationDto): ReservationDetail {
       reservationType: dto.reservationType,
       participationAvailable: dto.participationAvailable,
       participators: dto.participators?.filter(
-        (user) => user.memberId != dto.creatorId
+        (user) => user.memberId !== dto.creatorId,
       ), // User 타입 유지
       borrowInstruments: dto.borrowInstruments.map((instrument) => ({
         ...instrument,

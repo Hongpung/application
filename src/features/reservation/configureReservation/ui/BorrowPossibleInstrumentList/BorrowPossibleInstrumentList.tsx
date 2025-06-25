@@ -2,9 +2,9 @@ import { Color, Icons } from "@hongpung/src/common";
 import {
   BorrowInstrumentCard,
   Instrument,
+  useInstrumentAccordionList,
 } from "@hongpung/src/entities/instrument";
 import { Pressable, FlatList, View, Text, StyleSheet } from "react-native";
-import { useInstrumentList } from "@hongpung/src/entities/instrument";
 
 type BorrowPossibleInstrumentListProps = {
   instrumentList: Instrument[];
@@ -16,8 +16,8 @@ type BorrowPossibleInstrumentListProps = {
 export const BorrowPossibleInstrumentList: React.FC<
   BorrowPossibleInstrumentListProps
 > = ({ instrumentList, selectedInstruments, toggleInstrument, isLoading }) => {
-  const { isOpen, toggleAccordion, orderInstruments } =
-    useInstrumentList({ instrumentList });
+  const { isOpen, toggleAccordion, orderedInstrumentData } =
+    useInstrumentAccordionList({ instrumentList });
 
   if (isLoading) {
     return (
@@ -27,11 +27,11 @@ export const BorrowPossibleInstrumentList: React.FC<
     );
   }
 
-  const data = Object.entries(orderInstruments).map(([type, instruments]) => ({
+  const data = orderedInstrumentData.map(({ type, instruments }) => ({
     type,
     instruments,
     selectedCount: instruments.filter((instrument) =>
-      selectedInstruments.includes(instrument)
+      selectedInstruments.includes(instrument),
     ).length,
   }));
 

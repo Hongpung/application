@@ -1,6 +1,16 @@
-import { View, Text,  Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 
-import { Alert, Color, Icons } from "@hongpung/src/common";
+import {
+  Alert,
+  Color,
+  defaultSkeletonConfig,
+  DeferredComponent,
+  Icons,
+} from "@hongpung/src/common";
+import { useCallback, useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { Skeleton } from "moti/skeleton";
+import { WeekRow } from "./WeekRow";
 
 type FullCalendarProps = {
   onClickDate: (date: Date) => void;
@@ -8,18 +18,18 @@ type FullCalendarProps = {
   datesInMonth: number[][];
   incrementMonth: () => void;
   decrementMonth: () => void;
-  reservationsData: {
+
+  error: Error | null;
+  selectedDate: Date | null;
+  reservationsData?: {
     [key: number]: {
       color: string;
     }[];
-  } | null;
-  error: Error | null;
+  };
   isLoading: boolean;
 };
 
 export const FullCalendar: React.FC<FullCalendarProps> = (props) => {
-  const today = new Date();
-
   const {
     calendarMonth,
     datesInMonth,
@@ -29,11 +39,24 @@ export const FullCalendar: React.FC<FullCalendarProps> = (props) => {
     reservationsData,
     error,
     isLoading,
+    selectedDate,
   } = props;
 
-  if (error) {
-    Alert.alert("오류", error?.message || "알 수 없는 오류입니다.");
+  const navigation = useNavigation();
 
+  const onError = useCallback((error: Error) => {
+    console.error("오류 발생:", error);
+    Alert.alert("오류", error.message || "알 수 없는 오류입니다.");
+  }, []);
+
+  useEffect(() => {
+    if (error) {
+      onError(error);
+    }
+  }, [error, onError]);
+
+  if (error) {
+    navigation.goBack();
     return (
       <View>
         <Text>오류</Text>
@@ -98,139 +121,43 @@ export const FullCalendar: React.FC<FullCalendarProps> = (props) => {
           </Text>
         </View>
         <View style={{ height: 20 }} />
-        <View
-          style={{
-            gap: 4,
-          }}
-        >
-          {datesInMonth.map((week, index) => {
-            return (
-              <View
-                key={"week-" + index}
-                style={{
-                  flexDirection: "row",
-                  marginHorizontal: 32,
-                  justifyContent: "space-around",
-                }}
-              >
-                {week.map((day, index) => {
-                  if (isLoading || reservationsData === null) {
-                    return (
-                      <View
-                        key={"empty" + index}
-                        style={{
-                          width: 32,
-                          height: 60,
-                          borderRadius: 5,
-                        }}
-                      />
-                    );
-                  }
-                  if (day == 0)
-                    return (
-                      <View
-                        key={"empty" + index}
-                        style={{ width: 32, height: 32 }}
-                      />
-                    );
-                  else {
-                    const thisDate = new Date(
-                      calendarMonth.getFullYear(),
-                      calendarMonth.getMonth(),
-                      day
-                    );
-                    const textColor =
-                      thisDate < today ? Color["grey300"] : Color["grey400"];
-                    return (
-                      <Pressable
-                        key={`date-${day}`}
-                        style={{
-                          height: 60,
-                          width: 32,
-                          alignItems: "center",
-                          justifyContent: "flex-start",
-                          backgroundColor:
-                            day == today.getDate() &&
-                            calendarMonth.getMonth() == today.getMonth()
-                              ? Color["blue100"]
-                              : "transparent",
-                          borderRadius: 5,
-                        }}
-                        onPress={() =>
-                          onClickDate(
-                            new Date(
-                              `${calendarMonth.getFullYear()}-${
-                                calendarMonth.getMonth() + 1
-                              }-${day}`
-                            )
-                          )
-                        }
-                      >
-                        <Text
-                          style={[
-                            styles.CalendarText,
-                            {
-                              color:
-                                day === today.getDate() &&
-                                calendarMonth.getMonth() === today.getMonth()
-                                  ? Color["blue600"]
-                                  : textColor,
-                            },
-                          ]}
-                        >
-                          {day}
-                        </Text>
-                        <View
-                          style={{
-                            marginHorizontal: 2,
-                            height: 16,
-                            flexDirection: "column-reverse",
-                            marginTop: 4,
-                          }}
-                        >
-                          {reservationsData[day] &&
-                            reservationsData[day]
-                              .slice(0, 3)
-                              .map((obj, index) => {
-                                const color =
-                                  obj.color == "grey"
-                                    ? obj.color + "300"
-                                    : obj.color + "500";
-
-                                return (
-                                  <View
-                                    key={calendarMonth.getMonth() + day + index}
-                                    style={{
-                                      height: 4,
-                                      backgroundColor: Color[color],
-                                      width: 28,
-                                      borderRadius: 5,
-                                      marginTop: 2,
-                                    }}
-                                  />
-                                );
-                              })}
-                        </View>
-                        {reservationsData[day]?.length > 3 && (
-                          <Text
-                            style={{
-                              fontSize: 12,
-                              fontFamily: "NanumSquareNeo-Bold",
-                              color: Color["grey300"],
-                              marginTop: 2,
-                            }}
-                          >
-                            +{reservationsData[day].length - 3}
-                          </Text>
-                        )}
-                      </Pressable>
-                    );
-                  }
-                })}
-              </View>
-            );
-          })}
-        </View>
+        {isLoading || !reservationsData ? (
+          <DeferredComponent delay={100}>
+            <View
+              style={{
+                height: 300,
+                width: "100%",
+                paddingHorizontal: 32,
+                borderRadius: 24,
+                overflow: "hidden",
+              }}
+            >
+              <Skeleton
+                {...defaultSkeletonConfig}
+                height={300}
+                width={"100%"}
+              />
+            </View>
+          </DeferredComponent>
+        ) : (
+          <View
+            style={{
+              gap: 4,
+            }}
+          >
+            {datesInMonth.map((week, index) => (
+              <WeekRow
+                key={`week-${index}`}
+                week={week}
+                weekIndex={index}
+                calendarMonth={calendarMonth}
+                reservationsData={reservationsData}
+                onDatePress={onClickDate}
+                selectedDate={selectedDate}
+              />
+            ))}
+          </View>
+        )}
         <View style={{ height: 8 }} />
       </View>
     </View>

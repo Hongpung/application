@@ -1,15 +1,25 @@
-import React from 'react';
-import { Keyboard, Modal, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { ShortButton } from '@hongpung/src/common/ui/buttons';
-import { Color } from '@src/common';
-import { clubNames } from '@hongpung/src/entities/club';
+import React from "react";
+import {
+  Keyboard,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { ShortButton } from "@hongpung/src/common/ui/buttons";
+import { Color } from "@src/common";
+import { clubNames } from "@hongpung/src/entities/club";
 
 interface OptionsModalProps {
   visible: boolean;
   selectedClubs: string[];
   setClubsOption: React.Dispatch<React.SetStateAction<ClubName[]>>;
   selectedEnrollmentNumberRange: { startNumber?: string; endNumber?: string };
-  setEnrollmentNumberRange: React.Dispatch<React.SetStateAction<{ startNumber?: string; endNumber?: string }>>;
+  setEnrollmentNumberRange: React.Dispatch<
+    React.SetStateAction<{ startNumber?: string; endNumber?: string }>
+  >;
   onClose: () => void;
   onApply: () => void;
 }
@@ -23,7 +33,6 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
   onClose,
   onApply,
 }) => {
-
   return (
     <Modal visible={visible} transparent>
       <Pressable style={styles.overlay} onPress={Keyboard.dismiss}>
@@ -34,34 +43,62 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
             <Text style={styles.sectionTitle}>동아리</Text>
             <View style={styles.clubContainer}>
               <Pressable
-                style={[styles.clubBox, selectedClubs.length === 0 && styles.selectedBox]}
-                onPress={() => setClubsOption([])}>
-                <Text style={[styles.clubText, selectedClubs.length === 0 && styles.selectedText]}>전체</Text>
+                style={[
+                  styles.clubBox,
+                  selectedClubs.length === 0 && styles.selectedBox,
+                ]}
+                onPress={() => setClubsOption([])}
+              >
+                <Text
+                  style={[
+                    styles.clubText,
+                    selectedClubs.length === 0 && styles.selectedText,
+                  ]}
+                >
+                  전체
+                </Text>
               </Pressable>
-              {clubNames.filter(club => club != '기타').map(club => {
-                const isSelectedClub = selectedClubs.includes(club);
+              {clubNames
+                .filter((club) => club !== "기타")
+                .map((club) => {
+                  const isSelectedClub = selectedClubs.includes(club);
 
-                return (
-                  <Pressable
-                    key={club}
-                    style={[styles.clubBox, isSelectedClub && { borderColor: Color['blue500'], backgroundColor: Color['blue100'] }]}
-                    onPress={() => {
+                  return (
+                    <Pressable
+                      key={club}
+                      style={[
+                        styles.clubBox,
+                        isSelectedClub && {
+                          borderColor: Color["blue500"],
+                          backgroundColor: Color["blue100"],
+                        },
+                      ]}
+                      onPress={() => {
+                        if (!isSelectedClub && selectedClubs.length === 3) {
+                          setClubsOption([]);
+                          return;
+                        }
 
-                      if (!isSelectedClub && selectedClubs.length == 3) {
-                        setClubsOption([])
-                        return;
-                      }
-
-                      if (isSelectedClub)
-                        setClubsOption(prev => prev.filter(sclub => sclub != club))
-                      else
-                        setClubsOption(prev => ([...prev, club]))
-
-                    }}>
-                    <Text style={[styles.clubText, isSelectedClub ? { color: Color['blue500'] } : { color: Color['grey600'] }]}>{club}</Text>
-                  </Pressable>
-                )
-              })}
+                        if (isSelectedClub)
+                          setClubsOption((prev) =>
+                            prev.filter((sclub) => sclub !== club),
+                          );
+                        else setClubsOption((prev) => [...prev, club]);
+                      }}
+                    >
+                      <Text
+                        style={[
+                          styles.clubText,
+                          isSelectedClub
+                            ? { color: Color["blue500"] }
+                            : { color: Color["grey600"] },
+                        ]}
+                      >
+                        {club}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
             </View>
 
             <Text style={styles.sectionTitle}>학번</Text>
@@ -71,7 +108,10 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
                 style={styles.input}
                 value={selectedEnrollmentNumberRange.startNumber}
                 onChangeText={(value) =>
-                  setEnrollmentNumberRange((prev) => ({ ...prev, startNumber: value }))
+                  setEnrollmentNumberRange((prev) => ({
+                    ...prev,
+                    startNumber: value,
+                  }))
                 }
                 placeholder="시작 학번"
               />
@@ -81,7 +121,10 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
                 style={styles.input}
                 value={selectedEnrollmentNumberRange.endNumber}
                 onChangeText={(value) =>
-                  setEnrollmentNumberRange((prev) => ({ ...prev, endNumber: value }))
+                  setEnrollmentNumberRange((prev) => ({
+                    ...prev,
+                    endNumber: value,
+                  }))
                 }
                 placeholder="끝 학번"
               />
@@ -89,8 +132,18 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
           </View>
 
           <View style={styles.buttonContainer}>
-            <ShortButton color="blue" isFilled={false} innerContent="초기화" onPress={onClose} />
-            <ShortButton color="blue" isFilled innerContent="적용" onPress={onApply} />
+            <ShortButton
+              color="blue"
+              isFilled={false}
+              innerContent="초기화"
+              onPress={onClose}
+            />
+            <ShortButton
+              color="blue"
+              isFilled
+              innerContent="적용"
+              onPress={onApply}
+            />
           </View>
         </View>
       </Pressable>
@@ -101,12 +154,12 @@ const OptionsModal: React.FC<OptionsModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
   },
   modalContainer: {
     marginHorizontal: 24,
-    backgroundColor: '#FFF',
+    backgroundColor: "#FFF",
     paddingVertical: 16,
     borderRadius: 10,
   },
@@ -114,61 +167,61 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   title: {
-    fontFamily: 'NanumSquareNeo-Bold',
+    fontFamily: "NanumSquareNeo-Bold",
     fontSize: 16,
-    color: Color['grey700'],
+    color: Color["grey700"],
     marginBottom: 16,
   },
   sectionTitle: {
-    fontFamily: 'NanumSquareNeo-Bold',
+    fontFamily: "NanumSquareNeo-Bold",
     fontSize: 16,
-    color: Color['grey700'],
+    color: Color["grey700"],
     marginVertical: 8,
   },
   clubContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
   clubBox: {
     padding: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: Color['grey200'],
+    borderColor: Color["grey200"],
   },
   selectedBox: {
-    borderColor: Color['blue500'],
-    backgroundColor: Color['blue100'],
+    borderColor: Color["blue500"],
+    backgroundColor: Color["blue100"],
   },
   clubText: {
-    fontFamily: 'NanumSquareNeo-Regular',
-    color: Color['grey600'],
+    fontFamily: "NanumSquareNeo-Regular",
+    color: Color["grey600"],
   },
   selectedText: {
-    color: Color['blue500'],
+    color: Color["blue500"],
   },
   enrollmentContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   input: {
     flex: 1,
     height: 36,
     borderWidth: 1,
-    borderColor: Color['grey200'],
+    borderColor: Color["grey200"],
     borderRadius: 8,
     paddingHorizontal: 8,
-    backgroundColor: Color['grey100'],
+    backgroundColor: Color["grey100"],
   },
   rangeText: {
-    fontFamily: 'NanumSquareNeo-Regular',
+    fontFamily: "NanumSquareNeo-Regular",
     fontSize: 16,
-    color: Color['grey600'],
+    color: Color["grey600"],
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     marginTop: 16,
   },

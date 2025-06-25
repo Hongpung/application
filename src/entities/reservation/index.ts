@@ -16,18 +16,16 @@ export { DateTimeViewer } from "./ui/DateTimeViewer/DateTimeViewer";
 export { ReservationTypeViewer } from "./ui/ReservationTypeViewer/ReservationTypeViewer";
 export { ReservationCard } from "./ui/ReservationCard/ReservationCard";
 export { ReservationTicket } from "./ui/ReservationTicket/ReservationTicket";
+export { ReservationCardSkeleton } from "./ui/ReservationCardSkeleton/ReservationCardSkeleton";
 
 export {
   useLoadMonthlyReservationsFetch,
   useLoadDailyReservationsFetch,
   useLoadReservationDetailFetch,
-  
   useLoadMyUpcommingScheduleFetch,
   useLoadMySchedulesFetch,
   useLoadMyTodayReservationFetch,
-  
   useLoadOccupiedTimesFetch,
-
   useSearchInvitePossibleMembersFetch,
   useBorrowPossibleInstrumentsFetch,
   useCreateReservationRequest,

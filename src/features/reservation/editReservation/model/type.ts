@@ -1,7 +1,7 @@
 import { ReservationForm } from "@hongpung/src/entities/reservation";
 
 export type EditReservationContextProps = {
-  prevReservation: ReservationForm;
+  prevReservation: ReservationForm & { reservationId: number };
   reservation: ReservationForm;
 
   setDate: (date: ReservationForm["date"]) => void;
@@ -9,18 +9,21 @@ export type EditReservationContextProps = {
   setEndTime: (time: ReservationForm["endTime"]) => void;
   setTitle: (time: ReservationForm["title"]) => void;
   setParticipationAvailable: (
-    participationAvailable: ReservationForm["participationAvailable"]
+    participationAvailable: ReservationForm["participationAvailable"],
   ) => void;
   setReservationType: (
-    reservationType: ReservationForm["reservationType"]
+    reservationType: ReservationForm["reservationType"],
   ) => void;
   setParticipators: (participators: ReservationForm["participators"]) => void;
   setBorrowInstruments: (
-    borrowInstruments: ReservationForm["borrowInstruments"]
+    borrowInstruments: ReservationForm["borrowInstruments"],
   ) => void;
 
   verifyEditReservation: (onVerfyied: () => void) => Promise<void>;
-  differentKeys: (keyof ReservationForm)[];
+  differentKeys: (
+    | keyof Omit<ReservationForm, "startTime" | "endTime">
+    | "time"
+  )[];
 
   requestEditReservation: () => Promise<void>;
 

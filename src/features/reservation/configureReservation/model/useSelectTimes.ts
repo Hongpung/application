@@ -9,6 +9,7 @@ export const useSelectTimes = ({
   selectedTimeBlocks,
   setTimeBlocks,
   date,
+  prevDate,
 }: {
   occupiedTimes: TimeFormat[];
   startTime?: TimeFormat;
@@ -16,13 +17,13 @@ export const useSelectTimes = ({
   selectedTimeBlocks: TimeFormat[];
   setTimeBlocks: (newBlocks: TimeFormat[]) => void;
   date?: string;
+  prevDate?: string;
 }) => {
-  
-  if(!date){
+  if (!date) {
     throw new Error("date is required");
   }
 
-  const initialTimeBlock = useMemo((): TimeFormat[] => {
+  const initialTimeBlock = useMemo(() => {
     if (!startTime || !endTime) return [];
 
     const startIndex = TimeArray.indexOf(startTime);
@@ -36,13 +37,13 @@ export const useSelectTimes = ({
     (time: TimeFormat) => {
       const sortedSelectedTimes =
         selectedTimeBlocks.sort(
-          (a, b) => TimeArray.indexOf(a) - TimeArray.indexOf(b)
+          (a, b) => TimeArray.indexOf(a) - TimeArray.indexOf(b),
         ) ?? [];
 
       const timeIndex = TimeArray.indexOf(time);
       const firstSelectedTimeIndex = TimeArray.indexOf(sortedSelectedTimes[0]);
       const lastSelectedTimeIndex = TimeArray.indexOf(
-        sortedSelectedTimes[sortedSelectedTimes.length - 1]
+        sortedSelectedTimes[sortedSelectedTimes.length - 1],
       );
 
       if (!sortedSelectedTimes.includes(time)) {
@@ -60,7 +61,7 @@ export const useSelectTimes = ({
           const endIndex = Math.max(timeIndex, lastSelectedTimeIndex);
           const newTimes = TimeArray.slice(startIndex, endIndex + 1);
           const containingOccupied = newTimes.filter((newTime) =>
-            occupiedTimes.includes(newTime)
+            occupiedTimes.includes(newTime),
           );
 
           if (containingOccupied.length > 0 && containingOccupied) {
@@ -69,7 +70,7 @@ export const useSelectTimes = ({
               //중첩되는 occupideTime을 가져와야함
               const lastOccupiedIndex =
                 TimeArray.indexOf(
-                  containingOccupied[containingOccupied.length - 1]
+                  containingOccupied[containingOccupied.length - 1],
                 ) + 1;
               const newTimes = TimeArray.slice(lastOccupiedIndex, endIndex + 1);
               setTimeBlocks([...newTimes]);
@@ -78,31 +79,35 @@ export const useSelectTimes = ({
                 TimeArray.indexOf(containingOccupied[0]!) - 1;
               const newTimes = TimeArray.slice(
                 startIndex,
-                firstOccupiedIndex + 1
+                firstOccupiedIndex + 1,
               );
               setTimeBlocks([...newTimes]);
             }
           } else setTimeBlocks([...newTimes]);
         }
       } else {
-        if (timeIndex === firstSelectedTimeIndex ||
-            timeIndex === lastSelectedTimeIndex) {
+        if (
+          timeIndex === firstSelectedTimeIndex ||
+          timeIndex === lastSelectedTimeIndex
+        ) {
           setTimeBlocks(
-            sortedSelectedTimes.filter((selected) => selected !== time)
+            sortedSelectedTimes.filter((selected) => selected !== time),
           );
         }
       }
     },
-    [occupiedTimes, selectedTimeBlocks]
+    [occupiedTimes, selectedTimeBlocks, setTimeBlocks],
   );
 
   useEffect(() => {
-    if (startTime && endTime) setTimeBlocks(initialTimeBlock);
-  }, []);
+    setTimeBlocks(initialTimeBlock);
+    console.log("initialTimeBlock", startTime, endTime);
+  }, [startTime, endTime, initialTimeBlock, setTimeBlocks]);
 
   useEffect(() => {
+    if (date === prevDate) return;
     setTimeBlocks([]);
-  }, [date]);
+  }, [date, prevDate, setTimeBlocks]);
 
-  return { selectedTimeBlocks, toggleTimeBlock };
+  return { toggleTimeBlock };
 };

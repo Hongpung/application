@@ -6,7 +6,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
 import { Alert } from "@hongpung/src/common";
-import Toast from "react-native-toast-message";
+import { deleteCompleteToast } from "../lib/toast";
 
 export const useDeleteReservation = () => {
   const navigation = useNavigation();
@@ -38,10 +38,7 @@ export const useDeleteReservation = () => {
 
             await request({ reservationId: reservation.reservationId });
 
-            Toast.show({
-              text1: "예약이 취소되었습니다.",
-              type: "success",
-            });
+            deleteCompleteToast();
             navigation.goBack();
           } catch {
             Alert.alert("오류", "오류가 발생했습니다.");
@@ -49,7 +46,7 @@ export const useDeleteReservation = () => {
         },
       });
     },
-    [request, navigation]
+    [request, navigation],
   );
 
   return { onDeleteReservation, isLoading, error };

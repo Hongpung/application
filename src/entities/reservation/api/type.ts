@@ -1,138 +1,123 @@
-import { TimeFormat } from "@hongpung/src/common"
-import { Instrument } from "@hongpung/src/entities/instrument/@x/reservation"
-import { Member } from "@hongpung/src/entities/member/@x/reservation"
+import { TimeFormat } from "@hongpung/src/common";
+import { Instrument } from "@hongpung/src/entities/instrument/@x/reservation";
+import { Member } from "@hongpung/src/entities/member/@x/reservation";
 
+export type ReservationDto =
+  | {
+      reservationId?: number;
 
-export type ReservationDto = {
-    reservationId?: number
+      title: string; // 예약 제목
 
-    title: string // 예약 제목
+      date: string; // 예약 날짜 yyyy-mm-dd 형식
 
-    date: string // 예약 날짜 yyyy-mm-dd 형식
+      startTime: string; // 시작 시간 hh:mm 형식
+      endTime: string; // 시작 시간 hh:mm 형식
 
-    startTime: string // 시작 시간 hh:mm 형식
-    endTime: string // 시작 시간 hh:mm 형식
+      creatorId?: number;
+      creatorName: string;
+      creatorNickname?: string;
 
-    creatorId?: number;
-    creatorName: string;
-    creatorNickname?: string;
+      reservationType: Exclude<ReservationType, "EXTERNAL">;
 
-    reservationType: Exclude<ReservationType, "EXTERNAL">
+      participationAvailable: boolean;
 
-    participationAvailable: boolean
+      participators: Member[];
 
-    participators: Member[]
+      borrowInstruments: Instrument[];
+    }
+  | {
+      reservationId?: number;
 
-    borrowInstruments: Instrument[]
-}|{
-    reservationId?: number
+      title: string; // 예약 제목
 
-    title: string // 예약 제목
+      date: string; // 예약 날짜 yyyy-mm-dd 형식
 
-    date: string // 예약 날짜 yyyy-mm-dd 형식
+      startTime: string; // 시작 시간 hh:mm 형식
+      endTime: string; // 시작 시간 hh:mm 형식
 
-    startTime: string // 시작 시간 hh:mm 형식
-    endTime: string // 시작 시간 hh:mm 형식
+      creatorName: string;
 
-   
-    creatorName: string;
+      reservationType: "EXTERNAL";
 
-    reservationType: "EXTERNAL"
-
-    participationAvailable: boolean
-
-}
-
-
+      participationAvailable: boolean;
+    };
 
 export interface MonthlyReservationDto {
+  reservationId: number;
 
-    reservationId: number;
+  date: string;
 
-    date: string;
+  reservationType: ReservationType;
 
-    reservationType: ReservationType;
-
-    participationAvailable: boolean;
-
+  participationAvailable: boolean;
 }
 
 //일간 조회
 export interface DailyReservationDto {
+  reservationId: number;
 
-    reservationId: number;
+  date: string;
 
-    date: string;
+  startTime: string;
+  endTime: string;
 
-    startTime: string;
-    endTime: string;
+  title: string;
 
-    title: string;
+  amountOfParticipators: number;
 
-    amountOfParticipators: number;
+  creatorName: string;
 
-    creatorName: string;
+  creatorNickname?: string;
 
-    creatorNickname?: string;
+  reservationType: ReservationType;
 
-    reservationType: ReservationType;
-
-    participationAvailable: boolean;
+  participationAvailable: boolean;
 }
-
-
-
 
 export type ExistReservationDto = {
+  reservationId: number;
 
-    reservationId: number;
+  startTime: TimeFormat;
 
-    startTime: TimeFormat;
+  endTime: TimeFormat;
 
-    endTime: TimeFormat;
-
-    reservationType: ReservationType;
-
-}
+  reservationType: ReservationType;
+};
 
 export interface ReservationCreateRequestBody {
+  title: string; // 예약 제목
 
-    title: string // 예약 제목
+  date: string; // 예약 날짜 yyyy-mm-dd 형식
 
-    date: string // 예약 날짜 yyyy-mm-dd 형식
+  startTime: string; // 시작 시간 hh:mm 형식
+  endTime: string; // 시작 시간 hh:mm 형식
 
-    startTime: string // 시작 시간 hh:mm 형식
-    endTime: string // 시작 시간 hh:mm 형식
+  reservationType: Exclude<ReservationType, "EXTERNAL">; // 예약 유형 변환
 
-    reservationType: Exclude<ReservationType, 'EXTERNAL'>  // 예약 유형 변환
+  participationAvailable: boolean;
 
-    participationAvailable: boolean
+  participatorIds: number[];
 
-    participatorIds: number[]
-
-    borrowInstrumentIds: number[]
-
+  borrowInstrumentIds: number[];
 }
 
 export interface ReservationEditRequestBody {
+  reservationId: number;
 
-    reservationId: number
+  title?: string; // 예약 제목
 
-    title?: string // 예약 제목
+  date?: string; // 예약 날짜 yyyy-mm-dd 형식
 
-    date?: string // 예약 날짜 yyyy-mm-dd 형식
+  startTime?: string; // 시작 시간 hh:mm 형식
+  endTime?: string; // 시작 시간 hh:mm 형식
 
-    startTime?: string // 시작 시간 hh:mm 형식
-    endTime?: string // 시작 시간 hh:mm 형식
+  reservationType?: Exclude<ReservationType, "EXTERNAL">; // 예약 유형 변환
 
-    reservationType?: Exclude<ReservationType, 'EXTERNAL'>  // 예약 유형 변환
+  participationAvailable?: boolean;
 
-    participationAvailable?: boolean
+  addedParticipatorIds?: number[];
+  removedParticipatorIds?: number[];
 
-    addedParticipatorIds?: number[]
-    removedParticipatorIds?: number[]
-
-    addedBorrowInstrumentIds?: number[]
-    removedBorrowInstrumentIds?: number[]
-
+  addedBorrowInstrumentIds?: number[];
+  removedBorrowInstrumentIds?: number[];
 }
