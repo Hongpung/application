@@ -1,0 +1,112 @@
+import React from "react";
+import { Color, Icons, ImageWithSkeleton } from "@hongpung/src/common";
+
+import { Pressable, View, StyleSheet, Alert } from "react-native";
+
+interface ProfileImageSelectorProps {
+  profileImageUrl?: string;
+  selectedImageUri: string | null;
+  pickImageFromAlbum: () => void;
+  onResetProfileImage: () => void;
+}
+
+export const ProfileImageSelector: React.FC<ProfileImageSelectorProps> = ({
+  profileImageUrl,
+  selectedImageUri,
+  pickImageFromAlbum,
+  onResetProfileImage,
+}) => {
+  const onConfirmChange = () => {
+    if (profileImageUrl) {
+      Alert.alert(
+        "프로필 이미지 변경",
+        "프로필 이미지를 변경하시겠습니까?",
+        [
+          {
+            text: "확인",
+            isPreferred: true,
+            onPress: () => {
+              pickImageFromAlbum();
+            },
+          },
+          {
+            text: "취소",
+            style: "destructive",
+          },
+          {
+            text: "프로필 이미지 제거",
+            style: "destructive",
+            onPress: () => {
+              onResetProfileImage();
+            },
+          },
+        ],
+        { cancelable: true },
+      );
+    } else {
+      pickImageFromAlbum();
+    }
+  };
+
+  return (
+    <Pressable style={styles.imageContainer} onPress={onConfirmChange}>
+      {selectedImageUri || profileImageUrl ? (
+        <>
+          <ImageWithSkeleton
+            imageSource={selectedImageUri || profileImageUrl}
+            style={styles.image}
+            contentFit="cover"
+          />
+          <View style={styles.cameraIconContainer}>
+            <Icons name="camera" size={24} color={Color["grey400"]} />
+          </View>
+        </>
+      ) : (
+        <View style={styles.imagePlaceholder}>
+          <Icons name="add" size={32} color={Color["grey400"]} />
+        </View>
+      )}
+    </Pressable>
+  );
+};
+
+const styles = StyleSheet.create({
+  imageContainer: {
+    width: 90,
+    height: 120,
+    borderRadius: 10,
+    marginHorizontal: "auto",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  image: {
+    borderRadius: 10,
+    width: "100%",
+    height: "100%",
+  },
+  imagePlaceholder: {
+    backgroundColor: Color["grey200"],
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 16,
+    width: "100%",
+    height: "100%",
+    borderRadius: 10,
+  },
+  imagePlaceholderText: {
+    fontFamily: "NanumSquareNeo-Bold",
+    fontSize: 14,
+    color: Color["grey400"],
+  },
+  cameraIconContainer: {
+    position: "absolute",
+    backgroundColor: "#FFF",
+    borderRadius: 100,
+    width: 32,
+    height: 32,
+    bottom: -8,
+    right: -8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

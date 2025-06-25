@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { View, StyleSheet, FlatList, Text } from "react-native";
 import { type Member } from "@hongpung/src/entities/member";
-import MemberCard from "@hongpung/src/entities/member/ui/MemberCard/MemberCard";
 import MemberCardSkeleton from "@hongpung/src/entities/member/ui/MemberCardSkeleton/MemberCardSkeleton";
 import { MemberDetailModal } from "@hongpung/src/entities/member/ui/MemberDetailModal/MemberDetailModal";
 import { Color } from "@hongpung/src/common";
@@ -20,26 +19,28 @@ const ParticipatorList: React.FC<ParticipatorListProps> = ({
 }) => {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
-  const renderItem = ({ item: member }: { item: Member }) => (
-    <View style={styles.cardContainer}>
-      <ParticipatorCard
-        member={member}
-        onPress={() => {
-          setSelectedMember(member);
-        }}
-        isPicked={false}
-      />
-    </View>
-  );
-
   return (
     <>
-      <MemberDetailModal selectedMember={selectedMember} />
+      <MemberDetailModal
+        selectedMember={selectedMember}
+        resetMember={() => setSelectedMember(null)}
+      />
       <FlatList
         data={members}
         contentContainerStyle={styles.listContainer}
         keyExtractor={(member) => member.memberId.toString()}
-        renderItem={renderItem}
+        renderItem={({ item: member }) => (
+          <ParticipatorCard
+            member={member}
+            onPress={() => {
+              setSelectedMember(member);
+            }}
+            isPicked={false}
+          />
+        )}
+        ListHeaderComponent={<View style={{ height: 12 }} />}
+        ListFooterComponent={<View style={{ height: 12 }} />}
+        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
         ListEmptyComponent={
           isLoading ? (
             <View style={styles.skeletonContainer}>

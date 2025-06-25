@@ -1,35 +1,34 @@
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 import { Skeleton } from "moti/skeleton";
 
 import { Color, defaultSkeletonConfig } from "@hongpung/src/common";
 
 export const ClubProfileSectionSkeleton: React.FC = () => {
-
-    return (
-      <Skeleton.Group show>
-        <View style={[styles.profileImageContainer, { position: "relative" }]}>
-          <View style={styles.profileImage}>
-            <Skeleton width={"100%"} height={"100%"} {...defaultSkeletonConfig} />
-          </View>
+  return (
+    <Skeleton.Group show>
+      <View style={[styles.profileImageContainer, { position: "relative" }]}>
+        <View style={styles.profileImage}>
+          <Skeleton width={"100%"} height={"100%"} {...defaultSkeletonConfig} />
         </View>
+      </View>
 
-        <View style={styles.infoContainer}>
-          <View style={styles.info}>
-            <Text style={styles.skeletonLabel}>동아리</Text>
-            <Skeleton width={120} height={24} {...defaultSkeletonConfig} />
-          </View>
-          <View style={styles.info}>
-            <Text style={styles.skeletonLabel}>패짱</Text>
-            <Skeleton width={120} height={24} {...defaultSkeletonConfig} />
-          </View>
-          <View style={styles.info}>
-            <Text style={styles.skeletonLabel}>상쇠</Text>
-            <Skeleton width={120} height={24} {...defaultSkeletonConfig} />
-          </View>
+      <View style={styles.infoContainer}>
+        <View style={styles.info}>
+          <Text style={styles.skeletonLabel}>동아리</Text>
+          <Skeleton width={120} height={24} {...defaultSkeletonConfig} />
         </View>
-      </Skeleton.Group>
-    );
+        <View style={styles.info}>
+          <Text style={styles.skeletonLabel}>패짱</Text>
+          <Skeleton width={120} height={24} {...defaultSkeletonConfig} />
+        </View>
+        <View style={styles.info}>
+          <Text style={styles.skeletonLabel}>상쇠</Text>
+          <Skeleton width={120} height={24} {...defaultSkeletonConfig} />
+        </View>
+      </View>
+    </Skeleton.Group>
+  );
 };
 
 const styles = StyleSheet.create({

@@ -7,7 +7,7 @@ import { MemberDetailModal } from "@hongpung/src/entities/member/ui/MemberDetail
 import { Color } from "@hongpung/src/common";
 
 interface MemberListProps {
-  members: Member[] | null;
+  members?: Member[];
   isLoading?: boolean;
   EmptyComponent?: React.ReactNode;
 }
@@ -30,7 +30,7 @@ const MemberList: React.FC<MemberListProps> = ({
         />
       </View>
     ),
-    []
+    [],
   );
   if (isLoading)
     return (

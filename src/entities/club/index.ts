@@ -1,7 +1,7 @@
 import { Club, ClubInfo, ClubRole, clubIdsMap } from "./model/type";
 import { clubNames } from "./constant/clubNames";
 import {
-  useLoadClubInfoFetch,
+  useLoadClubInfoSuspenseFetch,
   useLoadMyClubMembersFetch,
   useLoadClubInstrumentsFetch,
 } from "./api/clubApi";
@@ -9,7 +9,7 @@ import {
 export type { Club, ClubInfo, ClubRole };
 export { clubNames, clubIdsMap };
 export {
-  useLoadClubInfoFetch,
+  useLoadClubInfoSuspenseFetch,
   useLoadMyClubMembersFetch,
   useLoadClubInstrumentsFetch,
 };

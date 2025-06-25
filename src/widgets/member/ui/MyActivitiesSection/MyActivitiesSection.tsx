@@ -1,6 +1,5 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Color } from "@hongpung/src/common";
-import { Icons } from "@hongpung/src/common";
+import { Color, Icons } from "@hongpung/src/common";
 import { MY_ACTIVITIE_MENUS } from "@hongpung/src/entities/member/constants/myActivitiesSubMenu";
 import { MainStackParamList } from "@hongpung/src/common/navigation";
 
@@ -63,4 +62,4 @@ const styles = StyleSheet.create({
     fontFamily: "NanumSquareNeo-Regular",
     textAlign: "left",
   },
-}); 
+});

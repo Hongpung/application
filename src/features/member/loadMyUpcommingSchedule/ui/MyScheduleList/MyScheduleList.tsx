@@ -1,8 +1,10 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-import { Reservation } from "@hongpung/src/entities/reservation";
-import { ReservationTicket } from "@hongpung/src/entities/reservation";
+import {
+  Reservation,
+  ReservationTicket,
+} from "@hongpung/src/entities/reservation";
 import { getDisplayDate } from "../../lib/getDisplayData";
 import EmptySchedule from "@hongpung/src/widgets/member/ui/EmptySchedule/EmptySchedule";
 
