@@ -1,7 +1,10 @@
-import { timeToDate } from "./timeToDate";
+import dayjs from "dayjs";
 
 export const isOpen = ((): boolean => {
-    const utcTime = new Date();
-    const koreaTime = new Date(utcTime.getTime() + 9 * 60 * 60 * 1000);
-    return timeToDate('08:00:00') <= koreaTime && timeToDate('22:30:00') >= koreaTime
-})()
+  const koreaTime = dayjs();
+  const openTime = dayjs().hour(10).minute(0).second(0).millisecond(0);
+  const closeTime = dayjs().hour(22).minute(0).second(0).millisecond(0);
+
+  console.log(openTime, closeTime, koreaTime);
+  return openTime.isBefore(koreaTime) && closeTime.isAfter(koreaTime);
+})();

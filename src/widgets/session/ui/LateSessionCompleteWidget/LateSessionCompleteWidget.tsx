@@ -1,12 +1,38 @@
 import LottieView from "lottie-react-native";
 import { View, StyleSheet, Text } from "react-native";
-import { Color } from "@hongpung/src/common";
 
-interface LateSessionCompleteWidgetProps {
-  startTime: string;
-}
+import dayjs from "dayjs";
 
-const LateSessionCompleteWidget: React.FC<LateSessionCompleteWidgetProps> = ({ startTime }) => {
+import { Alert, Color } from "@hongpung/src/common";
+
+import { timeToDate } from "@hongpung/src/entities/session";
+import { StepProps } from "@hongpung/react-step-flow";
+import { CheckInSteps } from "@hongpung/src/features/session/checkInRoom";
+import { useNavigation } from "@react-navigation/native";
+
+type LateSessionCompleteWidgetProps = StepProps<
+  CheckInSteps,
+  "LateSessionComplete"
+>;
+
+export const LateSessionCompleteWidget: React.FC<
+  LateSessionCompleteWidgetProps
+> = ({ stepProps }) => {
+  const navigation = useNavigation();
+  const { startTime } = stepProps ?? { startTime: new Date().toISOString() };
+  console.log("startTime", startTime);
+  console.log("stepProps", stepProps);
+
+  if (!startTime) {
+    Alert.alert("오류", "이용 정보가 없습니다.", {
+      onConfirm: () => {
+        navigation.goBack();
+      },
+      cancelable: false,
+    });
+    return null;
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>연습 출석 완료</Text>
@@ -37,7 +63,7 @@ const LateSessionCompleteWidget: React.FC<LateSessionCompleteWidgetProps> = ({ s
               marginBottom: 4,
             }}
           >
-            {Math.floor((Date.now() - new Date(startTime).getTime()) / 60000)}
+            {dayjs().diff(dayjs(timeToDate(startTime)), "minutes")}
           </Text>
           <Text
             style={{
@@ -79,8 +105,6 @@ const LateSessionCompleteWidget: React.FC<LateSessionCompleteWidgetProps> = ({ s
     </View>
   );
 };
-
-export default LateSessionCompleteWidget;
 
 const styles = StyleSheet.create({
   container: {

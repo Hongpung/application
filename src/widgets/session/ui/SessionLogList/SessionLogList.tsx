@@ -1,6 +1,6 @@
 import React from "react";
 import { FlatList, StyleSheet, View, Text } from "react-native";
-import { SessionLog } from "@hongpung/src/entities/session";
+import { SessionLog } from "@hongpung/src/entities/session-log";
 import { SessionLogCard } from "@hongpung/src/entities/session/ui/SessionLogCard/SessionLogCard";
 import { daysOfWeek } from "@hongpung/src/common/constant/dayOfWeek";
 import { Color } from "@hongpung/src/common";

@@ -1,23 +1,21 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Color, LongButton } from "@hongpung/src/common";
-import { Switch } from "@hongpung/src/common";
+import { Color, Switch } from "@hongpung/src/common";
 import { CheckInEmptySessionCard } from "@hongpung/src/entities/session/ui/CheckInEmptySessionCard/CheckInEmptySessionCard";
-import { ReservationSession } from "@hongpung/src/entities/session";
 
-interface CreateSessionConfirmWidgetProps {
-  nextSession: ReservationSession | null;
-  participationAvailable: boolean;
-  onParticipationAvailableChange: (value: boolean) => void;
-}
+import { StepProps } from "@hongpung/react-step-flow";
+import { CheckInSteps } from "@hongpung/src/features/session/checkInRoom/model/type";
+
+type CreateSessionConfirmWidgetProps = StepProps<
+  CheckInSteps,
+  "CreateSessionConfirm"
+>;
 
 export const CreateSessionConfirmWidget: React.FC<
   CreateSessionConfirmWidgetProps
-> = ({
-  nextSession,
-  participationAvailable,
-  onParticipationAvailableChange,
-}) => {
+> = ({ stepProps }) => {
+  const { nextSession, participationAvailable, setParticipationAvailable } =
+    stepProps;
   return (
     <View style={styles.container}>
       <Text style={styles.title}>바로 사용하기</Text>
@@ -27,7 +25,7 @@ export const CreateSessionConfirmWidget: React.FC<
           {nextSession
             ? `${nextSession.startTime.slice(
                 0,
-                2
+                2,
               )}시 ${nextSession.startTime.slice(-2)}분 까지 사용하실 수 있어요`
             : "제한 없이 사용할 수 있어요"}
         </Text>
@@ -47,7 +45,7 @@ export const CreateSessionConfirmWidget: React.FC<
           </Text>
           <Switch
             value={participationAvailable}
-            onChange={onParticipationAvailableChange}
+            onChange={() => setParticipationAvailable(!participationAvailable)}
           />
         </View>
       </View>

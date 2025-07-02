@@ -2,7 +2,7 @@ import LottieView from "lottie-react-native";
 import { View, StyleSheet, Text } from "react-native";
 import { Color } from "@hongpung/src/common";
 
-const StartSessionCompleteWidget = () => {
+export const StartSessionCompleteWidget: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>연습 시작 완료</Text>
@@ -66,11 +66,10 @@ const StartSessionCompleteWidget = () => {
   );
 };
 
-export default StartSessionCompleteWidget;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
     gap: 24,

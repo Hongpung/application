@@ -1,14 +1,14 @@
-import { RealtimeSession, ReservationSession } from "@hongpung/src/entities/session"
-import { Session } from "@hongpung/src/entities/session"
+import {
+  RealtimeSession,
+  ReservationSession,
+  SessionState,
+  CheckInAttendStatus,
+  CheckInStartStatus,
+  Session,
+} from "@hongpung/src/entities/session";
 
-export type SessionState =
-    | { status: 'CREATABLE', nextReservationSession: ReservationSession | null }
-    | { status: 'STARTABLE', nextReservationSession: ReservationSession }
-    | { status: 'JOINABLE', currentSession: ReservationSession | RealtimeSession }
-    | { status: 'UNAVAILABLE', errorMessage: string }
-
-export type CheckInAttendStatus = "출석" | "지각" | "참가";
-export type CheckInStartStatus = "started" | "created";
+// Re-export하여 호환성 유지
+export type { SessionState, CheckInAttendStatus, CheckInStartStatus };
 
 export interface ReservationSessionWidgetProps {
   session: Session;
@@ -25,4 +25,49 @@ export interface RealtimeSessionWidgetProps {
   participationAvailable: boolean;
   onParticipationChange: (value: boolean) => void;
   onStart: () => void;
+}
+
+// CheckIn Step-Flow 타입들
+export type CheckInSteps = {
+  StartSessionConfirm: StartSessionConfirmStepProps;
+  AttendSessionConfirm: AttendSessionConfirmStepProps;
+  CreateSessionConfirm: CreateSessionConfirmStepProps;
+  StartSessionComplete: StartSessionCompleteStepProps;
+  AttendSessionComplete: AttendSessionCompleteStepProps;
+  LateSessionComplete: LateSessionCompleteStepProps;
+};
+
+export type CheckInStep = keyof CheckInSteps;
+
+export interface StartSessionConfirmStepProps {
+  session: ReservationSession | RealtimeSession | null;
+  participationAvailable: boolean;
+  setParticipationAvailable: (value: boolean) => void;
+  onStart: () => void;
+}
+
+export interface AttendSessionConfirmStepProps {
+  session: ReservationSession | RealtimeSession | null;
+  onAttend: () => void;
+}
+
+export interface CreateSessionConfirmStepProps {
+  nextSession: ReservationSession | null;
+  participationAvailable: boolean;
+  setParticipationAvailable: (value: boolean) => void;
+  onStart: () => void;
+}
+
+export interface StartSessionCompleteStepProps {
+  navigateToHome: () => void;
+}
+
+export interface AttendSessionCompleteStepProps {
+  attendanceStatus: CheckInAttendStatus;
+  navigateToHome: () => void;
+}
+
+export interface LateSessionCompleteStepProps {
+  startTime: string | null;
+  navigateToHome: () => void;
 }

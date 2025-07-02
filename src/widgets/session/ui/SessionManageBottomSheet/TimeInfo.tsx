@@ -10,7 +10,12 @@ interface TimeInfoProps {
   remainingMinute: string;
 }
 
-export const TimeInfo = ({ startTime, endTime, remainingHour, remainingMinute }: TimeInfoProps) => {
+export const TimeInfo = ({
+  startTime,
+  endTime,
+  remainingHour,
+  remainingMinute,
+}: TimeInfoProps) => {
   return (
     <>
       <View style={styles.timeInfo}>
@@ -44,4 +49,4 @@ const styles = StyleSheet.create({
     color: Color["grey300"],
     fontSize: 12,
   },
-}); 
+});

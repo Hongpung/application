@@ -18,34 +18,41 @@ const QRScanner: React.FC<QRScannerProps> = ({
 }) => {
   console.log(flash);
   return (
-    <CameraView
-      style={styles.camera}
-      facing="back"
-      barcodeScannerSettings={{
-        barcodeTypes: ["qr"],
-      }}
-      enableTorch={flash === "on"}
-      onBarcodeScanned={onBarcodeScanned}
-      ratio="16:9"
-
-    >
-      <QRScanBackDrop
+    <View style={{ flex: 1 }}>
+      <CameraView
+        style={styles.camera}
+        facing="back"
+        barcodeScannerSettings={{
+          barcodeTypes: ["qr"],
+        }}
+        enableTorch={flash === "on"}
+        onBarcodeScanned={onBarcodeScanned}
+        ratio="16:9"
+      />
+      <View
         style={{
           position: "absolute",
-          left: -420 + 120 + (width - 200) / 2,
-          top: 0,
+          inset: 0,
         }}
-      />
+      >
+        <QRScanBackDrop
+          style={{
+            position: "absolute",
+            left: -420 + 120 + (width - 200) / 2,
+            top: 0,
+          }}
+        />
 
-      <View style={styles.buttonContainer}>
-        <Pressable style={styles.button} onPress={onToggleFlash}>
-          <Icons
-            name={flash === "on" ? "flashlight-outline" : "flashlight"}
-          />
-        </Pressable>
-        <Text style={styles.descript}>QR코드를 스캔해주세요</Text>
+        <View style={styles.buttonContainer}>
+          <Pressable style={styles.button} onPress={onToggleFlash}>
+            <Icons
+              name={flash === "on" ? "flashlight-outline" : "flashlight"}
+            />
+          </Pressable>
+          <Text style={styles.descript}>QR코드를 스캔해주세요</Text>
+        </View>
       </View>
-    </CameraView>
+    </View>
   );
 };
 
@@ -76,4 +83,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default QRScanner; 
+export default QRScanner;

@@ -12,7 +12,7 @@ export const useSeperateMember = (usingSession: Session | null) => {
       sessionAttendanceList: {
         user: Member;
         status: "참가" | "출석" | "결석" | "지각";
-      }[]
+      }[],
     ) => {
       const attends: Member[] = [];
       const lates: Member[] = [];
@@ -28,12 +28,12 @@ export const useSeperateMember = (usingSession: Session | null) => {
       setLateUsers(lates);
       setAbsentUsers(absences);
     },
-    []
+    [],
   );
 
   useEffect(() => {
-    if (usingSession) seperateUser(usingSession?.attendanceList);
-  }, [usingSession?.attendanceList]);
+    if (usingSession) seperateUser(usingSession.attendanceList);
+  }, [seperateUser, usingSession]);
 
   console.log("attendUsers", attendUsers);
   console.log("lateUsers", lateUsers);

@@ -1,13 +1,18 @@
 import { Color } from "@hongpung/src/common";
-import { CheckInAttendStatus } from "@hongpung/src/features/session/checkInRoom/model/type";
+import { CheckInSteps } from "@hongpung/src/features/session/checkInRoom/model/type";
 import LottieView from "lottie-react-native";
 import { View, Text, StyleSheet } from "react-native";
+import { StepProps } from "@hongpung/react-step-flow";
 
-interface AttendSessionCompleteWidgetProps {
-  attendanceStatus: Exclude<CheckInAttendStatus, "지각">;
-}
+type AttendSessionCompleteWidgetProps = StepProps<
+  CheckInSteps,
+  "AttendSessionComplete"
+>;
 
-const AttendSessionCompleteWidget: React.FC<AttendSessionCompleteWidgetProps> = ({ attendanceStatus }) => {
+export const AttendSessionCompleteWidget: React.FC<
+  AttendSessionCompleteWidgetProps
+> = ({ stepProps }) => {
+  const { attendanceStatus } = stepProps;
   return (
     <View style={styles.container}>
       <Text style={styles.title}>연습 {attendanceStatus} 완료</Text>
@@ -70,8 +75,6 @@ const AttendSessionCompleteWidget: React.FC<AttendSessionCompleteWidgetProps> = 
     </View>
   );
 };
-
-export default AttendSessionCompleteWidget;
 
 const styles = StyleSheet.create({
   container: {

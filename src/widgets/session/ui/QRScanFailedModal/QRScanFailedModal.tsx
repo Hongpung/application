@@ -15,9 +15,7 @@ const QRScanFailedModal: React.FC<QRScanFailedModalProps> = ({
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
           <Text style={styles.errorText}>유효하지 않은 QR코드 입니다.</Text>
-          <Text style={styles.descriptionText}>
-            확인 후 다시 촬영해주세요.
-          </Text>
+          <Text style={styles.descriptionText}>확인 후 다시 촬영해주세요.</Text>
           <View style={styles.buttonContainer}>
             <LongButton
               color="blue"
@@ -66,4 +64,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default QRScanFailedModal; 
+export default QRScanFailedModal;

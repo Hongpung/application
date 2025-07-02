@@ -1,21 +1,32 @@
-import React from "react";
-import { View, StyleSheet, Text, ActivityIndicator } from "react-native";
-import { LongButton } from "@hongpung/src/common";
+import React, { useEffect } from "react";
+import {
+  View,
+  StyleSheet,
+  Text,
+  ActivityIndicator,
+  Animated,
+} from "react-native";
 import { Color } from "@hongpung/src/common";
-import { Session } from "@hongpung/src/entities/session";
+import { useCompleteAnimation } from "@hongpung/src/features/session/checkOutRoom/lib/useCompleteAnimation";
 import LottieView from "lottie-react-native";
+import { CheckOutStepProps } from "@hongpung/src/features/session/checkOutRoom/model/types";
+import { StepProps } from "@hongpung/react-step-flow";
 
-interface CheckOutCompleteWidgetProps {
-  session: Session;
-  isLoading: boolean;
-  onHome: () => void;
-}
+type CheckOutCompleteProps = StepProps<CheckOutStepProps, "CheckOutComplete">;
 
-export const CheckOutCompleteWidget: React.FC<CheckOutCompleteWidgetProps> = ({
-  session,
-  isLoading,
-  onHome,
+export const CheckOutCompleteWidget: React.FC<CheckOutCompleteProps> = ({
+  stepProps: { isLoading, endSession },
+  goTo,
 }) => {
+  const { clapCount, animatedStyle, handleLottieFinish } = useCompleteAnimation(
+    isLoading,
+    () => goTo("CheckOutSummary"),
+  );
+
+  useEffect(() => {
+    endSession();
+  }, [endSession]);
+
   return (
     <View style={styles.container}>
       {isLoading ? (
@@ -27,33 +38,23 @@ export const CheckOutCompleteWidget: React.FC<CheckOutCompleteWidgetProps> = ({
           />
         </View>
       ) : (
-        <>
-          <View style={styles.contentContainer}>
-            <Text style={styles.title}>{`연습 종료`}</Text>
-            <View style={styles.lottieContainer}>
-              <LottieView
-                source={require("@hongpung/assets/lotties/Clab.json")}
-                style={styles.lottie}
-                autoPlay
-                speed={1}
-              />
-            </View>
-            <View>
-              <Text style={styles.sessionTitle}>
-                {session.title.length > 10 ? session.title.slice(0, 10) + "..." : session.title} 연습이
-              </Text>
-              <Text style={styles.completeText}>{`무사히 종료됐어요~\n고생했어요!`}</Text>
-            </View>
+        <Animated.View style={[animatedStyle, styles.contentContainer]}>
+          <LottieView
+            key={clapCount}
+            source={require("@hongpung/assets/lotties/Clab.json")}
+            style={styles.lottie}
+            autoPlay
+            loop={false}
+            speed={1}
+            onAnimationFinish={handleLottieFinish}
+          />
+
+          <View style={{ height: 120 }}>
+            <Text
+              style={styles.completeText}
+            >{`연습실 사용이 종료됐어요~\n고생했어요!`}</Text>
           </View>
-          <View style={styles.buttonContainer}>
-            <LongButton
-              color="blue"
-              innerContent={`홈으로`}
-              isAble={true}
-              onPress={onHome}
-            />
-          </View>
-        </>
+        </Animated.View>
       )}
     </View>
   );
@@ -77,40 +78,17 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    flexDirection: "column",
     justifyContent: "center",
-    gap: 24,
-  },
-  title: {
-    fontFamily: "NanumSquareNeo-Bold",
-    fontSize: 22,
-    color: Color["grey700"],
-    textAlign: "center",
-  },
-  lottieContainer: {
-    width: 400,
-    height: 300,
-    marginVertical: 24,
-    alignSelf: "center",
+    gap: 8,
   },
   lottie: {
     width: "100%",
-    height: "100%",
-  },
-  sessionTitle: {
-    fontFamily: "NanumSquareNeo-Bold",
-    fontSize: 22,
-    color: Color["grey700"],
-    textAlign: "center",
+    height: 300,
   },
   completeText: {
     fontFamily: "NanumSquareNeo-Bold",
     fontSize: 22,
     color: Color["grey700"],
     textAlign: "center",
-  },
-  buttonContainer: {
-    width: "100%",
-    paddingVertical: 12,
   },
 });

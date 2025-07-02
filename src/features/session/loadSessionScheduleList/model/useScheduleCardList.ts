@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList } from "react-native";
 import { isOpen, timeToDate } from "@hongpung/src/entities/session";
 import type { ScheduleCard, Session } from "@hongpung/src/entities/session";
+import dayjs from "dayjs";
 
 export const useScheduleCardList = (sessionList: Session[] | null) => {
   const [isOnAir, setOnAir] = useState<
@@ -10,19 +11,95 @@ export const useScheduleCardList = (sessionList: Session[] | null) => {
   const [isParticipatible, setParticipatible] = useState(false);
   const [scheduleCardList, setScheduleCardList] = useState<ScheduleCard[]>([]);
   const [slideToIndex, setSlideToIndex] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const cardViewRef = useRef<FlatList>(null);
+
+  // 예약 세션 시작 시간이 현재 시간보다 40분 이상 남았는지 확인
+  const isSessionStartInTime = useCallback((session: Session): boolean => {
+    const now = dayjs().toDate();
+
+    const sessionStartTime = timeToDate(session.startTime);
+
+    const timeGap = dayjs(sessionStartTime).diff(dayjs(now), "minute");
+
+    return timeGap > 40;
+  }, []);
+
+  // 예약 세션 처리 함수
+  const handleReservedSession = useCallback(
+    (
+      session: Session,
+      index: number,
+      sessionList: Session[],
+      fetchReservationCards: ScheduleCard[],
+      slideTo: { index: number | null },
+    ) => {
+      if (session.status === "AFTER" || session.status === "DISCARDED") {
+        fetchReservationCards.push({ type: "session", session });
+        if (!sessionList[index + 1] && isOpen) {
+          slideTo.index = index + 1;
+          fetchReservationCards.push({
+            type: "empty",
+            nextReservationTime: "없음",
+          });
+        }
+      } else if (session.status === "ONAIR") {
+        slideTo.index = index;
+        setOnAir("ON_AIR");
+        setParticipatible(session.participationAvailable);
+        fetchReservationCards.push({ type: "session", session });
+      } else if (session.status === "BEFORE") {
+        if (slideTo.index === null) {
+          slideTo.index = index;
+          if (isSessionStartInTime(session) && isOpen) {
+            fetchReservationCards.push({
+              type: "empty",
+              nextReservationTime: session.startTime,
+            });
+          } else if (isOpen) {
+            setOnAir("PREPARING");
+          }
+        }
+        fetchReservationCards.push({ type: "session", session });
+      }
+    },
+    [isSessionStartInTime],
+  );
+
+  // 실시간 세션 처리 함수
+  const handleRealtimeSession = useCallback(
+    (
+      session: Session,
+      index: number,
+      sessionList: Session[],
+      fetchReservationCards: ScheduleCard[],
+      slideTo: { index: number | null },
+    ) => {
+      fetchReservationCards.push({ type: "session", session });
+      if (session.status === "ONAIR") {
+        setOnAir("ON_AIR");
+        setParticipatible(session.participationAvailable);
+      } else if (!sessionList[index + 1] && isOpen) {
+        slideTo.index = index + 1;
+        fetchReservationCards.push({
+          type: "empty",
+          nextReservationTime: "없음",
+        });
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!sessionList) return;
 
-    const utcTime = new Date();
-    const koreaTime = new Date(utcTime.getTime() + 9 * 60 * 60 * 1000);
+    setIsLoading(true);
     const slideTo: { index: number | null } = { index: null };
     const fetchReservationCards: ScheduleCard[] = [];
 
     const sortedSessionList = sessionList.sort((a, b) =>
-      a.startTime.localeCompare(b.startTime)
+      a.startTime.localeCompare(b.startTime),
     );
 
     setOnAir("AVAILABLE"); // onAir 상태 초기화
@@ -35,7 +112,6 @@ export const useScheduleCardList = (sessionList: Session[] | null) => {
           sortedSessionList,
           fetchReservationCards,
           slideTo,
-          koreaTime
         );
       } else if (session.sessionType === "REALTIME") {
         handleRealtimeSession(
@@ -44,7 +120,6 @@ export const useScheduleCardList = (sessionList: Session[] | null) => {
           sortedSessionList,
           fetchReservationCards,
           slideTo,
-          koreaTime
         );
       }
     });
@@ -57,7 +132,8 @@ export const useScheduleCardList = (sessionList: Session[] | null) => {
     }
     setScheduleCardList(fetchReservationCards);
     setSlideToIndex(slideTo.index ?? 0);
-  }, [sessionList]);
+    setIsLoading(false);
+  }, [sessionList, handleReservedSession, handleRealtimeSession]);
 
   useEffect(() => {
     if (slideToIndex !== null && slideToIndex < scheduleCardList.length) {
@@ -66,80 +142,13 @@ export const useScheduleCardList = (sessionList: Session[] | null) => {
         animated: true,
       });
     }
-  }, [slideToIndex]);
+  }, [slideToIndex, scheduleCardList]);
 
-  return { isOnAir, isParticipatible, scheduleCardList, cardViewRef };
-
-  // 예약 세션 처리 함수
-  function handleReservedSession(
-    session: Session,
-    index: number,
-    sessionList: Session[],
-    fetchReservationCards: ScheduleCard[],
-    slideTo: { index: number | null },
-    koreaTime: Date
-  ) {
-    if (session.status === "AFTER" || session.status === "DISCARDED") {
-      fetchReservationCards.push({ type: "session", session });
-      if (!sessionList[index + 1] && isOpen) {
-        slideTo.index = index + 1;
-        fetchReservationCards.push({
-          type: "empty",
-          nextReservationTime: "없음",
-        });
-      }
-    } else if (session.status === "ONAIR") {
-      slideTo.index = index;
-      setOnAir("ON_AIR");
-      setParticipatible(session.participationAvailable);
-      fetchReservationCards.push({ type: "session", session });
-    } else if (session.status === "BEFORE") {
-      if (slideTo.index === null) {
-        slideTo.index = index;
-        if (isSessionStartInTime(session, koreaTime) && isOpen) {
-          fetchReservationCards.push({
-            type: "empty",
-            nextReservationTime: session.startTime,
-          });
-        } else if (isOpen) {
-          setOnAir("PREPARING");
-        }
-      }
-      fetchReservationCards.push({ type: "session", session });
-    }
-  }
-
-  // 실시간 세션 처리 함수
-  function handleRealtimeSession(
-    session: Session,
-    index: number,
-    sessionList: Session[],
-    fetchReservationCards: ScheduleCard[],
-    slideTo: { index: number | null },
-    koreaTime: Date
-  ) {
-    fetchReservationCards.push({ type: "session", session });
-    if (session.status === "ONAIR") {
-      setOnAir("ON_AIR");
-      setParticipatible(session.participationAvailable);
-    } else if (
-      !sessionList[index + 1] &&
-      isOpen &&
-      koreaTime <= timeToDate("22:00:00")
-    ) {
-      slideTo.index = index + 1;
-      fetchReservationCards.push({
-        type: "empty",
-        nextReservationTime: "없음",
-      });
-    }
-  }
-
-  // 예약 세션 시작 시간이 현재 시간보다 40분 이상 남았는지 확인
-  function isSessionStartInTime(session: Session, koreaTime: Date): boolean {
-    const date = koreaTime.toISOString().split("T")[0];
-    const sessionStartTime = new Date(`${date}T${session.startTime}Z`);
-    const timeGap = sessionStartTime.getTime() - koreaTime.getTime();
-    return timeGap > 40 * 60 * 1000;
-  }
+  return {
+    isOnAir,
+    isParticipatible,
+    scheduleCardList,
+    cardViewRef,
+    isLoading,
+  };
 };

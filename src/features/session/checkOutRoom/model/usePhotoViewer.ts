@@ -23,4 +23,4 @@ export const usePhotoViewer = ({ photos }: UsePhotoViewerProps) => {
     handleIndexChange,
     toggleIndicator,
   };
-}; 
+};

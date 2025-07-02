@@ -7,14 +7,15 @@ interface CheckInEmptySessionCardProps {
   nextSession?: Session | null;
 }
 
-export const CheckInEmptySessionCard: React.FC<CheckInEmptySessionCardProps> = ({
-  nextSession,
-}) => (
+export const CheckInEmptySessionCard: React.FC<
+  CheckInEmptySessionCardProps
+> = ({ nextSession }) => (
   <View style={styles.emptySessionCard}>
     <Text style={styles.emptyTitle}>이 시간은 예약이 없어요</Text>
     <Text style={styles.emptyMessage}>바로 사용할 수 있어요</Text>
     <Text style={styles.nextSessionTime}>
-      {"다음 예약 시간 : "}{nextSession ? nextSession.startTime : "없음"}
+      {"다음 예약 시간 : "}
+      {nextSession ? nextSession.startTime : "없음"}
     </Text>
   </View>
 );
