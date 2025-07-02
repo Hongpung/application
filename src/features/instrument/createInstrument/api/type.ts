@@ -1,6 +1,5 @@
-
 export type InstrumentCreateBody = {
-    instrumentType: string
-    name: string
-    imageUrl?: string
-}
+  instrumentType: string;
+  name: string;
+  imageUrl?: string;
+};

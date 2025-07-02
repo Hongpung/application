@@ -17,9 +17,10 @@ const InstrumentViewList: React.FC<InstrumentViewListProps> = ({
   onInstrumentClick,
   isLoading,
 }) => {
-  const { isOpen, toggleAccordion, orderedInstrumentData } = useInstrumentAccordionList({
-    instrumentList,
-  });
+  const { isOpen, toggleAccordion, orderedInstrumentData } =
+    useInstrumentAccordionList({
+      instrumentList,
+    });
 
   const renderItem = ({
     item,
@@ -29,12 +30,19 @@ const InstrumentViewList: React.FC<InstrumentViewListProps> = ({
     if (item.instruments.length === 0) return null;
 
     return (
-      <View>
+      <View style={{ overflow: "hidden" }}>
         <Pressable
           onPress={() => toggleAccordion(item.type)}
           style={styles.ArccodianMenu}
         >
-          <Text style={styles.ArccodianMenuText}>{item.type}</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <Text style={styles.ArccodianMenuText}>{item.type}</Text>
+            <Text
+              style={[styles.ArccodianMenuText, { color: Color["grey400"] }]}
+            >
+              ({item.instruments.length})
+            </Text>
+          </View>
 
           <Icons
             name={isOpen(item.type) ? "chevron-up" : "chevron-down"}
@@ -42,15 +50,23 @@ const InstrumentViewList: React.FC<InstrumentViewListProps> = ({
             size={24}
           />
         </Pressable>
-        <View style={styles.instrumentSkeletonContainer}>
-          {item.instruments.map((instrument, index) => (
+
+        <FlatList
+          style={[
+            styles.instrumentSkeletonContainer,
+            isOpen(item.type) ? {} : { height: 0, paddingVertical: 0 },
+          ]}
+          numColumns={2}
+          columnWrapperStyle={{ gap: 16 }}
+          data={item.instruments}
+          renderItem={({ item, index }) => (
             <ManageInstrumentCard
-              key={`${instrument.name}-${index}`}
-              instrument={instrument}
+              key={`${item.name}-${index}`}
+              instrument={item}
               onClickInstrument={onInstrumentClick}
             />
-          ))}
-        </View>
+          )}
+        />
       </View>
     );
   };
@@ -90,7 +106,7 @@ const InstrumentViewList: React.FC<InstrumentViewListProps> = ({
               fontFamily: "NanumSquareNeo-Regular",
               fontSize: 18,
               color: Color["grey400"],
-              paddingBottom: 60
+              paddingBottom: 60,
             }}
           >
             사용할 수 있는 악기가 없어요
@@ -120,7 +136,6 @@ const styles = StyleSheet.create({
   },
   instrumentSkeletonContainer: {
     flexDirection: "row",
-    flexWrap: "wrap",
     justifyContent: "space-between",
     paddingHorizontal: 8,
     rowGap: 16,

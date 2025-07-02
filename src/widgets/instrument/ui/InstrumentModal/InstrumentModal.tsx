@@ -1,4 +1,5 @@
-import { View, Text, Pressable, Image, StyleSheet, Modal } from "react-native";
+import { View, Text, Pressable, StyleSheet, Modal } from "react-native";
+import { Image } from "expo-image";
 import { Instrument } from "@hongpung/src/entities/instrument";
 import { Color } from "@hongpung/src/common";
 import { useEffect, useState } from "react";
@@ -36,6 +37,8 @@ const InstrumentModal: React.FC<{ instrument: Instrument | null }> = ({
               <Image
                 source={{ uri: instrument.imageUrl }}
                 style={styles.image}
+                contentFit="cover"
+                cachePolicy="memory-disk"
               />
             ) : (
               <View

@@ -1,32 +1,32 @@
 export type InstrumentDto = {
-    instrumentId: number
-    imageUrl?: string  // url
-    name: string
-    instrumentType: InstrumentType
-    club: Exclude<ClubName, '기타'>
-    borrowAvailable: boolean,
-}
+  instrumentId: number;
+  imageUrl?: string; // url
+  name: string;
+  instrumentType: InstrumentType;
+  club: Exclude<ClubName, "기타">;
+  borrowAvailable: boolean;
+};
 
 export type InstrumentEditBody = {
-    instrumentId: number
-    instrumentType: string
-    name: string
-    borrowAvailable: boolean
-    imageUrl?: string
-}
+  instrumentId: number;
+  instrumentType: string;
+  name: string;
+  borrowAvailable: boolean;
+  imageUrl?: string;
+};
 
 interface BorrowHistory {
-    borrowerName: string
-    borrowerNickname?: string
-    borrowDate: string
+  borrowerName: string;
+  borrowerNickname?: string;
+  borrowDate: string;
 }
 
 export type InstrumentDetailDto = {
-    instrumentId: number
-    imageUrl?: string  // url
-    name: string
-    instrumentType: InstrumentType
-    club: Exclude<ClubName, '기타'>
-    borrowAvailable: boolean
-    borrowHistory: BorrowHistory[]
-}
+  instrumentId: number;
+  imageUrl?: string; // url
+  name: string;
+  instrumentType: InstrumentType;
+  club: Exclude<ClubName, "기타">;
+  borrowAvailable: boolean;
+  borrowHistory: BorrowHistory[];
+};

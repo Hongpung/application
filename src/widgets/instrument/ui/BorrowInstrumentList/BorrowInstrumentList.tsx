@@ -14,18 +14,18 @@ interface BorrowInstrumentListProps {
 
 const BorrowInstrumentList: React.FC<BorrowInstrumentListProps> = ({
   instrumentList,
-  navigateToInstrumentDetail
+  navigateToInstrumentDetail,
 }) => {
   const { isOpen, toggleAccordion, orderedInstrumentData } =
     useInstrumentAccordionList({ instrumentList });
 
   const data = orderedInstrumentData;
 
-  const renderItem = ({ item }: { item: typeof data[0] }) => {
+  const renderItem = ({ item }: { item: (typeof data)[0] }) => {
     if (item.instruments.length === 0) return null;
 
     return (
-      <View>
+      <View style={{ overflow: "hidden" }}>
         <Pressable
           onPress={() => toggleAccordion(item.type)}
           style={styles.ArccodianMenu}
@@ -38,16 +38,22 @@ const BorrowInstrumentList: React.FC<BorrowInstrumentListProps> = ({
             size={24}
           />
         </Pressable>
-        <View style={styles.instrumentContainer}>
-          {item.instruments.map((instrument, index) => (
+        <FlatList
+          style={[
+            styles.instrumentContainer,
+            isOpen(item.type) ? {} : { height: 0, paddingVertical: 0 },
+          ]}
+          numColumns={2}
+          columnWrapperStyle={{ gap: 16 }}
+          data={item.instruments}
+          renderItem={({ item, index }) => (
             <BorrowInstrumentCard
-              key={`${instrument.name}-${index}`}
-              instrument={instrument}
+              key={`${item.name}-${index}`}
+              instrument={item}
               onClickInstrument={navigateToInstrumentDetail}
-              isPicked={false}
             />
-          ))}
-        </View>
+          )}
+        />
       </View>
     );
   };

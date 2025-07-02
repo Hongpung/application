@@ -1,46 +1,84 @@
-import { useState } from 'react'
-import { useNavigation } from '@react-navigation/native'
-import { Instrument } from '@hongpung/src/entities/instrument'
-import { useEditInstrumentRequest } from '../api/editInstrumentApi'
+import { useEffect, useRef, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import { Instrument } from "@hongpung/src/entities/instrument";
+import { useEditInstrumentRequest } from "../api/editInstrumentApi";
 
-import { Alert } from '@hongpung/src/common'
-import { showEditInstrumentCompleteToast } from '../constant/toastAction'
-import { parseInstrumentEditBody } from '../lib/parseInstrumentEditBody'
+import { Alert, useImagePicker, useValidatedForm } from "@hongpung/src/common";
+import { showEditInstrumentCompleteToast } from "../constant/toastAction";
+import { parseInstrumentEditBody } from "../lib/parseInstrumentEditBody";
 
-export const useEditInstrument = ({ initialInstrument, selectedFile }: { initialInstrument: Instrument, selectedFile: File | null }) => {
-    const navigation = useNavigation()
+import { instrumentEditFormSchema } from "./type";
 
-    const [instrument, setInstrument] = useState<Instrument>(initialInstrument)
+export const useEditInstrument = ({
+  initialInstrument,
+}: {
+  initialInstrument: Instrument;
+}) => {
+  const navigation = useNavigation();
+  const {
+    pickImageFromAlbum,
+    selectedImage,
+    selectedImageUri,
+    resetImage,
+    isResetImage,
+  } = useImagePicker();
+  const isInitialImage = useRef(true);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(
+    initialInstrument.imageUrl ?? null,
+  );
 
-    const { request, isLoading } = useEditInstrumentRequest()
+  const form = useValidatedForm({
+    schema: instrumentEditFormSchema,
+    defaultValues: {
+      instrumentId: initialInstrument.instrumentId,
+      name: initialInstrument.name,
+      instrumentType: initialInstrument.instrumentType,
+      selectedImage: null,
+      borrowAvailable: initialInstrument.borrowAvailable,
+    },
+  });
 
-    const handleNameChange = (name: string) => {
-        setInstrument(prev => ({ ...prev, name }))
+  const { request, isLoading } = useEditInstrumentRequest();
+
+  useEffect(() => {
+    form.setSelectedImage(selectedImage);
+    if (isInitialImage.current) {
+      isInitialImage.current = false;
+    } else {
+      setSelectedImageUrl(selectedImageUri);
     }
+  }, [selectedImage, form, selectedImageUri]);
 
-    const handleSubmit = async () => {
-        try {
-            const submitForm = await parseInstrumentEditBody({
-                instrument,
-                selectedImage: selectedFile
-            });
-            await request(submitForm);
-            showEditInstrumentCompleteToast();
-            navigation.goBack();
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                Alert.alert('오류', '오류가 발생했어요.\n' + `(${err.message})`)
-            } else {
-                Alert.alert('오류', '알수 없는 원인에 의해 실패했어요.\n관리자에게 문의해주세요')
-            }
-        }
-    }
+  const handleSubmit = async () => {
+    try {
+      const submitForm = await parseInstrumentEditBody(
+        { ...form, borrowAvailable: form.borrowAvailable ?? false },
+        isResetImage.current,
+      );
+      console.log("submitForm", submitForm);
+      await request(submitForm);
 
-    return {
-        instrument,
-        setInstrument,
-        handleNameChange,
-        handleSubmit,
-        isLoading
+      showEditInstrumentCompleteToast();
+      navigation.goBack();
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        Alert.alert("오류", "오류가 발생했어요.\n" + `(${err.message})`);
+      } else {
+        Alert.alert(
+          "오류",
+          "알수 없는 원인에 의해 실패했어요.\n관리자에게 문의해주세요",
+        );
+      }
     }
-} 
+  };
+
+  return {
+    ...form,
+    pickImageFromAlbum,
+    selectedImage,
+    resetImage,
+    selectedImageUrl,
+    handleSubmit,
+    isLoading,
+  };
+};

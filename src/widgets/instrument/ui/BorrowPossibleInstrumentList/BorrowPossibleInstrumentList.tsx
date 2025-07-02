@@ -2,12 +2,12 @@ import { Color, Icons } from "@hongpung/src/common";
 import {
   BorrowInstrumentCard,
   Instrument,
+  useInstrumentAccordionList,
 } from "@hongpung/src/entities/instrument";
 import { Pressable, FlatList, View, Text, StyleSheet } from "react-native";
-import { useInstrumentAccordionList } from "@hongpung/src/entities/instrument";
 
 type BorrowPossibleInstrumentListProps = {
-  instrumentList: Instrument[] | null;
+  instrumentList: Instrument[] | undefined;
   selectedInstruments: Instrument[];
   toggleInstrument: (instrument: Instrument) => void;
   isLoading: boolean;
@@ -42,11 +42,11 @@ const BorrowPossibleInstrumentList: React.FC<
 
         const hasSelected =
           item.instruments.filter((instrument) =>
-            selectedInstruments.includes(instrument)
+            selectedInstruments.includes(instrument),
           ).length > 0;
 
         return (
-          <View>
+          <View style={{ overflow: "hidden" }}>
             <Pressable
               onPress={() => toggleAccordion(item.type)}
               style={styles.container}
@@ -70,18 +70,23 @@ const BorrowPossibleInstrumentList: React.FC<
               />
             </Pressable>
 
-            {isOpen(item.type) && (
-              <View style={styles.instrumentsContainer}>
-                {item.instruments.map((instrument, index) => (
-                  <BorrowInstrumentCard
-                    key={index}
-                    instrument={instrument}
-                    isPicked={selectedInstruments.includes(instrument)}
-                    onClickInstrument={toggleInstrument}
-                  />
-                ))}
-              </View>
-            )}
+            <FlatList
+              style={[
+                styles.instrumentsContainer,
+                isOpen(item.type) ? {} : { height: 0, paddingVertical: 0 },
+              ]}
+              numColumns={2}
+              columnWrapperStyle={{ gap: 16 }}
+              data={item.instruments}
+              renderItem={({ item, index }) => (
+                <BorrowInstrumentCard
+                  key={index}
+                  instrument={item}
+                  isPicked={selectedInstruments.includes(item)}
+                  onClickInstrument={toggleInstrument}
+                />
+              )}
+            />
           </View>
         );
       }}

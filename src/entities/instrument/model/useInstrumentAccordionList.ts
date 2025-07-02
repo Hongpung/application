@@ -4,9 +4,16 @@ import { Instrument } from "./type";
 export const useInstrumentAccordionList = ({
   instrumentList,
 }: {
-  instrumentList: Instrument[] | null;
+  instrumentList: Instrument[] | undefined;
 }) => {
-  const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
+  const [openMap, setOpenMap] = useState<Record<string, boolean>>({
+    꽹과리: true,
+    징: true,
+    장구: true,
+    북: true,
+    소고: true,
+    기타: true,
+  });
 
   const toggleAccordion = (type: string) => {
     setOpenMap((prev) => ({ ...prev, [type]: !prev[type] }));
@@ -23,16 +30,18 @@ export const useInstrumentAccordionList = ({
       소고: [],
       기타: [],
     };
-  
+
     if (!instrumentList) return [];
-  
+
     for (const instrument of instrumentList) {
       const type = instrument.instrumentType;
       instrumentMappedByType[type].push(instrument);
     }
-  
+
     // 여기서 바로 [type, instruments] 배열로 정제 (비어있지 않은 것만)
-    return (Object.entries(instrumentMappedByType) as [InstrumentType, Instrument[]][])
+    return (
+      Object.entries(instrumentMappedByType) as [InstrumentType, Instrument[]][]
+    )
       .filter(([_, instruments]) => instruments.length > 0)
       .map(([type, instruments]) => ({ type, instruments }));
   }, [instrumentList]);

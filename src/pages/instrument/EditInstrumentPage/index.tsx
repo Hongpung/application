@@ -9,10 +9,9 @@ import {
 } from "react-native";
 import React from "react";
 
-import { Color } from "@hongpung/src/common";
+import { Color, Header } from "@hongpung/src/common";
 
 import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
-import { useImagePicker } from "@hongpung/src/common/lib/useImagePicker";
 import { InstrumentTypeSelector } from "@hongpung/src/features/instrument/configureInstrument/ui/InstrumentTypeSelector";
 import { InstrumentNameInput } from "@hongpung/src/features/instrument/configureInstrument/ui/InstrumentNameInput/InstrumentNameInput";
 import { useSelector } from "@hongpung/src/common/lib/useSelector";
@@ -21,30 +20,36 @@ import { useEditInstrument } from "@hongpung/src/features/instrument/editInstrum
 import { useDeleteInstrument } from "@hongpung/src/features/instrument/deleteInstrument/model/useDeleteInstrument";
 import { EditInstrumentButton } from "@hongpung/src/features/instrument/editInstrument/ui/EditInstrumentButton/EditInstrumentButton";
 import { DeleteInstrumentButton } from "@hongpung/src/features/instrument/deleteInstrument/ui/DeleteInstrumentButton/DeleteInstrumentButton";
-import { useRoute } from "@react-navigation/native";
+
 import { Instrument } from "@hongpung/src/entities/instrument";
 import { BorrowAvailableSwitch } from "@hongpung/src/features/instrument/configureInstrument/ui/BorrowAvailableSwitch/BorrowAvailableSwitch";
 import InstrumentProfileSelector from "@hongpung/src/features/instrument/configureInstrument/ui/InstrumentProfileSelector/InstrumentProfileSelector";
+import { MainStackScreenProps } from "@hongpung/src/common/navigation";
 
-// type InstrumentEditNav = NativeStackNavigationProp<ClubInstrumentStackParamList, 'InstrumentEdit'>
+type EditInstrumentPageProps = MainStackScreenProps<"EditInstrument">;
 
-const EditInstrumentPage: React.FC = () => {
-  const { instrument: instrumentData } = useRoute().params as {
-    instrument: string;
-  };
+const EditInstrumentPage: React.FC<EditInstrumentPageProps> = ({ route }) => {
+  const { instrument: instrumentData } = route.params;
   const initialInstrument = JSON.parse(instrumentData) as Instrument;
-  const { pickImageFromAlbum, selectedImage, selectedImageUri } =
-    useImagePicker();
+
   const [onSelectType, setSelectTypeVisible, closeInstrumentTypeSelector] =
     useSelector();
 
   const {
-    instrument,
-    setInstrument,
-    handleNameChange,
+    instrumentId,
+    name,
+    instrumentType,
+    borrowAvailable,
+    setBorrowAvailable,
+    setName,
+    setInstrumentType,
     handleSubmit,
+    pickImageFromAlbum,
+
+    selectedImageUrl,
+    resetImage,
     isLoading: isEditing,
-  } = useEditInstrument({ initialInstrument, selectedFile: selectedImage });
+  } = useEditInstrument({ initialInstrument });
 
   const { handleDelete, isLoading: isDeleting } = useDeleteInstrument();
 
@@ -62,36 +67,31 @@ const EditInstrumentPage: React.FC = () => {
       >
         <View style={styles.container}>
           <FullScreenLoadingModal isLoading={isEditing || isDeleting} />
-
+          <Header headerName="악기 수정" LeftButton={"close"} />
           <ScrollView contentContainerStyle={styles.scrollView} bounces={false}>
             <View style={{ height: 12 }} />
 
             <InstrumentProfileSelector
               pickImageFromAlbum={pickImageFromAlbum}
-              instrumentImageUrl={instrument.imageUrl}
-              selectedImageUri={selectedImageUri}
+              selectedImageUri={selectedImageUrl}
+              onResetImage={resetImage}
             />
 
             <View style={{ height: 28 }} />
 
             <View style={styles.inputContainer}>
-              <InstrumentNameInput
-                name={instrument.name}
-                setName={handleNameChange}
-              />
+              <InstrumentNameInput name={name} setName={setName} />
 
               <InstrumentTypeSelector
                 onSelectType={onSelectType}
                 setSelectTypeVisible={setSelectTypeVisible}
-                instrumentType={instrument.instrumentType}
-                setInstrumentType={(type) =>
-                  setInstrument((prev) => ({ ...prev, instrumentType: type }))
-                }
+                instrumentType={instrumentType}
+                setInstrumentType={setInstrumentType}
               />
 
               <BorrowAvailableSwitch
-                instrument={instrument}
-                setInstrument={setInstrument}
+                borrowAvailable={borrowAvailable ?? false}
+                setBorrowAvailable={setBorrowAvailable}
               />
             </View>
           </ScrollView>
@@ -100,7 +100,7 @@ const EditInstrumentPage: React.FC = () => {
             <EditInstrumentButton onPress={handleSubmit} />
 
             <DeleteInstrumentButton
-              onPress={() => handleDelete(instrument.instrumentId)}
+              onPress={() => handleDelete(instrumentId)}
             />
           </View>
         </View>

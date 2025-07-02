@@ -1,25 +1,64 @@
-import { Color, Icons } from "@hongpung/src/common";
-import { Instrument } from "@hongpung/src/entities/instrument";
-import { Pressable, View, Image, Text, StyleSheet } from "react-native";
+import { Color, Icons, ImageWithSkeleton } from "@hongpung/src/common";
+
+import { Pressable, View, Text, StyleSheet, Alert } from "react-native";
+import React from "react";
 
 interface InstrumentProfileSelectorProps {
-  instrumentImageUrl?: string;
   selectedImageUri: string | null;
   pickImageFromAlbum: () => void;
+  onResetImage: () => void;
 }
 
 const InstrumentProfileSelector: React.FC<InstrumentProfileSelectorProps> = ({
-  instrumentImageUrl,
   selectedImageUri,
   pickImageFromAlbum,
+  onResetImage,
 }) => {
+  const onConfirmChange = () => {
+    if (selectedImageUri) {
+      Alert.alert(
+        "프로필 이미지 변경",
+        "프로필 이미지를 변경하시겠습니까?",
+        [
+          {
+            text: "확인",
+            isPreferred: true,
+            onPress: () => {
+              pickImageFromAlbum();
+            },
+          },
+          {
+            text: "취소",
+            style: "destructive",
+          },
+          {
+            text: "프로필 이미지 제거",
+            style: "destructive",
+            onPress: () => {
+              onResetImage();
+            },
+          },
+        ],
+        { cancelable: true },
+      );
+    } else {
+      pickImageFromAlbum();
+    }
+  };
+
   return (
-    <Pressable style={styles.imageContainer} onPress={pickImageFromAlbum}>
-      {instrumentImageUrl || selectedImageUri ? (
-        <Image
-          source={{ uri: selectedImageUri || instrumentImageUrl }}
-          style={styles.image}
-        />
+    <Pressable style={styles.imageContainer} onPress={onConfirmChange}>
+      {selectedImageUri ? (
+        <>
+          <ImageWithSkeleton
+            imageSource={selectedImageUri}
+            style={styles.image}
+            contentFit="cover"
+          />
+          <View style={styles.cameraIconContainer}>
+            <Icons name="camera" size={24} color={Color["grey400"]} />
+          </View>
+        </>
       ) : (
         <View style={styles.imagePlaceholder}>
           <Icons name="add" size={64} color={Color["grey400"]} />
@@ -36,7 +75,6 @@ export default InstrumentProfileSelector;
 
 const styles = StyleSheet.create({
   imageContainer: {
-    overflow: "hidden",
     width: 308,
     height: 204,
     borderRadius: 10,
@@ -46,6 +84,7 @@ const styles = StyleSheet.create({
   image: {
     width: 308,
     height: 204,
+    borderRadius: 10,
   },
   imagePlaceholder: {
     backgroundColor: Color["grey200"],
@@ -60,5 +99,16 @@ const styles = StyleSheet.create({
     fontFamily: "NanumSquareNeo-Bold",
     fontSize: 14,
     color: Color["grey400"],
+  },
+  cameraIconContainer: {
+    position: "absolute",
+    backgroundColor: Color["grey100"],
+    borderRadius: 100,
+    width: 32,
+    height: 32,
+    bottom: -8,
+    right: -8,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

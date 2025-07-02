@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   StyleSheet,
   View,
@@ -7,32 +8,53 @@ import {
   Platform,
   Keyboard,
 } from "react-native";
-import React from "react";
 
-import { Color } from "@hongpung/src/common";
-
-import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
-
-import { useImagePicker } from "@hongpung/src/common/lib/useImagePicker";
-
-import { CreateInstrumentButton } from "@hongpung/src/features/instrument/createInstrument/ui/CreateInstrumentButton/CreateInstrumentButton";
-import { InstrumentTypeSelector } from "@hongpung/src/features/instrument/configureInstrument/ui/InstrumentTypeSelector";
-import { InstrumentNameInput } from "@hongpung/src/features/instrument/configureInstrument/ui/InstrumentNameInput/InstrumentNameInput";
-import { useCreateInstrument } from "@hongpung/src/features/instrument/createInstrument/model/useCreateInstrument";
+import { Color, Header, FullScreenLoadingModal } from "@hongpung/src/common";
 import { useSelector } from "@hongpung/src/common/lib/useSelector";
-import InstrumentProfileSelector from "@hongpung/src/features/instrument/configureInstrument/ui/InstrumentProfileSelector/InstrumentProfileSelector";
+import { MainStackScreenProps } from "@hongpung/src/common/navigation";
+import { debounce } from "lodash";
 
-const InstrumentEditScreen: React.FC = () => {
-  const { pickImageFromAlbum, selectedImage, selectedImageUri } =
-    useImagePicker();
+import {
+  CreateInstrumentButton,
+  useCreateInstrument,
+} from "@hongpung/src/features/instrument/createInstrument";
+import {
+  InstrumentTypeSelector,
+  InstrumentNameInput,
+  InstrumentProfileSelector,
+} from "@hongpung/src/features/instrument/configureInstrument";
+
+type InstrumentCreateScreenProps = MainStackScreenProps<"CreateInstrument">;
+
+const InstrumentCreateScreen: React.FC<InstrumentCreateScreenProps> = ({
+  navigation,
+}) => {
+  const navigateToInstrumentDetail = useMemo(
+    () =>
+      debounce(
+        (instrumentId: number) => {
+          navigation.replace("InstrumentDetail", { instrumentId });
+        },
+        200,
+        {
+          leading: true,
+          trailing: false,
+        },
+      ),
+    [navigation],
+  );
+
   const {
     createInstrumentRequest,
     instrumentType,
     name,
+    resetImage,
+    pickImageFromAlbum,
+    selectedImageUri,
     setInstrumentType,
     setName,
     isLoading,
-  } = useCreateInstrument(selectedImage);
+  } = useCreateInstrument({ navigateToInstrumentDetail });
 
   const [onSelectType, setSelectTypeVisible, closeInstrumentTypeSelector] =
     useSelector();
@@ -50,6 +72,7 @@ const InstrumentEditScreen: React.FC = () => {
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
         <View style={styles.container}>
+          <Header LeftButton={"close"} headerName={"악기 생성"} />
           <FullScreenLoadingModal isLoading={isLoading} />
 
           <ScrollView contentContainerStyle={styles.scrollView} bounces={false}>
@@ -57,8 +80,8 @@ const InstrumentEditScreen: React.FC = () => {
 
             <InstrumentProfileSelector
               pickImageFromAlbum={pickImageFromAlbum}
-              instrumentImageUrl={undefined}
               selectedImageUri={selectedImageUri}
+              onResetImage={resetImage}
             />
 
             <View style={{ height: 28 }} />
@@ -84,12 +107,12 @@ const InstrumentEditScreen: React.FC = () => {
   );
 };
 
-export default InstrumentEditScreen;
+export default InstrumentCreateScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF",
+    backgroundColor: Color["white"],
   },
   keyboardAvoidingView: {
     flex: 1,

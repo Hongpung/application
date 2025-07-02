@@ -1,27 +1,36 @@
-import { InstrumentEditBody } from '../api/type'
-import { Instrument } from '@hongpung/src/entities/instrument'
-import uploadImage from '@hongpung/legacy/utils/uploadImage'
+import { InstrumentEditBody } from "../api/type";
+import { uploadImageRequest } from "@hongpung/src/common/api/uploadImageApi";
+import { InstrumentEditForm } from "../model/type";
 
-interface ParseInstrumentEditBodyParams {
-    instrument: Instrument
-    selectedImage: File | null
-}
+export const parseInstrumentEditBody = async (
+  form: InstrumentEditForm,
+  isResetImage: boolean,
+): Promise<InstrumentEditBody> => {
+  const { selectedImage, instrumentId, name, instrumentType, borrowAvailable } =
+    form;
 
-export const parseInstrumentEditBody = async ({ instrument, selectedImage }: ParseInstrumentEditBodyParams): Promise<InstrumentEditBody> => {
-    
-    const submitForm: InstrumentEditBody = {
-        instrumentId: instrument.instrumentId,
-        name: instrument.name,
-        instrumentType: instrument.instrumentType,
-        borrowAvailable: instrument.borrowAvailable,
-        imageUrl: instrument.imageUrl
+  const submitBody: InstrumentEditBody = {
+    instrumentId,
+    name,
+    instrumentType,
+    borrowAvailable,
+    imageUrl: undefined,
+  };
+
+  if (selectedImage === null) {
+    // 이미지 삭제
+    if (isResetImage) {
+      submitBody.imageUrl = null;
+      return submitBody;
     }
+    // 이미지 변경 안함
+    return submitBody;
+  }
 
-    if (selectedImage) {
-        const uploadResponse = await uploadImage(selectedImage, 'instruments')
-        if (!uploadResponse) throw Error('업로드 실패')
-        submitForm.imageUrl = uploadResponse.imageUrl
-    }
+  //이미지 변경 및 전송
+  const uploadResponse = await uploadImageRequest(selectedImage, "instruments");
+  if (!uploadResponse) throw Error("업로드 실패");
+  submitBody.imageUrl = uploadResponse.imageUrl;
 
-    return submitForm
-} 
+  return submitBody;
+};
