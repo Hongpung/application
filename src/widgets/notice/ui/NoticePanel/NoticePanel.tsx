@@ -13,8 +13,8 @@ type NoticePanelProps = {
 
 export const NoticePanel: React.FC<NoticePanelProps> = (props) => {
   const { navigateToNoticeDetail, navigateToNoticeList } = props;
-  
-  const { noticeList = [], isLoading } = useNoticePanel();
+
+  const { noticeList, isLoading } = useNoticePanel();
 
   return (
     <View style={styles.container}>
@@ -28,7 +28,7 @@ export const NoticePanel: React.FC<NoticePanelProps> = (props) => {
           <Icons name="add" size={16} color={Color["grey300"]} />
         </Pressable>
       </View>
-      {isLoading ? (
+      {isLoading && !noticeList ? (
         <View style={[styles.noticeList, { gap: 8 }]}>
           {Array.from({ length: 3 }).map((_, index) => (
             <Skeleton

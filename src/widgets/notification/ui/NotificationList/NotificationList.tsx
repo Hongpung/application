@@ -22,10 +22,10 @@ export const NotificationList: React.FC<NotificationListProps> = ({
     <GestureHandlerRootView>
       <FlatList
         data={data}
-        contentContainerStyle={{ gap: 8 }}
+        contentContainerStyle={{ flexGrow: 1, gap: 8 }}
         renderItem={({ item }) => (
           <>
-            {item.notificationId == lastReadNotificationId && (
+            {item.notificationId === lastReadNotificationId && (
               <View key={"latest-line"} style={styles.latestLine}>
                 <View style={styles.separator} />
                 <Text style={styles.previousNotificationText}>이전 알림</Text>
@@ -40,8 +40,9 @@ export const NotificationList: React.FC<NotificationListProps> = ({
             />
           </>
         )}
+        ListFooterComponent={() => <View style={{ height: 24 }} />}
         keyExtractor={(item) => item.notificationId.toString()}
-        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+        ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>새로운 알림이 없습니다.</Text>
@@ -57,6 +58,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     marginVertical: 4,
     marginHorizontal: 36,
+    paddingBottom: 12,
     flexDirection: "row",
     alignItems: "center",
   },
@@ -72,7 +74,6 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     flex: 1,
-    height: 500,
     justifyContent: "center",
     alignItems: "center",
   },

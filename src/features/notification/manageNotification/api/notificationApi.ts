@@ -7,6 +7,10 @@ const notificationApi = baseApi.addEndpoints({
       query: () => ({
         url: "/notification/my",
       }),
+      queryOptions: () => ({
+        staleTime: 0,
+        queryKey: ["notification"],
+      }),
     }),
 
     deleteAllNotifications: builder.request<void, void>({
@@ -14,12 +18,18 @@ const notificationApi = baseApi.addEndpoints({
         url: "/notification/delete/all",
         method: "DELETE",
       }),
+      queryOptions: {
+        mutationKey: ["notification"],
+      },
     }),
     readAllNotifications: builder.request<void, void>({
       query: () => ({
         url: "/notification/read",
         method: "POST",
       }),
+      queryOptions: {
+        mutationKey: ["notification"],
+      },
     }),
   }),
 });

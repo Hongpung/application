@@ -1,7 +1,7 @@
 import React from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet } from "react-native";
 import NoticeList from "@hongpung/src/widgets/notice/ui/NoticeList/NoticeList";
-import { Color, Header } from "@hongpung/src/common";
+import { Header } from "@hongpung/src/common";
 import { NoticeStackProps } from "@hongpung/src/common/navigation/noticeStack";
 
 const NoticeListPage: React.FC<NoticeStackProps<"NoticeList">> = ({
@@ -13,7 +13,7 @@ const NoticeListPage: React.FC<NoticeStackProps<"NoticeList">> = ({
 
   return (
     <View style={{ flex: 1 }}>
-      <Header leftButton={"arrow-back"} headerName="공지사항" />
+      <Header LeftButton={"arrow-back"} headerName="공지사항" />
       <View style={styles.container}>
         <NoticeList onNoticePress={handleNoticePress} />
       </View>
@@ -25,6 +25,6 @@ export default NoticeListPage;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
 });

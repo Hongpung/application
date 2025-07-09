@@ -14,7 +14,12 @@ export const NoticeItemSkeleton: React.FC = () => {
   if (!showSkeleton) return null;
   return (
     <View style={{ paddingHorizontal: 16, paddingVertical: 24, gap: 8 }}>
-      <Skeleton {...defaultSkeletonConfig} width="100%" height={20} radius={4} />
+      <Skeleton
+        {...defaultSkeletonConfig}
+        width="100%"
+        height={20}
+        radius={4}
+      />
       <Skeleton {...defaultSkeletonConfig} width="30%" height={12} radius={4} />
     </View>
   );

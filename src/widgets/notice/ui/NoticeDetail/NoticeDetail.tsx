@@ -10,8 +10,7 @@ interface NoticeDetailProps {
 
 const NoticeDetail: React.FC<NoticeDetailProps> = ({ noticeId }) => {
   const { data, isLoading } = useLoadNoticeDetailFetch({ noticeId });
-  if (isLoading) 
-    {
+  if (isLoading) {
     return <NoticeDetailSekeleton />;
   }
 
@@ -76,5 +75,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "NanumSquareNeo-Regular",
   },
-  
 });
