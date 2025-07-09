@@ -1,8 +1,8 @@
 import { View, Text, ViewStyle, StyleProp } from "react-native";
 
 import { Color, Icons } from "@hongpung/src/common";
-import { useCallback, useMemo } from "react";
-import React from "react";
+import React, { useCallback } from "react";
+import dayjs from "dayjs";
 
 type DateTimeDisplayProps = {
   date?: string | null;
@@ -14,32 +14,24 @@ type DateTimeDisplayProps = {
 const useDateTimeHelpers = (
   date?: string | null,
   startTime?: string | null,
-  endTime?: string | null
+  endTime?: string | null,
 ) => {
-  const daysOfWeek = useMemo(
-    () => ["일", "월", "화", "수", "목", "금", "토"],
-    []
-  );
-
   const DateString = useCallback(() => {
     if (date) {
-      const selectedDate = new Date(date);
-      return `${selectedDate.getFullYear()}.${
-        selectedDate.getMonth() + 1
-      }.${selectedDate.getDate()}(${daysOfWeek[selectedDate.getDay()]})`;
+      return dayjs(date).format("YYYY.MM.DD (ddd)");
     }
     return "";
-  }, [date, daysOfWeek]);
+  }, [date]);
 
   const TimeGapText = useCallback(() => {
     if (startTime && endTime) {
-      const [startHour, startMinute] = startTime.split(":");
-      const [endHour, endMinute] = endTime.split(":");
+      const [startHour, startMinute] = startTime.split(":").map(Number);
+      const [endHour, endMinute] = endTime.split(":").map(Number);
 
-      const timeGap =
-        Number(endHour) * 60 +
-        Number(endMinute) -
-        (Number(startHour) * 60 + Number(startMinute));
+      const timeGap = dayjs()
+        .hour(endHour)
+        .minute(endMinute)
+        .diff(dayjs().hour(startHour).minute(startMinute), "minute");
       const hourGap = Math.floor(timeGap / 60);
       const minuteGap = timeGap % 60;
 
@@ -62,12 +54,12 @@ export const DateTimeViewer: React.FC<DateTimeDisplayProps> = ({
   const { DateString, TimeGapText } = useDateTimeHelpers(
     date,
     startTime,
-    endTime
+    endTime,
   );
 
   return (
     <View
-      style={[{ flexDirection: "column", gap: 16, paddingVertical: 24 }, style]}
+      style={[{ flexDirection: "column", gap: 16, paddingVertical: 12 }, style]}
     >
       <Text
         style={{
@@ -84,6 +76,7 @@ export const DateTimeViewer: React.FC<DateTimeDisplayProps> = ({
         style={{
           height: 100,
           marginHorizontal: 40,
+          padding: 8,
           backgroundColor: Color["grey100"],
           borderRadius: 10,
           justifyContent: "center",
@@ -93,6 +86,8 @@ export const DateTimeViewer: React.FC<DateTimeDisplayProps> = ({
           style={{
             flexDirection: "row",
             alignItems: "center",
+            gap: 4,
+            paddingHorizontal: 4,
           }}
         >
           {date && (
@@ -101,7 +96,6 @@ export const DateTimeViewer: React.FC<DateTimeDisplayProps> = ({
                 style={{
                   height: 24,
                   width: 24,
-                  marginRight: 6,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -131,7 +125,7 @@ export const DateTimeViewer: React.FC<DateTimeDisplayProps> = ({
           <View
             style={{
               flexDirection: "row",
-              flex: 1,
+              flexGrow: 1,
               alignItems: "center",
               justifyContent: "space-evenly",
             }}
@@ -176,9 +170,10 @@ export const DateTimeViewer: React.FC<DateTimeDisplayProps> = ({
         ) : date ? (
           <View
             style={{
+              flexGrow: 1,
               flexDirection: "row",
               alignItems: "center",
-              justifyContent: "space-evenly",
+              justifyContent: "center",
             }}
           >
             <Text

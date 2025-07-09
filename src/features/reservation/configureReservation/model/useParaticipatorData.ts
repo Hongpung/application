@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Alert } from "@hongpung/src/common";
 import { useSearchInvitePossibleMembersFetch } from "@hongpung/src/entities/reservation";
 import { Member } from "@hongpung/src/entities/member";
@@ -41,28 +41,27 @@ export const useInvitePossibleMemberData = (searchParams: FindOptions) => {
           if (isCanGoBack) {
             navigation.goBack();
           }
-        }
+        },
       });
-
     }
-  }, [fetchData]);
+  }, [fetchData, error, navigation, page]);
 
   useEffect(() => {
     setPage(0);
   }, [searchParams]);
 
-  const loadNewPage = useCallback(
-    throttle(() => {
-      if (isLast) {
-        return;
-      }
+  const loadNewPage = useCallback(() => {
+    if (isLast) return;
+    if (!isLoading) {
+      setPage((prev) => prev + 1);
+    }
+  }, [isLoading, isLast]);
 
-      if (!isLoading) {
-        setPage((prev) => prev + 1);
-      }
-    }, 1000),
-    [setPage, isLoading]
-  );
+  const loadNewPageThrottled = useMemo(() => {
+    return throttle(() => {
+      loadNewPage();
+    }, 1000);
+  }, [loadNewPage]);
 
-  return { data, isLoading, error, loadNewPage };
+  return { data, isLoading, error, loadNewPage: loadNewPageThrottled };
 };

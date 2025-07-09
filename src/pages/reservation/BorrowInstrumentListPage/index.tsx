@@ -5,6 +5,7 @@ import { Header } from "@hongpung/src/common";
 import BorrowInstrumentList from "@hongpung/src/widgets/instrument/ui/BorrowInstrumentList/BorrowInstrumentList";
 import { StackActions } from "@react-navigation/native";
 import { MainStackScreenProps } from "@hongpung/src/common/navigation";
+import { debounce } from "lodash";
 
 export const BorrowInstrumentListPage: React.FC<
   MainStackScreenProps<"BorrowInstrumentList">
@@ -12,16 +13,25 @@ export const BorrowInstrumentListPage: React.FC<
   const { borrowInstruments } = route.params;
   const instrumentList: Instrument[] = JSON.parse(borrowInstruments);
 
-  const handleInstrumentClick = (instrument: Instrument) => {
-    // Handle instrument click
-    navigation.dispatch(
-      StackActions.push("InstrumentDetail", { instrumentId: instrument.instrumentId })
-    );
-  };
+  const handleInstrumentClick = debounce(
+    (instrument: Instrument) => {
+      // Handle instrument click
+      navigation.dispatch(
+        StackActions.push("InstrumentDetail", {
+          instrumentId: instrument.instrumentId,
+        }),
+      );
+    },
+    200,
+    {
+      leading: true,
+      trailing: false,
+    },
+  );
 
   return (
     <View style={styles.container}>
-      <Header leftButton={"close"} headerName="대여 악기 목록" />
+      <Header LeftButton={"close"} headerName="대여 악기 목록" />
       <View style={styles.content}>
         <BorrowInstrumentList
           instrumentList={instrumentList}

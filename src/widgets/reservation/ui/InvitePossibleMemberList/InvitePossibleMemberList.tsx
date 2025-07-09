@@ -9,17 +9,26 @@ interface InvitePossibleMemberListProps {
   selectedMembers: Member[];
   toggleMember: (member: Member) => void;
   onEndReached: () => void; // 추가 리스트 요청 로직
-  isLoading: boolean
+  isLoading: boolean;
 }
 
-const InvitePossibleMemberList: React.FC<InvitePossibleMemberListProps> = ({ invitePossibleMembers, isLoading, selectedMembers, toggleMember, onEndReached }) => {
-
+const InvitePossibleMemberList: React.FC<InvitePossibleMemberListProps> = ({
+  invitePossibleMembers,
+  isLoading,
+  selectedMembers,
+  toggleMember,
+  onEndReached,
+}) => {
   const renderItem = ({ item: member }: { item: Member }) => (
     <View style={styles.cardContainer}>
       <ParticipatorCard
         member={member}
-        isPicked={selectedMembers.some(selectedMember => selectedMember.memberId === member.memberId)}
-        onPress={() => { toggleMember(member) }}
+        isPicked={selectedMembers.some(
+          (selectedMember) => selectedMember.memberId === member.memberId,
+        )}
+        onPress={() => {
+          toggleMember(member);
+        }}
       />
     </View>
   );
@@ -27,7 +36,9 @@ const InvitePossibleMemberList: React.FC<InvitePossibleMemberListProps> = ({ inv
   return (
     <FlatList
       data={invitePossibleMembers}
-      keyExtractor={(member, index) => member.memberId.toString() + "member" + index}
+      keyExtractor={(member, index) =>
+        member.memberId.toString() + "member" + index
+      }
       renderItem={renderItem}
       style={{ flex: 1 }}
       contentContainerStyle={styles.listContainer}
@@ -42,14 +53,11 @@ const InvitePossibleMemberList: React.FC<InvitePossibleMemberListProps> = ({ inv
             <MemberCardSkeleton key={"skeleton4"} />
             <MemberCardSkeleton key={"skeleton5"} />
           </>
-
         ) : null
       }
     />
   );
-
 };
-
 
 const styles = StyleSheet.create({
   listContainer: {

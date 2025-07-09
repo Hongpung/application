@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
 
 import SelectedParticipatorList from "@hongpung/src/widgets/reservation/ui/SelectedParticipatorHList/SelectedParticipatorHList";
-import { Header } from "@hongpung/src/common";
+import { Header, Color } from "@hongpung/src/common";
 import { Icons } from "@hongpung/src/common/ui/Icons/Icons";
 import { ParticipatorsConfirmButton } from "@hongpung/src/widgets/reservation/ui/ParticipatorsConfirmButton/ParticipatorsConfirmButton";
 import OptionsModal from "@hongpung/src/widgets/reservation/ui/OptionsModal/OptionsModal";
@@ -10,14 +10,15 @@ import FilterHList from "@hongpung/src/widgets/reservation/ui/FilterHList/Filter
 import SearchMemberNameBar from "@hongpung/src/widgets/reservation/ui/SearchMemberNameBar.tsx/SearchMemberNameBar";
 import { useParticipatorsFilters } from "@hongpung/src/features/reservation/configureReservation/model/useParticipatorsFilters";
 import { useSelectParticipators } from "@hongpung/src/features/reservation/configureReservation/model/useSelectParticipators";
-import { Color } from "@hongpung/src/common";
 
 import { useInvitePossibleMemberData } from "@hongpung/src/features/reservation/configureReservation/model/useParaticipatorData";
 import { useEditReservation } from "@hongpung/src/features/reservation/editReservation/model/useEditReservation.context";
 import InvitePossibleMemberList from "@hongpung/src/widgets/reservation/ui/InvitePossibleMemberList/InvitePossibleMemberList";
 import { EditReservationStackScreenProps } from "@hongpung/src/common/navigation";
 
-const ParticipantsSelectScreen: React.FC<EditReservationStackScreenProps<"EditReservationParticipatorsSelect">> = ({ navigation }) => {
+const ParticipantsSelectScreen: React.FC<
+  EditReservationStackScreenProps<"EditReservationParticipatorsSelect">
+> = ({ navigation }) => {
   const {
     findOptions,
     setFindOptions,
@@ -39,7 +40,7 @@ const ParticipantsSelectScreen: React.FC<EditReservationStackScreenProps<"EditRe
     useInvitePossibleMemberData(filterParams);
 
   const { ...participatorsData } = useSelectParticipators(
-    reservation.participators
+    reservation.participators,
   );
 
   const { newParticipators, toggleParticipator } = participatorsData;
@@ -51,7 +52,7 @@ const ParticipantsSelectScreen: React.FC<EditReservationStackScreenProps<"EditRe
   return (
     <View style={styles.container}>
       <Header
-        leftButton="close"
+        LeftButton="close"
         headerName={"인원 선택"}
         RightButton={
           <Icons size={28} name={"search"} color={Color["grey400"]} />
@@ -110,7 +111,7 @@ const ParticipantsSelectScreen: React.FC<EditReservationStackScreenProps<"EditRe
               participatorsLength={newParticipators.length}
               onPress={() => {
                 setParticipators([...newParticipators]);
-                navigation.navigate("EditReservationForm")
+                navigation.navigate("EditReservationForm");
               }}
             />
           </View>

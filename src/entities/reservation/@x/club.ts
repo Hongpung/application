@@ -1,1 +1,1 @@
-export { Club } from '@hongpung/src/entities/club'
+export { Club } from "@hongpung/src/entities/club";

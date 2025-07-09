@@ -15,11 +15,11 @@ import {
   ReservationDetail,
 } from "../model/type";
 import { mapReservationDetail } from "../lib/mapReservationDetail";
-import { myTodayReservationState } from "../model/myTodayReservationState";
 import { TimeArray, TimeFormat } from "@hongpung/src/common";
 import { getReservationColor } from "../lib/getReservationColor";
 import type { Member } from "@hongpung/src/entities/member/@x/reservation";
 import { Instrument } from "../../instrument/@x/reservation";
+import dayjs from "dayjs";
 
 const reservationApi = baseApi.addEndpoints({
   endpoints: (builder) => ({
@@ -30,18 +30,22 @@ const reservationApi = baseApi.addEndpoints({
       query: ({ reservationId }) => ({
         url: `/reservation/${reservationId}`,
         withAuthorize: true,
+        refetchOnFocus: true,
       }),
 
       transformResponse: (data: ReservationDto) => mapReservationDetail(data),
+      queryOptions: (params) => ({
+        queryKey: ["reservation-detail", params.reservationId],
+      }),
     }),
 
     loadOccupiedTimes: builder.fetch<
-      { times: TimeFormat[]; reservationId: number }[],
+      { reservationId: number; times: TimeFormat[] }[],
       { date: Date }
     >({
       query: ({ date }) => {
-        const koreanTime = new Date(date.getTime() + 9 * 60 * 60 * 1000);
-        const DateString = koreanTime.toISOString().split("T")[0];
+        const koreanTime = dayjs(date);
+        const DateString = koreanTime.format("YYYY-MM-DD");
 
         return {
           url: `/reservation/daily/occupied`,
@@ -51,34 +55,39 @@ const reservationApi = baseApi.addEndpoints({
       },
       transformResponse: (data: ExistReservationDto[]) => {
         return data.map((reservation) => {
-          const occupiedTimes = data.map((reservation) => {
-            const firstTimeIndex = TimeArray.indexOf(
-              reservation.startTime
-            );
-            const lastTimeIndex = TimeArray.indexOf(
-              reservation.endTime
-            );
-            return TimeArray.slice(firstTimeIndex, lastTimeIndex)
-          }).flat();
+          const occupiedTimes = data
+            .map((reservation) => {
+              const firstTimeIndex = TimeArray.indexOf(reservation.startTime);
+              const lastTimeIndex = TimeArray.indexOf(reservation.endTime);
+              return TimeArray.slice(firstTimeIndex, lastTimeIndex);
+            })
+            .flat();
           return {
             reservationId: reservation.reservationId,
             times: occupiedTimes,
           };
         });
       },
+      queryOptions: (params) => ({
+        queryKey: ["daily-reservations", params.date],
+      }),
     }),
 
     loadDailyReservations: builder.fetch<DailyReservation[], { date: Date }>({
       query: ({ date }) => {
-        const koreanTime = new Date(date.getTime() + 9 * 60 * 60 * 1000);
-        const DateString = koreanTime.toISOString().split("T")[0];
+        const koreanTime = dayjs(date);
+        const DateString = koreanTime.format("YYYY-MM-DD");
 
         return {
           url: `/reservation/daily`,
           params: { date: DateString },
           withAuthorize: true,
+          refetchOnFocus: true,
         };
       },
+      queryOptions: (params) => ({
+        queryKey: ["daily-reservations", params.date],
+      }),
     }),
 
     loadMonthlyReservations: builder.fetch<
@@ -86,25 +95,26 @@ const reservationApi = baseApi.addEndpoints({
       { calendarMonth: Date }
     >({
       query: ({ calendarMonth }) => {
-        const koreanTime = new Date(
-          calendarMonth.getTime() + 9 * 60 * 60 * 1000
-        );
+        const koreanTime = dayjs(calendarMonth);
         return {
           url: `/reservation/month-calendar`,
           params: {
-            year: koreanTime.getUTCFullYear(),
-            month: koreanTime.getUTCMonth() + 1,
+            year: koreanTime.year(),
+            month: koreanTime.month() + 1,
           },
           withAuthorize: true,
+          refetchOnFocus: true,
         };
       },
       transformResponse: (data: MonthlyReservationDto[]) => {
         const reservedDates: { [key: number]: { color: string }[] } = [];
 
         data.map((reservation) => {
-          const reservedDate = new Date(reservation.date).getDate();
+          const reservedDate = dayjs(reservation.date).date();
           if (!reservedDates[reservedDate])
-            reservedDates[reservedDate] = [{ color: getReservationColor(reservation) }];
+            reservedDates[reservedDate] = [
+              { color: getReservationColor(reservation) },
+            ];
           else
             reservedDates[reservedDate] = [
               ...reservedDates[reservedDate],
@@ -114,6 +124,9 @@ const reservationApi = baseApi.addEndpoints({
 
         return reservedDates;
       },
+      queryOptions: (params) => ({
+        queryKey: ["monthly-reservations", params.calendarMonth],
+      }),
     }),
 
     searchInvitePossibleMembers: builder.fetch<
@@ -127,12 +140,23 @@ const reservationApi = baseApi.addEndpoints({
           params: { page, ...params },
         };
       },
+      queryOptions: (params) => ({
+        queryKey: [
+          "search-invite-possible-members",
+          params.keyword,
+          params.clubId,
+          params.page,
+        ],
+      }),
     }),
 
     borrowPossibleInstruments: builder.fetch<Instrument[], void>({
       query: () => ({
         url: `/instrument/borrow-list`,
         withAuthorize: true,
+      }),
+      queryOptions: (params) => ({
+        queryKey: ["borrow-possible-instruments"],
       }),
     }),
 
@@ -153,6 +177,9 @@ const reservationApi = baseApi.addEndpoints({
           },
         };
       },
+      queryOptions: {
+        mutationKey: ["reservation"],
+      },
     }),
 
     editReservation: builder.request<void, ReservationEditRequestBody>({
@@ -169,6 +196,9 @@ const reservationApi = baseApi.addEndpoints({
           },
         };
       },
+      queryOptions: {
+        mutationKey: ["reservation"],
+      },
     }),
 
     deleteReservation: builder.request<void, { reservationId: number }>({
@@ -178,6 +208,9 @@ const reservationApi = baseApi.addEndpoints({
           withAuthorize: true,
           method: "DELETE",
         };
+      },
+      queryOptions: {
+        mutationKey: ["reservation"],
       },
     }),
 
@@ -189,13 +222,20 @@ const reservationApi = baseApi.addEndpoints({
           method: "POST",
         };
       },
+      queryOptions: {
+        mutationKey: ["reservation"],
+      },
     }),
 
     loadMyTodayReservation: builder.fetch<DailyReservationDto[], void>({
-      stateKey: myTodayReservationState,
       query: () => ({
         url: "/reservation/today",
         withAuthorize: true,
+      }),
+      queryOptions: (params) => ({
+        queryKey: ["my-today-reservation"],
+        staleTime: 60 * 60 * 1000,
+        gcTime: 60 * 60 * 1000,
       }),
     }),
 
@@ -213,11 +253,17 @@ const reservationApi = baseApi.addEndpoints({
           withAuthorize: true,
         };
       },
+      queryOptions: (params) => ({
+        queryKey: ["my-schedules", params.skip],
+      }),
     }),
     loadMyUpcommingSchedule: builder.fetch<Reservation[], { skip: number }>({
       query: ({ skip }) => ({
         url: `/reservation/my-schedule?skip=${skip}`,
         method: "GET",
+      }),
+      queryOptions: (params) => ({
+        queryKey: ["my-upcomming-schedule", params.skip],
       }),
     }),
   }),

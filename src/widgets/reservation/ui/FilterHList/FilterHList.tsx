@@ -1,7 +1,6 @@
 import React from "react";
 import { Pressable, ScrollView, Text, View, StyleSheet } from "react-native";
-import { Icons } from "@hongpung/src/common";
-import { Color } from "@src/common";
+import { Icons, Color } from "@hongpung/src/common";
 
 interface FilterHListProps {
   descendingOrder: boolean;

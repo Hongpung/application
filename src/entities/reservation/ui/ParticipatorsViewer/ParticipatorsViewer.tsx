@@ -1,13 +1,15 @@
+import { View, Text } from "react-native";
+import { Image } from "expo-image";
+
 import { Color } from "@hongpung/src/common";
 import { Member } from "@hongpung/src/entities/member/@x/reservation";
-import { View, Text, Image } from "react-native";
 
 type ParticipatorsViewerProps = {
   participators: Member[];
 };
 
 export const ParticipatorsViewer: React.FC<ParticipatorsViewerProps> = (
-  props
+  props,
 ) => {
   const { participators } = props;
 
@@ -66,8 +68,9 @@ export const ParticipatorsViewer: React.FC<ParticipatorsViewerProps> = (
                       style={{
                         width: "100%",
                         height: "100%",
-                        zIndex: 5
+                        zIndex: 5,
                       }}
+                      cachePolicy="memory-disk"
                     />
                   </View>
                 ) : (
@@ -84,7 +87,7 @@ export const ParticipatorsViewer: React.FC<ParticipatorsViewerProps> = (
                             : array.length === 5
                               ? -16
                               : -8,
-                              
+
                       overflow: "hidden",
                       backgroundColor: Color["grey300"],
                       borderColor: Color["grey200"],
@@ -92,7 +95,7 @@ export const ParticipatorsViewer: React.FC<ParticipatorsViewerProps> = (
                       borderRadius: 5,
                     }}
                   />
-                )
+                ),
               )}
             </View>
             <View

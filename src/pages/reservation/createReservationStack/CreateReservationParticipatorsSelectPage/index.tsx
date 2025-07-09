@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, View, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 import { Header, Color, Icons } from "@hongpung/src/common";
 import { ParticipatorsConfirmButton } from "@hongpung/src/widgets/reservation/ui/ParticipatorsConfirmButton/ParticipatorsConfirmButton";
@@ -40,7 +40,7 @@ const CreateReservationParticipatorsSelectScreen: React.FC<
     useInvitePossibleMemberData(filterParams);
 
   const { toggleParticipator, ...participatorsData } = useSelectParticipators(
-    reservation.participators
+    reservation.participators,
   );
 
   const { newParticipators } = participatorsData;
@@ -52,7 +52,7 @@ const CreateReservationParticipatorsSelectScreen: React.FC<
   return (
     <View style={styles.container}>
       <Header
-        leftButton="close"
+        LeftButton="close"
         headerName={"인원 선택"}
         RightButton={
           <Icons size={28} name={"search"} color={Color["grey400"]} />

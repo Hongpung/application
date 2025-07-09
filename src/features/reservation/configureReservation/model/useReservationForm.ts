@@ -2,25 +2,30 @@ import { type ReservationForm } from "@hongpung/src/entities/reservation";
 import { useCallback, useMemo, useState } from "react";
 
 const useReservationForm = (initialReservationForm?: ReservationForm) => {
-  const [reservationForm, setReservationForm] = useState<ReservationForm>(initialReservationForm ||{
-    title: "",
-    reservationType: "REGULAR",
-    participationAvailable: false,
-    borrowInstruments: [],
-    participators: [],
-  });
+  const [reservationForm, setReservationForm] = useState<ReservationForm>(
+    initialReservationForm || {
+      title: "",
+      reservationType: "REGULAR",
+      participationAvailable: false,
+      borrowInstruments: [],
+      participators: [],
+    },
+  );
 
   const isCompleteReservation = useCallback(
     (
-      reservationForm: ReservationForm
+      reservationForm: ReservationForm,
     ): reservationForm is Required<ReservationForm> => {
       return Object.entries(reservationForm).every(([key, value]) => {
         const typedKey = key as keyof ReservationForm;
-        if (typedKey === 'title') { return (value !== null) }
-        else { return true }
+        if (typedKey === "title") {
+          return value !== null;
+        } else {
+          return value !== undefined && value !== null;
+        }
       });
     },
-    []
+    [],
   );
 
   // setReservation을 업데이트 함수로 개선
@@ -56,14 +61,14 @@ const useReservationForm = (initialReservationForm?: ReservationForm) => {
           participators,
         })),
       setBorrowInstruments: (
-        borrowInstruments: ReservationForm["borrowInstruments"]
+        borrowInstruments: ReservationForm["borrowInstruments"],
       ) =>
         setReservationForm((prev) => ({
           ...prev,
           borrowInstruments,
         })),
       setParticipationAvailable: (
-        available: ReservationForm["participationAvailable"]
+        available: ReservationForm["participationAvailable"],
       ) =>
         setReservationForm((prev) => ({
           ...prev,
@@ -75,9 +80,8 @@ const useReservationForm = (initialReservationForm?: ReservationForm) => {
           reservationType: type,
         })),
     }),
-    []
+    [],
   );
-
 
   return {
     reservationForm,

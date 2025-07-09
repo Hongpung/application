@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo } from "react";
-import { Alert } from "@hongpung/src/common"; 
+import { Alert } from "@hongpung/src/common";
 
 import { isEqual } from "lodash";
 
@@ -14,6 +14,7 @@ import {
 import useReservationForm from "../../configureReservation/model/useReservationForm";
 
 import { EditReservationContextProps } from "./type";
+import { editCompleteToast } from "../lib/toast";
 
 const EditReservationContext = createContext<
   EditReservationContextProps | undefined
@@ -28,14 +29,14 @@ const EditReservationContextProvider: React.FC<
   }
 > = ({ navigation, prevReservation, children }) => {
   const { reservationForm, setForm, isCompleteReservation } =
-    useReservationForm();
+    useReservationForm(prevReservation);
 
   const { request, isLoading, error } = useEditReservationRequest();
   // setReservation을 업데이트 함수로 개선
 
   const isValidReservation = useMemo(
     () => isCompleteReservation(reservationForm),
-    [reservationForm]
+    [reservationForm, isCompleteReservation],
   );
   // 예약 생성 API 요청 함수 (더미 함수로 예시)
   const verifyEditReservation = useCallback(
@@ -43,31 +44,45 @@ const EditReservationContextProvider: React.FC<
       if (isEqual(prevReservation, reservationForm)) {
         Alert.alert(
           "예약 오류", // 타이틀
-          "기존 예약과 동일합니다."
+          "기존 예약과 동일합니다.",
         );
       } else {
         onVerfyied();
       }
     },
-    [reservationForm]
+    [reservationForm, prevReservation],
   );
 
   const differenceKey = useMemo(() => {
     if (!reservationForm) return [];
 
     if (!prevReservation) return []; // 초기 상태면 전체 반환
-    const diff: (keyof ReservationForm)[] = [];
 
+    const diff = new Set<
+      keyof Omit<ReservationForm, "startTime" | "endTime"> | "time"
+    >();
     for (const key of Object.keys(
-      reservationForm
+      reservationForm,
     ) as (keyof ReservationForm)[]) {
       if (reservationForm[key] !== prevReservation[key]) {
-        diff.push(key);
+        if (key === "borrowInstruments" || key === "participators") {
+          if (
+            JSON.stringify(reservationForm[key]) !==
+            JSON.stringify(prevReservation[key])
+          )
+            diff.add(key);
+        } else {
+          if (key === "startTime" || key === "endTime") {
+            diff.add("time");
+          } else {
+            diff.add(key);
+          }
+        }
       }
     }
 
-    return diff;
-  }, [reservationForm]);
+    return [...diff];
+  }, [reservationForm, prevReservation]);
 
   const requestEditReservation = async () => {
     try {
@@ -76,12 +91,17 @@ const EditReservationContextProvider: React.FC<
       if (isEqual(prevReservation, reservationForm))
         throw new Error("기존 예약과 동일합니다.");
 
+      console.log("예약 수정 요청", {
+        reservationForm,
+      });
       await request(
-        getReservationEditRequestBody(prevReservation, reservationForm)
+        getReservationEditRequestBody(prevReservation, reservationForm),
       );
       navigation.navigate("ReservationDetail", {
         reservationId: prevReservation.reservationId,
       });
+
+      editCompleteToast();
     } catch (e) {
       if (e instanceof Error) {
         Alert.alert("예약 오류", e.message);
@@ -89,7 +109,7 @@ const EditReservationContextProvider: React.FC<
       } else if (error instanceof Error) {
         Alert.alert(
           "예약 오류",
-          error?.message || "예약 수정 중 오류가 발생했습니다."
+          error?.message || "예약 수정 중 오류가 발생했습니다.",
         );
         console.error("예약 수정 중 오류 발생:", error);
       } else {
@@ -123,7 +143,7 @@ const useEditReservation = () => {
   const context = useContext(EditReservationContext);
   if (!context) {
     throw new Error(
-      "useCreateReservation must be used within a CreateReservationContextProvider"
+      "useCreateReservation must be used within a CreateReservationContextProvider",
     );
   }
   return context;

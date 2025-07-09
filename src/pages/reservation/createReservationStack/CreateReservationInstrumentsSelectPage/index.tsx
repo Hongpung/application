@@ -22,13 +22,13 @@ const CreateReservationBorrowInstrumentsSelectScreen: React.FC = () => {
     setNewBorrowInstruments((prev) =>
       prev.includes(instrument)
         ? prev.filter((i) => i !== instrument)
-        : [...prev, instrument]
+        : [...prev, instrument],
     );
   };
 
   return (
     <View style={styles.container}>
-      <Header leftButton="close" headerName="대여 악기 선택" />
+      <Header LeftButton="close" headerName="대여 악기 선택" />
 
       <View style={styles.container}>
         <BorrowPossibleInstrumentList

@@ -32,22 +32,18 @@ export const LeaveReservationButton: React.FC<LeaveReservationButtonProps> = ({
       return;
     }
 
-    Alert.confirm(
-      "확인",
-      "정말 예약에서 나가시겠습니까?",
-      {
-        cancelText: "아니오",
-        confirmText: "예",
-        onConfirm: async () => {
-          try {
-            await request({ reservationId });
-            navigation.goBack();
-          } catch {
-            Alert.alert("오류", "오류가 발생했습니다.");
-          }
-        },
+    Alert.confirm("확인", "정말 예약에서 나가시겠습니까?", {
+      cancelText: "아니오",
+      confirmText: "예",
+      onConfirm: async () => {
+        try {
+          await request({ reservationId });
+          navigation.goBack();
+        } catch {
+          Alert.alert("오류", "오류가 발생했습니다.");
+        }
       },
-    )
+    });
   };
 
   return (

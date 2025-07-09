@@ -1,4 +1,11 @@
-import { ScrollView, View } from "react-native";
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import React, { useCallback, useState } from "react";
 import { type ReservationForm as ReservationFormType } from "@hongpung/src/entities/reservation";
 
@@ -7,7 +14,7 @@ import { ParticipatorsSelector } from "../ParticipatorsSelector/ParticipatorsSel
 import BorrowInstrumentsSelector from "../BorrowInstrumentsSelector/BorrowInstrumentsSelector";
 import { TitleInput } from "../TitleInput/TitleInput";
 import { DateTimeSelector } from "../DateTimeSelector/DateTimeSelector";
-import { Checkbox, LongButton } from "@hongpung/src/common";
+import { Checkbox, Color, LongButton } from "@hongpung/src/common";
 
 type ReservationFormProps = {
   reservation: ReservationFormType;
@@ -70,52 +77,66 @@ export const ReservationForm: React.FC<ReservationFormProps> = (props) => {
     if (!date) {
       navigateDatePickerPage();
     } else {
-      navigateDatePickerPage();
+      // navigateDatePickerPage();
       navigateTimePickerPage();
     }
-  }, [date]);
+  }, [date, navigateDatePickerPage, navigateTimePickerPage]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#FFF" }}>
-      <ScrollView
-        style={{ flex: 1, backgroundColor: "#FFF" }}
-        contentContainerStyle={{
-          flexGrow: 1,
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+        >
+          <ScrollView
+            style={{ flex: 1, backgroundColor: "#FFF" }}
+            contentContainerStyle={{
+              flexGrow: 1,
+              backgroundColor: "#FFF",
+              gap: 24,
+            }}
+          >
+            <DateTimeSelector
+              date={date}
+              startTime={startTime}
+              endTime={endTime}
+              onPress={onDateTimePress}
+            />
+            <View style={{ height: 24, backgroundColor: Color["grey100"] }} />
+            <TitleInput title={title} setTitle={setTitle} />
+            <ReservationTypeSelector
+              participationAvailable={participationAvailable}
+              reservationType={reservationType}
+              setParticipationAvailable={setParticipationAvailable}
+              setReservationType={setReservationType}
+            />
+
+            <View style={{ height: 24, backgroundColor: Color["grey100"] }} />
+            <ParticipatorsSelector
+              onPress={navigateToParticipatorsPickerPage}
+              participators={participators}
+              resetParticipator={resetParticipators}
+            />
+
+            <BorrowInstrumentsSelector
+              onPress={navigateToBorrowInstrumentsPickerPage}
+              borrowInstruments={borrowInstruments}
+              resetBorrowInstruments={resetBorrowInstruments}
+            />
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
+      <View
+        style={{
+          paddingVertical: 16,
+          gap: 12,
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
           backgroundColor: "#FFF",
-          gap: 24,
         }}
       >
-        <DateTimeSelector
-          date={date}
-          startTime={startTime}
-          endTime={endTime}
-          onPress={onDateTimePress}
-        />
-
-        <TitleInput title={title} setTitle={setTitle} />
-
-        <ReservationTypeSelector
-          participationAvailable={participationAvailable}
-          reservationType={reservationType}
-          setParticipationAvailable={setParticipationAvailable}
-          setReservationType={setReservationType}
-        />
-
-        <ParticipatorsSelector
-          onPress={navigateToParticipatorsPickerPage}
-          participators={participators}
-          resetParticipator={resetParticipators}
-        />
-
-        <BorrowInstrumentsSelector
-          onPress={navigateToBorrowInstrumentsPickerPage}
-          borrowInstruments={borrowInstruments}
-          resetBorrowInstruments={resetBorrowInstruments}
-        />
-
-
-      </ScrollView>
-      <View style={{ paddingVertical: 16, gap: 12, borderTopLeftRadius: 16, borderTopRightRadius: 16, backgroundColor: "#FFF" }}>
         <View style={{ paddingHorizontal: 32 }}>
           <Checkbox
             isChecked={isAgree}
@@ -126,7 +147,7 @@ export const ReservationForm: React.FC<ReservationFormProps> = (props) => {
         <LongButton
           onPress={() => onSubmit(reservation)}
           innerContent={submitButtonText}
-          isAble={canSubmit&&isAgree}
+          isAble={canSubmit && isAgree}
           color="blue"
         />
       </View>

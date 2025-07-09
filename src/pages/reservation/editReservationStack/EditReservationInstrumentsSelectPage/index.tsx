@@ -1,9 +1,8 @@
 import React, { useCallback, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 
 import { Instrument } from "@hongpung/src/entities/instrument";
-import { Header } from "@hongpung/src/common";
-import { Color } from "@hongpung/src/common";
+import { Header, Color } from "@hongpung/src/common";
 
 import { useBorrowPossibleInstrumentsFetch } from "@hongpung/src/entities/reservation";
 import { BorrowInstrumentsConfirmButton } from "@hongpung/src/widgets/reservation/ui/BorrowInstrumentsConfirmButton/BorrowInstrumentsConfirmButton";
@@ -31,11 +30,11 @@ const BorrowInstrumentSelectScreen: React.FC<
   const onPressConfirm = useCallback(() => {
     setBorrowInstruments(newBorrowInstruments);
     navigation.goBack();
-  }, [newBorrowInstruments]);
+  }, [newBorrowInstruments, navigation, setBorrowInstruments]);
 
   return (
     <View style={styles.container}>
-      <Header leftButton="close" headerName="대여 악기 선택" />
+      <Header LeftButton="close" headerName="대여 악기 선택" />
 
       <View style={styles.container}>
         <BorrowPossibleInstrumentList
