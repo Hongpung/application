@@ -1,6 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { ReservationStackScreenProps } from "@hongpung/src/common/navigation";
 import { CreateReservationStackParamList } from "../common/navigation/createReservation";
 import CreateReservationConfirmPage from "../pages/reservation/createReservationStack/CreateReservationConfirmPage";
 import ReservationCreatePage from "../pages/reservation/createReservationStack/ReservationCreatePage";

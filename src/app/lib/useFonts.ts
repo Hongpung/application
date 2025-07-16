@@ -5,7 +5,6 @@ export const useFonts = () => {
   const [fontLoaded, setFontLoaded] = useState(false);
 
   useEffect(() => {
-
     const fetchFonts = async () => {
       await Font.loadAsync({
         "NanumSquareNeo-Bold": require("@hongpung/assets/fonts/NanumSquareNeoOTF-Bd.otf"),

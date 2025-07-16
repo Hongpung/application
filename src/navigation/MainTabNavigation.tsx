@@ -7,6 +7,8 @@ import HomeScreen from "@hongpung/src/pages/home/HomePage";
 import MyPageScreen from "@hongpung/src/pages/member/MyPagePage";
 import QRCodeScreen from "@hongpung/src/pages/session/QRScanPage";
 import ReservationScreen from "@hongpung/src/pages/reservation/ReservationMainPage";
+import { Pressable } from "react-native";
+import * as Haptics from "expo-haptics";
 
 const MainTab = createBottomTabNavigator<MainTabParamList>();
 
@@ -38,6 +40,15 @@ export const MainTabNavigation: React.FC = () => {
           marginBottom: 2,
         },
         tabBarLabelStyle: { fontFamily: "NanumSquareNeo-Bold", fontSize: 12 },
+        tabBarButton: (props) => (
+          <Pressable
+            {...props}
+            onPress={(e) => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              props.onPress?.(e);
+            }}
+          />
+        ),
       }}
     >
       <MainTab.Screen
@@ -60,6 +71,7 @@ export const MainTabNavigation: React.FC = () => {
               color={color}
             />
           ),
+
           tabBarLabel: "예약",
         }}
       />
@@ -70,6 +82,7 @@ export const MainTabNavigation: React.FC = () => {
           tabBarIcon: ({ color }) => (
             <Icons name={"qr-code-sharp"} color={color} />
           ),
+
           tabBarLabel: "QR 스캔",
           tabBarStyle: { display: "none" },
           unmountOnBlur: true,
@@ -79,7 +92,9 @@ export const MainTabNavigation: React.FC = () => {
         name="MyPage"
         component={MyPageScreen}
         options={{
+          unmountOnBlur: true,
           tabBarIcon: ({ color }) => <Icons name={"person"} color={color} />,
+
           tabBarLabel: "내 정보",
         }}
       />

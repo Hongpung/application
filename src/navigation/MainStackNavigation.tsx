@@ -1,9 +1,15 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { useUserUseRoomFetch } from "@hongpung/src/entities/session";
+import {
+  UseRoomState,
+  useUserUseRoomFetch,
+} from "@hongpung/src/entities/session";
 
 import { MainStackParamList } from "@hongpung/src/common/navigation";
-import { useLoadMyStatusFetch } from "@hongpung/src/entities/member";
+import {
+  useLoadMyStatusFetch,
+  UserStatusState,
+} from "@hongpung/src/entities/member";
 
 import { LoginSettingPage } from "@hongpung/src/pages/setting/LoginSettingPage";
 import NotificationSettingPage from "@hongpung/src/pages/setting/NotificationSettingPage";
@@ -19,20 +25,31 @@ import ParticipatorListViewPage from "@hongpung/src/pages/reservation/Participat
 
 import { InstrumentDetailPage } from "@hongpung/src/pages/instrument/InstrumentDetailPage";
 import { CheckInPage } from "@hongpung/src/pages/session/CheckInPage";
+import { CheckOutScreen as CheckOutSessionScreen } from "@hongpung/src/pages/session/CheckOutPage";
+import { UsingManageScreen as SessionManagementScreen } from "@hongpung/src/pages/session/UsingSessionManagePage";
 
 import WebViewPage from "@hongpung/src/pages/webview/WebViewPage";
 
 import { MainTabNavigation as MainTab } from "./MainTabNavigation";
 import { ClubStackNavigation as ClubStack } from "./ClubStackNavigation";
 import { ReservationStackNavigation as ReservationStack } from "./ReservationNavigation";
-import { SessionManagementStackNavigation as SessionManagementStack } from "./SessionManagementStackNavigation";
 import { NoticeStackNavigation as NoticeStack } from "./NoticeStackNavigation";
+import EditInstrumentPage from "@hongpung/src/pages/instrument/EditInstrumentPage";
+import InstrumentCreateScreen from "@hongpung/src/pages/instrument/CreateInstrumentPage";
+import WithdrawalScreen from "@hongpung/src/pages/auth/WithdrawalPage/WithdrawalPage";
+import { SessionLogInfoPage } from "@hongpung/src/pages/session-log/SessionLogInfoPage";
+import ChangeProfilePage from "@hongpung/src/pages/member/ChangeProfilePage";
+import { BannerListPage } from "../pages/banner/BannerListPage";
+import { useSyncQueryToAtom } from "../common/lib/useSyncQueryToAtom";
 
 const MainStack = createNativeStackNavigator<MainStackParamList>();
 
 export const MainStackNavigation = () => {
-  useLoadMyStatusFetch();
-  useUserUseRoomFetch();
+  const MyStatusQuery = useLoadMyStatusFetch();
+  const isUseRoomQuery = useUserUseRoomFetch();
+
+  useSyncQueryToAtom(MyStatusQuery, UserStatusState);
+  useSyncQueryToAtom(isUseRoomQuery, UseRoomState);
 
   return (
     <MainStack.Navigator
@@ -47,15 +64,20 @@ export const MainStackNavigation = () => {
           headerShown: false,
         }}
       />
+
+      <MainStack.Screen name="Notification" component={NotificationPage} />
+
       <MainStack.Screen
-        name="Notification"
-        component={NotificationPage}
-        options={{ presentation: "modal" }}
+        options={{ presentation: "formSheet" }}
+        name="SessionManage"
+        component={SessionManagementScreen}
       />
       <MainStack.Screen
-        name="SessionManagement"
-        component={SessionManagementStack}
-        options={{ presentation: "modal", animation: "slide_from_bottom" }}
+        name="CheckOutSession"
+        component={CheckOutSessionScreen}
+        options={{
+          gestureEnabled: false, // iOS에서 스와이프 back 비활성화
+        }}
       />
 
       <MainStack.Screen name="Club" component={ClubStack} />
@@ -85,14 +107,35 @@ export const MainStackNavigation = () => {
         component={ParticipatorListViewPage}
       />
 
-      <MainStack.Screen name="WebView" component={WebViewPage} />
+      <MainStack.Screen
+        name="WebView"
+        options={{ animation: "none" }}
+        component={WebViewPage}
+      />
 
       <MainStack.Screen
         name="InstrumentDetail"
         component={InstrumentDetailPage}
       />
+      <MainStack.Screen name="EditInstrument" component={EditInstrumentPage} />
+      <MainStack.Screen
+        name="CreateInstrument"
+        component={InstrumentCreateScreen}
+      />
 
       <MainStack.Screen name="Notice" component={NoticeStack} />
+
+      <MainStack.Screen name="Withdraw" component={WithdrawalScreen} />
+
+      <MainStack.Screen name="SessionLogInfo" component={SessionLogInfoPage} />
+
+      <MainStack.Screen
+        name="ChangeProfile"
+        component={ChangeProfilePage}
+        options={{ gestureEnabled: false }}
+      />
+
+      <MainStack.Screen name="BannerList" component={BannerListPage} />
     </MainStack.Navigator>
   );
 };
