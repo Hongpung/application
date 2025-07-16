@@ -11,7 +11,7 @@ export const SessionTimer: React.FC<SessionTimerProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      {Number(remainingHour) != 0 && (
+      {Number(remainingHour) !== 0 && (
         <Text style={styles.hourText}>{remainingHour}</Text>
       )}
       <Text style={styles.minuteText}>{remainingMinute}</Text>

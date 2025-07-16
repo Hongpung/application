@@ -1,9 +1,15 @@
 import { Session } from "../../model/type";
-import { Color } from "@hongpung/src/common";
-import { Icons } from "@hongpung/src/common";
+import { Color, Icons } from "@hongpung/src/common";
 import { BlurView } from "expo-blur";
-import { View, Pressable, Text, Dimensions, StyleSheet } from "react-native";
-import React from "react";
+import {
+  View,
+  Pressable,
+  Text,
+  Dimensions,
+  StyleSheet,
+  Animated,
+} from "react-native";
+import React, { useEffect, useRef } from "react";
 
 type SessionCardProps = {
   session: Session;
@@ -13,20 +19,55 @@ type SessionCardProps = {
 const SessionCard: React.FC<SessionCardProps> = (props) => {
   const { session, navigateToDetail: onNavigateDetail } = props;
 
-  const isPlayed = session?.status == "ONAIR" || false;
-  const isAfter = session?.status == "AFTER";
+  const isPlayed = session?.status === "ONAIR" || false;
+  const isAfter = session?.status === "AFTER";
   const color =
-    session.sessionType == "RESERVED" && session?.reservationType == "REGULAR"
+    session.sessionType === "RESERVED" && session?.reservationType === "REGULAR"
       ? "blue"
       : session.participationAvailable
-      ? "green"
-      : "red";
+        ? "green"
+        : "red";
+  const opacity = useRef(new Animated.Value(1)).current;
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.parallel([
+          Animated.timing(opacity, {
+            toValue: 0.4,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scale, {
+            toValue: 0.99,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+        ]),
+        Animated.parallel([
+          Animated.timing(scale, {
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]),
+    ).start();
+  }, [opacity, scale]);
 
   return (
     <View>
       <View>
         {isPlayed && (
-          <View style={styles.playedOverlay}>
+          <Animated.View
+            style={[styles.playedOverlay, { opacity, transform: [{ scale }] }]}
+          >
             <View
               style={[
                 styles.playedBackground,
@@ -45,10 +86,10 @@ const SessionCard: React.FC<SessionCardProps> = (props) => {
               tint="default"
               style={styles.blurView}
             />
-          </View>
+          </Animated.View>
         )}
 
-        {session.sessionType == "RESERVED" ? (
+        {session.sessionType === "RESERVED" ? (
           <Pressable
             key={session.sessionId}
             style={[styles.reservedCard, { width: width - 48 }]}
@@ -56,7 +97,7 @@ const SessionCard: React.FC<SessionCardProps> = (props) => {
               onNavigateDetail(session.reservationId);
             }}
           >
-            {session.reservationType == "REGULAR" ? (
+            {session.reservationType === "REGULAR" ? (
               <View style={styles.bookmarkIcon}>
                 <Icons
                   size={52}
@@ -75,12 +116,12 @@ const SessionCard: React.FC<SessionCardProps> = (props) => {
               </View>
             )}
 
-            {session.status == "AFTER" ? (
+            {session.status === "AFTER" ? (
               <View style={styles.statusBadge}>
                 <Text style={styles.statusText}>종료됨</Text>
               </View>
             ) : (
-              session.status == "DISCARDED" && (
+              session.status === "DISCARDED" && (
                 <View style={styles.statusBadge}>
                   <Text style={styles.statusText}>취소됨</Text>
                 </View>
@@ -96,7 +137,7 @@ const SessionCard: React.FC<SessionCardProps> = (props) => {
             </Text>
 
             <View style={styles.sessionFooter}>
-              {session.status == "DISCARDED" ? (
+              {session.status === "DISCARDED" ? (
                 <Text style={styles.sessionTime}>
                   {session.startTime} ~ --:--
                 </Text>
@@ -105,7 +146,7 @@ const SessionCard: React.FC<SessionCardProps> = (props) => {
                   style={styles.sessionTime}
                 >{`${session.startTime} ~ ${session.endTime}`}</Text>
               )}
-              {session.reservationType != "EXTERNAL" ? (
+              {session.reservationType !== "EXTERNAL" ? (
                 <View style={styles.participators}>
                   <Icons size={24} name={"people"} color={Color["grey300"]} />
                   <Text style={styles.participatorsCount}>
@@ -130,7 +171,7 @@ const SessionCard: React.FC<SessionCardProps> = (props) => {
                 </Text>
               )}
             </View>
-            {session.status == "AFTER" && (
+            {session.status === "AFTER" && (
               <View style={styles.statusBadge}>
                 <Text style={styles.statusText}>종료됨</Text>
               </View>

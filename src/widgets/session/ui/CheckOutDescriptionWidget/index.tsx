@@ -1,24 +1,30 @@
 import React, { useState, useRef } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { LongButton } from "@hongpung/src/common";
-import { Color } from "@hongpung/src/common";
 import PagerView from "react-native-pager-view";
-import { Session } from "@hongpung/src/entities/session";
+
 import {
   INSTRUMENT_PAGES,
   NO_INSTRUMENT_PAGES,
 } from "@hongpung/src/features/session/checkOutRoom/constant/descriptionPage";
+
 import { PageIndicator } from "@hongpung/src/common/ui/PageIndicator";
 import { DescriptionPage } from "@hongpung/src/common/ui/DescriptionPage";
+import { CheckOutStepProps } from "@hongpung/src/features/session/checkOutRoom/model/types";
+import { StepProps } from "@hongpung/react-step-flow";
 
-interface CheckOutDescriptionWidgetProps {
-  session: Session;
-  onNext: () => void;
-}
+type CheckOutDescriptionProps = StepProps<
+  CheckOutStepProps,
+  "CheckOutDescription"
+>;
 
-export const CheckOutDescriptionWidget: React.FC<
-  CheckOutDescriptionWidgetProps
-> = ({ session, onNext }) => {
+export const CheckOutDescriptionWidget: React.FC<CheckOutDescriptionProps> = ({
+  stepProps: { session },
+  goTo,
+}) => {
+  const onNext = () => {
+    goTo("Camera");
+  };
   const [pageNum, setPageNum] = useState(0);
   const pagerRef = useRef<PagerView>(null);
 
@@ -40,11 +46,10 @@ export const CheckOutDescriptionWidget: React.FC<
   };
 
   const isLastPage = pageNum === pages.length - 1;
-
   return (
     <View style={styles.basicBackground}>
       <View style={styles.contentContainer}>
-        <Text style={styles.title}>연습실 정리 안내</Text>
+        <Text style={styles.title}>이용 종료 전 확인해주세요!</Text>
         <PagerView
           style={styles.pager}
           initialPage={0}
@@ -73,22 +78,24 @@ export const CheckOutDescriptionWidget: React.FC<
 
 const styles = StyleSheet.create({
   basicBackground: {
+    flexGrow: 1,
     flex: 1,
-    backgroundColor: Color.white,
+    backgroundColor: "#FFF",
   },
   contentContainer: {
-    flex: 1,
-    paddingTop: 160,
-    gap: 24,
+    position: "relative",
+    flexDirection: "column",
+    flexGrow: 1,
   },
   title: {
     textAlign: "center",
     fontFamily: "NanumSquareNeo-Bold",
     fontSize: 20,
+    paddingTop: 48,
   },
   pager: {
-    flex: 1,
-    alignItems: "center",
+    flexGrow: 1,
+    borderRadius: 8,
   },
   footer: {
     gap: 24,
@@ -100,5 +107,3 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
 });
-
-export default CheckOutDescriptionWidget;

@@ -21,8 +21,8 @@ export const CheckInButton: React.FC<CheckInButtonProps> = ({
           isCheckin
             ? "확인"
             : sessionStatus === "JOINABLE"
-            ? "맞아요"
-            : "시작할래요"
+              ? "맞아요"
+              : "시작할래요"
         }
         onPress={onPress}
       />

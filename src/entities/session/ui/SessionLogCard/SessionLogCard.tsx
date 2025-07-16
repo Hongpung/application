@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Color } from "@hongpung/src/common";
-import { SessionLog } from "@hongpung/src/entities/session";
+import { SessionLog } from "@hongpung/src/entities/session-log";
 
 export interface SessionLogCardProps {
   session: SessionLog;
@@ -12,13 +12,13 @@ export const SessionLogCard: React.FC<SessionLogCardProps> = ({
   session,
   onPress,
 }) => {
-  
-
   return (
     <Pressable onPress={onPress} style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.date}>{session.date}</Text>
-        <Text style={styles.duration}>{session.startTime}~{session.endTime}</Text>
+        <Text style={styles.duration}>
+          {session.startTime}~{session.endTime}
+        </Text>
       </View>
       <View style={styles.content}>
         <Text style={styles.title}>{session.title}</Text>

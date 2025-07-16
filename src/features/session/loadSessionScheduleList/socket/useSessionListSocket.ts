@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Session } from "@hongpung/src/entities/session/model/type";
 import { getToken } from "@hongpung/src/common";
 import { io, Socket } from "socket.io-client";
@@ -10,7 +10,7 @@ export const useSessionListSocket = () => {
   const [sessionList, setSessionList] = useState<Session[] | null>(null);
   const isFocused = useIsFocused();
 
-  const connectSocket = async () => {
+  const connectSocket = useCallback(async () => {
     if (socketRef.current) {
       socketRef.current.disconnect(); // 기존 소켓 연결 해제
     }
@@ -25,7 +25,7 @@ export const useSessionListSocket = () => {
 
     setupSocketHandlers(socket); // 소켓 이벤트 핸들러 설정
     socketRef.current = socket; // 소켓 참조 업데이트
-  };
+  }, []);
 
   const setupSocketHandlers = (socket: Socket) => {
     socket.on("connect", () => {
@@ -63,7 +63,7 @@ export const useSessionListSocket = () => {
         socketRef.current.disconnect();
       }
     };
-  }, [isFocused]);
+  }, [isFocused, connectSocket]);
 
   return { sessionList, connectSocket, socketRef };
 };

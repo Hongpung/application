@@ -9,7 +9,7 @@ import { View, FlatList, Dimensions } from "react-native";
 const { width } = Dimensions.get("window");
 
 type ScheduleCardListProps = {
-  isOnAir: 'PREPARING' | 'ON_AIR' | 'CLOSED' | 'AVAILABLE';
+  isOnAir: "PREPARING" | "ON_AIR" | "CLOSED" | "AVAILABLE";
   scheduleCards: ScheduleCard[];
   navigateToQRScan: () => void;
   navigateToDetail: (reservationId: number) => void;
@@ -23,7 +23,7 @@ export const ScheduleCardList = forwardRef<
 
   const isNoSchedule =
     scheduleCards.length === 0 ||
-    (scheduleCards?.length == 1 && scheduleCards[0].type === "empty");
+    (scheduleCards?.length === 1 && scheduleCards[0].type === "empty");
 
   if (isNoSchedule) {
     return <NoScheduleCard toNavigateQRScan={navigateToQRScan} />;
@@ -61,9 +61,12 @@ export const ScheduleCardList = forwardRef<
       }}
       renderItem={({ item }: { item: ScheduleCard }) => {
         if (isEmpty(item)) {
-          if (isOnAir === 'ON_AIR') return null;
+          if (isOnAir === "ON_AIR") return null;
           return (
-            <EmptySessionCard nextReservationTime={item.nextReservationTime} />
+            <EmptySessionCard
+              nextReservationTime={item.nextReservationTime}
+              toNavigateQRScan={navigateToQRScan}
+            />
           );
         }
         return (
@@ -85,5 +88,7 @@ export const ScheduleCardList = forwardRef<
     />
   );
 });
+
+ScheduleCardList.displayName = "ScheduleCardList";
 
 export default ScheduleCardList;

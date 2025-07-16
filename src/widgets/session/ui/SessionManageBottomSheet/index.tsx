@@ -7,40 +7,57 @@ import { useAtomValue } from "jotai";
 import { Header } from "./Header";
 import { TimeInfo } from "./TimeInfo";
 import { ExtendButton } from "./ExtendButton";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 interface SessionManageBottomSheetProps {
-  toggleBottomSheet: () => void;
-  isSlideUp: boolean;
   navigateToUsingManage: () => void;
 }
 
 export const SessionManageBottomSheet: React.FC<
   SessionManageBottomSheetProps
-> = ({ toggleBottomSheet, isSlideUp, navigateToUsingManage }) => {
+> = ({ navigateToUsingManage }) => {
   useUsingRoomSocket();
+
+  const [isSlideUp, setIsSlideUp] = useState(true);
+
+  const toggleBottomSheet = () => {
+    setIsSlideUp((prev) => !prev);
+  };
+
   const BottomSheetHeight = useBottomTabBarHeight();
 
+  const isStartFlag = useRef(true);
   const usingSession = useAtomValue(ThisSessionState);
   const { remainingHour, remainingMinute } = useCalculateTime();
 
-  const bottomAnim = useRef(new Animated.Value(0)).current;
+  const bottomAnim = useRef(
+    new Animated.Value(-140 + BottomSheetHeight),
+  ).current;
 
-  const moveUp = () => {
+  const moveUp = useCallback(() => {
     Animated.timing(bottomAnim, {
       toValue: -50 + BottomSheetHeight, // 이동하고자 하는 bottom 값
       duration: 300, // 애니메이션 시간 (ms)
       useNativeDriver: false, // layout 관련 속성은 false
     }).start();
-  };
+  }, [bottomAnim, BottomSheetHeight]);
 
-  const moveDown = () => {
+  const moveDown = useCallback(() => {
     Animated.timing(bottomAnim, {
       toValue: -140 + BottomSheetHeight,
       duration: 300,
       useNativeDriver: false,
     }).start();
-  };
+  }, [bottomAnim, BottomSheetHeight]);
+
+  useEffect(() => {
+    if (!usingSession && !isStartFlag.current) {
+      Alert.alert("오류", "세션 정보가 존재하지 않아요.");
+    }
+    if (isStartFlag.current) {
+      isStartFlag.current = false;
+    }
+  }, [usingSession]);
 
   useEffect(() => {
     if (isSlideUp) {
@@ -48,11 +65,9 @@ export const SessionManageBottomSheet: React.FC<
     } else {
       moveDown();
     }
-  }, [isSlideUp]);
+  }, [isSlideUp, moveUp, moveDown]);
 
   if (!usingSession) {
-    Alert.alert("오류", "세션 정보가 존재하지 않아요.");
-
     return null;
   }
 

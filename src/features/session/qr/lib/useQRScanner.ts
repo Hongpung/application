@@ -26,7 +26,7 @@ export const useQRScanner = ({
 
   useEffect(() => {
     resetScanStatus();
-  }, [isFocusing]);
+  }, [isFocusing, resetScanStatus]);
 
   const toggleFlash = useCallback(() => {
     setFlash((prev) => (prev === "on" ? "off" : "on"));
@@ -75,7 +75,7 @@ export const useQRScanner = ({
       }
       return null;
     },
-    [scanStatus, isInCenter]
+    [scanStatus, isInCenter, onSuccess],
   );
 
   const onScanned = debounce(handleScanned, 200, {

@@ -1,4 +1,4 @@
-import { Header } from "@hongpung/src/common";
+import { Header, NeedCameraPermssionPanel } from "@hongpung/src/common";
 import { View, StyleSheet } from "react-native";
 import { useCameraPermission } from "@hongpung/src/common/lib/useCameraPermission";
 import { useQRScanner } from "@hongpung/src/features/session/qr/lib/useQRScanner";
@@ -6,15 +6,27 @@ import QRScanFailedModal from "@hongpung/src/widgets/session/ui/QRScanFailedModa
 import QRScanner from "@hongpung/src/features/session/qr/ui/QRScanner/QRScanner";
 import React from "react";
 import { MainTabScreenProps } from "@hongpung/src/common/navigation";
-import { NeedCameraPermssionPanel } from "@hongpung/src/common";
+import { debounce } from "lodash";
 
 const EXPECTED_QR_URL = "https://app.hongpung.com/qr";
+
 const QRScanPage: React.FC<MainTabScreenProps<"QRCode">> = ({ navigation }) => {
-  const handleScanSuccess = (data: string) => {
-    if (data === EXPECTED_QR_URL) {
-      navigation.jumpTo("Home");
-      navigation.push("CheckIn");
-    }
+  const handleScanSuccess = debounce(
+    (data: string) => {
+      if (data === EXPECTED_QR_URL) {
+        navigation.jumpTo("Home");
+        navigation.push("CheckIn");
+      }
+    },
+    500,
+    {
+      leading: true,
+      trailing: false,
+    },
+  );
+
+  const handleCloseAction = () => {
+    navigation.jumpTo("Home");
   };
 
   const { hasPermission, isLoading } = useCameraPermission();
@@ -25,8 +37,8 @@ const QRScanPage: React.FC<MainTabScreenProps<"QRCode">> = ({ navigation }) => {
     <View style={{ flex: 1 }}>
       <Header
         headerName="QR 코드 스캔"
-        leftButton="close"
-        leftAction={() => navigation.jumpTo("Home")}
+        LeftButton="close"
+        leftAction={handleCloseAction}
       />
       <View style={styles.container}>
         {isLoading ? (

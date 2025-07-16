@@ -1,25 +1,20 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { CameraView } from "expo-camera";
-import { useIsFocused } from "@react-navigation/native";
 import { PhotoFileFormat } from "@hongpung/src/common/types/PhotoFileFormat";
-import { Session } from "@hongpung/src/entities/session";
 
 interface UseCheckOutCameraProps {
-  session: Session;
-  photos: PhotoFileFormat[];
+  demadingPhotoCount: number;
   setPhotos: React.Dispatch<PhotoFileFormat[]>;
   onNext: () => void;
 }
 
 export const useCheckOutCamera = ({
-  session,
-  photos,
+  demadingPhotoCount,
   setPhotos,
   onNext,
 }: UseCheckOutCameraProps) => {
-  const isFocusing = useIsFocused();
   const cameraRef = useRef<CameraView | null>(null);
-  const shootingCount = (session.borrowInstruments?.length || 0) + 2;
+  const [newPhotos, setNewPhotos] = useState<PhotoFileFormat[]>([]);
 
   const takePictureHandler = async () => {
     if (!cameraRef.current) return;
@@ -30,28 +25,30 @@ export const useCheckOutCamera = ({
     });
 
     if (photo) {
-      setPhotos([
-        ...photos,
-        {
-          uri: photo.uri,
-          originHeight: photo.height,
-          originWidth: photo.width,
-        },
-      ]);
+      console.log("촬영된 사진:", photo);
+      setNewPhotos((prev) => {
+        return [
+          ...prev,
+          {
+            uri: photo.uri,
+            originHeight: photo.height,
+            originWidth: photo.width,
+          },
+        ];
+      });
     }
   };
 
   useEffect(() => {
-    if (photos.length > 0) setPhotos([]);
-  }, [isFocusing]);
-
-  useEffect(() => {
-    if (photos.length === shootingCount) onNext();
-  }, [photos]);
+    if (newPhotos.length === demadingPhotoCount) {
+      setPhotos(newPhotos);
+      onNext();
+    }
+  }, [newPhotos, demadingPhotoCount, setPhotos, onNext]);
 
   return {
     cameraRef,
     takePictureHandler,
-    shootingCount,
+    photoLength: newPhotos.length,
   };
-}; 
+};

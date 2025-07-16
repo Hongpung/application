@@ -1,43 +1,36 @@
 import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { CameraView } from "expo-camera";
-import { Session } from "@hongpung/src/entities/session";
-import { PhotoFileFormat } from "@hongpung/src/common/types/PhotoFileFormat";
-import { Color } from "@hongpung/src/common";
+
 import { CameraButton } from "@hongpung/src/common/ui/CameraButton";
 import { CameraGuideText } from "@hongpung/src/common/ui/CameraGuideText";
-import { useCheckOutCamera } from "../../../../features/session/checkOutRoom/model/useCheckOutCamera";
-import { useCameraGuideText } from "../../../../features/session/checkOutRoom/model/useCameraGuideText";
+import { useCheckOutCamera } from "@hongpung/src/features/session/checkOutRoom/model/useCheckOutCamera";
+import { useCameraGuideText } from "@hongpung/src/features/session/checkOutRoom/model/useCameraGuideText";
 import { useCameraPermission } from "@hongpung/src/common/lib/useCameraPermission";
+import { CheckOutStepProps } from "@hongpung/src/features/session/checkOutRoom/model/types";
+import { StepProps } from "@hongpung/react-step-flow";
 
-interface CheckOutCameraWidgetProps {
-  session: Session;
-  photos: PhotoFileFormat[];
-  setPhotos: React.Dispatch<PhotoFileFormat[]>;
-  onNext: () => void;
-}
-
-export const CheckOutCameraWidget: React.FC<CheckOutCameraWidgetProps> = ({
-  session,
-  photos,
-  setPhotos,
-  onNext,
+type CheckOutCameraProps = StepProps<CheckOutStepProps, "Camera">;
+export const CheckOutCameraWidget: React.FC<CheckOutCameraProps> = ({
+  stepProps: { session, setPhotos, demadingPhotoCount },
+  goTo,
 }) => {
-  
+  const onNext = () => {
+    goTo("ConfirmPhotos");
+  };
   const { hasPermission, requestPermission } = useCameraPermission();
-  const { cameraRef, takePictureHandler, shootingCount } = useCheckOutCamera({
-    session,
-    photos,
+  const { cameraRef, takePictureHandler, photoLength } = useCheckOutCamera({
+    demadingPhotoCount,
     setPhotos,
     onNext,
   });
   const { guideText } = useCameraGuideText({
     session,
-    photos,
-    shootingCount,
+    photoLength,
+    demadingPhotoCount,
   });
 
-  if (!hasPermission) {
+  if (hasPermission === false) {
     return (
       <View style={styles.container}>
         <Text style={styles.message}>카메라 권한이 필요해요</Text>
@@ -49,8 +42,8 @@ export const CheckOutCameraWidget: React.FC<CheckOutCameraWidgetProps> = ({
   return (
     <View style={styles.container}>
       <CameraView ref={cameraRef} style={styles.camera} facing="back">
+        <CameraGuideText text={guideText} />
         <View style={styles.cameraControls}>
-          <CameraGuideText text={guideText} />
           <CameraButton onPress={takePictureHandler} />
         </View>
       </CameraView>
@@ -61,7 +54,7 @@ export const CheckOutCameraWidget: React.FC<CheckOutCameraWidgetProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.white,
+    backgroundColor: "#000",
   },
   camera: {
     flex: 1,

@@ -2,24 +2,27 @@ import React, { useState } from "react";
 import { Text, View, FlatList, StyleSheet } from "react-native";
 
 import { useAtomValue } from "jotai";
-import { ThisSessionState } from "@hongpung/src/entities/session";
-import { Alert, Color, ErrorModal, Header, Icons } from "@hongpung/src/common";
+import {
+  ThisSessionState,
+  useExtendSessionRequest,
+} from "@hongpung/src/entities/session";
+import { Alert, AlertModal, Color, Header, Icons } from "@hongpung/src/common";
 import MemberList from "@hongpung/src/widgets/member/ui/MemberList/MemberList";
 import { useCalculateTime } from "@hongpung/src/features/session/useRoom/model/useCalculateTime";
 import {
   BorrowInstrumentCard,
   Instrument,
 } from "@hongpung/src/entities/instrument";
-import { useExtendSessionRequest } from "@hongpung/src/entities/session";
 import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
 import { extendSessionSuccessToast } from "@hongpung/src/features/session/useRoom/lib/toast";
 import { SessionControlButton } from "@hongpung/src/features/session/useRoom/ui/SessionControlButton/SessionControlButton";
 import { useSeperateMember } from "@hongpung/src/features/session/useRoom/model/useSeperateMember";
 import InstrumentModal from "@hongpung/src/widgets/instrument/ui/InstrumentModal/InstrumentModal";
-import { SessionManagementScreenProps } from "@hongpung/src/common/navigation";
+import { MainStackScreenProps } from "@hongpung/src/common/navigation";
+import { debounce } from "lodash";
 
-const UsingManageScreen: React.FC<
-  SessionManagementScreenProps<"SessionManage">
+export const UsingManageScreen: React.FC<
+  MainStackScreenProps<"SessionManage">
 > = ({ navigation }) => {
   const usingSession = useAtomValue(ThisSessionState);
 
@@ -30,15 +33,43 @@ const UsingManageScreen: React.FC<
 
   const [instrument, setInstrument] = useState<Instrument | null>(null);
 
-  console.log("usingSession", usingSession);
+  const debouncedGoBack = debounce(
+    () => {
+      navigation.goBack();
+    },
+    500,
+    {
+      leading: true,
+      trailing: false,
+    },
+  );
 
-  const handleExtendSession = async () => {
+  const debouncedReplaceCheckOut = debounce(
+    () => {
+      navigation.replace("CheckOutSession");
+    },
+    500,
+    {
+      leading: true,
+      trailing: false,
+    },
+  );
+
+  const handleExtendSession = () => {
+    Alert.confirm("확인", "이용 시간을 연장하시겠어요?", {
+      onConfirm: () => {
+        extendSession();
+      },
+    });
+  };
+
+  const extendSession = async () => {
     try {
       if (!canExtand) throw new Error("세션 연장 불가능");
       const { message } = await extendRequest();
       if (message === "Success") {
         extendSessionSuccessToast();
-        navigation.goBack();
+        debouncedGoBack();
       } else {
         throw new Error("세션 연장 실패" + message);
       }
@@ -51,22 +82,16 @@ const UsingManageScreen: React.FC<
     }
   };
 
-  if (!usingSession)
-    return (
-      <ErrorModal
-        visible={true}
-        title={"오류"}
-        message={"세션 정보가 존재하지 않아요."}
-        onConfirm={() => {
-          navigation.goBack();
-        }}
-      />
-    );
+  if (!usingSession) {
+    Alert.alert("오류", "세션 정보를 불러오지 못했어요. 다시 시도해주세요.");
+    return <View style={styles.container} />;
+  }
 
   return (
     <View style={styles.container}>
+      <AlertModal />
       <FullScreenLoadingModal isLoading={isLoading} />
-      <Header leftButton={"close"} />
+      <Header LeftButton={"close"} />
       <InstrumentModal instrument={instrument} />
       <View style={styles.container}>
         <View style={styles.headerSpacing} />
@@ -139,17 +164,7 @@ const UsingManageScreen: React.FC<
         canExtand={canExtand}
         canReturn={canReturn}
         handleExtendSession={handleExtendSession}
-        handleReturnSession={() => {
-          navigation.reset({
-            index: 0,
-            routes: [
-              {
-                name: "SessionManagement",
-                params: { screen: "CheckOutSession" },
-              },
-            ],
-          });
-        }}
+        handleReturnSession={debouncedReplaceCheckOut}
       />
     </View>
   );
@@ -193,5 +208,3 @@ const styles = StyleSheet.create({
     width: 36,
   },
 });
-
-export default UsingManageScreen;

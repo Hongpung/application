@@ -1,29 +1,41 @@
-import React from "react";
-import { StyleSheet, View } from "react-native";
-import { Alert, Header, NeedCameraPermssionPanel } from "@hongpung/src/common";
-import { CheckOutConfirmWidget } from "@hongpung/src/widgets/session/ui/CheckOutConfirmWidget";
-import { CheckOutDescriptionWidget } from "@hongpung/src/widgets/session/ui/CheckOutDescriptionWidget";
-import { CheckOutCameraWidget } from "@hongpung/src/widgets/session/ui/CheckOutCameraWidget";
-import { CheckOutConfirmPhotosWidget } from "@hongpung/src/widgets/session/ui/CheckOutConfirmPhotosWidget";
-import { CheckOutCompleteWidget } from "@hongpung/src/widgets/session/ui/CheckOutCompleteWidget";
+import React, { useCallback, useEffect } from "react";
+import { StyleSheet, View, BackHandler } from "react-native";
 
-import { useCheckOut } from "@hongpung/src/features/session/checkOutRoom/model/useCheckOut";
-import { SessionManagementScreenProps } from "@hongpung/src/common/navigation";
-import { StepContainer, StepScreen } from "@hongpung/src/common/lib/useSteps";
-import { useCameraPermission } from "@hongpung/src/common/lib/useCameraPermission";
+import { useStepFlow } from "@hongpung/react-step-flow";
 
-const CheckOutScreen: React.FC<
-  SessionManagementScreenProps<"CheckOutSession">
+import { Alert, Header } from "@hongpung/src/common";
+import { MainStackScreenProps } from "@hongpung/src/common/navigation";
+
+import {
+  useCheckOut,
+  type CheckOutStepProps,
+} from "@hongpung/src/features/session/checkOutRoom";
+
+import {
+  CheckOutDescriptionWidget,
+  CheckOutConfirmPhotosWidget,
+  CheckOutCameraWidget,
+  CheckOutCompleteWidget,
+  CheckOutSummaryWidget,
+} from "@hongpung/src/widgets/session";
+
+export const CheckOutScreen: React.FC<
+  MainStackScreenProps<"CheckOutSession">
 > = ({ navigation }) => {
-  const checkOutState = useCheckOut();
-
-  const { hasPermission } = useCameraPermission();
-  const navigateToHome = () => {
+  const { currentStep, ...CheckOut } = useStepFlow<CheckOutStepProps>({
+    initialStep: "CheckOutDescription",
+  });
+  const { setCurrentStep, ...checkOutState } = useCheckOut();
+  const navigateToHome = useCallback(() => {
     navigation.setOptions({ animation: "none" });
-    navigation.replace("MainTab", { screen: "Home" });
-  };
+    navigation.navigate("MainTab", { screen: "Home" });
+  }, [navigation]);
 
-  const handleLeftAction = () => {
+  const onExitAction = useCallback(() => {
+    if (currentStep === "CheckOutSummary") {
+      navigateToHome();
+      return;
+    }
     Alert.confirm("이용 종료", "이용 종료를 취소하시겠습니까?", {
       onConfirm: () => {
         navigateToHome();
@@ -31,31 +43,91 @@ const CheckOutScreen: React.FC<
       cancelText: "취소",
       confirmText: "확인",
     });
-  };
+  }, [navigateToHome, currentStep]);
 
-  if (!checkOutState) {
+  useEffect(() => {
+    // 이용 종료 페이지가 아닌 경우에만 뒤로가기 동작 방지
+    if (currentStep !== "CheckOutSummary") {
+      const onBackPress = () => {
+        onExitAction();
+        // 뒤로가기 동작 방지
+        return true;
+      };
+
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        onBackPress,
+      );
+
+      return () => {
+        subscription.remove();
+      };
+    }
+  }, [currentStep, onExitAction]);
+
+  if (
+    !checkOutState ||
+    (checkOutState.photos.length !== checkOutState.demadingPhotoCount &&
+      !checkOutState.session)
+  ) {
     Alert.alert("오류", "이용 정보가 없습니다.", {
       onConfirm: navigateToHome,
     });
+    return null;
+  }
+
+  if (
+    !checkOutState.session &&
+    currentStep !== "CheckOutComplete" &&
+    currentStep !== "CheckOutSummary"
+  ) {
+    Alert.alert("오류", "이용 정보가 없습니다.", {
+      onConfirm: navigateToHome,
+    });
+    return null;
   }
 
   return (
     <View style={styles.container}>
-      <Header leftButton="close" leftAction={handleLeftAction} />
-      <StepContainer initialStep="CheckOutConfirm">
-        <StepScreen name="CheckOutConfirm" screen={CheckOutConfirmWidget} />
-        <StepScreen
+      <Header LeftButton="close" leftAction={onExitAction} />
+      <CheckOut.Flow>
+        <CheckOut.Step
           name="CheckOutDescription"
-          screen={CheckOutDescriptionWidget}
+          component={CheckOutDescriptionWidget}
+          stepProps={{
+            ...checkOutState, // 모든 스텝에 필요한 props를 전달
+          }}
         />
-        {hasPermission ? (
-          <StepScreen name="Camera" screen={CheckOutCameraWidget} />
-        ) : (
-          <StepScreen name="Camera" screen={NeedCameraPermssionPanel} />
-        )}
-        <StepScreen name="ConfirmPhotos" screen={CheckOutConfirmPhotosWidget} />
-        <StepScreen name="CheckOutComplete" screen={CheckOutCompleteWidget} />
-      </StepContainer>
+        <CheckOut.Step
+          name="Camera"
+          component={CheckOutCameraWidget}
+          stepProps={{
+            ...checkOutState,
+          }}
+        />
+        <CheckOut.Step
+          name="ConfirmPhotos"
+          component={CheckOutConfirmPhotosWidget}
+          stepProps={{
+            ...checkOutState,
+          }}
+        />
+        <CheckOut.Step
+          name="CheckOutComplete"
+          component={CheckOutCompleteWidget}
+          stepProps={{
+            ...checkOutState,
+          }}
+        />
+        <CheckOut.Step
+          name="CheckOutSummary"
+          component={CheckOutSummaryWidget}
+          stepProps={{
+            ...checkOutState,
+            onHome: navigateToHome,
+          }}
+        />
+      </CheckOut.Flow>
     </View>
   );
 };

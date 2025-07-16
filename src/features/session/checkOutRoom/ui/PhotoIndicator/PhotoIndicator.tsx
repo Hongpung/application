@@ -15,7 +15,10 @@ export const PhotoIndicator: React.FC<PhotoIndicatorProps> = ({
   selectedIndex,
 }) => {
   const getPhotoDescription = () => {
-    if (session?.borrowInstruments && selectedIndex < session?.borrowInstruments.length) {
+    if (
+      session?.borrowInstruments &&
+      selectedIndex < session?.borrowInstruments.length
+    ) {
       return `${session.borrowInstruments[selectedIndex].name} 사진`;
     }
     if (selectedIndex === photos.length - 2) {
@@ -39,9 +42,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
     paddingVertical: 16,
-    backgroundColor: "rgba(0,0,0,0.5)",
   },
   text: {
     color: "#FFF",
+    fontFamily: "NanumSquareNeo-Bold",
   },
-}); 
+});

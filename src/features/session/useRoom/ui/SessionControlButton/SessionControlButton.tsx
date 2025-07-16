@@ -2,15 +2,18 @@ import { Color, LongButton } from "@hongpung/src/common";
 import { View, Text, StyleSheet } from "react-native";
 
 interface SessionControlButtonProps {
-    canExtand: boolean;
-    canReturn: boolean;
-    handleExtendSession: () => void;
-    handleReturnSession: () => void;
+  canExtand: boolean;
+  canReturn: boolean;
+  handleExtendSession: () => void;
+  handleReturnSession: () => void;
 }
 
-export const SessionControlButton:React.FC<SessionControlButtonProps> = (props) => {
-  const { canExtand, canReturn, handleExtendSession, handleReturnSession } = props;
-  
+export const SessionControlButton: React.FC<SessionControlButtonProps> = (
+  props,
+) => {
+  const { canExtand, canReturn, handleExtendSession, handleReturnSession } =
+    props;
+
   return (
     <View style={styles.buttonContainer}>
       {!canExtand && (
@@ -38,17 +41,16 @@ export const SessionControlButton:React.FC<SessionControlButtonProps> = (props) 
 };
 
 const styles = StyleSheet.create({
-    buttonContainer: {
-        bottom: 0,
-        display: "flex",
-        gap: 12,
-        paddingBottom: 28,
-      },
-      errorText: {
-        alignSelf: "center",
-        color: Color["red700"],
-        fontSize: 14,
-        fontFamily: "NanumSquareNeo-Bold",
-      },
+  buttonContainer: {
+    bottom: 0,
+    display: "flex",
+    gap: 12,
+    paddingBottom: 28,
+  },
+  errorText: {
+    alignSelf: "center",
+    color: Color["red700"],
+    fontSize: 14,
+    fontFamily: "NanumSquareNeo-Bold",
+  },
 });
-

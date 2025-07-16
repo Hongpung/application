@@ -1,24 +1,26 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Text, Pressable } from "react-native";
 import { Color } from "@hongpung/src/common";
-import { Session } from "@hongpung/src/entities/session";
-import { PhotoFileFormat } from "@hongpung/src/common/types/PhotoFileFormat";
 import ImageViewer from "react-native-image-zoom-viewer";
-import { usePhotoViewer } from "../../../../features/session/checkOutRoom/model/usePhotoViewer";
-import { ThumbnailList } from "../../../../common/ui/ThumbnailList/ThumbnailList";
-import { PhotoIndicator } from "../../../../features/session/checkOutRoom/ui/PhotoIndicator/PhotoIndicator";
+import { usePhotoViewer } from "@hongpung/src/features/session/checkOutRoom/model/usePhotoViewer";
+import { ThumbnailList } from "@hongpung/src/common/ui/ThumbnailList/ThumbnailList";
+import { PhotoIndicator } from "@hongpung/src/features/session/checkOutRoom/ui/PhotoIndicator/PhotoIndicator";
+import { CheckOutStepProps } from "@hongpung/src/features/session/checkOutRoom/model/types";
+import { StepProps } from "@hongpung/react-step-flow";
 
-interface CheckOutConfirmPhotosWidgetProps {
-  session: Session;
-  photos: PhotoFileFormat[];
-  onEnd: () => void;
-}
-
-export const CheckOutConfirmPhotosWidget: React.FC<CheckOutConfirmPhotosWidgetProps> = ({
-  session,
-  photos,
-}) => {
-  const { selectedIndex, indicatorVisible, handleIndexChange, toggleIndicator } = usePhotoViewer({
+type CheckOutConfirmPhotosProps = StepProps<CheckOutStepProps, "ConfirmPhotos">;
+export const CheckOutConfirmPhotosWidget: React.FC<
+  CheckOutConfirmPhotosProps
+> = ({ stepProps: { session, photos }, goTo }) => {
+  const onNext = () => {
+    goTo("CheckOutComplete");
+  };
+  const {
+    selectedIndex,
+    indicatorVisible,
+    handleIndexChange,
+    toggleIndicator,
+  } = usePhotoViewer({
     photos,
   });
 
@@ -41,18 +43,36 @@ export const CheckOutConfirmPhotosWidget: React.FC<CheckOutConfirmPhotosWidgetPr
         </View>
       )}
       {indicatorVisible && (
-        <View style={styles.indicatorContainer}>
-          <PhotoIndicator
-            session={session}
-            photos={photos}
-            selectedIndex={selectedIndex}
-          />
-          <ThumbnailList
-            photos={photos}
-            selectedIndex={selectedIndex}
-            onSelect={handleIndexChange}
-          />
-        </View>
+        <>
+          <Pressable
+            style={{
+              position: "absolute",
+              top: -48,
+              alignSelf: "flex-end",
+              zIndex: 2,
+              padding: 16,
+              backgroundColor: "#FFF",
+              borderRadius: 24,
+            }}
+            onPress={onNext}
+          >
+            <Text style={{ fontFamily: "NanumSquareNeo-Regular" }}>
+              제출하기
+            </Text>
+          </Pressable>
+          <View style={styles.indicatorContainer}>
+            <PhotoIndicator
+              session={session}
+              photos={photos}
+              selectedIndex={selectedIndex}
+            />
+            <ThumbnailList
+              photos={photos}
+              selectedIndex={selectedIndex}
+              onSelect={handleIndexChange}
+            />
+          </View>
+        </>
       )}
     </View>
   );
@@ -73,6 +93,7 @@ const styles = StyleSheet.create({
     height: "auto",
   },
   indicatorContainer: {
+    backgroundColor: "rgba(0,0,0,0.5)",
     position: "absolute",
     bottom: 4,
     zIndex: 3,

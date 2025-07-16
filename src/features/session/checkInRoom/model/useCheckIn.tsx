@@ -1,26 +1,23 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { useAtomValue, useAtom } from "jotai";
 
 import { Alert } from "@hongpung/src/common";
 
 import { UserStatusState } from "@hongpung/src/entities/member";
-import { UseRoomState } from "@hongpung/src/entities/session";
 import {
-  CheckInAttendStatus,
-  CheckInStartStatus,
-} from "@hongpung/src/features/session/checkInRoom/model/type";
-import {
+  UseRoomState,
   useCheckInPossibilityFetch,
   useStartSessionRequest,
   useAttendSessionRequest,
-} from "@hongpung/src/features/session/checkInRoom/api/checkInApi";
-import AttendSessionCompleteWidget from "@hongpung/src/widgets/session/ui/AttendSessionCompleteWidget/AttendSessionCompleteWidget";
-import { AttendSessionConfirmWidget } from "@hongpung/src/widgets/session/ui/AttendSessionConfirmWidget/AttendSessionConfirmWidget";
-import { CreateSessionConfirmWidget } from "@hongpung/src/widgets/session/ui/CreateSessionConfirmWidget/CreateSessionConfirmWidget";
-import LateSessionCompleteWidget from "@hongpung/src/widgets/session/ui/LateSessionCompleteWidget/LateSessionCompleteWidget";
-import StartSessionCompleteWidget from "@hongpung/src/widgets/session/ui/StartSessionCompleteWidget/StartSessionCompleteWidget";
-import { StartSessionConfirmWidget } from "@hongpung/src/widgets/session/ui/StartSessionConfirmWidget/StartSessionConfirmWidget";
+} from "@hongpung/src/entities/session";
+
+import type {
+  CheckInAttendStatus,
+  CheckInStartStatus,
+  CheckInStep,
+} from "./type";
+import { getStepFromSessionData } from "./mapStateForStep";
 
 export const useCheckIn = () => {
   const navigation = useNavigation();
@@ -29,25 +26,69 @@ export const useCheckIn = () => {
   const [usingRoom, setUseRoom] = useAtom(UseRoomState);
   const [isCheckin, setIsCheckin] = useState(false);
 
-  const [checkinStatus, setCheckinStatus] = useState<
-    CheckInAttendStatus | CheckInStartStatus | null
-  >(null);
+  const [checkinAttendStatus, setCheckinAttendStatus] =
+    useState<CheckInAttendStatus | null>(null);
+  const [checkinBootStatus, setCheckinBootStatus] =
+    useState<CheckInStartStatus | null>(null);
+  const [currentStep, setCurrentStep] = useState<CheckInStep | null>(null);
   const [participationAvailable, setParticipationAvailable] = useState(false);
 
   const { data: sessionData, isLoading } = useCheckInPossibilityFetch();
   const { request: startSession } = useStartSessionRequest();
   const { request: attendSession } = useAttendSessionRequest();
 
-  const handleStartSession = async () => {
+  // Step 관리를 위한 helper 함수
+
+  // Step 관리
+  useEffect(() => {
+    if (!sessionData) return;
+    const newStep = getStepFromSessionData(
+      sessionData,
+      isCheckin,
+      checkinBootStatus,
+    );
+    setCurrentStep(newStep);
+  }, [sessionData, isCheckin, checkinBootStatus]);
+
+  const handleStartSession = useCallback(async () => {
     try {
       if (!loginUser) throw new Error("유저 정보가 없습니다.");
 
-      const response = await startSession({ participationAvailable });
-      if (response === "failed") throw new Error("연습 시작에 실패했습니다.");
-      setCheckinStatus(response);
+      const { status } = await startSession({ participationAvailable });
+      if (status === "failed") {
+        throw new Error("연습 시작에 실패했습니다.");
+      }
+
+      console.log("handleStartSession response", status);
+      setCheckinBootStatus(status);
+      setIsCheckin(true);
+      setUseRoom(true);
+
+      console.log("handleStartSession currentStep", currentStep);
+    } catch (e) {
+      if (e instanceof Error) {
+        Alert.alert("오류", e.message);
+      } else {
+        Alert.alert("오류", "알 수 없는 오류가 발생했습니다.");
+      }
+    }
+  }, [
+    loginUser,
+    startSession,
+    participationAvailable,
+    setUseRoom,
+    currentStep,
+  ]);
+
+  const handleAttendSession = useCallback(async () => {
+    try {
+      if (!loginUser) throw new Error("유저 정보가 없습니다.");
+
+      const { status } = await attendSession();
+      setCheckinAttendStatus(status);
       setIsCheckin(true);
 
-      if (response) {
+      if (status !== null) {
         setUseRoom(true);
       }
     } catch (e) {
@@ -57,92 +98,27 @@ export const useCheckIn = () => {
         Alert.alert("오류", "알 수 없는 오류가 발생했습니다.");
       }
     }
-  };
-
-  const handleAttendSession = async () => {
-    try {
-      if (!loginUser) throw new Error("유저 정보가 없습니다.");
-
-      const response = await attendSession();
-      setCheckinStatus(response);
-      setIsCheckin(true);
-
-      if (response) {
-        setUseRoom(true);
-      }
-    } catch (e) {
-      if (e instanceof Error) {
-        Alert.alert("오류", e.message);
-      } else {
-        Alert.alert("오류", "알 수 없는 오류가 발생했습니다.");
-      }
-    }
-  };
+  }, [loginUser, attendSession, setUseRoom]);
 
   const handleConfirm = () => {
     navigation.goBack();
   };
 
-  const content = useMemo(() => {
-    if (!sessionData) return null;
-
-    if (isCheckin) {
-      if (checkinStatus === "지각" && sessionData.status === "JOINABLE") {
-        return (
-          <LateSessionCompleteWidget
-            startTime={sessionData.currentSession.startTime}
-          />
-        );
+  const buttonHandler = useCallback(
+    (navigateToHome: () => void) => {
+      if (isCheckin) {
+        navigateToHome();
+      } else if (
+        currentStep === "StartSessionConfirm" ||
+        currentStep === "CreateSessionConfirm"
+      ) {
+        handleStartSession();
+      } else if (currentStep === "AttendSessionConfirm") {
+        handleAttendSession();
       }
-      if (checkinStatus === "참가" || checkinStatus === "출석") {
-        return <AttendSessionCompleteWidget attendanceStatus={checkinStatus} />;
-      }
-      return <StartSessionCompleteWidget />;
-    }
-
-    if (sessionData.status === "JOINABLE" && sessionData.currentSession) {
-      return (
-        <AttendSessionConfirmWidget session={sessionData.currentSession} />
-      );
-    }
-
-    if (
-      sessionData.status === "STARTABLE" &&
-      sessionData.nextReservationSession
-    ) {
-      return (
-        <StartSessionConfirmWidget
-          session={sessionData.nextReservationSession}
-        />
-      );
-    }
-
-    if (sessionData.status === "CREATABLE") {
-      return (
-        <CreateSessionConfirmWidget
-          nextSession={sessionData.nextReservationSession}
-          participationAvailable={participationAvailable}
-          onParticipationAvailableChange={setParticipationAvailable}
-        />
-      );
-    }
-
-    return null;
-  }, [isCheckin, checkinStatus, sessionData, participationAvailable]);
-
-  const buttonAction = () => {
-    if (!sessionData) return () => null;
-
-    if (isCheckin) {
-      return handleConfirm();
-    }
-
-    if (sessionData.status === "JOINABLE") {
-      return handleAttendSession();
-    }
-
-    return handleStartSession();
-  };
+    },
+    [isCheckin, currentStep, handleStartSession, handleAttendSession],
+  );
 
   const errorMessage = useMemo(() => {
     if (usingRoom) return "이미 참여중인 세션입니다.";
@@ -152,16 +128,24 @@ export const useCheckIn = () => {
   }, [usingRoom, sessionData]);
 
   return {
+    // 기본 상태
     usingRoom,
-
     sessionData,
     isLoading,
     isCheckin,
+    checkinAttendStatus,
+    checkinBootStatus,
+    participationAvailable,
+    setParticipationAvailable,
+
+    // Step-Flow
+    currentStep,
+
+    // 액션들
+    handleStartSession,
+    handleAttendSession,
     handleConfirm,
-
-    content,
+    buttonHandler,
     errorMessage,
-
-    buttonAction,
   };
 };

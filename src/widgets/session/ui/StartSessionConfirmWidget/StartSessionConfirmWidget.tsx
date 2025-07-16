@@ -1,16 +1,30 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { Color, LongButton } from "@hongpung/src/common";
+import { Alert, Color } from "@hongpung/src/common";
 import { OwnedSessionCard } from "@hongpung/src/entities/session/ui/OwnedSessionCard/OwnedSessionCard";
-import { ReservationSession } from "@hongpung/src/entities/session";
+import { StepProps } from "@hongpung/react-step-flow";
+import { CheckInSteps } from "@hongpung/src/features/session/checkInRoom/model/type";
+import { useNavigation } from "@react-navigation/native";
 
-interface StartSessionConfirmWidgetProps {
-  session: ReservationSession;
-}
+type StartSessionConfirmWidgetProps = StepProps<
+  CheckInSteps,
+  "StartSessionConfirm"
+>;
 
 export const StartSessionConfirmWidget: React.FC<
   StartSessionConfirmWidgetProps
-> = ({ session }) => {
+> = ({ stepProps }) => {
+  const navigation = useNavigation();
+  const { session } = stepProps;
+  if (!session) {
+    Alert.alert("오류", "이용 정보가 없습니다.", {
+      onConfirm: () => {
+        navigation.goBack();
+      },
+      cancelable: false,
+    });
+    return null;
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>연습 시작하기</Text>
@@ -28,7 +42,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    gap:24
+    gap: 24,
   },
   title: {
     fontFamily: "NanumSquareNeo-Bold",
