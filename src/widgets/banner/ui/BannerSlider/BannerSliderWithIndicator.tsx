@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { NativeSyntheticEvent, StyleSheet, View, Image } from "react-native";
+import { NativeSyntheticEvent, View, Image } from "react-native";
 
 import PagerView from "react-native-pager-view";
 
@@ -36,7 +36,7 @@ const BannerSliderWithIndicator: React.FC<
         setBannerCount(position - 1);
       }
     },
-    [banners]
+    [banners],
   );
 
   useEffect(() => {
@@ -55,7 +55,7 @@ const BannerSliderWithIndicator: React.FC<
           flex: 1,
         }}
       >
-        {bannerLength == 0 ? (
+        {bannerLength === 0 ? (
           <BlankBanner />
         ) : bannerLength > 1 ? (
           <>

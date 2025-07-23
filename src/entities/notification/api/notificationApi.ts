@@ -4,9 +4,12 @@ const notificationApi = baseApi.addEndpoints({
   endpoints: (builder) => ({
     deleteNotification: builder.request<void, { notificationId: number }>({
       query: ({ notificationId }) => ({
-        url: `/notification/${notificationId}`,
+        url: `/notification/delete/${notificationId}`,
         method: "DELETE",
       }),
+      queryOptions: {
+        mutationKey: ["notification"],
+      },
     }),
   }),
 });

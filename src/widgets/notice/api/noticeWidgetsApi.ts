@@ -4,7 +4,10 @@ import { BriefNotice } from "@hongpung/src/entities/notice/model/type";
 const noticeWidgetsApi = baseApi.addEndpoints({
   endpoints: (builder) => ({
     getNoticeList: builder.fetch<BriefNotice[], void>({
-      query: () => ({ url: "/notice" }),
+      query: () => ({ url: "/notice", refetchOnFocus: true }),
+      queryOptions: (params) => ({
+        queryKey: ["notice-list"],
+      }),
     }),
   }),
 });

@@ -13,9 +13,20 @@ export const NotificationIcon: React.FC<NotificationIconProps> = ({
   const { data: isNotRead } = useGetNotReadNotificationFetch();
 
   return (
-    <Pressable style={styles.icons} onPress={navigateToNotificationPage}>
+    <Pressable
+      style={styles.icons}
+      onPress={navigateToNotificationPage}
+      testID="notification-icon-pressable"
+      accessibilityRole="button"
+      accessibilityLabel="알림 페이지로 이동"
+      accessibilityHint={
+        isNotRead?.status ? "읽지 않은 알림이 있습니다." : undefined
+      }
+    >
       <Icons size={28} name={"notifications"} color={Color["grey400"]} />
-      {isNotRead?.status && <View style={styles.notReadMarker} />}
+      {isNotRead?.status && (
+        <View style={styles.notReadMarker} testID="not-read-marker" />
+      )}
     </Pressable>
   );
 };

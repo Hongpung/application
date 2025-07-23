@@ -1,1 +1,3 @@
-export * from "./api/notReadNotificationApi";
+import { useGetNotReadNotificationFetch } from "./api/notReadNotificationApi";
+
+export { useGetNotReadNotificationFetch };

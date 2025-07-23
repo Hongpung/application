@@ -5,17 +5,17 @@ import { Color } from "@hongpung/src/common";
 import { NotificationType } from "../../model/type";
 import { calculateTimeDifference } from "../../lib/calculatgeTimeDifference";
 
-type NotificationCard = {
+type NotificationCardProps = {
   notification: NotificationType;
   onPress: () => void;
 };
 
-const NotificationCard: React.FC<NotificationCard> = ({
+const NotificationCard: React.FC<NotificationCardProps> = ({
   notification,
   onPress,
 }) => {
   return (
-    <Pressable onPress={onPress}>
+    <Pressable style={styles.notificationContainer} onPress={onPress}>
       <View style={styles.notificationContent}>
         <View style={styles.titleContainer}>
           <Text style={styles.titleText}>{notification.data.title}</Text>
@@ -40,9 +40,18 @@ const NotificationCard: React.FC<NotificationCard> = ({
   );
 };
 
+NotificationCard.displayName = "NotificationCard";
+
 export default NotificationCard;
 
 const styles = StyleSheet.create({
+  notificationContainer: {
+    backgroundColor: "#FFF",
+    marginHorizontal: 24,
+    borderWidth: 1,
+    borderColor: Color["grey100"],
+    borderRadius: 8,
+  },
   notificationContent: {
     margin: 14,
     flexDirection: "row",

@@ -11,6 +11,7 @@ import Animated, {
   interpolate,
   SharedValue,
   useAnimatedStyle,
+  useSharedValue,
 } from "react-native-reanimated";
 
 type SwipeableNotificationCardProps = {
@@ -18,29 +19,31 @@ type SwipeableNotificationCardProps = {
   onDelete: () => void;
 };
 
-export const SwipeableNotificationCard: React.FC<SwipeableNotificationCardProps> = ({
-  notification,
-  onDelete,
-}) => {
+export const SwipeableNotificationCard: React.FC<
+  SwipeableNotificationCardProps
+> = ({ notification, onDelete }) => {
   const navigation = useNavigation();
   const [isSwiped, setIsSwiped] = useState(false); // Swipeable 상태 관리
+  const dragXParam = useSharedValue(0);
+
+  const rightActionAnimatedStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      dragXParam.value,
+      [-100, -50, 0],
+      [1, 0.5, 0],
+      "clamp",
+    );
+    return {
+      opacity,
+    };
+  });
 
   const renderRightActions = (
     _: SharedValue<number>,
-    dragXParam: SharedValue<number>,
-    swipeable: SwipeableMethods
+    _dragXParam: SharedValue<number>,
+    swipeable: SwipeableMethods,
   ) => {
-    const rightActionAnimatedStyle = useAnimatedStyle(() => {
-      const opacity = interpolate(
-        dragXParam.value,
-        [-100, -50, 0],
-        [1, 0.5, 0],
-        "clamp"
-      );
-      return {
-        opacity,
-      };
-    });
+    dragXParam.value = _dragXParam.value;
 
     return (
       <Pressable
@@ -80,7 +83,7 @@ export const SwipeableNotificationCard: React.FC<SwipeableNotificationCardProps>
                 StackActions.push("Reservation", {
                   screen: "ReservationDetail",
                   params: { reservationId },
-                })
+                }),
               );
             } else if (notification.data.data?.noticeId) {
               const { noticeId } = notification.data.data;
@@ -89,7 +92,7 @@ export const SwipeableNotificationCard: React.FC<SwipeableNotificationCardProps>
                 StackActions.push("NoticeStack", {
                   screen: "NoticeDetail",
                   params: { noticeId },
-                })
+                }),
               );
             }
           }}
@@ -113,7 +116,6 @@ const styles = StyleSheet.create({
   rightActionView: {
     flex: 1,
     backgroundColor: Color["red500"],
-    marginVertical: 6,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 28,

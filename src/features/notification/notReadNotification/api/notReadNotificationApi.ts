@@ -5,7 +5,12 @@ const notReadNotificationApi = baseApi.addEndpoints({
     getNotReadNotification: builder.fetch<{ status: boolean }, void>({
       query: () => ({
         url: "/notification/notRead",
-      })
+        refetchOnFocus: true,
+        staleTime: 1000 * 60,
+      }),
+      queryOptions: (params) => ({
+        queryKey: ["not-read-notification"],
+      }),
     }),
   }),
 });

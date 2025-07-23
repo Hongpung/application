@@ -1,2 +1,4 @@
-export { NotificationList } from "./ui/NotificationList/NotificationList";
-export { NotificationIcon } from "./ui/NotificationIcon/NotificationIcon";
+import { NotificationList } from "./ui/NotificationList/NotificationList";
+import { NotificationIcon } from "./ui/NotificationIcon/NotificationIcon";
+
+export { NotificationList, NotificationIcon };
