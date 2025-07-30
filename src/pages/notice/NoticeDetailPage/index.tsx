@@ -12,7 +12,7 @@ const NoticeDetailPage: React.FC<NoticeStackProps<"NoticeDetail">> = ({
 
   return (
     <View style={styles.container}>
-      <Header leftButton={"arrow-back"} headerName="공지사항" />
+      <Header LeftButton={"arrow-back"} headerName="공지사항" />
       <NoticeDetail noticeId={noticeId} />
     </View>
   );

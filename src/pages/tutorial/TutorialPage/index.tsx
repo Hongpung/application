@@ -5,9 +5,11 @@ import { LongButton, ShortButton } from "@hongpung/src/common";
 import { PageIndicator } from "@hongpung/src/common/ui/PageIndicator";
 import ImagePage from "@hongpung/src/common/ui/ImagePage/ImagePage";
 import { RootStackScreenProps } from "@hongpung/src/common/navigation";
+import { debounce } from "lodash";
 
-
-const TutorialScreen: React.FC<RootStackScreenProps<'Tutorial'>> = ({ navigation }) => {
+const TutorialScreen: React.FC<RootStackScreenProps<"Tutorial">> = ({
+  navigation,
+}) => {
   const [pageNum, setPageNum] = useState(0);
   const pagerRef = useRef<PagerView>(null);
 
@@ -17,9 +19,16 @@ const TutorialScreen: React.FC<RootStackScreenProps<'Tutorial'>> = ({ navigation
     }
   };
 
-  const onSkip = () => {
-    navigation.replace("Permission");
-  };
+  const onSkip = debounce(
+    () => {
+      navigation.replace("Permission");
+    },
+    500,
+    {
+      leading: true,
+      trailing: false,
+    },
+  );
 
   return (
     <View style={styles.basicBackground}>

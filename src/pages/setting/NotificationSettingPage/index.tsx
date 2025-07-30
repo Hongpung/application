@@ -10,9 +10,8 @@ import {
   Header,
   registerForPushNotificationsAsync,
   Switch,
-  FullScreenLoadingModal
+  FullScreenLoadingModal,
 } from "@hongpung/src/common";
-
 
 import { useUpdateNotificationStatusRequest } from "@hongpung/src/features/notification/manageNotificationToken/api/notificationTokenApi";
 import { notificationOffSuccessToast } from "@hongpung/src/features/notification/manageNotificationToken/lib/notificationOffSuccessToast";
@@ -57,8 +56,11 @@ const NotificationSettingPage: React.FC = () => {
               });
               notificationOffSuccessToast();
             }
-          } catch (e) {
-            Alert.alert("오류", "알림 설정 변경에 실패했어요.\n다시 시도해주세요.");
+          } catch {
+            Alert.alert(
+              "오류",
+              "알림 설정 변경에 실패했어요.\n다시 시도해주세요.",
+            );
           }
         };
 
@@ -66,8 +68,7 @@ const NotificationSettingPage: React.FC = () => {
         handleNotificationStatus();
       }
     };
-  }, []);
-
+  }, [isEnabledRef, updateNotificationStatusRequest]);
 
   const toggleNotification = async () => {
     isChangedRef.current = true;
@@ -76,7 +77,7 @@ const NotificationSettingPage: React.FC = () => {
       Alert.alert(
         "권한 거부",
         "알림 권한이 거부되었습니다. 시스템 설정에서 권한을 부여해야 알림을 받을 수 있습니다.",
-        { confirmText: "확인", onConfirm: () => Linking.openSettings() }
+        { confirmText: "확인", onConfirm: () => Linking.openSettings() },
       );
       return;
     }
@@ -87,7 +88,7 @@ const NotificationSettingPage: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Header headerName="알림 설정" leftButton={"arrow-back"} />
+      <Header headerName="알림 설정" LeftButton={"arrow-back"} />
       <FullScreenLoadingModal isLoading={isLoading} />
       <View style={styles.switchContainer}>
         <Text style={styles.label}>푸시 알림</Text>
@@ -100,7 +101,7 @@ const NotificationSettingPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color["grey100"]
+    backgroundColor: Color["grey100"],
   },
   loadingContainer: {
     flex: 1,

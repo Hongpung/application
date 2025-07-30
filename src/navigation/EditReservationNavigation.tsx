@@ -9,12 +9,7 @@ import { EditReservationStackParamList } from "@hongpung/src/common/navigation/e
 import EditReservationConfirmPage from "@hongpung/src/pages/reservation/editReservationStack/EditReservationConfirmPage";
 import ReservationEditPage from "@hongpung/src/pages/reservation/editReservationStack/ReservationEditPage";
 import { EditReservationContextProvider } from "@hongpung/src/features/reservation/editReservation/model/useEditReservation.context";
-import {
-  ReservationForm,
-  useLoadReservationDetailFetch,
-} from "@hongpung/src/entities/reservation";
-import { View } from "react-native";
-import { ErrorModal, FullScreenLoadingModal } from "@hongpung/src/common";
+import { ReservationForm } from "@hongpung/src/entities/reservation";
 
 const EditReservationStack =
   createNativeStackNavigator<EditReservationStackParamList>();
@@ -22,53 +17,14 @@ const EditReservationStack =
 export const EditReservationNavigation: React.FC<
   ReservationStackScreenProps<"EditReservation">
 > = ({ navigation, route }) => {
-  const { reservationId } = route.params;
-
-  const {
-    data: prevReservation,
-    error,
-    isLoading,
-  } = useLoadReservationDetailFetch({
-    reservationId,
-  });
-
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <FullScreenLoadingModal isLoading={isLoading} />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ErrorModal
-          title="오류"
-          visible={error !== null}
-          message={error.message}
-          onConfirm={() => {
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            } else {
-              navigation.navigate("Reservation", {
-                screen: "ReservationDetail",
-                params: { reservationId },
-              });
-            }
-          }}
-        />
-      </View>
-    );
-  }
+  const { reservationJson } = route.params;
+  const prevReservation: ReservationForm & { reservationId: number } =
+    JSON.parse(reservationJson);
 
   return (
     <EditReservationContextProvider
       navigation={navigation}
-      prevReservation={{
-        ...(prevReservation as ReservationForm),
-        reservationId,
-      }}
+      prevReservation={prevReservation}
     >
       <EditReservationStack.Navigator
         screenOptions={{

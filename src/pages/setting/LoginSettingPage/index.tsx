@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import { Color } from "@hongpung/src/common";
-import { Header, Switch } from "@hongpung/src/common";
+import { Color, Header, Switch } from "@hongpung/src/common";
 import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
 import { LogoutButton } from "@hongpung/src/features/auth/logout/ui/LogoutButton";
 import useLogout from "@hongpung/src/features/auth/logout/model/useLogout";
@@ -14,7 +13,7 @@ export const LoginSettingPage: React.FC = () => {
   return (
     <View>
       <FullScreenLoadingModal isLoading={isLoading} />
-      <Header headerName="로그인 설정" leftButton="arrow-back" />
+      <Header headerName="로그인 설정" LeftButton="arrow-back" />
       <View style={{ height: 24 }} />
       <View style={styles.autoLoginContainer}>
         <Text style={styles.autoLoginText}>자동 로그인 설정</Text>

@@ -5,15 +5,12 @@ import { Header } from "@hongpung/src/common";
 import MemberList from "@hongpung/src/widgets/member/ui/MemberList/MemberList";
 import { ClubStackProps } from "@hongpung/src/common/navigation";
 
-const ClubMemberListPage: React.FC<ClubStackProps<"ClubMembers">> = ({
-  navigation,
-  route,
-}) => {
+const ClubMemberListPage: React.FC<ClubStackProps<"ClubMembers">> = () => {
   const { data: members, isLoading } = useLoadMyClubMembersFetch();
-  
+
   return (
     <View style={styles.container}>
-      <Header leftButton={"close"} headerName="동아리원 목록" />
+      <Header LeftButton={"close"} headerName="동아리원 목록" />
       <MemberList members={members} isLoading={isLoading} />
     </View>
   );

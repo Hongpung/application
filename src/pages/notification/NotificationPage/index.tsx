@@ -1,14 +1,7 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import React, { useEffect, useMemo, useState } from "react";
 
-import {
-  Alert, Color, Header
-} from "@hongpung/src/common";
+import { Alert, Color, Header } from "@hongpung/src/common";
 
 import { NotificationList } from "@hongpung/src/widgets/notification/ui/NotificationList/NotificationList";
 
@@ -22,30 +15,45 @@ import { NotificationType } from "@hongpung/src/entities/notification/model/type
 
 const NotificationScreen: React.FC = () => {
   const { request: deleteNotification } = useDeleteNotificationRequest();
-  const { request: handleDeleteAll } = useDeleteAllNotificationsRequest();
+  const { request: deleteAll } = useDeleteAllNotificationsRequest();
   const { request: readAll } = useReadAllNotificationsRequest();
   const [notificationList, setNotificationList] = useState<NotificationType[]>(
-    []
+    [],
   );
-  const {
-    data: notificationData,
-    isLoading,
-    error,
-  } = useLoadNotificationsFetch();
+  const { data: notificationData } = useLoadNotificationsFetch();
 
-  const handleDelete = async (notificationId: number) => {
-    await deleteNotification({ notificationId });
-    setNotificationList(
-      notificationList.filter(
-        (notification) => notification.notificationId !== notificationId
-      )
-    );
+  const handleDelete = (notificationId: number) => {
+    const deleteRequest = async (notificationId: number) => {
+      try {
+        await deleteNotification({ notificationId });
+        setNotificationList((prev) =>
+          prev.filter(
+            (notification) => notification.notificationId !== notificationId,
+          ),
+        );
+      } catch {
+        Alert.alert("오류", "알림 삭제에 했어요.\n다시 시도해주세요.");
+      }
+    };
+    deleteRequest(notificationId);
   };
 
   const lastReadNotification = useMemo(
     () => notificationData?.find((notification) => notification.isRead),
-    [notificationData]
+    [notificationData],
   );
+
+  const handleDeleteAll = () => {
+    console.log("handleDeleteAll");
+    Alert.confirm("확인", "알림을 모두 삭제할까요?", {
+      cancelText: "아니오",
+      confirmText: "예",
+      onConfirm: () => {
+        deleteAll();
+        setNotificationList([]);
+      },
+    });
+  };
 
   useEffect(() => {
     if (notificationData) {
@@ -55,12 +63,11 @@ const NotificationScreen: React.FC = () => {
 
   useEffect(() => {
     readAll();
-  }, []);
-
+  }, [readAll]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#FFF" }}>
-      <Header headerName="알림" leftButton={"close"} />
+      <Header headerName="알림" LeftButton={"close"} />
       <View style={{ marginTop: 6 }} />
       <View style={styles.container}>
         <View
@@ -71,19 +78,8 @@ const NotificationScreen: React.FC = () => {
             marginVertical: 8,
           }}
         >
-          {notificationData && notificationData.length > 0 && (
-            <Pressable
-              onPress={() => {
-                Alert.confirm("확인", "알림을 모두 삭제할까요?", {
-                  cancelText: "아니오",
-                  confirmText: "예",
-                  onConfirm: () => {
-                    handleDeleteAll();
-                    setNotificationList([]);
-                  },
-                })
-              }}
-            >
+          {notificationList && notificationList.length > 0 && (
+            <Pressable onPress={handleDeleteAll}>
               <Text
                 style={{
                   fontFamily: "NanumSquareNeo-Regular",
@@ -97,11 +93,10 @@ const NotificationScreen: React.FC = () => {
           )}
         </View>
         <NotificationList
-          data={notificationData}
+          data={notificationList}
           handleDelete={handleDelete}
           lastReadNotificationId={lastReadNotification?.notificationId}
         />
-
       </View>
     </View>
   );
@@ -124,6 +119,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderWidth: 1,
     borderColor: Color["grey100"],
-    backgroundColor: "#FFF",
+    backgroundColor: Color["white"],
   },
 });

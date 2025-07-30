@@ -1,129 +1,100 @@
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  Text,
-  InteractionManager,
-} from "react-native";
-import { NotificationIcon } from "@hongpung/src/widgets/notification";
-import { SessionManageBottomSheet } from "@hongpung/src/widgets/session/ui/SessionManageBottomSheet";
-import { UseRoomState } from "@hongpung/src/entities/session";
-import { useAtom, useAtomValue } from "jotai";
-import { useMemo, useState } from "react";
-import TodaySchedule from "@hongpung/components/home/TodaySchedule";
-import { UserStatusState } from "@hongpung/src/entities/member";
-import { myTodayReservationState } from "@hongpung/src/entities/reservation";
-import { Color, MainFooter } from "@hongpung/src/common";
-import { BannerSlider } from "@hongpung/src/widgets/banner/ui/BannerSlider/BannerSlider";
-import { ClubPortalPanel } from "@hongpung/src/widgets/club";
-import { NoticePanel } from "@hongpung/src/widgets/notice";
+import { ScrollView, View, StyleSheet, Text } from "react-native";
+
+import { useAtomValue } from "jotai";
+import dayjs from "dayjs";
+
+import { Color, defaultSkeletonConfig, MainFooter } from "@hongpung/src/common";
 import { MainTabScreenProps } from "@hongpung/src/common/navigation";
+
+import { useLoadMyTodayReservationFetch } from "@hongpung/src/entities/reservation";
+import { UseRoomState } from "@hongpung/src/entities/session";
+
+import { ClubPortalPanel } from "@hongpung/src/widgets/club";
+import { NotificationIcon } from "@hongpung/src/widgets/notification";
+import { SessionManageBottomSheet } from "@hongpung/src/widgets/session";
+import { NoticePanel } from "@hongpung/src/widgets/notice";
+import { BannerSlider } from "@hongpung/src/widgets/banner";
+
+import { TodaySchedulePanel } from "@hongpung/src/widgets/reservation";
+import { Skeleton } from "moti/skeleton";
+import { debounce } from "lodash";
+import { UserStatusState } from "@hongpung/src/entities/member";
 
 const HomePage: React.FC<MainTabScreenProps<"Home">> = ({ navigation }) => {
   const isUsingSession = useAtomValue(UseRoomState);
   const loginUser = useAtomValue(UserStatusState);
-  const today = useMemo(() => {
-    return new Date().toISOString().split("T")[0];
-  }, []);
-
-  const todayReservationsData = useAtomValue(myTodayReservationState);
-
-  const [isSlideUp, setIsSlideUp] = useState(false);
+  const { data: todayReservationsData, isLoading: isLoadingTodayReservations } =
+    useLoadMyTodayReservationFetch();
 
   const navigateToNotificationPage = () => {
-    const start = Date.now();
     navigation.navigate("Notification");
-    InteractionManager.runAfterInteractions(() => {
-      const duration = Date.now() - start;
-      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
-    });
   };
 
   const navigateToNoticeList = () => {
-    const start = Date.now();
     navigation.navigate("Notice", {
       screen: "NoticeList",
     });
-    InteractionManager.runAfterInteractions(() => {
-      const duration = Date.now() - start;
-      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
-    });
   };
 
-  const navigateToNoticeDetail = (noticeId: number) => {
-    const start = Date.now();
-    navigation.navigate("Notice", {
-      screen: "NoticeDetail",
-      params: { noticeId },
-    });
-    InteractionManager.runAfterInteractions(() => {
-      const duration = Date.now() - start;
-      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
-    });
+  const navigateToNoticeDetail = debounce(
+    (noticeId: number) => {
+      navigation.push("Notice", {
+        screen: "NoticeList",
+      });
+      navigation.push("Notice", {
+        screen: "NoticeDetail",
+        params: { noticeId },
+      });
+    },
+    500,
+    {
+      leading: true,
+      trailing: false,
+    },
+  );
+
+  const navigateToBannerList = () => {
+    navigation.navigate("BannerList");
   };
 
   const navigateToClubHome = () => {
-    const start = Date.now();
-    navigation.push("Club", { screen: "ClubMain" });
-    InteractionManager.runAfterInteractions(() => {
-      const duration = Date.now() - start;
-      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
-    });
-  };
-  const navigateToReservationDetail = (reservationId: number) => {
-    const start = Date.now();
-    navigation.navigate("Reservation", {
-      screen: "ReservationDetail",
-      params: { reservationId },
-    });
-    InteractionManager.runAfterInteractions(() => {
-      const duration = Date.now() - start;
-      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
-    });
+    navigation.navigate("Club", { screen: "ClubMain" });
   };
 
+  const navigateToReservationDetail = debounce(
+    (reservationId: number) => {
+      navigation.push("Reservation", {
+        screen: "ReservationDetail",
+        params: { reservationId },
+      });
+    },
+    500,
+    {
+      leading: true,
+      trailing: false,
+    },
+  );
+
   const navigateToReservationCalendar = () => {
-    const start = Date.now();
-    navigation.push("Reservation", { screen: "ReservationCalendar" });
-    InteractionManager.runAfterInteractions(() => {
-      const duration = Date.now() - start;
-      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
-    });
+    navigation.navigate("Reservation", { screen: "ReservationCalendar" });
   };
 
   const navigateToServiceTerms = () => {
-    const start = Date.now();
-    navigation.push("WebView", {
+    navigation.navigate("WebView", {
       title: "서비스 이용약관",
       url: "https://storage.hongpung.com/terms/%EC%84%9C%EB%B9%84%EC%8A%A4+%EC%9D%B4%EC%9A%A9%EC%95%BD%EA%B4%80.html",
-    });
-    InteractionManager.runAfterInteractions(() => {
-      const duration = Date.now() - start;
-      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
     });
   };
 
   const navigateToPrivacyPolicy = () => {
-    const start = Date.now();
-    navigation.push("WebView", {
+    navigation.navigate("WebView", {
       title: "개인정보 처리방침",
       url: "https://storage.hongpung.com/terms/%EA%B0%9C%EC%9D%B8%EC%A0%95%EB%B3%B4+%EC%B2%98%EB%A6%AC%EB%B0%A9%EC%B9%A8.html",
-    });
-    InteractionManager.runAfterInteractions(() => {
-      const duration = Date.now() - start;
-      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
     });
   };
 
   const navigateToUsingManage = () => {
-    const start = Date.now();
-    navigation.navigate("SessionManagement", {
-      screen: "SessionManage",
-    });
-    InteractionManager.runAfterInteractions(() => {
-      const duration = Date.now() - start;
-      console.log(`실제 사용자에게 보이기까지 걸린 시간: ${duration}ms`);
-    });
+    navigation.navigate("SessionManage");
   };
 
   return (
@@ -155,25 +126,38 @@ const HomePage: React.FC<MainTabScreenProps<"Home">> = ({ navigation }) => {
           >
             <View style={styles.text}>
               <Text style={styles.dateText}>
-                {today.split("-")[0]}년 {today.split("-")[1]}월{" "}
-                {today.split("-")[2]}일
+                {dayjs().format("YYYY년 M월 D일")}
               </Text>
-              <Text style={styles.greetingText}>
-                {loginUser?.nickname || loginUser?.name}님,{" "}
-                {todayReservationsData && todayReservationsData.length > 0
-                  ? "오늘 예약이 있어요!"
-                  : `안녕하세요!`}
-              </Text>
+              {isLoadingTodayReservations ? (
+                <View>
+                  <Skeleton
+                    {...defaultSkeletonConfig}
+                    width={160}
+                    height={28}
+                    radius={4}
+                  ></Skeleton>
+                </View>
+              ) : (
+                <Text style={styles.greetingText}>
+                  {loginUser?.nickname || loginUser?.name}님,{" "}
+                  {todayReservationsData && todayReservationsData.length > 0
+                    ? "오늘 예약이 있어요!"
+                    : `안녕하세요!`}
+                </Text>
+              )}
             </View>
             <NotificationIcon
               navigateToNotificationPage={navigateToNotificationPage}
             />
           </View>
-          <TodaySchedule
+          <TodaySchedulePanel
             navigateToReservationDetail={navigateToReservationDetail}
             navigateToReservationCalendar={navigateToReservationCalendar}
           />
-          <BannerSlider banners={[]} />
+          <BannerSlider
+            onPressIndicator={navigateToBannerList}
+            showAllButton={true}
+          />
           <ClubPortalPanel navigateToClubHome={navigateToClubHome} />
           <NoticePanel
             navigateToNoticeDetail={navigateToNoticeDetail}
@@ -187,10 +171,6 @@ const HomePage: React.FC<MainTabScreenProps<"Home">> = ({ navigation }) => {
       </ScrollView>
       {isUsingSession && (
         <SessionManageBottomSheet
-          toggleBottomSheet={() => {
-            setIsSlideUp(!isSlideUp);
-          }}
-          isSlideUp={isSlideUp}
           navigateToUsingManage={navigateToUsingManage}
         />
       )}
