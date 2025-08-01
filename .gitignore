@@ -37,3 +37,11 @@ yarn-error.*
 
 #unusedComponent
 _unused/
+
+# Test files
+*.spec.ts
+*.spec.tsx
+jest.config.js
+jest-setup.ts
+eslint.config.js
+src/common/config/jest/
