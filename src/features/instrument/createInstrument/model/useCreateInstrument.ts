@@ -15,7 +15,7 @@ export const useCreateInstrument = ({
   const { pickImageFromAlbum, selectedImage, selectedImageUri, resetImage } =
     useImagePicker();
 
-  const form = useValidatedForm({
+  const { getField, trigger, getValues } = useValidatedForm({
     schema: instrumentCreateFormSchema,
     defaultValues: {
       instrumentType: null,
@@ -25,18 +25,18 @@ export const useCreateInstrument = ({
   });
 
   useEffect(() => {
-    form.setSelectedImage(selectedImage);
-  }, [selectedImage, form]);
+    getField("selectedImage").setValue(selectedImage);
+  }, [selectedImage, getField]);
 
   const { request, isLoading } = useCreateInsrumentRequest();
 
   const createInstrumentRequest = async () => {
     try {
-      if (form.instrumentTypeValidation.state === "ERROR") {
+      if (getField("instrumentType").validation.state === "ERROR") {
         Alert.alert("오류", "악기 종류를 선택해주세요.");
         return;
       }
-      const submitForm = await parseInstrumentCreateBody(form);
+      const submitForm = await parseInstrumentCreateBody(getValues());
       const response = await request(submitForm);
 
       const { instrumentId } = response;
@@ -56,7 +56,10 @@ export const useCreateInstrument = ({
   };
 
   return {
-    ...form,
+    getField,
+    trigger,
+    getValues,
+
     createInstrumentRequest,
     pickImageFromAlbum,
     selectedImageUri,

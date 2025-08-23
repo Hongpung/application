@@ -4,10 +4,11 @@ import { View } from "react-native";
 
 interface DropdownProps<T extends string> {
   label: string;
-  value: T | null;
+  value?: T | null;
   visible: boolean;
-  onChange: (value: T) => void;
+  setValue: (value: T) => void;
   setVisible: (newValue: boolean) => void;
+  onBlur?: () => void;
   children: React.ReactNode;
 }
 
@@ -15,8 +16,9 @@ const DropdownContainer = <T extends string>({
   label,
   value,
   visible,
-  onChange,
+  setValue,
   setVisible,
+  onBlur,
   children,
 }: DropdownProps<T>) => {
   return (
@@ -24,7 +26,8 @@ const DropdownContainer = <T extends string>({
       value={value}
       visible={visible}
       setVisible={setVisible}
-      setValue={onChange}
+      setValue={setValue}
+      onBlur={onBlur}
     >
       <View>{children}</View>
     </DropdownProvider>

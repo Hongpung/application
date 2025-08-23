@@ -1,18 +1,16 @@
-import { Color, Icons } from "@hongpung/src/common";
+import { Color, Icons, ValidationState } from "@hongpung/src/common";
 import { useRef, useEffect } from "react";
 import { Animated, Pressable, View, Text, StyleSheet } from "react-native";
 
 interface SelectorLabelProps {
-  value: string | null;
-  isErrored: boolean;
-  errorText: string;
+  value?: string | null;
+  validation: ValidationState;
   onPress?: () => void;
 }
 
 export const ClubSelectorLabel: React.FC<SelectorLabelProps> = ({
   value,
-  isErrored,
-  errorText,
+  validation,
   onPress,
 }) => {
   const labelAnimation = useRef(new Animated.Value(value ? 1 : 0)).current; // 초기 값 설정
@@ -48,7 +46,7 @@ export const ClubSelectorLabel: React.FC<SelectorLabelProps> = ({
           styles.InputBox,
           {
             borderBottomWidth: 1,
-            borderBottomColor: isErrored ? Color["red500"] : Color["green500"],
+            borderBottomColor: validation.state === "ERROR" ? Color["red500"] : Color["green500"],
             color: value ? Color["grey800"] : Color["grey400"],
           },
         ]}
@@ -59,7 +57,7 @@ export const ClubSelectorLabel: React.FC<SelectorLabelProps> = ({
       <View style={[styles.SelectBtn]}>
         <Icons name={"caret-down"} color={Color["green500"]} size={24}></Icons>
       </View>
-      {isErrored && <Text style={styles.errorText}>{errorText}</Text>}
+      {validation.state === "ERROR" && <Text style={styles.errorText}>{validation.errorText}</Text>}
     </Pressable>
   );
 };

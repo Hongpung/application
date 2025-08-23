@@ -12,6 +12,7 @@ export * from "./lib/TokenHandler";
 export * from "./lib/deepEqual";
 export * from "./lib/useValidatedForm";
 export * from "./lib/useMiniCalendar";
+export * from "./lib/useBackBlock";
 export { useEntryAnimation } from "./lib/useEntryAnimation";
 export { useImagePicker } from "./lib/useImagePicker";
 

@@ -10,8 +10,13 @@ import {
 import { Header } from "@hongpung/src/common";
 
 import { ChangePasswordSection } from "@hongpung/src/widgets/auth/ui/ChangePasswordSection/ChangePasswordSection";
+import { useChangePasswordForm } from "@hongpung/src/features/auth/changePassword/model/useChangePassword";
+import { MainStackScreenProps } from "@hongpung/src/common/navigation";
 
-const ChangePasswordScreen: React.FC = () => {
+const ChangePasswordScreen: React.FC<MainStackScreenProps<"ChangePassword">> = ({
+  navigation,
+}) => {
+  const changePasswordForm = useChangePasswordForm();
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
@@ -20,7 +25,21 @@ const ChangePasswordScreen: React.FC = () => {
       >
         <Header LeftButton={"close"} />
         <Text style={styles.titleText}>비밀번호 변경</Text>
-        <ChangePasswordSection />
+        <ChangePasswordSection
+          {...changePasswordForm}
+          onChangePassword={async () => {
+            await changePasswordForm.onChangePassword({
+              onSuccess: () => {
+                navigation.navigate("MainTab", {
+                  screen: "MyPage",
+                })
+              },
+              onError: () => {
+                console.log("비밀번호 변경 실패");
+              },
+            });
+          }}
+        />
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );

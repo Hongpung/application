@@ -1,7 +1,8 @@
 import React from "react";
-import { LongButton, ValidationState } from "@hongpung/src/common";
+import { FieldReturn, LongButton, ValidationState } from "@hongpung/src/common";
 import { BasicInput } from "@hongpung/src/common/ui/inputs/BasicInput";
 import { TextInput, View } from "react-native";
+import { PasswordFormData } from "../../model/changePasswordSchema";
 
 interface PasswordValue {
   currentPassword: string;
@@ -14,17 +15,9 @@ type PasswordFormValidation = {
 };
 
 interface ChangePasswordFormProps {
-  currentPassword: string;
-  setCurrentPassword: (text: string) => void;
-  newPassword: string;
-  setNewPassword: (text: string) => void;
-  confirmPassword: string;
-  setConfirmPassword: (text: string) => void;
+  getField: (fieldName: keyof PasswordFormData) => FieldReturn<PasswordFormData[keyof PasswordFormData]>;
   onChangePassword: () => Promise<void>;
-  passwordValidation: PasswordFormValidation;
-  onCurrentPasswordBlur: () => void;
-  onNewPasswordBlur: () => void;
-  onConfirmPasswordBlur: () => void;
+
   currentPasswordRef: React.RefObject<TextInput | null>;
   newPasswordRef: React.RefObject<TextInput | null>;
   confirmPasswordRef: React.RefObject<TextInput | null>;
@@ -35,20 +28,11 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = (
   props,
 ) => {
   const {
-    currentPassword,
-    setCurrentPassword,
-    newPassword,
-    setNewPassword,
-    confirmPassword,
-    setConfirmPassword,
+    getField,
     onChangePassword,
-    passwordValidation,
     currentPasswordRef,
     newPasswordRef,
     confirmPasswordRef,
-    onCurrentPasswordBlur,
-    onNewPasswordBlur,
-    onConfirmPasswordBlur,
     isCanChangePassword,
   } = props;
 
@@ -61,30 +45,21 @@ export const ChangePasswordForm: React.FC<ChangePasswordFormProps> = (
             label="현재 비밀번호"
             isEncryption
             color="green"
-            inputValue={currentPassword}
-            setInputValue={setCurrentPassword}
-            validationCondition={passwordValidation.currentPassword}
-            onBlur={onCurrentPasswordBlur}
+            {...getField("currentPassword")}
           />
           <BasicInput
             ref={newPasswordRef}
             label="새로운 비밀번호"
             isEncryption
             color="green"
-            inputValue={newPassword}
-            setInputValue={setNewPassword}
-            validationCondition={passwordValidation.newPassword}
-            onBlur={onNewPasswordBlur}
+            {...getField("newPassword")}
           />
           <BasicInput
             ref={confirmPasswordRef}
             label="새로운 비밀번호 확인"
             isEncryption
             color="green"
-            inputValue={confirmPassword}
-            setInputValue={setConfirmPassword}
-            validationCondition={passwordValidation.confirmPassword}
-            onBlur={onConfirmPasswordBlur}
+            {...getField("confirmPassword")}
           />
         </View>
       </View>

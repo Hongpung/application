@@ -1,4 +1,4 @@
-import { useRef, useMemo } from "react";
+import { useRef } from "react";
 import { useValidatedForm } from "@hongpung/src/common";
 import { withdrawalSchema, type WithdrawalFormData } from "./withdrawalSchema";
 import * as z from "zod";
@@ -6,12 +6,17 @@ import { useWithdrawRequest } from "@hongpung/src/entities/auth";
 import { TextInput } from "react-native";
 
 export const useWithdrawAuth = () => {
-  const { request: withdrawRequest } = useWithdrawRequest();
+  const { request: withdrawRequest, isLoading } = useWithdrawRequest();
 
   const confirmwordRef = useRef<TextInput>(null);
   const currentPasswordRef = useRef<TextInput>(null);
 
-  const formDatas = useValidatedForm({
+  const   {
+    getField,
+    getValues,
+    validateAll,
+    isFormValid
+  } = useValidatedForm({
     schema: withdrawalSchema,
     defaultValues: {
       confirmword: "",
@@ -19,22 +24,20 @@ export const useWithdrawAuth = () => {
     },
   });
 
-  const {
-    confirmword,
-    setConfirmword,
-    confirmwordValidation,
-    validateConfirmword,
 
-    currentPassword,
-    setCurrentPassword,
-    currentPasswordValidation,
-    validateCurrentPassword,
-  } = formDatas;
-
-  const handleWithdraw = async () => {
+  const handleWithdraw = async ({
+    onSuccess,
+    onError,
+  }: {
+    onSuccess?: () => void;
+    onError?: () => void;
+  }) => {
     try {
-      await withdrawalSchema.parseAsync({ confirmword, currentPassword });
+      const validation = await validateAll();
+      if (validation === false) throw new Error("비밀번호가 일치하지 않습니다.");
+      const { currentPassword } = getValues();
       await withdrawRequest({ password: currentPassword });
+      onSuccess?.();
     } catch (error) {
       if (error instanceof z.ZodError) {
         const errors = error.errors;
@@ -47,47 +50,19 @@ export const useWithdrawAuth = () => {
           }
         });
       }
+      onError?.();
     }
   };
 
-  const onBlur = useMemo(() => {
-    return {
-      onCurrentPasswordBlur: () => {
-        if (currentPasswordValidation.state !== "BEFORE")
-          validateCurrentPassword();
-      },
-      onConfirmwordBlur: () => {
-        if (confirmwordValidation.state !== "BEFORE") validateConfirmword();
-      },
-    };
-  }, [
-    currentPasswordValidation,
-    confirmwordValidation,
-    validateCurrentPassword,
-    validateConfirmword,
-  ]);
-
-  const isFormValid = useMemo(() => {
-    return (
-      currentPasswordValidation.state === "VALID" &&
-      confirmwordValidation.state === "VALID"
-    );
-  }, [currentPasswordValidation, confirmwordValidation]);
 
   return {
-    currentPassword,
-    confirmword,
-    setCurrentPassword,
-    setConfirmword,
     currentPasswordRef,
     confirmwordRef,
-    validateConfirmword,
-    validateCurrentPassword,
-    currentPasswordValidation,
-    confirmwordValidation,
+    getField,
 
-    ...onBlur,
     onWithdraw: handleWithdraw,
     isCanWithdraw: isFormValid,
+
+    isWithdrawPending: isLoading,
   };
 };

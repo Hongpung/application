@@ -2,10 +2,11 @@ import Dropdown from "./dropdown";
 
 interface SelectProps<T extends string> {
   label: string;
-  value: T | null;
-  onChange: (value: T) => void;
+  value?: T | null;
+  setValue: (value: T) => void;
   visible: boolean;
   setVisible: (newValue: boolean) => void;
+  onBlur?: () => void;
   trigger: React.ElementType;
   options: readonly T[];
   children: React.ReactNode;
@@ -19,7 +20,8 @@ export const Selector = <T extends string>({
   visible,
   setVisible,
   value,
-  onChange,
+  setValue,
+  onBlur,
   options,
   children,
   color = "blue",
@@ -29,9 +31,10 @@ export const Selector = <T extends string>({
     <Dropdown
       label={label}
       value={value}
-      onChange={onChange}
+      setValue={setValue}
       visible={visible}
       setVisible={setVisible}
+      onBlur={onBlur}
     >
       <Dropdown.Trigger as={trigger}>{children}</Dropdown.Trigger>
       <Dropdown.Menu>

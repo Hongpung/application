@@ -10,8 +10,11 @@ import {
 
 import { Header } from "@hongpung/src/common";
 import { WithdrawalSection } from "@hongpung/src/widgets/auth";
+import { StackActions, useNavigation } from "@react-navigation/native";
 
 const WithdrawalScreen: React.FC = () => {
+  const navigation = useNavigation();
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
@@ -21,7 +24,9 @@ const WithdrawalScreen: React.FC = () => {
       >
         <Header LeftButton={"close"} />
         <Text style={styles.titleText}>회원 탈퇴</Text>
-        <WithdrawalSection />
+        <WithdrawalSection onWithdrawSuccess={() => {
+          navigation.dispatch(StackActions.replace("LoginStack"));
+        }} />
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );

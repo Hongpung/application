@@ -3,26 +3,20 @@ import React from "react";
 import {
   Checkbox,
   Color,
+  FieldReturn,
   Input,
   LongButton,
   ValidationState,
 } from "@hongpung/src/common";
+import { LoginFormData } from "../../model/LoginSchema";
 
 interface LoginFormProps {
   emailRef: React.RefObject<TextInput | null>;
-  emailValidation: ValidationState;
-  passwordValidation: ValidationState;
-  email: string;
-  password: string;
-
-  onBlurValidateAllInput: () => void;
-
-  setPassword: (password: string) => void;
-  setEmail: (email: string) => void;
+  passwordRef: React.RefObject<TextInput | null>;
+  getField: <T extends keyof LoginFormData>(field: T) => FieldReturn<LoginFormData[T]>;
 
   onLogin: () => void;
   options: { saveID: boolean; autoLogin: boolean };
-  passwordRef: React.RefObject<TextInput | null>;
   setAutoLogin: (value: boolean) => void;
   setSaveID: (value: boolean) => void;
   isLoading: boolean;
@@ -33,17 +27,10 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
     emailRef,
 
     passwordRef,
-    emailValidation,
-    passwordValidation,
-    email,
-    password,
-    setEmail,
-    setPassword,
-    onBlurValidateAllInput,
+    getField,
 
     onLogin,
     options,
-
     setAutoLogin,
     setSaveID,
     isLoading,
@@ -54,24 +41,18 @@ const LoginForm: React.FC<LoginFormProps> = (props) => {
       <View style={styles.inputContainer}>
         <Input
           ref={emailRef}
-          inputValue={email}
-          setInputValue={setEmail}
           label="이메일"
           keyboardType={"email-address"}
-          validationCondition={emailValidation}
-          onBlur={onBlurValidateAllInput}
+          {...getField("email")}
         />
       </View>
 
       <View style={styles.inputContainer}>
         <Input
           ref={passwordRef}
-          inputValue={password}
-          setInputValue={setPassword}
           label="비밀번호"
           isEncryption={true}
-          validationCondition={passwordValidation}
-          onBlur={onBlurValidateAllInput}
+          {...getField("password")}
         />
       </View>
 

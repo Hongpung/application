@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-import { LongButton, BasicInput } from "@hongpung/src/common";
+import { LongButton, BasicInput, Alert } from "@hongpung/src/common";
 
 import { SignUpStepPropsList } from "../../model/type";
 import { StepProps } from "@hongpung/react-step-flow";
@@ -13,25 +13,21 @@ export const SetPasswordForm: React.FC<SetPasswordFormProps> = ({
 }) => {
   const {
     passwordRef,
-    password,
-    setPassword,
-    passwordValidation,
-    validatePassword,
-
     confirmPasswordRef,
-    confirmPassword,
-    setConfirmPassword,
-    confirmPasswordValidation,
-    validateConfirmPassword,
+    getField,
+    validateNewPassword,
+    isCanSetPassword,
   } = props;
 
   const nextStep = () => {
-    if (
-      confirmPasswordValidation.state === "VALID" &&
-      passwordValidation.state === "VALID"
-    ) {
-      goTo("PersonalInfo");
-    }
+    validateNewPassword({
+      onSuccess: () => {
+        goTo("PersonalInfo");
+      },
+      onError: () => {
+        Alert.alert("오류", "비밀번호 설정에 실패했어요");
+      },
+    });
   };
 
   return (
@@ -43,10 +39,7 @@ export const SetPasswordForm: React.FC<SetPasswordFormProps> = ({
             label="비밀번호"
             isEncryption
             color="green"
-            inputValue={password || ""}
-            setInputValue={setPassword}
-            validationCondition={passwordValidation}
-            onBlur={validatePassword}
+            {...getField("password")}
           />
         </View>
         <View style={{ marginHorizontal: 48 }}>
@@ -55,10 +48,7 @@ export const SetPasswordForm: React.FC<SetPasswordFormProps> = ({
             label="비밀번호 확인"
             isEncryption
             color="green"
-            inputValue={confirmPassword || ""}
-            setInputValue={setConfirmPassword}
-            validationCondition={confirmPasswordValidation}
-            onBlur={validateConfirmPassword}
+            {...getField("confirmPassword")}
           />
         </View>
       </View>
@@ -66,10 +56,7 @@ export const SetPasswordForm: React.FC<SetPasswordFormProps> = ({
         <LongButton
           color={"green"}
           innerContent="비밀번호 설정 완료"
-          isAble={
-            confirmPasswordValidation.state === "VALID" &&
-            passwordValidation.state === "VALID"
-          }
+          isAble={isCanSetPassword}
           onPress={nextStep}
         />
       </View>

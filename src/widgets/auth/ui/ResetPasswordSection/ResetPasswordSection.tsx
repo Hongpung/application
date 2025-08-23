@@ -17,7 +17,7 @@ const ResetPasswordSection: React.FC<ResetPasswordSectionProps> = (props) => {
   ];
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <DescriptionBox descriptions={descriptions} />
       <ResetPasswordForm {...props} />
     </View>

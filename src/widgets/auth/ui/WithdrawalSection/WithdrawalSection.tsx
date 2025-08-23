@@ -5,7 +5,9 @@ import { WithdrawalAuthForm } from "@hongpung/src/features/auth/withdrawAuth/ui/
 import { useAtomValue } from "jotai";
 import { UserStatusState } from "@hongpung/src/entities/member";
 
-const WithdrawalSection: React.FC = () => {
+const WithdrawalSection: React.FC<{
+  onWithdrawSuccess: () => void;
+}> = ({ onWithdrawSuccess }) => {
   const loginUser = useAtomValue(UserStatusState);
   const withdrawForm = useWithdrawAuth();
 
@@ -23,7 +25,13 @@ const WithdrawalSection: React.FC = () => {
       contentContainerStyle={{ flexGrow: 1, gap: 16 }}
     >
       <DescriptionBox descriptions={descriptions} />
-      <WithdrawalAuthForm {...withdrawForm} />
+      <WithdrawalAuthForm {...withdrawForm} onWithdraw={() => {
+        withdrawForm.onWithdraw({
+          onSuccess: () => {
+            onWithdrawSuccess();
+          },
+        });
+      }} />
     </ScrollView>
   );
 };

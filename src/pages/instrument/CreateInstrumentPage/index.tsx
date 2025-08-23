@@ -46,13 +46,10 @@ const InstrumentCreateScreen: React.FC<InstrumentCreateScreenProps> = ({
 
   const {
     createInstrumentRequest,
-    instrumentType,
-    name,
+    getField,
     resetImage,
     pickImageFromAlbum,
     selectedImageUri,
-    setInstrumentType,
-    setName,
     isLoading,
   } = useCreateInstrument({ navigateToInstrumentDetail });
 
@@ -87,13 +84,12 @@ const InstrumentCreateScreen: React.FC<InstrumentCreateScreenProps> = ({
             <View style={{ height: 28 }} />
 
             <View style={styles.inputContainer}>
-              <InstrumentNameInput name={name} setName={setName} />
+              <InstrumentNameInput {...getField("name")} />
 
               <InstrumentTypeSelector
                 onSelectType={onSelectType}
                 setSelectTypeVisible={setSelectTypeVisible}
-                instrumentType={instrumentType}
-                setInstrumentType={setInstrumentType}
+                {...getField("instrumentType")}
               />
             </View>
           </ScrollView>

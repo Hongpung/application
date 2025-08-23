@@ -2,22 +2,22 @@ import { Color } from "@hongpung/src/common";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 
 type InstrumentNameInputProps = {
-  name: string;
-  setName: React.Dispatch<string>;
+  value: string;
+  setValue: (text: string) => void;
 };
 
 export const InstrumentNameInput: React.FC<InstrumentNameInputProps> = (
   props,
 ) => {
-  const { name, setName } = props;
+  const { value, setValue } = props;
 
   return (
     <View style={styles.Row}>
       <Text style={styles.RowLeft}>{`악기 이름`}</Text>
 
       <TextInput
-        value={name}
-        onChangeText={setName}
+        value={value}
+        onChangeText={setValue}
         style={[styles.RowRight, { borderBottomWidth: 0.5, paddingBottom: 4 }]}
       />
     </View>

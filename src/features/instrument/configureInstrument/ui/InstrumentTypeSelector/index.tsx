@@ -6,8 +6,8 @@ type InstrumentTypeSelectorProps = {
   setSelectTypeVisible: React.Dispatch<boolean>;
   onSelectType: boolean;
 
-  instrumentType: InstrumentType | null;
-  setInstrumentType: React.Dispatch<InstrumentType>;
+  value: InstrumentType | null;
+  setValue: React.Dispatch<InstrumentType>;
 };
 
 export const InstrumentTypeSelector: React.FC<InstrumentTypeSelectorProps> = (
@@ -16,8 +16,8 @@ export const InstrumentTypeSelector: React.FC<InstrumentTypeSelectorProps> = (
   const {
     setSelectTypeVisible,
     onSelectType,
-    setInstrumentType,
-    instrumentType,
+    setValue,
+    value,
   } = props;
 
   return (
@@ -27,11 +27,11 @@ export const InstrumentTypeSelector: React.FC<InstrumentTypeSelectorProps> = (
       <Selector
         label="악기 종류"
         setVisible={setSelectTypeVisible}
-        onChange={(value) => setInstrumentType(value as InstrumentType)}
+        setValue={(value) => setValue(value as InstrumentType)}
         options={instrumentTypes}
         trigger={Pressable}
         visible={onSelectType}
-        value={instrumentType}
+        value={value}
         color="blue"
         align="right"
       >
@@ -41,11 +41,11 @@ export const InstrumentTypeSelector: React.FC<InstrumentTypeSelectorProps> = (
             {
               width: 120,
               color:
-                instrumentType === null ? Color["grey800"] : Color["grey 400"],
+                value === null ? Color["grey800"] : Color["grey 400"],
             },
           ]}
         >
-          {instrumentType || "악기"}
+          {value || "악기"}
         </Text>
       </Selector>
     </View>

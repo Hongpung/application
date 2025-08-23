@@ -13,6 +13,7 @@ export const LoginStackNavigation = () => {
     <LoginStack.Navigator
       screenOptions={{
         headerShown: false,
+        animation: "none",
       }}
     >
       <LoginStack.Screen name="Login" component={LoginScreen} />

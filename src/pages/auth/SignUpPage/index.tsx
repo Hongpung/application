@@ -13,11 +13,12 @@ import {
 
 import { createStepFlow } from "@hongpung/react-step-flow";
 
-import { Header } from "@hongpung/src/common";
+import { Header, useBackBlock } from "@hongpung/src/common";
 import { LoginStackScreenProps } from "@hongpung/src/common/navigation";
 
 import { useSignUpSteps } from "@hongpung/src/features/auth/signUp/model/useSignUpSteps";
 import { SignUpStepPropsList } from "@hongpung/src/features/auth/signUp/model/type";
+import { PersonalInfoFormData } from "@hongpung/src/features/auth/signUp/model/signUpSchema";
 
 import {
   CreateNewPasswordSection,
@@ -25,17 +26,28 @@ import {
   RegisterEmailSection,
 } from "@hongpung/src/widgets/auth";
 
-const SignUpStep = createStepFlow<SignUpStepPropsList>();
-
 const SignUpPage: React.FC<LoginStackScreenProps<"SignUp">> = ({
   navigation,
 }) => {
-  const navigateToLoginPage = () => {
-    navigation.navigate("Login");
-  };
-  const { onClose, setStep, step, dissmissClubOptions, ...signUpSteps } =
-    useSignUpSteps({ navigateToLoginPage });
+  const {
+    SignUpStep,
+    emailValidationStep,
+    setNewPasswordStep,
+    personalInfoStep,
+    dissmissClubOptions,
+  } = useSignUpSteps();
 
+  const { handleBackPress } = useBackBlock(() => {}, {
+    title: "확인",
+    message: "회원가입을 취소하고 뒤로 돌아갈까요?",
+    cancelText: "아니오",
+    confirmText: "네",
+    confirmButtonColor: "green",
+    cancelButtonColor: "green",
+    onConfirm: () => {
+      navigation.goBack();
+    },
+  });
   return (
     <TouchableWithoutFeedback
       onPress={() => {
@@ -49,7 +61,7 @@ const SignUpPage: React.FC<LoginStackScreenProps<"SignUp">> = ({
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
         <View style={{ flex: 1, backgroundColor: "#FFF" }}>
-          <Header LeftButton={"close"} leftAction={onClose} />
+          <Header LeftButton={"close"} leftAction={handleBackPress} />
           <Text style={styles.titleText}>회원가입</Text>
           <ScrollView
             bounces={false}
@@ -61,23 +73,38 @@ const SignUpPage: React.FC<LoginStackScreenProps<"SignUp">> = ({
             }}
             contentContainerStyle={{ flexGrow: 1 }}
           >
-            <SignUpStep.Container onStepChange={setStep} currentStep={step}>
+            <SignUpStep.Flow>
               <SignUpStep.Step
                 name="EmailConfirm"
                 component={RegisterEmailSection}
-                stepProps={{ ...signUpSteps }}
+                stepProps={{ ...emailValidationStep }}
               />
               <SignUpStep.Step
                 name="SetPassword"
                 component={CreateNewPasswordSection}
-                stepProps={{ ...signUpSteps }}
+                stepProps={{ ...setNewPasswordStep }}
               />
               <SignUpStep.Step
                 name="PersonalInfo"
                 component={PersonalInfoSection}
-                stepProps={{ ...signUpSteps }}
+                stepProps={{
+                  ...personalInfoStep,
+                  signUp: async ({ onSuccess, onError }) => {
+                    await personalInfoStep.signUp({
+                      onSuccess: () => {
+                        navigation.navigate("Login");
+                        console.log("signUp 성공");
+                        onSuccess?.();
+                      },
+                      onError: () => {
+                        console.log("signUp 실패");
+                        onError?.();
+                      },
+                    });
+                  },
+                }}
               />
-            </SignUpStep.Container>
+            </SignUpStep.Flow>
           </ScrollView>
         </View>
       </KeyboardAvoidingView>

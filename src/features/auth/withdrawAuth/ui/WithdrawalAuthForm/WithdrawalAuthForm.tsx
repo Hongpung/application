@@ -1,5 +1,5 @@
 import React from "react";
-import { LongButton, ValidationState } from "@hongpung/src/common";
+import { FieldReturn, LongButton } from "@hongpung/src/common";
 import { BasicInput } from "@hongpung/src/common/ui/inputs/BasicInput";
 import { TextInput, View } from "react-native";
 
@@ -8,22 +8,10 @@ interface WithdrawalAuthFormValue {
   currentPassword: string;
 }
 
-type WithdrawalAuthFormValidation = {
-  [key in keyof WithdrawalAuthFormValue]: ValidationState;
-};
-
 interface WithdrawalAuthFormProps {
   currentPasswordRef: React.RefObject<TextInput | null>;
-  currentPassword: string;
-  setCurrentPassword: (text: string) => void;
-  currentPasswordValidation: WithdrawalAuthFormValidation["currentPassword"];
-  onCurrentPasswordBlur: () => void;
-
   confirmwordRef: React.RefObject<TextInput | null>;
-  confirmword: string;
-  setConfirmword: (text: string) => void;
-  confirmwordValidation: WithdrawalAuthFormValidation["confirmword"];
-  onConfirmwordBlur: () => void;
+    getField: (fieldName: keyof WithdrawalAuthFormValue) => FieldReturn<WithdrawalAuthFormValue[keyof WithdrawalAuthFormValue]>;
 
   isCanWithdraw: boolean;
   onWithdraw: () => void;
@@ -34,19 +22,12 @@ export const WithdrawalAuthForm: React.FC<WithdrawalAuthFormProps> = (
 ) => {
   const {
     currentPasswordRef,
-    currentPassword,
-    setCurrentPassword,
-    currentPasswordValidation,
-    onCurrentPasswordBlur,
-
     confirmwordRef,
-    confirmword,
-    setConfirmword,
-    confirmwordValidation,
-    onConfirmwordBlur,
+    getField,
 
     isCanWithdraw,
     onWithdraw,
+
   } = props;
 
   return (
@@ -58,10 +39,7 @@ export const WithdrawalAuthForm: React.FC<WithdrawalAuthFormProps> = (
             label="비밀번호"
             isEncryption
             color="red"
-            inputValue={currentPassword}
-            setInputValue={setCurrentPassword}
-            validationCondition={currentPasswordValidation}
-            onBlur={onCurrentPasswordBlur}
+            {...getField("currentPassword")}
           />
           <BasicInput
             ref={confirmwordRef}
@@ -69,10 +47,7 @@ export const WithdrawalAuthForm: React.FC<WithdrawalAuthFormProps> = (
             placeholder={`\"탈퇴하기\"를 입력해주세요.`}
             isEncryption
             color="red"
-            inputValue={confirmword}
-            setInputValue={setConfirmword}
-            validationCondition={confirmwordValidation}
-            onBlur={onConfirmwordBlur}
+            {...getField("confirmword")}
           />
         </View>
       </View>

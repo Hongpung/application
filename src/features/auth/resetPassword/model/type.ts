@@ -1,4 +1,11 @@
-import { ValidationState } from "@hongpung/src/common";
+import { TextInput } from "react-native";
+import { FieldReturn } from "@hongpung/src/common";
+
+import {
+  EmailFormData,
+  NewPasswordFormData,
+  VerificationCodeFormData,
+} from "./resetPasswordSchema";
 
 export type ResetPasswordStep = "EmailConfirm" | "ResetPassword";
 
@@ -14,39 +21,53 @@ export type ResetPasswordStepsProps = {
 };
 
 export interface EmailValidateFormProps {
-  email: string;
-  setEmail: (email: string) => void;
-  emailValidation: ValidationState;
-  validateEmail: (email: string) => void;
+  emailRef: React.RefObject<TextInput|null>;
+  verificationCodeRef: React.RefObject<TextInput|null>;
 
-  //이메일 인증 코드 발송
-  isSendingCode: boolean;
-  isSendingCodeError: Error | null;
+  getField: <T extends "email" | "verificationCode">(
+    name: T
+  ) => FieldReturn<(EmailFormData&VerificationCodeFormData)[T]>;
 
-  sendVerificationCode: () => void;
-  isSendingCodeLoading: boolean;
+  isCanSendVerificationCode: boolean;
 
-  verificationCode: string;
-  verificationCodeValidation: ValidationState;
-  setVerificationCode: (code: string) => void;
-  validateVerificationCode: (code: string) => void;
+  sendVerificationCode: ({
+    onSuccess,
+    onError,
+  }: {
+    onSuccess?: () => void;
+    onError?: () => void;
+  }) => Promise<void>;
 
-  onVerifyCode: ({ onSuccess }: { onSuccess: () => void }) => void;
-  isVerifyingCodeLoading: boolean;
-  isVerifyingCodeError: Error | null;
+  isSendVerificationCodePending: boolean;
+  isSendCode: boolean;
+
+  isCanVerifyCode: boolean;
+  verifyCode: ({
+    onSuccess,
+    onError,
+  }: {
+    onSuccess?: () => void;
+    onError?: () => void;
+  }) => Promise<void>;
+  isVerifyingCodePending: boolean;
 }
 
 export interface ResetPasswordFormProps {
-  newPassword?: string;
-  setNewPassword: (text: string) => void;
-  confirmPassword?: string;
-  setConfirmPassword: (text: string) => void;
+  newPasswordRef: React.RefObject<TextInput|null>;
+  confirmPasswordRef: React.RefObject<TextInput|null>;
 
-  newPasswordValidation: ValidationState;
-  confirmPasswordValidation: ValidationState;
+  getField: <T extends keyof NewPasswordFormData>(
+    name: T
+  ) => FieldReturn<NewPasswordFormData[T]>;
 
-  validateConfirmPassword: (text: string) => void;
-  validateNewPassword: (text: string) => void;
+  isCanResetPassword: boolean;
 
-  resetPassword: () => void;
+  resetPassword: ({
+    onSuccess,
+    onError
+  }: {
+    onSuccess?: () => void;
+    onError?: () => void;
+  }) => Promise<void>;
+  isResetPasswordPending: boolean;
 }

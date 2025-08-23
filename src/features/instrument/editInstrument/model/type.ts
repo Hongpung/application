@@ -20,7 +20,7 @@ export const instrumentEditFormSchema = z.object({
     })
     .nullable(),
 
-  borrowAvailable: z.boolean().default(false),
+  borrowAvailable: z.boolean(),
 });
 
 export type InstrumentEditForm = z.infer<typeof instrumentEditFormSchema>;

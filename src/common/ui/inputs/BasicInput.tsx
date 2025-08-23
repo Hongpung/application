@@ -19,11 +19,13 @@ import { ValidationState } from "../../types/ValidationState";
 type InputProps = {
   ref?: Ref<TextInput>;
   label: string;
-  inputValue: string;
-  setInputValue: (text: string) => void;
-  validationCondition: ValidationState;
+  // register 스프레드 지
+  onChange?: (text: string) => void;
   onBlur?: () => void;
   onFocus?: () => void;
+  error?: string;
+  validation?: ValidationState;
+  // 기존 props (선택적)
   placeholder?: string;
   isEditible?: boolean;
   isRequired?: boolean;
@@ -32,27 +34,33 @@ type InputProps = {
   color?: "red" | "blue" | "green";
   maxLength?: number;
   requireMark?: boolean;
+  value?: string;
+  setValue?: (text: string) => void;
 };
 
 export const BasicInput = forwardRef<TextInput, InputProps>(
   (
     {
       label,
+      // register 스프레드 지원
+      onChange,
+      onBlur,
+      onFocus,
+      error,
+      validation,
+      // 기존 props
       isEncryption = false,
       color = "blue",
       isEditible = true,
       isRequired = true,
       requireMark = false,
-      inputValue,
-      setInputValue,
+      value,
+      setValue,
       keyboardType = "default",
       placeholder = "",
       maxLength = undefined,
-      validationCondition,
-      onBlur,
-      onFocus,
     },
-    ref,
+    ref
   ) => {
     // 암호화 상태일때 보이는지 안보이는지 판별
     const [isVisible, setIsVisible] = useState(!isEncryption);
@@ -61,6 +69,14 @@ export const BasicInput = forwardRef<TextInput, InputProps>(
 
     //언더라인 색상 - 기본은 파란색
     const underlineColor = Color[color + "500"];
+
+    // register 스프레드와 기존 방식 호환
+    const currentValue = value || "";
+    const currentError =
+      error ||
+      (validation?.state === "ERROR" ? validation.errorText : "") ||
+      "";
+    const hasError = !!error || validation?.state === "ERROR";
 
     const labelStyle = {
       fontSize: labelAnimation.interpolate({
@@ -75,11 +91,11 @@ export const BasicInput = forwardRef<TextInput, InputProps>(
     //유저가 값을 기입하면 레이블 축소 됨
     useEffect(() => {
       Animated.timing(labelAnimation, {
-        toValue: inputValue.length > 0 ? 1 : 0,
+        toValue: currentValue.length > 0 ? 1 : 0,
         duration: 100,
         useNativeDriver: false,
       }).start();
-    }, [inputValue, labelAnimation]);
+    }, [currentValue, labelAnimation]);
 
     return (
       <View style={[styles.inputGroup]}>
@@ -93,10 +109,7 @@ export const BasicInput = forwardRef<TextInput, InputProps>(
           style={[
             styles.InputBox,
             {
-              borderBottomColor:
-                validationCondition?.state !== "ERROR"
-                  ? underlineColor
-                  : Color["red500"],
+              borderBottomColor: hasError ? Color["red500"] : underlineColor,
             },
           ]}
           placeholder={
@@ -105,14 +118,22 @@ export const BasicInput = forwardRef<TextInput, InputProps>(
               `${!isRequired ? " (없으면 빈칸)" : ``}`
           }
           placeholderTextColor={Color["grey400"]}
-          value={inputValue}
-          onChangeText={setInputValue}
+          value={currentValue}
+          onChangeText={(text) => {
+            // register 스프레드와 기존 방식 모두 지원
+            onChange?.(text);
+            setValue?.(text);
+          }}
           secureTextEntry={isEncryption ? !isVisible : false}
           editable={isEditible}
           keyboardType={keyboardType}
           maxLength={maxLength}
-          onFocus={onFocus}
-          onBlur={onBlur}
+          onFocus={() => {
+            onFocus?.();
+          }}
+          onBlur={() => {
+            onBlur?.();
+          }}
           returnKeyType="done"
           multiline={false}
         />
@@ -126,15 +147,12 @@ export const BasicInput = forwardRef<TextInput, InputProps>(
             <Icons name={isVisible ? "eye-outline" : "eye-off-outline"}></Icons>
           </Pressable>
         )}
-        {validationCondition?.state === "ERROR" &&
-          validationCondition.errorText.length > 0 && (
-            <Text style={styles.errorText}>
-              {validationCondition?.errorText}
-            </Text>
-          )}
+        {hasError && currentError && (
+          <Text style={styles.errorText}>{currentError}</Text>
+        )}
       </View>
     );
-  },
+  }
 );
 
 BasicInput.displayName = "BasicInput";
@@ -159,11 +177,10 @@ const styles = StyleSheet.create({
     height: 20,
   },
   errorText: {
-    position: "absolute",
-    top: "100%",
+
+    top: 8,
     color: Color["red500"],
     fontFamily: "NanumSquareNeo-Bold",
-    paddingTop: 8,
     paddingHorizontal: 4,
     fontSize: 12,
   },

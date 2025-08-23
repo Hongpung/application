@@ -36,13 +36,7 @@ const EditInstrumentPage: React.FC<EditInstrumentPageProps> = ({ route }) => {
     useSelector();
 
   const {
-    instrumentId,
-    name,
-    instrumentType,
-    borrowAvailable,
-    setBorrowAvailable,
-    setName,
-    setInstrumentType,
+    getField,
     handleSubmit,
     pickImageFromAlbum,
 
@@ -80,18 +74,16 @@ const EditInstrumentPage: React.FC<EditInstrumentPageProps> = ({ route }) => {
             <View style={{ height: 28 }} />
 
             <View style={styles.inputContainer}>
-              <InstrumentNameInput name={name} setName={setName} />
+              <InstrumentNameInput {...getField("name")} />
 
               <InstrumentTypeSelector
                 onSelectType={onSelectType}
                 setSelectTypeVisible={setSelectTypeVisible}
-                instrumentType={instrumentType}
-                setInstrumentType={setInstrumentType}
+                {...getField("instrumentType")}
               />
 
               <BorrowAvailableSwitch
-                borrowAvailable={borrowAvailable ?? false}
-                setBorrowAvailable={setBorrowAvailable}
+                {...getField("borrowAvailable")}
               />
             </View>
           </ScrollView>
@@ -100,7 +92,7 @@ const EditInstrumentPage: React.FC<EditInstrumentPageProps> = ({ route }) => {
             <EditInstrumentButton onPress={handleSubmit} />
 
             <DeleteInstrumentButton
-              onPress={() => handleDelete(instrumentId)}
+              onPress={() => handleDelete(getField("instrumentId").value)}
             />
           </View>
         </View>

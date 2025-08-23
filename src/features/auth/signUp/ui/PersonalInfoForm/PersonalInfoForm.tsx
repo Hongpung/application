@@ -20,42 +20,20 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
   stepProps: props,
 }) => {
   const {
-    name,
-    setName,
-    nickname,
-    setNickname,
-    club,
-    setClub,
-    enrollmentNumber,
-    setEnrollmentNumber,
-    nameValidation,
-    nicknameValidation,
-    enrollmentNumberValidation,
-    validateName,
-    validateNickname,
-    validateEnrollmentNumber,
     nameRef,
     nicknameRef,
     enrollmentNumberRef,
+    getField,
     isClubOptionsVisible,
     setIsClubOptionsVisible,
-    clubValidation,
+    isCanSignUp,
     signUp,
-    isSignUpError,
-    isSignUpLoading,
+    isSignUpPending,
   } = props;
 
   return (
     <View style={{ flex: 1 }}>
-      <ErrorModal
-        visible={!!isSignUpError}
-        title="오류"
-        message={
-          "회원가입에 실패했어요\n다시 시도해주세요.\n에러코드: " +
-          isSignUpError?.message
-        }
-      />
-      <FullScreenLoadingModal isLoading={isSignUpLoading} />
+      <FullScreenLoadingModal isLoading={isSignUpPending} />
       <View style={{ flex: 1, gap: 28, width: "100%" }}>
         <View
           style={{
@@ -70,23 +48,16 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
           <View style={{ flex: 1 }}>
             <Selector
               label={"동아리"}
-              value={club}
-              onChange={setClub}
               visible={isClubOptionsVisible}
               setVisible={setIsClubOptionsVisible}
               trigger={Pressable}
               color="green"
               options={clubNames}
+              {...getField("club")}
             >
               <ClubSelectorLabel
                 onPress={() => setIsClubOptionsVisible(true)}
-                value={club}
-                isErrored={clubValidation.state === "ERROR"}
-                errorText={
-                  clubValidation.state === "ERROR"
-                    ? clubValidation.errorText
-                    : ""
-                }
+                {...getField("club")}
               />
             </Selector>
           </View>
@@ -95,14 +66,11 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
               ref={enrollmentNumberRef}
               label="학번"
               requireMark={true}
-              inputValue={enrollmentNumber ?? ""}
-              setInputValue={setEnrollmentNumber}
               color={"green"}
-              onBlur={validateEnrollmentNumber}
-              validationCondition={enrollmentNumberValidation}
               isRequired
               keyboardType="number-pad"
               maxLength={2}
+              {...getField("enrollmentNumber")}
             />
           </View>
         </View>
@@ -115,11 +83,8 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
             ref={nameRef}
             label="이름(본명)"
             color={"green"}
-            inputValue={name}
             requireMark={true}
-            setInputValue={setName}
-            validationCondition={nameValidation}
-            onBlur={validateName}
+            {...getField("name")}
           />
         </View>
 
@@ -132,24 +97,20 @@ export const PersonalInfoForm: React.FC<PersonalInfoFormProps> = ({
             ref={nicknameRef}
             label="패명"
             color={"green"}
-            inputValue={nickname ?? ""}
-            setInputValue={setNickname}
             isEditible={true}
             isRequired={false}
-            onBlur={validateNickname}
-            validationCondition={nicknameValidation}
+            {...getField("nickname")}
           />
         </View>
       </View>
       <View style={{ paddingHorizontal: 12 }}>
         <LongButton
           innerContent="회원가입 하기"
-          onPress={signUp}
+          onPress={() => signUp({ onError: () => {
+           
+          }})}
           isAble={
-            nameValidation.state === "VALID" &&
-            nicknameValidation.state === "VALID" &&
-            clubValidation.state === "VALID" &&
-            enrollmentNumberValidation.state === "VALID"
+            isCanSignUp
           }
           color="green"
         />

@@ -27,7 +27,7 @@ export const useEditInstrument = ({
     initialInstrument.imageUrl ?? null,
   );
 
-  const form = useValidatedForm({
+  const { getField, trigger, getValues } = useValidatedForm({
     schema: instrumentEditFormSchema,
     defaultValues: {
       instrumentId: initialInstrument.instrumentId,
@@ -41,18 +41,18 @@ export const useEditInstrument = ({
   const { request, isLoading } = useEditInstrumentRequest();
 
   useEffect(() => {
-    form.setSelectedImage(selectedImage);
+    getField("selectedImage").setValue(selectedImage);
     if (isInitialImage.current) {
       isInitialImage.current = false;
     } else {
       setSelectedImageUrl(selectedImageUri);
     }
-  }, [selectedImage, form, selectedImageUri]);
+  }, [selectedImage, getField, selectedImageUri]);
 
   const handleSubmit = async () => {
     try {
       const submitForm = await parseInstrumentEditBody(
-        { ...form, borrowAvailable: form.borrowAvailable ?? false },
+        { ...getValues(), borrowAvailable: getField("borrowAvailable").value ?? false },
         isResetImage.current,
       );
       console.log("submitForm", submitForm);
@@ -73,7 +73,10 @@ export const useEditInstrument = ({
   };
 
   return {
-    ...form,
+    getField,
+    trigger,
+    getValues,
+
     pickImageFromAlbum,
     selectedImage,
     resetImage,

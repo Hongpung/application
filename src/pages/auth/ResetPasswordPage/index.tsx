@@ -10,14 +10,11 @@ import {
   ScrollView,
 } from "react-native";
 
-import { useStepFlow } from "@hongpung/react-step-flow";
+import { useNavigation } from "@react-navigation/native";
 
-import { Header } from "@hongpung/src/common";
+import { Header, useBackBlock } from "@hongpung/src/common";
 
-import {
-  useResetPasswordSteps,
-  ResetPasswordStepsProps,
-} from "@hongpung/src/features/auth/resetPassword";
+import { useResetPasswordSteps } from "@hongpung/src/features/auth/resetPassword";
 
 import {
   ValidateEmailSection,
@@ -25,13 +22,22 @@ import {
 } from "@hongpung/src/widgets/auth";
 
 const ResetPasswordPage: React.FC = () => {
-  const { onClose, step, ...resetPasswordSteps } = useResetPasswordSteps();
+  const navigation = useNavigation();
 
-  const { currentStep, ...ResetPasswordStep } =
-    useStepFlow<ResetPasswordStepsProps>({
-      initialStep: "EmailConfirm",
-      onStepChange: (step) => {},
-    });
+  const { ResetPasswordStep, emailValidationProps, resetPasswordProps } =
+    useResetPasswordSteps();
+
+  const { handleBackPress } = useBackBlock(() => {}, {
+    title: "확인",
+    message: "비밀번호 재설정을 취소하고 뒤로 돌아갈까요?",
+    cancelText: "아니오",
+    confirmText: "네",
+    confirmButtonColor: "green",
+    cancelButtonColor: "green",
+    onConfirm: () => {
+      navigation.goBack();
+    },
+  });
 
   return (
     <TouchableWithoutFeedback
@@ -45,7 +51,7 @@ const ResetPasswordPage: React.FC = () => {
         keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
       >
         <View style={{ flex: 1, backgroundColor: "#FFF" }}>
-          <Header LeftButton={"close"} leftAction={onClose} />
+          <Header LeftButton={"close"} leftAction={handleBackPress} />
           <Text style={styles.titleText}>비밀번호 재설정</Text>
           <ScrollView
             bounces={false}
@@ -63,12 +69,25 @@ const ResetPasswordPage: React.FC = () => {
               <ResetPasswordStep.Step
                 name="EmailConfirm"
                 component={ValidateEmailSection}
-                stepProps={resetPasswordSteps}
+                stepProps={emailValidationProps}
               />
               <ResetPasswordStep.Step
                 name="ResetPassword"
                 component={ResetPasswordSection}
-                stepProps={resetPasswordSteps}
+                stepProps={{
+                  ...resetPasswordProps,
+                  resetPassword: async ({onSuccess, onError}) => {
+                    await resetPasswordProps.resetPassword({
+                      onSuccess: () => {
+                        navigation.goBack();
+                        onSuccess?.();
+                      },
+                      onError: () => {
+                        onError?.();
+                      },
+                    });
+                  },
+                }}
               />
             </ResetPasswordStep.Flow>
           </ScrollView>

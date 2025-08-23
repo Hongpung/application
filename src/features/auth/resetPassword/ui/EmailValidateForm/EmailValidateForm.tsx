@@ -16,85 +16,52 @@ const EmailValidateForm: React.FC<ValidateEmailSectionProps> = ({
 }) => {
   //이메일
   const {
-    email,
-    setEmail,
-    emailValidation,
-    validateEmail: valitateEmail,
-  } = props;
-
-  //이메일 인증 코드 발송
-  const {
+    emailRef,
+    verificationCodeRef,
+    getField,
+    isCanSendVerificationCode,
     sendVerificationCode,
-    isSendingCode,
-    isSendingCodeLoading,
-    isSendingCodeError,
-  } = props;
-
-  //이메일 인증 코드 검증
-  const {
-    verificationCode,
-    setVerificationCode,
-    verificationCodeValidation,
-    validateVerificationCode,
-
-    isVerifyingCodeLoading,
-    isVerifyingCodeError,
-
-    onVerifyCode,
+    isSendVerificationCodePending,
+    isSendCode,
+    isVerifyingCodePending,
+    verifyCode,
+    isCanVerifyCode,
   } = props;
 
   return (
     <View style={styles.container}>
       <FullScreenLoadingModal
-        isLoading={isVerifyingCodeLoading || isSendingCodeLoading}
-      />
-      <ErrorModal
-        visible={isSendingCodeError !== null}
-        title={"오류"}
-        message={
-          "이메일 인증번호 전송에 실패했어요.\n인터넷 확인 후 다시 시도해주세요."
-        }
-      />
-
-      <ErrorModal
-        visible={isVerifyingCodeError !== null}
-        title={"오류"}
-        message={
-          "인증번호 검증에 실패했어요.\n인터넷 확인 후 다시 시도해주세요."
-        }
+        isLoading={isVerifyingCodePending || isSendVerificationCodePending}
       />
 
       <View style={styles.inputContainer}>
         <View style={styles.inputGroup}>
           <View style={{ flex: 1 }}>
             <BasicInput
-              inputValue={email}
-              setInputValue={setEmail}
               label="이메일"
+              ref={emailRef}
               color="green"
-              isEditible={!isSendingCode}
+              isEditible={!isSendCode}
               keyboardType={"email-address"}
-              validationCondition={emailValidation}
-              onBlur={() => valitateEmail(email)}
+              {...getField("email")}
             />
           </View>
-          <Pressable style={styles.button} onPress={sendVerificationCode}>
+          <Pressable style={styles.button} onPress={() => {
+            if(!isCanSendVerificationCode) return;
+            sendVerificationCode({})
+          }}>
             <Text style={styles.buttonText}>
-              {isSendingCode ? "인증번호\n재전송" : "인증번호\n전송"}
+              {isSendCode ? "인증번호\n재전송" : "인증번호\n전송"}
             </Text>
           </Pressable>
         </View>
-        {isSendingCode && (
+        {isSendCode && (
           <BasicInput
             label="인증 코드"
             keyboardType="number-pad"
             color="green"
-            inputValue={verificationCode}
-            setInputValue={setVerificationCode}
-            validationCondition={verificationCodeValidation}
-            onBlur={() => {
-              validateVerificationCode(verificationCode);
-            }}
+            ref={verificationCodeRef}
+            {...getField("verificationCode")}
           />
         )}
       </View>
@@ -103,14 +70,16 @@ const EmailValidateForm: React.FC<ValidateEmailSectionProps> = ({
         <LongButton
           innerContent="이메일 인증"
           color="green"
-          onPress={() =>
-            onVerifyCode({
+          onPress={() =>{
+            console.log("press");
+            verifyCode({
               onSuccess: () => {
+                console.log("success");
                 goTo("ResetPassword");
-              },
-            })
+              }
+            })}
           }
-          isAble={verificationCodeValidation.state === "VALID"}
+          isAble={isCanVerifyCode}
         />
       </View>
     </View>

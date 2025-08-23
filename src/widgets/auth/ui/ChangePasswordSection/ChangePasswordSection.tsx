@@ -1,11 +1,19 @@
-import { DescriptionBox } from "@hongpung/src/common";
-import { useChangePasswordForm } from "@hongpung/src/features/auth/changePassword/model/useChangePassword";
+import { DescriptionBox, FieldReturn } from "@hongpung/src/common";
+import { PasswordFormData } from "@hongpung/src/features/auth/changePassword/model/changePasswordSchema";
 import { ChangePasswordForm } from "@hongpung/src/features/auth/changePassword/ui/ChangePasswordForm/ChangePasswordForm";
-import { ScrollView, View } from "react-native";
+import { ScrollView, TextInput, View } from "react-native";
 
-export const ChangePasswordSection: React.FC = () => {
-  const form = useChangePasswordForm();
+interface ChangePasswordSectionProps {
+  getField: (fieldName: keyof PasswordFormData) => FieldReturn<PasswordFormData[keyof PasswordFormData]>;
+  onChangePassword: (
+  ) => Promise<void>;
+  currentPasswordRef: React.RefObject<TextInput | null>;
+  newPasswordRef: React.RefObject<TextInput | null>;
+  confirmPasswordRef: React.RefObject<TextInput | null>;
+  isCanChangePassword: boolean;
+}
 
+export const ChangePasswordSection: React.FC<ChangePasswordSectionProps> = (props) => {
   const descriptions = [
     "현재 로그인에 사용중인 비밀번호를 입력해주세요.",
     "",
@@ -23,7 +31,7 @@ export const ChangePasswordSection: React.FC = () => {
         contentContainerStyle={{ flexGrow: 1, gap: 16 }}
         showsVerticalScrollIndicator={false}
       >
-        <ChangePasswordForm {...form} />
+        <ChangePasswordForm {...props} />
       </ScrollView>
     </View>
   );

@@ -6,6 +6,7 @@ interface DropdownContextProps<T extends string> {
   close: () => void;
   value: T | null;
   setValue: (value: T) => void;
+  onBlur?: () => void;
 }
 
 const DropdownContext = createContext<DropdownContextProps<any> | undefined>(
@@ -28,8 +29,9 @@ interface DropdownProviderProps<T extends string> {
   children: ReactNode;
   visible: boolean;
   setVisible: (newValue: boolean) => void;
-  value: T | null;
+  value?: T | null;
   setValue: (newValue: T) => void;
+  onBlur?: () => void;
 }
 
 export const DropdownProvider = <T extends string>({
@@ -38,13 +40,17 @@ export const DropdownProvider = <T extends string>({
   setVisible,
   value,
   setValue,
+  onBlur,
 }: DropdownProviderProps<T>) => {
   const toggle = () => setVisible(!visible);
-  const close = () => setVisible(false);
+  const close = () => {
+    setVisible(false);
+    onBlur?.();
+  };
 
   return (
     <DropdownContext.Provider
-      value={{ isOpen: visible, toggle, close, value, setValue }}
+      value={{ isOpen: visible, toggle, close, value, setValue, onBlur }}
     >
       {children}
     </DropdownContext.Provider>

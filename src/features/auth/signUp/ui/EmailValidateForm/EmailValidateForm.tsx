@@ -18,70 +18,53 @@ export const EmailValidateForm: React.FC<EmailValidateFormProps> = ({
 }) => {
   //이메일
   const {
-    email,
-    setEmail,
-    emailValidation,
-    validateEmail,
-    emailRef: emailInputRef,
-  } = props;
+    emailRef,
+    verificationCodeRef,
 
-  //이메일 인증 코드 발송
-  const { sendVerificationCode, isSendingCode, isSendingCodeLoading } = props;
-
-  //이메일 인증 코드 검증
-  const {
-    verificationCodeRef: verificationCodeInputRef,
-
-    verificationCode,
-    setVerificationCode,
-    verificationCodeValidation,
-    validateVerificationCode,
-
-    isVerifyingCodeLoading,
-
+    getField,
+    
+    isCanSendVerificationCode,
+    sendVerificationCode,
+    isSendVerificationCodePending,
+    
+    isSendCode,
+    
+    isCanVerifyCode,
     verifyCode,
+    isVerifyingCodePending,
   } = props;
 
   return (
     <View style={styles.container}>
       <FullScreenLoadingModal
-        isLoading={isVerifyingCodeLoading || isSendingCodeLoading}
+        isLoading={isVerifyingCodePending || isSendVerificationCodePending}
       />
 
       <View style={styles.inputContainer}>
         <View style={styles.inputGroup}>
           <View style={{ flex: 1 }}>
             <BasicInput
-              ref={emailInputRef}
-              inputValue={email}
-              setInputValue={setEmail}
+              ref={emailRef}
               label="이메일"
               color="green"
-              isEditible={!isSendingCode}
+              isEditible={!isSendCode}
               keyboardType={"email-address"}
-              validationCondition={emailValidation}
-              onBlur={validateEmail}
+              {...getField("email")}
             />
           </View>
-          <Pressable style={styles.button} onPress={sendVerificationCode}>
+          <Pressable style={styles.button} onPress={() => sendVerificationCode({})}>
             <Text style={styles.buttonText}>
-              {isSendingCode ? "인증번호\n재전송" : "인증번호\n전송"}
+              {isSendCode ? "인증번호\n재전송" : "인증번호\n전송"}
             </Text>
           </Pressable>
         </View>
-        {isSendingCode && (
+        {isSendCode && (
           <BasicInput
-            ref={verificationCodeInputRef}
+            ref={verificationCodeRef}
             label="인증 코드"
             keyboardType="number-pad"
             color="green"
-            inputValue={verificationCode}
-            setInputValue={setVerificationCode}
-            validationCondition={verificationCodeValidation}
-            onBlur={() => {
-              console.log(verificationCode);
-              validateVerificationCode(verificationCode);
-            }}
+            {...getField("verificationCode")}
           />
         )}
       </View>
@@ -97,7 +80,7 @@ export const EmailValidateForm: React.FC<EmailValidateFormProps> = ({
               },
             })
           }
-          isAble={verificationCodeValidation.state === "VALID"}
+          isAble={isCanVerifyCode}
         />
       </View>
     </View>

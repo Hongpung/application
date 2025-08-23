@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent, act } from "@testing-library/react-native";
-import { LogoutButton } from "../LogoutButton";
+import { LogoutButton } from "./LogoutButton";
 
 describe("LogoutButton", () => {
   const mockOnPress = jest.fn();
