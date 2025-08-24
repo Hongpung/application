@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { Color, Header, Switch } from "@hongpung/src/common";
 import { FullScreenLoadingModal } from "@hongpung/src/common/ui/LoadingModal/FullScreenLoadingModal";
-import { LogoutButton } from "@hongpung/src/features/auth/logout/ui/LogoutButton";
+import { LogoutButton } from "@hongpung/src/features/auth/logout/ui/LogoutButton/LogoutButton";
 import useLogout from "@hongpung/src/features/auth/logout/model/useLogout";
 import useAutoLogin from "@hongpung/src/features/auth/setAutoLogin/model/useAutoLogin";
 

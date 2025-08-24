@@ -33,7 +33,7 @@ const usePermission = () => {
       });
     }
     //관계 없이 넘어가야함 appstore 심사에 걸림
-    navigation.dispatch(StackActions.replace("Login"));
+    navigation.dispatch(StackActions.replace("LoginStack"));
   };
 
   return { PermissionHandler };
