@@ -8,10 +8,10 @@ const authApi = baseApi.addEndpoints({
       { currentPassword: string; newPassword: string }
     >({
       query: ({ currentPassword, newPassword }) => ({
-        url: "/auth/change-password",
-        method: "POST",
-        options: { headers: { "Content-Type": "application/json" } },
+        url: "/auth/changePW",
+        method: "PATCH",
         body: { currentPassword, newPassword },
+        options: { headers: { "Content-Type": "application/json" } },
       }),
       queryOptions: {
         mutationKey: ["changePassword"],
@@ -152,14 +152,15 @@ const authApi = baseApi.addEndpoints({
       }),
       queryOptions: {
         mutationKey: ["verifyResetPasswordVerificationCode"],
+        gcTime: 0,
       },
     }),
 
     resetPassword: builder.request<
       void,
-      { email: string; newPassword: string; oneTimeToken: string }
+      { email: string; newPassword: string; tempToken: string }
     >({
-      query: ({ oneTimeToken, ...body }) => {
+      query: ({ tempToken, ...body }) => {
         return {
           url: "/auth/resetPW",
           method: "PATCH",
@@ -168,7 +169,7 @@ const authApi = baseApi.addEndpoints({
           options: {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${oneTimeToken}`,
+              Authorization: `Bearer ${tempToken}`,
             },
           },
         };
