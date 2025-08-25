@@ -5,6 +5,12 @@ export {
   type ReservationForm,
 } from "./model/type";
 
+export { 
+  reservationFormSchema,
+  completeReservationFormSchema,
+  type ValidReservationForm 
+} from "./model/reservationFormSchema";
+
 export { mapReservationDetail } from "./lib/mapReservationDetail";
 export { getReservationEditRequestBody } from "./lib/getReservationEditRequestBody";
 export { parseReservationCreateRequestBody } from "./lib/parseReservationCreateRequestBody";

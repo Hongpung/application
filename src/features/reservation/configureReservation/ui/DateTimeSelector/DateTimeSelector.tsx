@@ -1,7 +1,8 @@
 import { Pressable } from "react-native";
 
-import { DateTimeViewer } from "@hongpung/src/entities/reservation/ui/DateTimeViewer/DateTimeViewer";
+import { DateTimeViewer } from "@hongpung/src/entities/reservation";
 import React from "react";
+import { Color } from "@hongpung/src/common";
 
 type DateTimeSelectorProps = {
   date?: string | null;
@@ -14,7 +15,7 @@ export const DateTimeSelector: React.FC<DateTimeSelectorProps> = (props) => {
   const { date, startTime, endTime, onPress } = props;
 
   return (
-    <Pressable onPress={onPress}>
+    <Pressable onPress={onPress} style={{ backgroundColor: Color["white"] }}>
       <DateTimeViewer date={date} endTime={endTime} startTime={startTime} />
     </Pressable>
   );

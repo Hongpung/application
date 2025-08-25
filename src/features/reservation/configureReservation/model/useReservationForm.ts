@@ -1,4 +1,5 @@
 import { type ReservationForm } from "@hongpung/src/entities/reservation";
+import { completeReservationFormSchema } from "@hongpung/src/entities/reservation/model/reservationFormSchema";
 import { useCallback, useMemo, useState } from "react";
 
 const useReservationForm = (initialReservationForm?: ReservationForm) => {
@@ -9,21 +10,38 @@ const useReservationForm = (initialReservationForm?: ReservationForm) => {
       participationAvailable: false,
       borrowInstruments: [],
       participators: [],
+      date: undefined,
+      startTime: undefined,
+      endTime: undefined,
     },
   );
 
   const isCompleteReservation = useCallback(
-    (
-      reservationForm: ReservationForm,
-    ): reservationForm is Required<ReservationForm> => {
-      return Object.entries(reservationForm).every(([key, value]) => {
-        const typedKey = key as keyof ReservationForm;
-        if (typedKey === "title") {
-          return value !== null;
-        } else {
-          return value !== undefined && value !== null;
-        }
-      });
+    (reservationForm: ReservationForm): reservationForm is Required<ReservationForm> => {
+      const result = completeReservationFormSchema.safeParse(reservationForm);
+      return result.success;
+    },
+    [],
+  );
+
+  const validateReservationForm = useCallback(
+    (reservationForm: ReservationForm) => {
+      const result = completeReservationFormSchema.safeParse(reservationForm);
+      
+      if (result.success) {
+        return { 
+          isValid: true, 
+          data: result.data,
+          errors: null 
+        };
+      } else {
+        return { 
+          isValid: false, 
+          data: null,
+          errors: result.error.issues,
+          fieldErrors: result.error.flatten().fieldErrors
+        };
+      }
     },
     [],
   );
@@ -86,6 +104,7 @@ const useReservationForm = (initialReservationForm?: ReservationForm) => {
   return {
     reservationForm,
     isCompleteReservation,
+    validateReservationForm,
     setForm,
   };
 };

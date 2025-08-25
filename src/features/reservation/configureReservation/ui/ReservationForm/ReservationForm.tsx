@@ -1,9 +1,7 @@
 import {
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import React, { useCallback, useState } from "react";
@@ -14,7 +12,7 @@ import { ParticipatorsSelector } from "../ParticipatorsSelector/ParticipatorsSel
 import BorrowInstrumentsSelector from "../BorrowInstrumentsSelector/BorrowInstrumentsSelector";
 import { TitleInput } from "../TitleInput/TitleInput";
 import { DateTimeSelector } from "../DateTimeSelector/DateTimeSelector";
-import { Checkbox, Color, LongButton } from "@hongpung/src/common";
+import { Checkbox, Color, LongButton, Space } from "@hongpung/src/common";
 
 type ReservationFormProps = {
   reservation: ReservationFormType;
@@ -77,14 +75,12 @@ export const ReservationForm: React.FC<ReservationFormProps> = (props) => {
     if (!date) {
       navigateDatePickerPage();
     } else {
-      // navigateDatePickerPage();
       navigateTimePickerPage();
     }
   }, [date, navigateDatePickerPage, navigateTimePickerPage]);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#FFF" }}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           style={{ flex: 1 }}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -94,8 +90,7 @@ export const ReservationForm: React.FC<ReservationFormProps> = (props) => {
             style={{ flex: 1, backgroundColor: "#FFF" }}
             contentContainerStyle={{
               flexGrow: 1,
-              backgroundColor: "#FFF",
-              gap: 24,
+              backgroundColor: Color["grey100"],
             }}
           >
             <DateTimeSelector
@@ -104,30 +99,42 @@ export const ReservationForm: React.FC<ReservationFormProps> = (props) => {
               endTime={endTime}
               onPress={onDateTimePress}
             />
-            <View style={{ height: 24, backgroundColor: Color["grey100"] }} />
-            <TitleInput title={title} setTitle={setTitle} />
-            <ReservationTypeSelector
-              participationAvailable={participationAvailable}
-              reservationType={reservationType}
-              setParticipationAvailable={setParticipationAvailable}
-              setReservationType={setReservationType}
-            />
+            <Space height={24} />
+            
+            <View
+              style={{ backgroundColor: Color["white"], paddingVertical: 24}}
+            >
+              <TitleInput title={title} setTitle={setTitle} />
+              <Space height={24} />
+              <ReservationTypeSelector
+                participationAvailable={participationAvailable}
+                reservationType={reservationType}
+                setParticipationAvailable={setParticipationAvailable}
+                setReservationType={setReservationType}
+              />
+            </View>
 
-            <View style={{ height: 24, backgroundColor: Color["grey100"] }} />
-            <ParticipatorsSelector
-              onPress={navigateToParticipatorsPickerPage}
-              participators={participators}
-              resetParticipator={resetParticipators}
-            />
-
-            <BorrowInstrumentsSelector
-              onPress={navigateToBorrowInstrumentsPickerPage}
-              borrowInstruments={borrowInstruments}
-              resetBorrowInstruments={resetBorrowInstruments}
-            />
+            <Space height={24} />
+            <View
+              style={{
+                backgroundColor: Color["white"],
+                paddingVertical: 24,
+              }}
+            >
+              <ParticipatorsSelector
+                onPress={navigateToParticipatorsPickerPage}
+                participators={participators}
+                resetParticipator={resetParticipators}
+              />
+              <Space height={24} />
+              <BorrowInstrumentsSelector
+                onPress={navigateToBorrowInstrumentsPickerPage}
+                borrowInstruments={borrowInstruments}
+                resetBorrowInstruments={resetBorrowInstruments}
+              />
+            </View>
           </ScrollView>
         </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
       <View
         style={{
           paddingVertical: 16,

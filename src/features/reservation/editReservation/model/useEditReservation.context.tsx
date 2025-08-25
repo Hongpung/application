@@ -15,6 +15,11 @@ import useReservationForm from "../../configureReservation/model/useReservationF
 
 import { EditReservationContextProps } from "./type";
 import { editCompleteToast } from "../lib/toast";
+import { useAtomValue } from "jotai";
+import { UserStatusState } from "@hongpung/src/entities/member";
+import { ensureReservationTitle } from "../../configureReservation/lib/ensureReservationTitle";
+import { useReservationDifference } from "./useReservationDifference";
+import { useQueryClient } from "@tanstack/react-query";
 
 const EditReservationContext = createContext<
   EditReservationContextProps | undefined
@@ -28,20 +33,34 @@ const EditReservationContextProvider: React.FC<
     children: React.ReactNode;
   }
 > = ({ navigation, prevReservation, children }) => {
-  const { reservationForm, setForm, isCompleteReservation } =
+  const userData = useAtomValue(UserStatusState);
+
+  const queryClient = useQueryClient();
+  const { reservationForm, setForm, isCompleteReservation ,validateReservationForm} =
     useReservationForm(prevReservation);
 
   const { request, isLoading, error } = useEditReservationRequest();
-  // setReservation을 업데이트 함수로 개선
-
+  
   const isValidReservation = useMemo(
     () => isCompleteReservation(reservationForm),
     [reservationForm, isCompleteReservation],
   );
+
+  // 변경된 필드들을 감지
+  const differentKeys = useReservationDifference(reservationForm, prevReservation);
+
   // 예약 생성 API 요청 함수 (더미 함수로 예시)
   const verifyEditReservation = useCallback(
     async (onVerfyied: () => void) => {
-      if (isEqual(prevReservation, reservationForm)) {
+      const validatedReservationForm = reservationForm as Required<ReservationForm>;
+      
+      const reservationFormCopy = ensureReservationTitle(
+        validatedReservationForm,
+        userData?.name,
+        userData?.nickname
+      );
+      
+      if (isEqual(prevReservation, reservationFormCopy)) {
         Alert.alert(
           "예약 오류", // 타이틀
           "기존 예약과 동일합니다.",
@@ -50,53 +69,34 @@ const EditReservationContextProvider: React.FC<
         onVerfyied();
       }
     },
-    [reservationForm, prevReservation],
+    [reservationForm, prevReservation, userData],
   );
-
-  const differenceKey = useMemo(() => {
-    if (!reservationForm) return [];
-
-    if (!prevReservation) return []; // 초기 상태면 전체 반환
-
-    const diff = new Set<
-      keyof Omit<ReservationForm, "startTime" | "endTime"> | "time"
-    >();
-    for (const key of Object.keys(
-      reservationForm,
-    ) as (keyof ReservationForm)[]) {
-      if (reservationForm[key] !== prevReservation[key]) {
-        if (key === "borrowInstruments" || key === "participators") {
-          if (
-            JSON.stringify(reservationForm[key]) !==
-            JSON.stringify(prevReservation[key])
-          )
-            diff.add(key);
-        } else {
-          if (key === "startTime" || key === "endTime") {
-            diff.add("time");
-          } else {
-            diff.add(key);
-          }
-        }
-      }
-    }
-
-    return [...diff];
-  }, [reservationForm, prevReservation]);
 
   const requestEditReservation = async () => {
     try {
-      if (!isValidReservation) throw Error("예약을 완벽히 작성해주세요.");
+      const { isValid, errors } = validateReservationForm(reservationForm);
+      if (!isValid) throw Error(errors?.[0]?.message || "예약을 완벽히 작성해주세요.");
+        
+      const validatedReservationForm = reservationForm as Required<ReservationForm>;
+      
+      const reservationFormCopy = ensureReservationTitle(
+        validatedReservationForm,
+        userData?.name,
+        userData?.nickname
+      );
 
-      if (isEqual(prevReservation, reservationForm))
+      if (isEqual(prevReservation, reservationFormCopy))
         throw new Error("기존 예약과 동일합니다.");
 
       console.log("예약 수정 요청", {
-        reservationForm,
+        reservationFormCopy,
       });
       await request(
-        getReservationEditRequestBody(prevReservation, reservationForm),
+        getReservationEditRequestBody(prevReservation, reservationFormCopy),
       );
+
+      queryClient.invalidateQueries({ queryKey: ["reservation-detail", prevReservation.reservationId, "daily-reservations", prevReservation.date, reservationFormCopy.date] });
+
       navigation.navigate("ReservationDetail", {
         reservationId: prevReservation.reservationId,
       });
@@ -124,7 +124,7 @@ const EditReservationContextProvider: React.FC<
       value={{
         prevReservation,
         reservation: reservationForm,
-        differentKeys: differenceKey,
+        differentKeys: differentKeys,
         ...setForm,
 
         isLoading,
