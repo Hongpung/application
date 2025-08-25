@@ -1,6 +1,6 @@
 export { Icons } from "./Icons/Icons";
 export { LongButton, ShortButton } from "./buttons";
-export { Switch } from "./switch/Switch";
+export { Switch } from "./Switch/Switch";
 export { CheckboxComponent as Checkbox } from "./CheckBox/CheckBox";
 export { WeekCalendarHeader } from "./WeekCalendarHeader/WeekCalendarHeader";
 export { Selector } from "./selector/Selector";
@@ -16,3 +16,4 @@ export { FullScreenLoadingModal } from "./LoadingModal/FullScreenLoadingModal";
 export { BasicInput } from "./inputs/BasicInput";
 export { ImageModal } from "./ImageModal/ImageModal";
 export { ImageWithSkeleton } from "./ImageWithSkeleton/ImageWithSkeleton";
+export { Space } from "./Space/Space";
